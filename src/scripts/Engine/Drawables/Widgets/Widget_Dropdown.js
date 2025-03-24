@@ -17,6 +17,7 @@ import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos
 import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties, Style_section_default_properties } from "./WidgetReadyStyles.js";
+import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 
 
 
@@ -111,7 +112,7 @@ export class Widget_Dropdown extends Section {
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
-      this.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_PARENT
+      this.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
 
       properties.dp.pos[2] += 1;
       // this.menu = Create_widget_section(Style_section_default_properties(properties.menu));
@@ -121,7 +122,7 @@ export class Widget_Dropdown extends Section {
       this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
-      this.menu.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_PARENT
+      this.menu.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
       
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
@@ -144,6 +145,15 @@ export class Widget_Dropdown extends Section {
 
    }
 
+   SetLayout(align_flags) {
+
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
 
 
 
@@ -294,14 +304,14 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   EnableGfx(which, params=null){
+   EnableGfx(which, params=null, menu_params=null, button_params=null){
       
       super.EnableGfx(which, params);
       
-      if(this.menu) this.menu.EnableGfx(which, params);
+      if(this.menu) this.menu.EnableGfx(which, menu_params);
       
       const btn = this.children.buffer[0];
-      btn.EnableGfx(which, params);
+      btn.EnableGfx(which, button_params);
       
    }
    
@@ -760,6 +770,35 @@ export class Widget_Dropdown extends Section {
 
 
 
+   /*******************************************************************************************************************************************************/
+   // Align
+   /*******************************************************************************************************************************************************/
+   AlignNEW(pos_x, pos_y) {
+
+      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
+      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+
+      this.geom.pos[0] = pos_x;
+      this.geom.pos[1] = pos_y;
+
+      this.menu.AlignNEW(pos_x, pos_y);
+      // this.menu.geom.pos[0] = pos_x + pad_x;
+      // this.menu.geom.pos[1] = pos_y + pad_y;
+
+      const btn = this.children.buffer[0];
+      btn.AlignNEW(pos_x, pos_y);
+
+      return {
+         // dim_x: 0,
+         // dim_y: 0,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
+         pad_x: pad_x / 2,
+         pad_y: pad_y / 2,
+      };
+   }
+
+
 
 
    /****************************************************************************************************************************************************/
@@ -866,96 +905,32 @@ export class Widget_Dropdown extends Section {
       if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
       
       
-      Calculate_sizes_recursive(widget_root, widget_root.options, );
+      // Calculate_sizes_recursive(widget_root, widget_root.options, );
       
       
-      if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-         CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-         CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      }
-      else {
-         if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-         else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-         else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      }
+      // if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+      //    CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+      //    CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+      // }
+      // else {
+      //    if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+      //    else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+      //    else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+      // }
       
-      widget_root.SectionSetPad();
+      // widget_root.SectionSetPad();
       
       // Calculate positions for dropdown
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
-
-
-
-
-      /********************************************************************************************************************/
-      // Set any scroller components
-      if(this.scroller_comp){
-         Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
-      }
-      // And for all scrollers up the mesh tree
-      let parent = this.parent;
-      while(parent!==null){
-         if(parent.scroller_comp){
-            Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
-         }
-         parent = parent.parent;
-      }
-      
-
-      /********************************************************************************************************************/
-      // Clip unnecessary meshes
-      { 
-
-         // // Get the group root mesh to Recalc position/dimentions 
-         // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-         // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-         // let clip_top = null, clip_bottom = null;
-         // if (group_root_mesh.parent) {
-   
-         //    clip_top = group_root_mesh.parent.GetPosY();
-         //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-         //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-         // }
-         // else {
-         //    clip_top = group_root_mesh.GetPosY();
-         //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-         // }
-   
-         // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-         // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-         // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-         // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-   
-   
-         // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-      }
-
+      Align_pre_simple(widget_root)
 
       /********************************************************************************************************************/
       // Re-create listen events 
-      /**
-       * ISSUE 
-       * Normaly we would construct the listeners only for the dp menu.
-       * Though in case of another dp in the widget_root, it's meshes 
-       * are active from the scroller cliping, but the listeners havn't
-       * been activated.
-       * So we activate the listeners of all meshes of the widget_root,
-       * eventhough this is very inefficient.
-       * 
-       * Solution:
-       * Find a way to create the listeners.
-       * In 'Clip()' would be the best place but unfortunately the
-       * activation of the listeners must be called once, from the mesh 
-       * that is the parent, so that the listeners tree view will 
-       * be build correctly(in the EventListeners.js)
-       */
-      // Construct_listen_events_from_mesh_tree(this.menu)
-      // Construct_listen_events_relations_from_mesh_tree(this.menu);
       Construct_listen_events_from_mesh_tree(widget_root)
       Construct_listen_events_relations_from_mesh_tree(widget_root);
       
@@ -963,7 +938,6 @@ export class Widget_Dropdown extends Section {
 
       /********************************************************************************************************************/
       // Re-render   
-      // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
    }
 
@@ -1022,7 +996,6 @@ export class Widget_Dropdown extends Section {
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
-         // View_add_to_group(menu, this.group_bufferidxs[0])
          View_add_to_group(menu, this.group_bufferidxs[0])
       }
 
@@ -1048,104 +1021,419 @@ export class Widget_Dropdown extends Section {
       // widget_root.Recalc_no_gfx_update(widget_root );
       
       
-      Calculate_sizes_recursive(widget_root, widget_root.options, this);
+      // Calculate_sizes_recursive(widget_root, widget_root.options, this);
       
       
-      if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-         CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-         CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      }
-      else {
-         if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-         else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-         else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      }
+      // if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+      //    CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+      //    CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+      // }
+      // else {
+      //    if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+      //    else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+      //    else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+      // }
       
-      widget_root.SectionSetPad();
+      // widget_root.SectionSetPad();
       
       // Calculate positions for dropdown
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+      // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
-
-
-      /********************************************************************************************************************/
-      // Set any scissor box
-      if(Vertex_buffer_group_has_scissorbox(this.gfx.vb.groupidx)){
-         Vertex_buffer_group_update_scissorbox_all_vb(this.gfx.vb.groupidx);
-      }
-
-
-
-
-      /********************************************************************************************************************/
-      // Set any scroller component
-      if(this.scroller_comp){
-         Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
-      }
-      // And for all scrollers up the mesh tree
-      let parent = this.parent;
-      while(parent!==null){
-         if(parent.scroller_comp){
-            Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
-         }
-         parent = parent.parent;
-      }
-      
-
-      /********************************************************************************************************************/
-      // Clip unnecessary meshes
-      { 
-
-         // Get the group root mesh to Recalc position/dimentions 
-         // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-         // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-         // let clip_top = null, clip_bottom = null;
-         // if (group_root_mesh.parent) {
-   
-         //    clip_top = group_root_mesh.parent.GetPosY();
-         //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-         //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-         // }
-         // else {
-         //    clip_top = group_root_mesh.GetPosY();
-         //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-         // }
-   
-         // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-         // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-         // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-         // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-   
-   
-         // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-      }
-
+      Align_pre_simple(widget_root)
 
       /********************************************************************************************************************/
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
 
-      // Set menu in focus
-      // // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
-      // // Mesh_set_root_in_focus(widget_root.root_bufferidx);
-      // Mesh_set_root_in_focus(root.root_bufferidx);
-      
-      
 
       /********************************************************************************************************************/
       // Re-render   
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-      // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-      // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-      // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
 
    }
+
+   /**SAVES */
+   // // Reset and rebuild vertex buffers x
+   // #DeactivateMenu(dp = null) {
+
+   //    if (!dp) dp = this;
+   //    this.menu_active = false; // Set state to active.
+
+   //    const menu = dp.menu;
+
+   //    if (dp.isOn & DP_MENU_STATE.ON) {
+   //       for (let j = 0; j <= menu.children.boundary; j++) {
+
+   //          const item = menu.children.buffer[j]; 
+
+   //          if(item){
+
+   //             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
+   //             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
+
+   //                const btn = item.children.buffer[0];
+   //                btn.text_mesh.SliceText(0, 1);
+   //                btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
+   
+   //                // item.RemoveFromMeshPerVbBuffer();
+   //                item.Deactivate();
+   //                item.SetIsGfxInserted(false);
+   
+   //                // console.log(item.GetName())
+   //                item.RemoveAllListenEvents();
+                  
+                  
+   //                if (item.isOn & DP_MENU_STATE.ON) this.#DeactivateMenu(item); // Run recursive for every dropdown in every menu
+   //             }
+   //             else {
+   //                if (item.gfx && item.is_gfx_inserted) {
+                     
+   //                   // item.RemoveFromMeshPerVbBuffer();
+   //                   item.Deactivate();
+   //                   item.SetIsGfxInserted(false);
+                     
+   //                   // console.log(item.GetName())
+   //                   item.RemoveAllListenEvents();
+   //                }
+   //             }
+   //          }
+   //       }
+
+   //       if (menu.gfx && menu.is_gfx_inserted) {
+
+   //          menu.state.mask &= ~MESH_STATE.ACTIVE;
+
+   //          // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
+   //          menu.is_gfx_inserted = false;
+   //       }
+   //    }
+
+   //    dp.isOn |= DP_MENU_STATE.OFF;
+   //    dp.isOn &= ~DP_MENU_STATE.ON;
+
+   // }
+
+
+   // DpDeactivateMenu() {
+
+   //    const menu = this.menu;
+   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
+
+   //    // Reset vertex buffers from group
+   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
+
+   //    // Remove menu and all its items from the group view
+   //    if (menu.group_bufferidxs[0] !== INT_NULL) {
+   //       View_remove_from_group(menu);
+   //    }
+
+   //    // this.DpDestroyListeners(menu);
+   //    this.#DeactivateMenu();
+   //    this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
+
+   //    const btn = this.children.buffer[0];
+   //    btn.text_mesh.SliceText(0, 1);
+   //    btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
+
+
+      
+   //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
+   //    const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+   //    // const widget_root = root.parent;
+   //    // const widget_root = root;
+
+   //    /********************************************************************************************************************/
+   //    // Calculate all meshes sizes from the root widget dropdown
+   //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
+   //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
+      
+      
+   //    // Calculate_sizes_recursive(widget_root, widget_root.options, );
+      
+      
+   //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+   //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+   //    }
+   //    else {
+   //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+   //       else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+   //       else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+   //    }
+      
+   //    widget_root.SectionSetPad();
+      
+   //    // Calculate positions for dropdown
+   //    const cur_pos = [0,0];
+   //    cur_pos[0] = this.geom.pos[0]; 
+   //    cur_pos[1] = this.geom.pos[1]; 
+      
+   //    // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+
+
+
+
+
+   //    /********************************************************************************************************************/
+   //    // Set any scroller components
+   //    if(this.scroller_comp){
+   //       Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
+   //    }
+   //    // And for all scrollers up the mesh tree
+   //    let parent = this.parent;
+   //    while(parent!==null){
+   //       if(parent.scroller_comp){
+   //          Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
+   //       }
+   //       parent = parent.parent;
+   //    }
+      
+
+   //    /********************************************************************************************************************/
+   //    // Clip unnecessary meshes
+   //    { 
+
+   //       // // Get the group root mesh to Recalc position/dimentions 
+   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+   //       // let clip_top = null, clip_bottom = null;
+   //       // if (group_root_mesh.parent) {
+   
+   //       //    clip_top = group_root_mesh.parent.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+   //       // }
+   //       // else {
+   //       //    clip_top = group_root_mesh.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
+   //       // }
+   
+   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
+   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+   
+   
+   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+   //    }
+
+
+   //    /********************************************************************************************************************/
+   //    // Re-create listen events 
+   //    /**
+   //     * ISSUE 
+   //     * Normaly we would construct the listeners only for the dp menu.
+   //     * Though in case of another dp in the widget_root, it's meshes 
+   //     * are active from the scroller cliping, but the listeners havn't
+   //     * been activated.
+   //     * So we activate the listeners of all meshes of the widget_root,
+   //     * eventhough this is very inefficient.
+   //     * 
+   //     * Solution:
+   //     * Find a way to create the listeners.
+   //     * In 'Clip()' would be the best place but unfortunately the
+   //     * activation of the listeners must be called once, from the mesh 
+   //     * that is the parent, so that the listeners tree view will 
+   //     * be build correctly(in the EventListeners.js)
+   //     */
+   //    // Construct_listen_events_from_mesh_tree(this.menu)
+   //    // Construct_listen_events_relations_from_mesh_tree(this.menu);
+   //    Construct_listen_events_from_mesh_tree(widget_root)
+   //    Construct_listen_events_relations_from_mesh_tree(widget_root);
+      
+      
+
+   //    /********************************************************************************************************************/
+   //    // Re-render   
+   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
+   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+   // }
+
+
+   // #ActivateMenu() {
+   //    // TODO: SEE ### Dropdown Remove
+   //    // Must remove listener
+
+   //    const menu = this.menu;
+   //    this.menu_active = true; // Set state to active.
+
+   //    menu.state.mask |= MESH_STATE.ACTIVE;
+
+   //    // Activate menu's items, recursively
+   //    for (let i = 0; i <= menu.children.boundary; i++) {
+
+   //       const item = menu.children.buffer[i];
+
+   //       if(item){
+
+   //          item.Activate();
+   //          if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
+   
+   //             // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
+   //             if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
+   
+   //                // If the menu was deactivated while open, then on activation keep its '-' symbol
+   //                const btn = item.children.buffer[0];
+   //                btn.text_mesh.SliceText(0, 1);
+   //                btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+   //                item.#ActivateMenu();
+   //             }
+   //          }
+   //       }
+   //    }
+
+   //    this.isOn |= DP_MENU_STATE.ON;
+   //    this.isOn &= ~DP_MENU_STATE.OFF;
+
+   // }
+
+
+   // DpActivateMenu() {
+
+   //    const menu = this.menu;
+   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
+
+
+   //    this.isOn |= DP_MENU_STATE.ON;
+   //    this.isOn &= ~DP_MENU_STATE.OFF;
+
+   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
+
+   //    this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
+
+
+   //    // Case its the first time this menu will be rendered
+   //    if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
+   //       // View_add_to_group(menu, this.group_bufferidxs[0])
+   //       View_add_to_group(menu, this.group_bufferidxs[0])
+   //    }
+
+
+      
+   //    this.#ActivateMenu(); // Add dropdown to gfx buffers.
+   //    // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
+      
+      
+   //    const btn = this.children.buffer[0];
+   //    btn.text_mesh.SliceText(0, 1);
+   //    btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+
+   //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
+   //    const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+
+   //    /********************************************************************************************************************/
+   //    // Calculate all meshes sizes from the root widget dropdown
+   //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
+   //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
+      
+      
+   //    // widget_root.Recalc_no_gfx_update(widget_root );
+      
+      
+   //    // Calculate_sizes_recursive(widget_root, widget_root.options, this);
+      
+      
+   //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+   //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+   //    }
+   //    else {
+   //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+   //       else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+   //       else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+   //    }
+      
+   //    widget_root.SectionSetPad();
+      
+   //    // Calculate positions for dropdown
+   //    const cur_pos = [0,0];
+   //    cur_pos[0] = this.geom.pos[0]; 
+   //    cur_pos[1] = this.geom.pos[1]; 
+      
+   //    // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+
+
+
+   //    /********************************************************************************************************************/
+   //    // Set any scissor box
+   //    if(Vertex_buffer_group_has_scissorbox(this.gfx.vb.groupidx)){
+   //       Vertex_buffer_group_update_scissorbox_all_vb(this.gfx.vb.groupidx);
+   //    }
+
+
+
+
+   //    /********************************************************************************************************************/
+   //    // Set any scroller component
+   //    if(this.scroller_comp){
+   //       Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
+   //    }
+   //    // And for all scrollers up the mesh tree
+   //    let parent = this.parent;
+   //    while(parent!==null){
+   //       if(parent.scroller_comp){
+   //          Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
+   //       }
+   //       parent = parent.parent;
+   //    }
+      
+
+   //    /********************************************************************************************************************/
+   //    // Clip unnecessary meshes
+   //    { 
+
+   //       // Get the group root mesh to Recalc position/dimentions 
+   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
+   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
+   //       // let clip_top = null, clip_bottom = null;
+   //       // if (group_root_mesh.parent) {
+   
+   //       //    clip_top = group_root_mesh.parent.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
+   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
+   //       // }
+   //       // else {
+   //       //    clip_top = group_root_mesh.GetPosY();
+   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
+   //       // }
+   
+   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
+   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
+   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
+   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
+   
+   
+   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+   //    }
+
+
+   //    /********************************************************************************************************************/
+   //    // Re-create listen events 
+   //    Construct_listen_events_from_mesh_tree(this.menu)
+   //    Construct_listen_events_relations_from_mesh_tree(this.menu);
+
+   //    // Set menu in focus
+   //    // // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
+   //    // // Mesh_set_root_in_focus(widget_root.root_bufferidx);
+   //    // Mesh_set_root_in_focus(root.root_bufferidx);
+      
+      
+
+   //    /********************************************************************************************************************/
+   //    // Re-render   
+   //    // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
+   //    // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
+   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+   //    // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
+
+   // }
 }
 
 

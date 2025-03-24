@@ -14,7 +14,7 @@ import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uni
 import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
-import { Contols_generic_uniforms_buffer } from "../Widgets/ControlWidgets.js";
+import { Contols_generic_uniforms_buffer } from "../Widgets/WidgetGenericControlsReady.js";
 
 
 

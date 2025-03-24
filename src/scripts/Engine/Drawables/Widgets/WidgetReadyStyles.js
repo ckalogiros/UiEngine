@@ -1,6 +1,6 @@
 "use strict";
 
-import { BLUEL, GREY, WHITE } from "../Material/Base/Colors";
+import { BLUEL, GREY, WHITE, YELLOWL } from "../Material/Base/Colors";
 
 // inspection of correct widget properties passed as parameters to widget creation function
 // OR widget configuration
@@ -405,7 +405,8 @@ export function Style_dropdown_default_properties(user_properties) {
          dim:_,
          col:GREY[2],
          
-         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10],
+         // pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
+         pad:[5,5],
          name:user_properties.name,
          num_face:1,
          style:style, 
@@ -421,11 +422,14 @@ export function Style_dropdown_default_properties(user_properties) {
          options:SECTION.VERTICAL, 
          
          pos:[0, 0, user_properties.pos[2]+1], 
-         dim:_,
-         col:GREY[4],
+         // dim:_,
+         dim:[100, 100],
+         // col:GREY[4],
+         col:YELLOWL[4],
          // col:TRANSPARENCY(BLUEL[9], 1.),
          
-         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
+         // pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
+         pad:[5,5], 
          // name:user_properties.name,
          num_face:1,
          style:style, 
@@ -446,13 +450,14 @@ export function Style_dropdown_default_properties(user_properties) {
          // col: BLUEL[4],
          dim:_,
          text_col:WHITE, 
-         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
+         // pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
+         pad:[0,0], 
 
          align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
          
          text:user_properties.text!==undefined ? user_properties.text : user_properties.name, 
-         text_pad:user_properties.text_pad, 
-         style:style, 
+         text_pad:user_properties.text_pad !== undefined ? user_properties.text_pad : [10, 6],  
+         style:{ rcorners: 4, feather: 0, border: 0 }, 
          
          // font_size:user_properties.font_size !== undefined ? user_properties.font_size : alert('009183321453312 font_size required'), 
          font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 

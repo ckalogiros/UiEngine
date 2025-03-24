@@ -263,7 +263,64 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
 
    }
+   
+   // SetLayout(self_align_flags = null, panel_align_flags = null, color_pick_align_flags = null, pane2_align_flags = null, color_present_align_flags = null, slider_trans_align_flags = null, handle_trans_align_flags=null, slider_hue_align_flags = null, labels_align_flags = null) {
 
+   //    super.align.flags = self_align_flags;
+
+   //    const slider_hue = this.children.buffer[slider_hue_idx];
+   //    slider_hue.align.flags = slider_hue_align_flags;
+
+   //    const panel = this.children.buffer[panel_idx];
+   //    panel.align.flags = panel_align_flags;
+
+   //    const color_pick = panel.children.buffer[color_pick_idx];
+   //    color_pick.align.flags = color_pick_align_flags;
+
+   //    const slider_trans = panel.children.buffer[slider_trans_idx];
+   //    slider_trans.align.flags = slider_trans_align_flags, handle_trans_align_flags;
+
+   //    const panel2 = panel.children.buffer[panel2_idx];
+   //    panel2.align.flags = pane2_align_flags;
+
+   //    const color_present = panel2.children.buffer[color_present_idx];
+   //    color_present.align.flags = color_present_align_flags;
+
+
+   //    for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
+   //       const label = panel2.children.buffer[i];
+   //       label.align.flags = labels_align_flags;
+   //    }
+   // }
+
+   // AddLayout(self_align_flags = null, panel_align_flags = null, color_pick_align_flags = null, pane2_align_flags = null, color_present_align_flags = null, slider_trans_align_flags = null, handle_trans_align_flags=null, slider_hue_align_flags = null, labels_align_flags = null) {
+
+   //    super.align.flags = self_align_flags;
+
+   //    const slider_hue = this.children.buffer[slider_hue_idx];
+   //    slider_hue.align.flags |= slider_hue_align_flags;
+
+   //    const panel = this.children.buffer[panel_idx];
+   //    panel.align.flags |= panel_align_flags;
+
+   //    const color_pick = panel.children.buffer[color_pick_idx];
+   //    color_pick.align.flags |= color_pick_align_flags;
+
+   //    const slider_trans = panel.children.buffer[slider_trans_idx];
+   //    slider_trans.align.flags |= slider_trans_align_flags, handle_trans_align_flags;
+
+   //    const panel2 = panel.children.buffer[panel2_idx];
+   //    panel2.align.flags |= pane2_align_flags;
+
+   //    const color_present = panel2.children.buffer[color_present_idx];
+   //    color_present.align.flags |= color_present_align_flags;
+
+
+   //    for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
+   //       const label = panel2.children.buffer[i];
+   //       label.align.flags |= labels_align_flags;
+   //    }
+   // }
 
 
    /****************************************************************************************************************************************************/

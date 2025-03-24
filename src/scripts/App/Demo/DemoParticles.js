@@ -21,8 +21,8 @@ import { Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/Ver
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
 import { Linear_interpolation } from '../../Helpers/Math/MathFunctions.js';
-import { Contols_generic_uniforms_buffer } from '../Widgets/ControlWidgets.js';
-import { Widget_ready_slider } from '../Widgets/ReadyWidgets.js';
+import { Contols_generic_uniforms_buffer } from '../Widgets/WidgetGenericControlsReady.js';
+import { Widget_ready_slider } from '../Widgets/WidgetReadyWidgets.js';
 
 
 

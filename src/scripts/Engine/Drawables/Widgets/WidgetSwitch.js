@@ -78,7 +78,16 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       }
 
    }
+   
+   SetLayout(align_flags) {
 
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
 
 
 

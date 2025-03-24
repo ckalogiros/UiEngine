@@ -57,6 +57,15 @@ export class Text_Mesh extends Mesh {
 
    }
 
+   SetLayout(align_flags) {
+
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
 
    StateEnable(MASK = 0x0) {
 

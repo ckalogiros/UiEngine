@@ -72,7 +72,16 @@ export class Widget_Menu_Bar extends Section {
       this.minimize_btn_idx = INT_NULL;
       
    }
+   
+   SetLayout(align_flags) {
 
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
 
 
 

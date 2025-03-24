@@ -8,14 +8,15 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Vi
 import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
-import { Style_button_default_properties, Style_label_default_properties, Style_section_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Style_widget_default } from "../Widgets/WidgetStyles.js";
+import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
+import { Widget_gfx_ready_enable, Widget_gfx_ready_enable_default } from "../Widgets/WidgetGfxReady.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
 
 
@@ -529,26 +530,21 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
 
    let zpos = 10;
 
-   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 0], dim, TRANSPARENCY(GREY[1], .9), 'section',);
-   const menu_panel = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
-   menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
-   menu_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   // const menu_panel = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
+   Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10}); //, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[2])});
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    menu_panel.SetName('MenuLoadPanel');
-
-   menu_panel.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.HORIZONTAL_CENTER;
-   // menu_panel.options = SECTION.RESIZE_PARENT | SECTION.VERTICAL | SECTION.EXPAND | SECTION.INHERIT | SECTION.HORIZONTAL_CENTER;
+   menu_panel.SetLayout(ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   
    zpos++;
-
-
+   
+   
    if(create_label!=='') {
       const label = Create_widget_label(Style_label_default_properties({text:create_label, pos:[0, 0, 1], col:GREENL[5]}));
-      label.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 7);
-      label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      label.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4]));
+      Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: 7, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4])});
+      label.SetLayout(ALIGN_2.HORIZONTAL);
       menu_panel.AddItem(label);
    }
    /*************************************************************************************************/
@@ -562,11 +558,15 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    // Render Menu 
    if(root_widget) {
 
+      Align_pre_simple(menu_panel);
+
       // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
       menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
+      // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, menu_panel.mesh_bufferidx);
       menu_panel.GenGfxCtx();
-      //  menu_panel.Calc_no_gfx_update(SECTION.EXPAND);
-      menu_panel.Calc_no_gfx_update(SECTION.RESIZE_PARENT | SECTION.VERTICAL | SECTION.EXPAND);
+
+      // //  menu_panel.Calc_no_gfx_update(SECTION.EXPAND);
+      // menu_panel.Calc_no_gfx_update(SECTION.RESIZE_PARENT | SECTION.VERTICAL | SECTION.EXPAND);
       menu_panel.Render();
    
       Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
@@ -606,119 +606,97 @@ function Create_menu_items_buttons() {
 
    /*************************************************************************************************/
    // Menu Items
-   const feather = 2;
    const rcorners = 15;
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = (PLATFORM.ANY_SMARTPHONE_DEVICE) ? 6 : 10;
    const text_col = WHITE;
    let btn_col = TRANSPARENCY(GREY[1], 1.);
 
-   /*******************************************************************************************/
-   // Button 1
-   btn_col = GetSequencedColor(7);
-   // const button1 = Create_widget_button(_, 'Mathematics      ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   const button1 = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-   button1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   Style_widget_default(button1, rcorners);
-   menu_items_array.push(button1);
+   {
+      /*******************************************************************************************/
+      // Button 1
+      btn_col = GetSequencedColor(7);
+      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
+   }
 
+   {
+      /*******************************************************************************************/
+      // Button 2
+      btn_col = GetSequencedColor(7);
+      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
+   }
 
-   /*******************************************************************************************/
-   // Button 2
-   btn_col = GetSequencedColor(7);
-   // const button2 = Create_widget_button(_, 'Astronomy        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   const button2 = Create_widget_button(Style_button_default_properties({text:'Mathematics        ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-   button2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   Style_widget_default(button2, rcorners);
-   menu_items_array.push(button2);
+   {
+      /*******************************************************************************************/
+      // Button 3
+      btn_col = GetSequencedColor(7);
+      const button = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      menu_items_array.push(button);
+   }
 
-   /*******************************************************************************************/
-   // Button 3
-   btn_col = GetSequencedColor(7);
-   // const button3 = Create_widget_button(_, 'Molecular Biology', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   const button3 = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-   Style_widget_default(button3, rcorners);
-   button3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   menu_items_array.push(button3);
-
-   /*******************************************************************************************/
-   // Button 4
-   btn_col = GetSequencedColor(7);
-   // const button4 = Create_widget_button(_, 'Chemistry        ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   const button4 = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-   button4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   Style_widget_default(button4, rcorners);
-   menu_items_array.push(button4);
+   {
+      /*******************************************************************************************/
+      // Button 4
+      btn_col = GetSequencedColor(7);
+      const button = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
+   }
 
    {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      // const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-      const button5 = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Style_widget_default(button5, rcorners);
-      button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      menu_items_array.push(button5);
+      const button = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      Widget_gfx_ready_enable_default(button, rcorners);
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
-      // Button 5
+      // Button 6
       btn_col = GetSequencedColor(7);
-      // const button5 = Create_widget_button(_, 'Physics          ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-      const button5 = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Style_widget_default(button5, rcorners);
-      button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      menu_items_array.push(button5);
+      const button = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
-      // Button 5
+      // Button 7
       btn_col = GetSequencedColor(7);
-      // const button5 = Create_widget_button(_, 'Biochemistry     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-      const button5 = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Style_widget_default(button5, rcorners);
-      button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      menu_items_array.push(button5);
+      const button = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
-      // Button 5
+      // Button 8
       btn_col = GetSequencedColor(7);
-      // const button5 = Create_widget_button(_, 'Genetics         ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-      const button5 = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Style_widget_default(button5, rcorners);
-      button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      menu_items_array.push(button5);
+      const button = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      button.SetLayout(ALIGN_2.VERTICAL);
+      menu_items_array.push(button);
    }
-   // {
-   //    /*******************************************************************************************/
-   //    // Button 5
-   //    btn_col = GetSequencedColor(7);
-   //    const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   //    Style_widget_default(button5, rcorners);
-   //    button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    menu_items_array.push(button5);
-   // }
-   // {
-   //    /*******************************************************************************************/
-   //    // Button 5
-   //    btn_col = GetSequencedColor(7);
-   //    const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   //    Style_widget_default(button5, rcorners);
-   //    button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    menu_items_array.push(button5);
-   // }
-   // {
-   //    /*******************************************************************************************/
-   //    // Button 5
-   //    btn_col = GetSequencedColor(7);
-   //    const button5 = Create_widget_button(_, 'Neuroscience     ', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
-   //    Style_widget_default(button5, rcorners);
-   //    button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   //    menu_items_array.push(button5);
-   // }
-
-
 
    return menu_items_array;
 }
@@ -1094,10 +1072,6 @@ function Animation_rotate_back_stop(params) {
 export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20,) {
 
    let total_height = 0;
-   const u_wpos_flags = {
-      unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
-   }
 
    const slope_params_pointer = Demo_clbk_animations_create_transition_slope(_, slope, speed);
 
@@ -1113,12 +1087,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    /*************************************************************************************************/
    // Create controls
-   const controls_section = Create_widget_section(Style_section_default_properties({is_root:root_widget, options:SECTION.VERTICAL, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:BLACK, name:'Controls Section', style:[0, 10, 2],}));
-   controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2;
-   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]));
+   const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:BLACK, name:'Controls Section', style:[0, 10, 2],}));
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3])});
 
    if (create_contols) { // Create slider controls only if this is to be rendered from this function
 
@@ -1132,26 +1102,19 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    }
 
-   controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-
-
-
+   controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
    /****************************************************************************************************************/
    // Render 
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
 
+      Align_pre_simple(controls_section);
+
       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-
-      // controls_section.options = SECTION.VERTICAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT | SECTION.EXPAND;
-      controls_section.Calc_no_gfx_update();
-
+      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
       Construct_listen_events_from_mesh_tree(controls_section);
       Construct_listen_events_relations_from_mesh_tree(controls_section);
 
@@ -1165,39 +1128,25 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Create animated meshes
 
    // Create panel
-   const section = Create_widget_section(Style_section_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 0, 0], col:GREY[2]}));
-   {
-      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      section.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[1], GREY[4]));
-      section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
-   }
+   // const section = Create_widget_section(Style_section_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 0, 0], col:GREY[2]}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 100, 0], col:GREY[2]}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3])});
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
 
    // ISSUE: Somehow the text on update shifts to the rigth in x-axis, but the first characters ar aligned correctly
 
 
    // Create animated meshes
    const text_pad_x = 10, text_pad_y = 6;
-   // const mesh2 = Create_widget_label(_, '-', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.CONSOLAS_32px);
    const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-   {
-      mesh2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
-      mesh2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0]));
-      section.AddItem(mesh2)
-   }
-   // const mesh1 = Create_widget_label(_, '.', _, [0, 0, 0], _, BLUEL[9], WHITE, [text_pad_x, text_pad_y], _, _, TEXTURES.MTSDF_COMIC_1024);
+   Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0])});
+   section.AddItem(mesh2)
    const mesh1 = Create_widget_label(Style_label_default_properties({text:'.', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-   {
-      mesh1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
-      mesh1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh1.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0]));
-      section.AddItem(mesh1)
-   }
+   Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0])});
+   section.AddItem(mesh1)
+
+   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
 
 
@@ -1207,10 +1156,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render animated meshes
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
-      section.Calc_no_gfx_update();
-
+      Align_pre_simple(section);
+      section.GenGfxCtx();
       section.Render()
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       Construct_listen_events_from_mesh_tree(section);
@@ -1293,34 +1240,32 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
 
-      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), name:'Animation Slope', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-      slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners, bar_rcorners);
-      slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, name:'Animation Slope', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
+      
       slider.SetInitialValue(slope_params_pointer.GetSlope());
-
+      slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      slider.SetLayout(ALIGN_2.HORIZONTAL);
+      
       contols_buffer.push(slider);
-
+      
       // animation_properties:animation_properties
       const slider_params = slope_params_pointer;
       Slider_connect(slider, (params, slider_val) => {
          params.clbk_params.SetSlope(slider_val);
       }, slider_params);
    }
-
+   
    /*****************************************************************************************/
    // Slider for controling the animation speed
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-
-      // const slider = Create_widget_slider(_, [0, 0, zpos + 1], slider_dim, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), _, 'Animation Speed');
-      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), name:'Animation Speed', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-      slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners, bar_rcorners);
-      slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]),);
+      
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, name:'Animation Speed', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
       slider.SetInitialValue(slope_params_pointer.GetSlope());
+      slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      slider.SetLayout(ALIGN_2.VERTICAL);
 
       contols_buffer.push(slider);
 

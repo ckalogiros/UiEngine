@@ -1,7 +1,7 @@
 "use strict";
 
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Widget_ready_slider } from "./ReadyWidgets.js";
+import { Widget_ready_slider } from "./WidgetReadyWidgets.js";
 
 
 

@@ -87,7 +87,15 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
    }
+   SetLayout(align_flags) {
 
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
 
 
 

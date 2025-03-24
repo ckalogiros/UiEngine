@@ -1,4 +1,13 @@
 TODO
+* Implement Ready Widgets instead of in TestWidgets to ReadyWidgets.js
+
+* DROPDOWN WIDGET
+   * Create Horizontal alignment
+   * Create Style btn for the dp btn in the construction via Style_dropdown...
+   * Render dp with scrolller
+   * Demo a dp with all kinds of widgets inside, SEE 'CreateDropdownWithScroller()'
+      also check if align works as intended. 
+
 * Currently we render a 4 color vertex buffers support.
    So it is free to create color gradiants for all meshes.
    IS MULTICOLOR VERTEX BUFFER USE SAME VB OPERATIONS AS THE 1 COLOR????????

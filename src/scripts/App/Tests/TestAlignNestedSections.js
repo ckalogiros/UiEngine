@@ -8,7 +8,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Style_rect_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_angle, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { Widget_ready_label, Widget_ready_slider } from "../Widgets/ReadyWidgets.js";
+import { Widget_ready_label, Widget_ready_slider } from "../Widgets/WidgetReadyWidgets.js";
 
 
 
@@ -285,7 +285,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
             else if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
                cur_pos_x += cur_mesh.geom.dim[0] * 2;
             }
-            console.log('cur_pos_y', cur_pos_y, cur_mesh.GetName(), mesh.GetName(), '\n', cur_mesh.geom.dim[1] * 2, ret.dim_y * 2)
+            // console.log('cur_pos_y', cur_pos_y, cur_mesh.GetName(), mesh.GetName(), '\n', cur_mesh.geom.dim[1] * 2, ret.dim_y * 2)
          }
       }
       else {
@@ -303,7 +303,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          else {
             ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
             // cur_pos_y-=ret.dim_y*2
-            console.log('-cur_pos_y', cur_pos_y, cur_mesh.GetName(), ret.dim_y * 2)
+            // console.log('-cur_pos_y', cur_pos_y, cur_mesh.GetName(), ret.dim_y * 2)
          }
          
          // console.log('ret2', ret.dim_y)
@@ -340,9 +340,9 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
                // cur_pos_y += accum_row_size_y * 2;
 
                // if(mesh)
-               // cur_pos_x = mesh.geom.pos[0] + pad_x;
+               cur_pos_x = mesh.geom.pos[0] + pad_x;
                // cur_pos_x = mesh.geom.pos[0];
-               cur_pos_x = pad_x;
+               // cur_pos_x = pad_x;
                // cur_pos_x = 0;
                // console.log('cur_pos_x', cur_pos_x, cur_mesh.GetName(), mesh.GetName())
             }

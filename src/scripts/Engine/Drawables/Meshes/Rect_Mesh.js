@@ -310,6 +310,16 @@ export class Rect_Mesh extends Mesh {
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
    }
 
+   SetLayout(align_flags) {
+
+      this.align.flags = align_flags;
+   }
+
+   AddLayout(align_flags) {
+
+      this.align.flags |= align_flags;
+   }
+
 
    
 
@@ -469,6 +479,9 @@ export class Rect_Mesh extends Mesh {
    }
 
 
+   SetIsGfxInserted(flag) {
+      if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
+   }
 
 
 

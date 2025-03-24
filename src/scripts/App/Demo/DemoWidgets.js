@@ -15,7 +15,7 @@ import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetRandomColor, GetSequencedColor } from '../../Helpers/Helpers.js';
 import { CopyArr4, Max, Min } from '../../Helpers/Math/MathOperations.js';
 import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Widget_msdf_text_with_scale_slider, Widget_ready_label } from '../Widgets/ReadyWidgets.js';
+import { Widget_msdf_text_with_scale_slider, Widget_ready_label } from '../Widgets/WidgetReadyWidgets.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
 import { Align_expand, Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
 import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_slider_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';

@@ -144,6 +144,8 @@ export class Mesh {
         };
 
 
+
+
         this.gfx_ctx_flags = 0x0;
         this.gfx_ctx_parent = INT_NULL;
 
@@ -181,7 +183,7 @@ export class Mesh {
         
         // this.align_flags = 0x0;
         this.align = {
-            flags:0x0, // SEE: ALIGN_2 constant
+            flags:ALIGN_2.HORIZONTAL, // SEE: ALIGN_2 constant
             pad_x:0,
             pad_y:0,
             margin_x:0,

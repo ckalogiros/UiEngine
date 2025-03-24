@@ -174,7 +174,15 @@ export class Widget_Switch extends Widget_Button {
 
    }
 
+   SetLayout(rect_align_flags) {
 
+      this.SetLayout(rect_align_flags);
+   }
+   
+   AddLayout(rect_align_flags) {
+      
+      this.AddLayout(rect_align_flags);
+   }
 
 
 
