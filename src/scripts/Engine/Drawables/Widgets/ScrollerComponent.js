@@ -303,8 +303,8 @@ function Scroller_component_on_update_handle(_params) {
 
    Scroller_clip_scrolled_section(scrolled_section, bar.GetPosY(), bar.geom.dim[1]);
 
-   Root_group_reset_gfxs(scrolled_section.root_bufferidx)
-   Root_group_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
+   // Root_group_reset_gfxs(scrolled_section.root_bufferidx)
+   // Root_group_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
    
 }
 

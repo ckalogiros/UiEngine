@@ -2,12 +2,14 @@
 
 import { Bitwise_calc_bit_length_from_flag_base } from "../../../../Engine/Core/BitwiseOps.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLACK, BLUEL, GREEN, PURPLEB, PURPLER, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_get_panel_dim_x } from "./Arkanoid.js";
 import { ARKANOID_FLAGS } from "./ArkanoisConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
@@ -52,14 +54,14 @@ class Powup {
 
    constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, vb_groupidx = INT_NULL) {
 
-      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], color, 'PowupMesh', _, _, _,);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], color, 'PowupMesh', _, _, _,);
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[POWUP_INIT_SIZE, POWUP_INIT_SIZE], col:color, name:'PowupMesh', }));
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
 
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 8);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 

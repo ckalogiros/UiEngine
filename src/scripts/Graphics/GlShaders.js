@@ -58,6 +58,7 @@ export function Shaders_load(gl, sid, uniforms_info, shader_ops) {
 		shader_program:shader_program, 
 		attribsidx:vShader.attribsidx, 
 		attribs_indexing:vShader.attribs_indexing,
+		vars_using_uniform_buffer:fShader.vars_using_uniform_buffer,
 	};
 }
 

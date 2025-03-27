@@ -1,7 +1,7 @@
 "use strict";
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
-import { Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_section, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
 import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
@@ -26,6 +26,9 @@ import { Board_rotations } from "./Demo/DemoBoardRotations.js";
 import { Tetris, Tetris_reset } from "./Demo/Games/Snake/Tetris.js";
 import { Arkanoid_free_buffers, Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
 import { CALLBACK_ANIMATION_TYPE_FLAGS } from "../Engine/Animations/CallbackAnimationsReadyAnimations.js";
+import { Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Widget_gfx_ready_enable } from "./Widgets/WidgetGfxReady.js";
+import { Align_pre_simple } from "./Tests/TestAlignNestedSections.js";
 
 
 
@@ -142,8 +145,8 @@ export function Demos_welcome_menu() {
    let zpos = 10;
    const r_corners = 12;
 
-   // const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, VIEWPORT.HEIGHT / 2, 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
+   // const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
+   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, VIEWPORT.HEIGHT / 2, 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
@@ -171,8 +174,8 @@ export function Demos_welcome_menu() {
    const tr = .3;
    const col_inner = GREY[0];
 
-   // const welcome_panel = Create_widget_section(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
-   const welcome_panel = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREEN[5], .9), 'section',);
+   // const welcome_panel = Create_rect_mesh(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
+   const welcome_panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(GREEN[5], .9), name:'section',}));
    welcome_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    welcome_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    welcome_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
@@ -275,10 +278,10 @@ Explore the demos and discover the possibilities!`;
 // export function Demo_page(create_demo_id = subcategory_glow.id) {
 // export function Demo_page(create_demo_id = subcategory_animations1.id) {
 // export function Demo_page(create_demo_id = subcategory_animations_button.id) {
-   // export function Demo_page(create_demo_id = subcategory_animations_text.id) {
-   // export function Demo_page(create_demo_id = subcategory_snake.id) {
-   // export function Demo_page(create_demo_id = subcategory_comet.id) {
-   export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
+// export function Demo_page(create_demo_id = subcategory_animations_text.id) {
+// export function Demo_page(create_demo_id = subcategory_snake.id) {
+// export function Demo_page(create_demo_id = subcategory_comet.id) {
+export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
@@ -292,11 +295,11 @@ Explore the demos and discover the possibilities!`;
 
    const slider_dim = [100, 12];
    // Create Slider for controling the uniform 'Distance'
-   const slider_distance = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Distance');
+   const slider_distance = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Distance'}));
    // Create Slider for controling the uniform 'Smoothness'
-   const slider_smoothness = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Smoothness');
+   const slider_smoothness = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Smoothness'}));
    // Create Slider for controling the uniform 'Intensity'
-   const slider_intensity = Create_widget_slider(_, [0, 0, 10], slider_dim, GREY[3], _, 'Intensity');
+   const slider_intensity = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Intensity'}));
 
 
 
@@ -307,15 +310,13 @@ Explore the demos and discover the possibilities!`;
 
 
    const pad = 10;
+   const rcorners = 10;
 
    /****************************************************************************************************************************************************/
    // Create the load demo button
 
-   const window_menu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [0, 0, 0], [VIEWPORT.WIDTH / 2 - pad - 1, 0], TRANSPARENCY(GREY[5], .94),);
-   // const window_menu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [pad, pad], [0, 0, 0], [VIEWPORT.WIDTH/2 - pad-1, 0], GREEN[5],);
-   window_menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   window_menu.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   window_menu.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+   const window_menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[pad, pad], dim:[VIEWPORT.WIDTH / 2 - pad - 1, 0], col:TRANSPARENCY(GREY[5], .94), }));
+   Widget_gfx_ready_enable({mesh:window_menu, enable_sdf_rect:4,})
    window_menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true); // Create fake event so we can set the focus on any window_menu child.
    window_menu.SetName('window_menu');
 
@@ -324,11 +325,9 @@ Explore the demos and discover the possibilities!`;
 
    /*******************************************************************************************/
    // Load menu button
-   const Load_menu_btn = Create_widget_button(_, 'Demos', _, [0, 0, 1], 20, GREEN[7], WHITE, [8, 8], .5);
+   const Load_menu_btn = Create_widget_button(Style_button_default_properties({text:'Demos', pos:[0, 0, 1], col:GREEN[7], text_pad:[8, 8],}));
+   Widget_gfx_ready_enable({mesh:window_menu, enable_sdf_rect:rcorners,})
    Load_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   Load_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   Load_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   Load_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    window_menu.AddItem(Load_menu_btn);
 
    // Setup Load Menu Panel callback on lod button click
@@ -632,12 +631,9 @@ Explore the demos and discover the possibilities!`;
    /*******************************************************************************************/
    // Options menu button
 
-   const options_menu_btn = Create_widget_button(_, 'Options', _, [0, 0, 1], 20, GREENR[7], WHITE, [8, 8], .5);
+   const options_menu_btn = Create_widget_button(Style_button_default_properties({text:'Options', pos:[0, 0, 1], font_size:20, col:GREENR[7], text_pad:[8, 8],}));
+   Widget_gfx_ready_enable({mesh:options_menu_btn, enable_sdf_rect:10,});
    options_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   options_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   options_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   // options_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, options_menu_btn.geom.dim[1]);
-   options_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    window_menu.AddItem(options_menu_btn);
 
    // Setup Load Menu Panel callback on load button click
@@ -680,9 +676,11 @@ Explore the demos and discover the possibilities!`;
       // window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       // window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
 
+      Align_pre_simple(window_menu);
+
       window_menu.GenGfxCtx();
-      window_menu.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTY;
-      window_menu.Calc_no_gfx_update();
+      // window_menu.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTY;
+      // window_menu.Calc_no_gfx_update();
       window_menu.Render()
       Root_group_activate_all_vbs_in_renderqueue(window_menu.root_bufferidx);
 
@@ -700,11 +698,9 @@ Explore the demos and discover the possibilities!`;
    /****************************************************************************************************************************************************/
    { // Create the button for going to the top
 
-      const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, '^', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], _, GREY[4], GREEN[9], [12, 7], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+      const btn = Create_widget_button(Style_button_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, text:'^', pos:[VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], text_col:GREY[4], col:GREEN[9], text_pad:[12, 7], }));
+      Widget_gfx_ready_enable({mesh:options_menu_btn, enable_sdf_rect: btn.geom.dim[1],});
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, btn.geom.dim[1]);
 
       btn.Bind(
          () => {
@@ -766,7 +762,7 @@ function Create_menu_popup(params) {
 
    let zpos = 10;
 
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 30], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section',);
+   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 30], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
@@ -871,7 +867,7 @@ function Create_menu_horizontal_buttons(x = 0, y = 0, Create_menu_items_callback
 
    let zpos = 10;
 
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0, 0], TRANSPARENCY(GREY[1], .6), 'section',);
+   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 10], [0, 0], TRANSPARENCY(GREY[1], .6), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -977,7 +973,7 @@ function Options_menu_callback(params) {
 
 
 
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim, TRANSPARENCY(GREY[3], tr), 'section',);
+   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim, TRANSPARENCY(GREY[3], tr), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
@@ -995,7 +991,7 @@ function Options_menu_callback(params) {
    // Create items for the menu 'options'.
    if (demo_id & subcategory_comet.id) {
 
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
+      const slider_section = Create_rect_mesh(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
       slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1018,6 +1014,7 @@ function Options_menu_callback(params) {
       let comet_contols = params.params.comet_particles_struct.controls_section;
 
       const scale_down = .2;
+      const rcorners = 10;
 
       // If the options items haven't been initialized, initialize.
       if (comet_contols === null) {
@@ -1057,11 +1054,8 @@ function Options_menu_callback(params) {
          pass: SID.PASS.WPOS3,
       }
 
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
-      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      const slider_section = Create_rect_mesh(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
+      Widget_gfx_ready_enable({mesh:slider_section, enable_sdf_rect:rcorners,});
 
 
 
@@ -1079,7 +1073,6 @@ function Options_menu_callback(params) {
 
       menu_panel.AddItem(slider_section);
 
-      slider_section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
       // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
@@ -1094,18 +1087,8 @@ function Options_menu_callback(params) {
       const emitter = params.params.explosion_particles_struct.emitter;
       let explosion_particles_contols = params.params.explosion_particles_struct.controls_section;
 
-      const u_wpos_flags = {
-         unif: SID.UNIF.ROOT_WPOS2,
-         pass: SID.PASS.WPOS3,
-      }
-
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
-      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      // slider_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
+      const slider_section = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[2], tr), name:'SliderSection',}));
+      Widget_gfx_ready_enable({mesh:slider_section, enable_sdf_rect:rcorners,});
 
       const scale_down = .2;
       const explosion_slider_values = params.params.mnemonics.explosion_slider_values;
@@ -1118,11 +1101,8 @@ function Options_menu_callback(params) {
          slider_section.AddItem(explosion_particles_contols[i]);
       }
 
-
-
       menu_panel.AddItem(slider_section);
 
-      slider_section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
       // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
@@ -1135,30 +1115,17 @@ function Options_menu_callback(params) {
    if (demo_id & subcategory_smoke.id) {
 
       const emitter = params.params.smoke_particles_struct.emitter;
-      const controls = params.params.smoke_particles_struct.controls_section;
 
-      const u_wpos_flags = {
-         unif: SID.UNIF.ROOT_WPOS2,
-         pass: SID.PASS.WPOS3,
-      }
-
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
-      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-
-
+      const slider_section = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[2], tr), name:'SliderSection',}));
+      Widget_gfx_ready_enable({mesh:slider_section, enable_sdf_rect:rcorners,});
 
       const glow_particles_contols = Create_smoke_particles_controls(emitter, _, smoke_slider_values_transform_parameters);
       for (let i = 0; i < glow_particles_contols.length; i++) {
          slider_section.AddItem(glow_particles_contols[i]);
       }
 
-
-
       menu_panel.AddItem(slider_section);
 
-      slider_section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
       slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
       // slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, slider_section.mesh_bufferidx, true);
       slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
@@ -1173,15 +1140,9 @@ function Options_menu_callback(params) {
       const ellastic_collisions_balls = params.params.ellastic_collisions_struct.ellastic_collisions_balls;
       const mnemonics = params.params.ellastic_collisions_struct.mnemonics;
 
-      const u_wpos_flags = {
-         unif: SID.UNIF.ROOT_WPOS2,
-         pass: SID.PASS.WPOS3,
-      }
 
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
-      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+      const slider_section = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[2], tr), name:'SliderSection',}));
+      Widget_gfx_ready_enable({mesh:slider_section, enable_sdf_rect:rcorners,});
 
       const ell_coll_params = {
          mnemonics: mnemonics,
@@ -1207,28 +1168,16 @@ function Options_menu_callback(params) {
    }
    if (demo_id & subcategory_animations_text.id) {
 
-      // const controls  = params.params.smoke_particles_struct.controls_section;
       const slope_params_pointer = params.params.animations_text_struct.slope_params_pointer;
       const animation_properties = params.params.animations_text_struct.animation_properties;
 
-      const u_wpos_flags = {
-         unif: SID.UNIF.ROOT_WPOS2,
-         pass: SID.PASS.WPOS3,
-      }
-
-      const slider_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[2], tr), 'SliderSection',);
-      slider_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      slider_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-
-
+      const slider_section = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[2], tr), name:'SliderSection',}));
+      Widget_gfx_ready_enable({mesh:slider_section, enable_sdf_rect:rcorners,});
 
       const animation_text_contols = Demo_clbk_animations_text_create_contols(slope_params_pointer, animation_properties);
       for (let i = 0; i < animation_text_contols.length; i++) {
          slider_section.AddItem(animation_text_contols[i]);
       }
-
-
 
       menu_panel.AddItem(slider_section);
 
@@ -1246,13 +1195,10 @@ function Options_menu_callback(params) {
 
    /*******************************************************************************************/
    // Create close button
-   const close_btn = Create_widget_close_btn(_, menu_panel, 'CLOSE', [0, 0, zpos], 30, btn_col, WHITE, [dim[0] / 2 - pad * 2, 6], _, _, _);
-   close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   close_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   close_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, close_btn.geom.dim[1]);
+   const close_btn = Create_widget_close_btn(menu_panel, 'CLOSE', [0, 0, zpos], 30, btn_col, WHITE, [dim[0] / 2 - pad * 2, 6], _, _, _);
+   Widget_gfx_ready_enable({mesh:close_btn, enable_sdf_rect:close_btn.geom.dim[1],});
    close_btn.SetName('close_btn');
    close_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
-   // close_btn.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC, menu_panel.mesh_bufferidx, true);
    menu_panel.AddItem(close_btn);
 
    // Must recalculate all children meshes position offsets
@@ -1262,9 +1208,7 @@ function Options_menu_callback(params) {
 
    /*************************************************************************************************/
    // Render Section 
-   // menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, false);
    menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, false);
-   // menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, menu_panel.mesh_bufferidx, false);
    menu_panel.GenGfxCtx();
 
    // Build a group view of the scrolled section for the scroller

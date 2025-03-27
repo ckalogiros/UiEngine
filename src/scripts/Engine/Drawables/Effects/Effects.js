@@ -13,6 +13,7 @@
 "use strict";
 
 import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoisConstants.js";
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Gl_set_dim_xy, Gl_set_generic2, Gl_set_rgba, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
@@ -20,6 +21,7 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { View_add_to_group, View_build_group_from_root_mesh } from "../../Core/Views/MeshBufferViews.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
+import { Style_rect_default_properties } from "../Widgets/WidgetReadyStyles.js";
 
 
 
@@ -56,9 +58,13 @@ class Effect_Mesh_Explosion_Circle {
 
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, ring_diameter, intensity) {
 
-      const mesh = Create_rect_mesh(_, [0, 0, 1], [w, h], color, 'ExplosionMeshCircle',);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshCircle',}));
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, enable_pass_vpos:true, });
+      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
+      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, });
+
+
       mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
       mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
       mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:ring_diameter, b:intensity });
@@ -280,13 +286,18 @@ class Effect_Mesh_Explosion_Glow {
       this.timer_limit = 0;
       this.timer_step = 0;
       
-      const mesh = Create_rect_mesh(_, [0, 0, 1], [w, h], color, 'ExplosionMeshGlow',);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshGlow',}));
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, });
+      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
+      // Widget_gfx_ready_enable({mesh:mesh, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, });
+
       mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_GLOW);
       mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      
+      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_WPOS2);
+
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
       
       // Render

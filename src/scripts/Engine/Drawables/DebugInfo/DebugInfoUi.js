@@ -1683,7 +1683,7 @@ export function Debug_info_create_ui_mouse(x=0, y=0) {
    infomesh.align.flags = ALIGN_2.HORIZONTAL;
    section.AddItem(infomesh);
    // dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL
-   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.HORIZONTAL,);
+   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.VERTICAL,);
    infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.HORIZONTAL);
    // infomesh.CreateNewText('222',        fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
    // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);

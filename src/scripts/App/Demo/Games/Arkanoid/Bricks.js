@@ -8,10 +8,12 @@ import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREEN, GREY, PURPLE, TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_combo_counter_add, Arkanoid_create_update_game_loop, Arkanoid_get_panel_dim_x, Arkanoid_get_panel_pos_x, Arkanoid_get_panel_right, ARKANOID_SECTION_DIM_X } from "./Arkanoid.js";
 import { ARK_STATE, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoisConstants.js";
 import { Coin_create } from "./Coin.js";
@@ -123,25 +125,27 @@ export function Arkanoid_bricks_destroy() {
 /** */
 export class Brick {
 
-   constructor(x = 0, y = 0, color, name = 'BRICK', flags = 0x0, vb_grouidx = INT_NULL) {
+   constructor(x = 0, y = 0, color, name = 'BRICK', flags = 0x0, vb_groupidx = INT_NULL) {
 
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(_, [0, 0, 1], [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], color, name,);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col:color, name:name,}));
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      // const mesh = Create_rect_mesh(_, [0, 0, 1], [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], color, name,);
       mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
 
-      mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BRICKS.R_CORNERS);
-      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BRICKS.R_CORNERS);
+      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
 
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, vb_grouidx);
+      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+      
 
       mesh.geom.pos[0] = posx;
       mesh.geom.pos[1] = posy;
@@ -235,7 +239,7 @@ export function Bricks_reset_all_deactivated_bricks() {
    _bricks_counter.count = 0;
 }
 /** */
-function Bricks_create(x, y, color, name, flags, vb_grouidx, group_idx) {
+function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
 
    let idx = INT_NULL;
 
@@ -263,7 +267,7 @@ function Bricks_create(x, y, color, name, flags, vb_grouidx, group_idx) {
    }
    else { // If no apropriate free mesh was found, create new mesh
 
-      const brick = new Brick(0, 0, color, name, flags, vb_grouidx);
+      const brick = new Brick(0, 0, color, name, flags, vb_groupidx);
       idx = brick.idx;
       // Add to group
       View_add_to_group(brick.mesh, group_idx);
@@ -283,7 +287,8 @@ function Bricks_create(x, y, color, name, flags, vb_grouidx, group_idx) {
 
    _bricks_counter.count++;
 
-   return idx;
+   // return idx;
+   return _bricks_buffer.buffer[idx];
 
 }
 
@@ -298,7 +303,7 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
 
    let posx = x + bricks_row_0_x, posy = y + bricks_row_0_y;
 
-   let vb_grouidx = BRICKS.VB_GROUP_IDX;
+   let vb_groupidx = BRICKS.VB_GROUP_IDX;
 
    BRICKS.STAGE_SCHEMA = BRICK_STAGES[BRICKS.CURRENT_STAGE_INDEX++];
    const scema = BRICKS.STAGE_SCHEMA;
@@ -319,11 +324,16 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
 
             const color = Bricks_resolve_color_from_flag(flags);
 
-            const brick_idx = Bricks_create(posx, posy, color, `br-${i}-${j}`, flags, vb_grouidx, group_idx);
-            _bricks_rows.buffer[i].AddAtIndex(j, brick_idx);
+            const brick = Bricks_create(posx, posy, color, `br-${i}-${j}`, flags, vb_groupidx, group_idx);
+            _bricks_rows.buffer[i].AddAtIndex(j, brick.idx);
 
-            _bricks_buffer.buffer[brick_idx].mesh.geom.pos[1] -= 800;
-            Gl_add_wpos_y(_bricks_buffer.buffer[brick_idx].mesh.gfx, -800)
+            _bricks_buffer.buffer[brick.idx].mesh.geom.pos[1] -= 800;
+            Gl_add_wpos_y(_bricks_buffer.buffer[brick.idx].mesh.gfx, -800);
+
+            if(vb_groupidx === INT_NULL) {
+               vb_groupidx = brick.mesh.gfx.vb.groupidx;
+               BRICKS.VB_GROUP_IDX = brick.mesh.gfx.vb.groupidx;
+            }
          }
 
          posx += (BRICKS.DIM_X * 2) + BRICKS.COLUMN_PAD;

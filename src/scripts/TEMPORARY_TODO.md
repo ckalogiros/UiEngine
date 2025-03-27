@@ -1,12 +1,21 @@
 TODO
-* Implement Ready Widgets instead of in TestWidgets to ReadyWidgets.js
+
+* Remove any anecessary vpos pass in Arkanoid
+* Add 'u_scale' to Widget_gfx_enable
+* Add 'attr_time' to Widget_gfx_enable
+* Add 'ATTR_GENERIC_VEC2' to Widget_gfx_enable
+* Implement 'blend color' to Widget_gfx_enable
+
+* Demo comet:
+   Use the new generic uniform collector to automaticaly set the slider controls
+   Resolve the controls for glow particles. Implement a way to choose which controls to enable, from the comet function call
+* Particles are not ROUND!!!
+
+* Implement slider controls also for vb attributes (not only uniforms)
 
 * DROPDOWN WIDGET
-   * Create Horizontal alignment
    * Create Style btn for the dp btn in the construction via Style_dropdown...
    * Render dp with scrolller
-   * Demo a dp with all kinds of widgets inside, SEE 'CreateDropdownWithScroller()'
-      also check if align works as intended. 
 
 * Currently we render a 4 color vertex buffers support.
    So it is free to create color gradiants for all meshes.

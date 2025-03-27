@@ -55,6 +55,7 @@ export class Text_Mesh extends Mesh {
       this.text_width = (this.text_width < ret.width * this.geom.font_size) ? ret.width * this.geom.font_size : this.text_width;
       this.text_height = ret.height * this.geom.font_size;
 
+      this.SetLayout(properties.layout);
    }
 
    SetLayout(align_flags) {

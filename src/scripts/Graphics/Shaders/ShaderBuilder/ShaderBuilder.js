@@ -208,6 +208,205 @@ function Find_field_by_name(file, word, at_line=0, start_from=0) {
 	return wordpos;
 }
 
+
+
+// Example usage
+// const Mock_find_uniform_info_in_shader = `
+// float glow = u_generic_controls[cnt++];
+// some other code
+// some other code
+// some other code
+// float intensity = u_generic_controls[cnt++];
+// `;
+// const Mock_find_uniform_info_in_shader = `
+//      float glow = u_generic_controls[cnt++];
+//    some other code
+//    some other code
+//    some other code
+//    float intensity = u_generic_controls[cnt++];
+//    some other code
+//    some other code
+//    float u_3 = u_generic_controls[cnt++];
+//    float u_4 = u_generic_controls[cnt++];
+   
+//    sd';sl;d;lsd
+//    sdlk
+   
+//    float u_5 = u_generic_controls[cnt++];
+
+//    sd;';sd
+//    sdlsd
+// `;
+const Mock_find_uniform_info_in_shader = `
+/*** Operation outer_glow_rect ***/
+#ifndef INTERNAL_OUTER_GLOW_RECT // Use this effect many times over with different blending modes
+  #define INTERNAL_OUTER_GLOW_RECT
+  vec4 outer_glow_rect_color = vec4(.0);
+#endif
+{
+  float glow_radius = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float cog = glow_radius - d;
+  //float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
+  // float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
+  /* float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
+  float glow_intensity = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
+  // cog = cog*abs(cog) * glow_intensity*5.;
+  cog = (cog*5.) * (abs(cog) * glow_intensity)*(1.-c)*(1.-c);
+  
+  // cog = mix(cog, c, c);
+  
+  // final_color = vec4(0.0); // Must reset the final color since we used it in the above mix functio
+
+  // outer_glow_rect_color = vec4(vec3(cog), 1.)* src_color;
+  outer_glow_rect_color = vec4(vec3(cog), cog)* src_color;
+}
+/*** Operation outer_glow_rect End ***/
+`;
+
+// TODO: Use the uniform name('u_generic_controls') to distinguish which vars are for which uniforms 
+// Uniform names are passed by the Program class constructor
+function Resolve_generic_uniforms_names(shader_code, uniform_name) {
+
+   
+   const buffer = [];
+   
+   const word = uniform_name;
+   const filelen = shader_code.length;
+   
+   let i = 0;
+   
+   let wordpos = { start: -1, end: -1, len: 0, line: -1 };
+   
+   
+   // let i = word_position.start;
+   while(i < filelen) {
+      
+      let skip = false;
+      wordpos = Find_field_by_name(shader_code, word, wordpos.line, wordpos.start);
+      const from_where_it_left_off = wordpos.end;
+
+      if(from_where_it_left_off === -1) break;
+
+      i = wordpos.start;
+
+      /**
+       * SAMPLE code
+       * 1. uniform float u_generic_controls[3];
+       * 2. float ${u}glow_smoothstep_inner = u_generic_controls[u_gen_ctrl_map_cnt++];
+       */
+      // If word found, go to start of the line
+      while((shader_code[i] !== '\n' && shader_code[i] !== ';') && i > 0) i--;
+      
+
+      if(i > 0) i++; // Skip the '\n' || ';' characters. Also includes the edge case of the uniform being the first line of code in the shader and has no '\n': 'float glow = u_generic_controls' 
+      
+      // If word found, go to start of the line
+      while(shader_code[i] === ' ' || shader_code[i] === '\n' && i < filelen) i++; // Skip any number of spaces till the next word
+      if(shader_code[i] === '/') skip = true; // Avoid any commented code
+      
+      if(!skip) {
+
+         const struct = { type: '', name: '', };
+         
+         // Get the type of the uniform
+         while (shader_code[i] !== ' ' && i < filelen) {
+            struct.type += shader_code[i];
+            i++;
+         }
+         
+         // Get the name of the uniform
+         while(shader_code[i] === ' ' && i < filelen) i++; // Skip any number of spaces till the next word
+         
+         // Here we check for the special character that is ought to precede uniform variables that need to be collected
+         // This way we collect only the uniform variables of the uniform buffer elements and not for example the line of code that declares the uniform buffer.
+         if(shader_code[i] !== u) {
+            skip = true;
+         }
+
+         // Skip special character. We rather not name a slider with the special character
+         i++;
+
+         while (shader_code[i] !== ' ' && i < filelen) {
+            struct.name += shader_code[i];
+            i++;
+         }
+      
+         if(!skip) buffer.push(struct);
+      }
+
+      wordpos.start = from_where_it_left_off;
+
+   }
+
+  
+   if(DEBUG.SHADERS) console.log('uniform names in shader', buffer);
+   return buffer;
+
+}
+/**SAVE */
+// function Resolve_generic_uniforms_names(shader_code, uniform_name) {
+
+   
+//    const buffer = [];
+   
+//    const word = uniform_name;
+//    const filelen = shader_code.length;
+   
+//    let i = 0;
+   
+//    let wordpos = { start: -1, end: -1, len: 0, line: -1 };
+   
+   
+//    // let i = word_position.start;
+//    while(i < filelen) {
+      
+//       let skip = false;
+//       wordpos = Find_field_by_name(shader_code, word, wordpos.line, wordpos.start);
+//       const from_where_it_left_off = wordpos.end;
+
+//       if(from_where_it_left_off === -1) break;
+
+//       i = wordpos.start;
+      
+//       // If word found, go to start of the line
+//       while((shader_code[i] !== '\n' && shader_code[i] !== ';') && i > 0) i--;
+      
+//       if(i > 0) i++; // Skip the \n character. Also includes the edge case of the uniform being the first line of code in the shader and has no '\n': 'float glow = u_generic_controls' 
+      
+//       // If word found, go to start of the line
+//       while(shader_code[i] === ' ' || shader_code[i] === '\n' && i < filelen) i++; // Skip any number of spaces till the next word
+//       if(shader_code[i] === '/') skip = true; // Avoid any commented code
+      
+//       if(!skip) {
+
+//          const struct = { type: '', name: '', };
+         
+//          // Get the type of the uniform
+//          while (shader_code[i] !== ' ' && i < filelen) {
+//             struct.type += shader_code[i];
+//             i++;
+//          }
+         
+//          // Get the name of the uniform
+//          while(shader_code[i] === ' ' && i < filelen) i++; // Skip any number of spaces till the next word
+         
+//          while (shader_code[i] !== ' ' && i < filelen) {
+//             struct.name += shader_code[i];
+//             i++;
+//          }
+      
+//          buffer.push(struct);
+//       }
+
+//       wordpos.start = from_where_it_left_off;
+
+//    }
+
+  
+//    if(DEBUG.SHADERS) console.log('uniform names in shader', buffer);
+//    return buffer;
+
+// }
 function Resolve_generic_uniforms_count(shader_code) {
 
    /**
@@ -550,16 +749,12 @@ function Vertex_shader_resolve_attributes_in(sid) {
    for (let i = 0; i < attributes_len; i++) {
 
       const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
-      // if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) {
       if ((sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) && (attr_info.FLAG & SID.ATTR.MSDF)===0) {
 
          const attr_flag = attr_info.FLAG;
          const attr_name = attr_info.ATTR_NAME;
          const attr_type = attr_info.TYPE;
          const attr_type_size = attr_info.TYPE_SIZE;
-
-
-         // const pass_to_fs = (attr_flag & SID.ATTR.WPOS3) ? ((sid.pass & attr_info.FLAG) | (sid.pass & SID.PASS.WPOS3)) : sid.pass & attr_info.FLAG;
 
 
          // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
@@ -582,9 +777,6 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
             
             // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
-            // if (attr_flag & SID.ATTR.WPOS3 && j === 2)
-            //    loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, 0x0,);
-            // else loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, pass_to_fs,);
             loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
             
             vec_idx++;
@@ -649,9 +841,6 @@ function Vertex_shader_resolve_attributes_in(sid) {
             }
 
             // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
-            // if (attr_flag & SID.ATTR.WPOS3 && j === 2)
-            //    loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, 0x0,);
-            // else loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, pass_to_fs,);
             loc[loc_idx].attr[vec_idx] = loc[loc_idx].attr[vec_idx] = Create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
 
             
@@ -779,6 +968,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    const ret = Vertex_shader_resolve_attributes_in(sid);
    Vertex_shader_resolve_attributes_out();
    Vertex_shader_resolve_attributes_out_assignment();
+
 
    const vs_chunks = [
       '#version 300 es',
@@ -1264,10 +1454,23 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
    ID++;
 
+   const buffer = [];
+   for(let i=0; i<uniforms_info.length; i++) {
+      
+      // Collect all uniform names from a shader only if the current uniform is of type uniform buffer 
+      // if(uniforms_info[i].arr_size > 0) {
+
+         const vars_using_uniform_buffer = Resolve_generic_uniforms_names(fragment_shader, uniforms_info[i].name);
+         buffer.push(vars_using_uniform_buffer);
+      // }
+   }
+   // console.log(buffer)
+
    console.info(fs);
    return {
       fs:fs,
       code:fs_chunks,
+      vars_using_uniform_buffer:buffer,
    };
 }
 

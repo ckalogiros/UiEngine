@@ -6,9 +6,11 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
 import { Bricks_check_collision_column_only } from "./Bricks.js";
 import { Player_get } from "./Player.js";
@@ -115,11 +117,8 @@ function Gun_create(x, y, vb_groupidx) {
    _gun.timer_limit = 0;
    _gun.timer_step = 0;
 
-   const mesh = Create_rect_mesh(_, [x, y, 1], [_gun.w, _gun.h], YELLOWR[9], 'Gun',);
-   mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BULLET_INIT_DIM_X);
+   const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w, _gun.h], col:YELLOWR, name:'Bullet', }));
+   Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -134,11 +133,8 @@ function Gun_create(x, y, vb_groupidx) {
 
    // Create gun's mesh part 2
    y -= _gun.h + _gun.h * .7;
-   const mesh2 = Create_rect_mesh(_, [x, y, 1], [_gun.w * .5, _gun.h * .7], YELLOWR[9], 'GunMeshn2',);
-   mesh2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   mesh2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BULLET_INIT_DIM_X);
+   const mesh2 = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w * .5, _gun.h * .7], col:YELLOWR, name:'GunMeshn2', }));
+   Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
    mesh2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -179,12 +175,10 @@ export class Bullet {
       this.timer_limit = 0;
       this.timer_step = 0;
 
-      // const mesh = Create_rect_mesh(_, [0, 0, 1], [w, h], YELLOWR[9], 'Bullet',);
-      const mesh = Create_rect_mesh(_, [x, y, 1], [w, h], YELLOWR[9], 'Bullet',);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // const mesh = Create_rect_mesh(_, [x, y, 1], [w, h], YELLOWR[9], 'Bullet',);
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR, name:'Bullet', }));
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BULLET_INIT_DIM_X);
       // mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_GLOW);
       // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
       // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);

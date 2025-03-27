@@ -70,6 +70,8 @@ export class Widget_Menu_Bar extends Section {
       
       this.close_btn_idx = INT_NULL;
       this.minimize_btn_idx = INT_NULL;
+
+      this.SetLayout(properties.layout);
       
    }
    

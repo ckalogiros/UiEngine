@@ -41,7 +41,8 @@ const GL_STATE = {
 };
 
 
-
+/** This is a special character used in shader code, to denote that a (uniform) variable is to be 'collected' so that the application can use the uniform's name  */
+const u = '_';
 
 
 

@@ -166,7 +166,7 @@ export function Create_widget_button(properties) {
 
 
 //  is_root = 0x0, text_on, text_off, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
-export function Create_widget_switch(properties) {
+export function Create_widget_switch_button(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();

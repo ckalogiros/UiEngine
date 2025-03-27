@@ -1,7 +1,7 @@
 "use strict"
 
 import { Mouse_get_posx } from "../../../../Engine/Controls/Input/Mouse.js";
-import { Create_widget_label, Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_widget_label, Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { Effects_explosion_circle_init_buffer, Effects_explosion_circle_update, Effects_explosion_glow_init_buffer, Effects_explosion_glow_update, Effects_print } from "../../../../Engine/Drawables/Effects/Effects.js";
@@ -20,6 +20,10 @@ import { Arkanoid_powerup_reset, Arkanoid_powup_destroy, Powup_init_buffer, Powu
 import { Arkanoid_scoremod_destroy, Arkanoid_scoremod_reset, Score_mod_init_buffer } from "./ScoreMod.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_activate_all_vbs } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Check_intersection_point_rect } from "../../../../Engine/Drawables/Operations/Collisions.js";
+import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Align_pre_simple } from "../../../Tests/TestAlignNestedSections.js";
+import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -161,37 +165,36 @@ function Arkanoid_on_click_callback(params) {
 /** */
 function Arkanoid_initialize_start_menu(x, y) {
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x, y, 0], [ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], GREY[4]);
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, y, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[4]}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, enable_pass_vpos:true, });
    section.SetName('Arkanoid-Start Menu Panel');
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
-   // section.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
-   section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-
-
-   section.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
-
-
-
-
+   // section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
+   // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   // section.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+   
+   
+   section.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
+   section.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+   
+   
+   
+   
    /*******************************************************************************************/
    // Load menu button
-   const start_menu_btn = Create_widget_label(_, 'Start', _, [0, 0, 1], 40, GREEN[7], WHITE, [16, 16], .5, _, TEXTURES.MTSDF_COMIC_1024);
-   start_menu_btn.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
-   start_menu_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:GREEN[7], dim:[16, 16], }));
    start_menu_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   start_menu_btn.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-   start_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   start_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 35);
-   start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   // start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.OUTER_GLOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // start_menu_btn.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
+   
+   Widget_gfx_ready_enable({mesh:start_menu_btn, enable_sdf_rect:20, enable_pass_vpos:true});
+   // start_menu_btn.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+   // start_menu_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+   // start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+   start_menu_btn.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
+   start_menu_btn.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
 
    section.AddItem(start_menu_btn);
@@ -217,7 +220,8 @@ function Arkanoid_initialize_start_menu(x, y) {
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    // Set and update bricks uniforms for the INNER_SHADOW shader
-   section.GfxUniformSetAndUpdate('u_generic_controls', [.25, 1., .5]);
+   // section.GfxUniformSetAndUpdate('u_generic_controls', [.25, 1., .5]);
+   section.GfxUniformSetAndUpdate('u_generic_controls', [.5, .7, .2]);
 
    View_build_group_from_root_mesh(section);
    _arkanoid_struct.start_menu.panel.view_group = section.group_bufferidxs;
@@ -234,15 +238,15 @@ function Arkanoid_initialize_game(x, y) {
    /***************************************************************************************************************/
    // Create score panel
 
-   const menu = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x, ypos, 0], [ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y], GREY[5]);
+   const menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y], col:GREY[5], layout:ALIGN_2.HORIZONTAL}));
+   Widget_gfx_ready_enable({mesh:menu, enable_sdf_rect:10, enable_pass_vpos:true,});
    menu.SetName('Arkanoid-Menu');
-   menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
-   menu.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-   menu.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   menu.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   menu.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   // menu.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+   // menu.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+   // menu.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   // menu.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    menu.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
    menu.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
@@ -253,29 +257,30 @@ function Arkanoid_initialize_game(x, y) {
    y = pad;
 
    // Score text
-   const score_text = Create_widget_label(_, 'score', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   score_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   const score_text = Create_widget_label(Style_label_default_properties({text:'score', pos:[0, 0, 4], col:TRANSPARENT, font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:score_text, enable_sdf_rect:20, enable_pass_vpos:true});
    menu.AddItem(score_text);
    _arkanoid_struct.score_text = score_text;
    score_text.text_mesh.mat.x
 
-   x += score_text.text_mesh.text_width * 2 + pad;
-   const score_num_text = Create_widget_label(_, '000000000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   score_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // x += score_text.text_mesh.text_width * 2 + pad;
+   const score_num_text = Create_widget_label(Style_label_default_properties({text:'000000000', pos:[0, 0, 4], col:TRANSPARENT, font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:score_num_text, enable_sdf_rect:20, enable_pass_vpos:true});
    menu.AddItem(score_num_text)
    _arkanoid_struct.score_num_text = score_num_text;
 
    // Score modifier
    x = pad;
    y += score_text.text_mesh.geom.dim[1] * 2 + pad;
-   const score_mod_text = Create_widget_label(_, 'score mod', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   score_mod_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   const score_mod_text = Create_widget_label(Style_label_default_properties({text:'score mod', pos:[0, 0, 4], col:TRANSPARENT, font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:score_mod_text, enable_sdf_rect:20, enable_pass_vpos:true});
    menu.AddItem(score_mod_text);
    _arkanoid_struct.score_mod_text = score_mod_text;
 
    x += score_mod_text.text_mesh.text_width * 2 + pad;
-   const score_mod_num_text = Create_widget_label(_, '00000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   score_mod_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const score_mod_num_text = Create_widget_label(_, '00000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
+   const score_mod_num_text = Create_widget_label(Style_label_default_properties({text:'00000', pos:[0, 0, 0], col:TRANSPARENT, text_col:GREEN[9], font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:score_mod_num_text, enable_sdf_rect:20, enable_pass_vpos:true});
    menu.AddItem(score_mod_num_text)
    _arkanoid_struct.score_mod_num_text = score_mod_num_text;
 
@@ -283,37 +288,43 @@ function Arkanoid_initialize_game(x, y) {
    // x += (menu.geom.dim[0]*2) score_mod_num_text.text_mesh.text_width*2+pad;
    x += score_mod_num_text.text_mesh.text_width * 2 + pad + 130;
    y = pad;
-   const coins_texture = Create_widget_section(_, _, [0, 0], [x, y, 4], [COIN_SIZE, COIN_SIZE], WHITE, 'CoinCounterUi', _, _, COIN_TEXTURE);
-   coins_texture.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const coins_texture = Create_rect_mesh(_, _, [0, 0], [x, y, 4], [COIN_SIZE, COIN_SIZE], WHITE, 'CoinCounterUi', _, _, COIN_TEXTURE);
+   const coins_texture = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 4], col:WHITE, dim:[COIN_SIZE, COIN_SIZE], name:'CoinCounterUi', texture_id:COIN_TEXTURE, layout:ALIGN_2.VERTICAL}));
+   // Widget_gfx_ready_enable({mesh:coins_texture, enable_sdf_rect:20, enable_pass_vpos:true});
+   Widget_gfx_ready_enable({mesh:coins_texture, enable_sdf_rect:20});
+   // Widget_gfx_ready_enable({mesh:coins_texture, });
    menu.AddItem(coins_texture);
    _arkanoid_struct.coins_texture = coins_texture;
 
    x += coins_texture.geom.dim[0] * 2 + pad;
-   const coins_texture_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   coins_texture_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const coins_texture_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
+   const coins_texture_text = Create_widget_label(Style_label_default_properties({text:'x000', pos:[0, 0, 4], col:TRANSPARENT, text_col:GREEN[9], font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:coins_texture_text, enable_sdf_rect:20, enable_pass_vpos:true})
    menu.AddItem(coins_texture_text)
    _arkanoid_struct.coins_num_text = coins_texture_text;
 
 
    // Combo counter
    y += coins_texture.geom.dim[1] * 2 + pad;
-   // x = coins_texture.geom.pos[0] + score_mod_num_text.text_mesh.text_width*2+pad;
    x = coins_texture.geom.pos[0];
-   const combo_text = Create_widget_label(_, 'combo', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   combo_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const combo_text = Create_widget_label(_, 'combo', _, [x, y, 4], 12, TRANSPARENT, WHITE, [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
+   const combo_text = Create_widget_label(Style_label_default_properties({text:'combo', pos:[0, 0, 4], col:TRANSPARENT, font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:combo_text, enable_sdf_rect:20, enable_pass_vpos:true});
    menu.AddItem(combo_text);
    _arkanoid_struct.combo_text = combo_text;
 
    x += combo_text.text_mesh.text_width * 2 + pad;
-   const combo_num_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
-   combo_num_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const combo_num_text = Create_widget_label(_, 'x000', _, [x, y, 4], 12, TRANSPARENT, GREEN[9], [0, 0], .5, _, TEXTURES.MTSDF_COMIC_1024,);
+   const combo_num_text = Create_widget_label(Style_label_default_properties({text:'x000', pos:[0, 0, 4], col:TRANSPARENT, text_col:GREEN[9], font_size:12, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, }));
+   Widget_gfx_ready_enable({mesh:combo_num_text, enable_sdf_rect:20, enable_pass_vpos:true})
    menu.AddItem(combo_num_text)
    _arkanoid_struct.combo_num_text = combo_num_text;
 
+   Align_pre_simple(menu);
 
    // Render
-   menu.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
    menu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
 
 
    menu.Render()
@@ -324,12 +335,15 @@ function Arkanoid_initialize_game(x, y) {
 
 
    // Set and update bricks uniforms for the INNER_SHADOW shader
-   menu.GfxUniformSetAndUpdate('u_generic_controls', [1.0, .3, 1.0]);
+   // menu.GfxUniformSetAndUpdate('u_generic_controls', [1.0, .3, 1.0]);
+   // menu.GfxUniformSetAndUpdate('u_generic_controls', [.5, .8, .2]);
 
    score_num_text.text_mesh.RenderTextFromNumber(0);
    score_mod_num_text.text_mesh.RenderTextFromNumber(0);
    coins_texture_text.text_mesh.RenderTextFromNumber(0);
    combo_num_text.text_mesh.RenderTextFromNumber(0);
+
+   // Renderqueue_set_priority_by_vb(LAST, coins_texture.gfx.vb.groupidx);
 
 
    View_build_group_from_root_mesh(menu);
@@ -358,24 +372,20 @@ function Arkanoid_initialize_game(x, y) {
    /***************************************************************************************************************/
    // Create game panel
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [ARKANOID_SECTION_PAD_X, ypos, 0], [ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], GREY[5]);
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[ARKANOID_SECTION_PAD_X, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[5]}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, enable_pass_vpos:true, });
+   // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [ARKANOID_SECTION_PAD_X, ypos, 0], [ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], GREY[5]);
    section.SetName('Arkanoid-Game Panel');
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
 
-   section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-
+   // section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    section.EnableGfx(MESH_ENABLE.GFX.FN_INNER_SHADOW);
    section.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
-   arkanoid_panel_mesh = section;
-   _arkanoid_struct.game_panel.panel.view_group = section.group_bufferidxs;
-   _arkanoid_struct.game_panel.panel.mesh = section;
 
    // Render
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -386,14 +396,22 @@ function Arkanoid_initialize_game(x, y) {
    Construct_listen_events_from_mesh_tree(section);
    Construct_listen_events_relations_from_mesh_tree(section);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   
 
-
-   // Set and update bricks uniforms for the INNER_SHADOW shader
    // section.GfxUniformSetAndUpdate('u_generic_controls', [1.0, .3, 1.0]);
-   section.GfxUniformSetAndUpdate('u_generic_controls', [.0, .0, .0]);
+   // section.GfxUniformSetAndUpdate('u_generic_controls', [.5, .8, .2]);
+   // section.GfxUniformSetAndUpdate('u_generic_controls', [.0, .0, .0]);
 
 
-   View_add_to_group(section, group_idx);
+
+
+   // HERE
+   arkanoid_panel_mesh = section;
+   View_build_group_from_root_mesh(section);
+   _arkanoid_struct.game_panel.panel.view_group = section.group_bufferidxs;
+   _arkanoid_struct.game_panel.panel.mesh = section;
+
+   // View_add_to_group(section, group_idx);
 
 
    /***********************************************************************************/

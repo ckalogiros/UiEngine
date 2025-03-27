@@ -286,19 +286,23 @@ export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, va
 		 * depending on the implementation
 		 */
 
-		const is_metrics_loaded = _textureBuffer[texture_idx].IsMetricsLoaded(variant_idx);
-		if(!is_metrics_loaded) { // Load the metrics for the variant
-
-			metrics_idx = Texture_metrics_create_uvmap(_textureBuffer[texture_idx].texture_file_id, variant_idx, sub_tex_idx, _textureBuffer[texture_idx].metrics_file);
-			_textureBuffer[texture_idx].SetMetricsIndex(metrics_idx, variant_idx);
-		}
-
 		tex_idx = texture_idx;
-		if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
+		
+		if((TEX_TYPE & TEXTURE_TYPE.TYPE_TEXTURE) === 0) {
 
-			metrics_idx = _textureBuffer[texture_idx].metrics_idxs[variant_idx];
-			// metrics_idx = Uv_retrieve_uvmap_idx(texture_file_id);// the index for the texture metrics in the font metrics buffer
-			// _textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
+			const is_metrics_loaded = _textureBuffer[texture_idx].IsMetricsLoaded(variant_idx);
+			if(!is_metrics_loaded) { // Load the metrics for the variant
+	
+				metrics_idx = Texture_metrics_create_uvmap(_textureBuffer[texture_idx].texture_file_id, variant_idx, sub_tex_idx, _textureBuffer[texture_idx].metrics_file);
+				_textureBuffer[texture_idx].SetMetricsIndex(metrics_idx, variant_idx);
+			}
+	
+			if (TEX_TYPE & TEXTURE_TYPE.TYPE_FONT){
+	
+				metrics_idx = _textureBuffer[texture_idx].metrics_idxs[variant_idx];
+				// metrics_idx = Uv_retrieve_uvmap_idx(texture_file_id);// the index for the texture metrics in the font metrics buffer
+				// _textureBuffer[texture_idx].SetMetricsIndex(metrics_idx);
+			}
 		}
 	}
 

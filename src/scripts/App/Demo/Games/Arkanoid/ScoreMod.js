@@ -5,7 +5,9 @@ import { Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_score_calc } from "./Arkanoid.js";
 
 
@@ -48,8 +50,8 @@ class Score_Mod {
 
    constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL) {
 
-      const mesh = Create_widget_label(_, text, _, [0, 0, 4], font_size, TRANSPARENT, text_color, [0, 0], .5, _, font,);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENT, text_col:text_color, texture_id:font,}));
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidxs.label, vb_groupidxs.text_mesh);
 
 

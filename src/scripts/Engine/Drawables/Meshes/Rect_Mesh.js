@@ -299,7 +299,8 @@ export class Rect_Mesh extends Mesh {
 
       this.SetStyle(properties.style);
       this.StylesSetPad(properties.pad);
-      this.SetName(`[${this.mesh_bufferidx}]{${properties.name}}-RECT_MESH`);
+      // this.SetName(`[${this.mesh_bufferidx}]{${properties.name}}-RECT_MESH`);
+      this.SetName(`${properties.name}`);
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -308,6 +309,8 @@ export class Rect_Mesh extends Mesh {
       }
 
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
+
+      this.SetLayout(properties.layout)
    }
 
    SetLayout(align_flags) {
@@ -545,10 +548,6 @@ export class Rect_Mesh extends Mesh {
       return this.gfx.vb.start;
    }
 
-   // Rerender() {
-
-   //    super.AddToGfxFromReset();
-   // }
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
@@ -576,8 +575,8 @@ export class Rect_Mesh extends Mesh {
       this.geom.pos[1] = pos_y + pad_y;
 
       return {
-         dim_x: this.geom.dim[0] + pad_x / 2,
-         dim_y: this.geom.dim[1] + pad_y / 2,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };

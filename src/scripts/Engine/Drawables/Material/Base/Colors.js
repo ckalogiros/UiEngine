@@ -539,19 +539,21 @@ function Calculate_color_ratio(index, color_center, color_wide, step, color_inde
 }
 
 
-export function Get_mix_color(index, max_count) {
+export function Get_mix_color(index, max_count, color_array) {
+
+	// TODO: implement: Draw colors from a color buffer, also passed by the user as: @color_array 
 
 
-	if (index === 0) console.log('---------------------------------')
+	const color_buffer = color_array !== undefined ? color_array : COLOR_ARRAY;
+	const num_colors = color_buffer.length;
 
-	const num_colors = COLOR_ARRAY.length;
 	const blue_color_index = 0;
 	const green_color_index = 1;
 	const red_color_index = 2;
 
 	const overlap = 0;
 
-	const color_wide = max_count / num_colors;
+	const color_wide = (max_count*2) / num_colors;
 
 	const blue_center = (color_wide * blue_color_index);
 	const blue_left = blue_center - (color_wide + overlap);

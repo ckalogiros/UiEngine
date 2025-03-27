@@ -782,15 +782,11 @@ export class Widget_Dropdown extends Section {
       this.geom.pos[1] = pos_y;
 
       this.menu.AlignNEW(pos_x, pos_y);
-      // this.menu.geom.pos[0] = pos_x + pad_x;
-      // this.menu.geom.pos[1] = pos_y + pad_y;
 
       const btn = this.children.buffer[0];
       btn.AlignNEW(pos_x, pos_y);
 
       return {
-         // dim_x: 0,
-         // dim_y: 0,
          dim_x: this.geom.dim[0],
          dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,

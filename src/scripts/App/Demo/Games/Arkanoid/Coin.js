@@ -1,16 +1,18 @@
 'use strict';
 
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_section } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle, Effects_create_explosion_glow } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_add_wpos_xy, Gl_set_alpha, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs } from "../../../../Helpers/Math/MathOperations.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_coin_counter_add } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top } from "./Player.js";
@@ -74,9 +76,12 @@ class Coin {
 
 
       // Coin textured mesh
-      const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_file_id,);
+      // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_file_id,);
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[COIN_SIZE, COIN_SIZE], col:WHITE, name:'CoinMesh', texture_id:texture_file_id}));
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:COIN_SIZE, });
+      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false});
 
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 
 

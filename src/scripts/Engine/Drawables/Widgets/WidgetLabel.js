@@ -37,6 +37,9 @@ export class Widget_Label extends Rect_Mesh {
 
         text_mesh.StylesSetPad(properties.text_pad);
 
+        // // HACK: Create equal x pad for the ratio dif of w/h
+        // properties.text_pad[0] += text_mesh.geom.dim[0] * 1.1708984375/2
+
         // Align text to the center of the label
         text_mesh.geom.pos[0] += properties.text_pad[0];
         text_mesh.geom.pos[1] += properties.text_pad[1];
@@ -80,6 +83,7 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.parent = this; // Use a special case for text meshes that are part of a widget without being in children's buffer.
 
 
+        this.SetLayout(properties.layout);
 
         if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
             this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -222,13 +226,22 @@ export class Widget_Label extends Rect_Mesh {
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
 
-        if (this.text_mesh.gfx_ctx_flags)
-            this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
-        else if (text_specific_vb_groupidx !== INT_NULL) {
-            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
+        if (this.text_mesh.gfx_ctx_flags) {
+
+            if (text_specific_vb_groupidx !== INT_NULL) {
+                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
+            }
+            else {
+
+                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
+            }
         }
         else {
-            this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
+            
+            if (text_specific_vb_groupidx !== INT_NULL) {
+                this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
+            }
+            else this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
         }
 
         return this.gfx;
@@ -315,8 +328,10 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[1] = pos_y + pad_y + text_pad_y;
 
         return {
-            dim_x: this.geom.dim[0] + pad_x / 2,
-            dim_y: this.geom.dim[1] + pad_y / 2,
+            // dim_x: this.geom.dim[0] + pad_x / 2,
+            // dim_y: this.geom.dim[1] + pad_y / 2,
+            dim_x: this.geom.dim[0],
+            dim_y: this.geom.dim[1],
             pad_x: pad_x / 2,
             pad_y: pad_y / 2,
         };

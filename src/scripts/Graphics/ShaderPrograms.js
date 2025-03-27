@@ -189,9 +189,9 @@ class Gl_Program {
 		this.sid = sid; // Shader Type ID (E.g. ATTR_COL4 | ATTR_POS2 | INDEXED)
 		this.state = { mask: 0x0 };
 
+
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
-		this.uniforms = uniforms;
 		this.shader_ops = null; // Init the array
 		if (shader_ops_idxs !== null)
 			this.AddShaderOperation(shader_ops_idxs); // Build the array
@@ -211,9 +211,41 @@ class Gl_Program {
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
 
+		// this.uniforms = uniforms;
+		this.uniforms = [];
+		for (let i = 0; i < uniforms.length; i++) {
+
+			this.uniforms.push({
+				name: uniforms[i].name,
+				shader: uniforms[i].shader, // Some shader flags(IN_FS, IN_VS, ...)
+				type: uniforms[i].type, // UNIF_TYPE.FARR,
+				ubidx: uniforms[i].ubidx, // Index
+				arr_size: uniforms[i].arr_size, // If this uniform is a uniform buffer 
+				shader_variables_unif_names: null// A collection of all names and types of the variable written inside the shader program code
+			});
+
+			// if(uniforms[i].arr_size > 0 && ret.vars_using_uniform_buffer.length > 0) {
+			if(uniforms[i].arr_size > 0) {
+
+				this.uniforms[i].shader_variables_unif_names = [];
+				// If uniform is a uniform buffer, store each unif name and type
+				for (let j = 0; j < ret.vars_using_uniform_buffer[i].length; j++) {
+					this.uniforms[i].shader_variables_unif_names[j] = {
+	
+						name: ret.vars_using_uniform_buffer[i][j].name,
+						type: ret.vars_using_uniform_buffer[i][j].type,
+					};
+				}
+			}
+
+
+			
+		}
+		console.log('Program::Uniforms', this.uniforms);
+
 
 		/****************************************************************************************************/
-		// Sampler uniforms. // TODO: This must be implemented with regular uiniforms???
+		// Sampler uniforms. // TODO: Move this to the .uniforms field
 		this.shaderinfo = {
 			uniforms: {
 				sampler: gl.getUniformLocation(this.shader_program, 'u_sampler0'),	// Sampler for texture units 	
@@ -301,6 +333,9 @@ export function Program_use_program2(progidx) {
 
 
 
+
+
+
 /****************************************************************************************************************************************************/
 // Uniforms
 /****************************************************************************************************************************************************/
@@ -321,7 +356,22 @@ export function Program_find_uniform_ubidx_from_name(progidx, unif_name) {
 	alert('Program_find_uniform_ubidx_from_name() \nNo uniform found.')
 }
 
+/** */
+export function Program_get_uniforms(progidx) {
+	return _programs.buffer[progidx].uniforms;
+}
+/** */
+export function Program_get_uniform_from_name(progidx, unif_name) {
 
+	const program_uniforms = _programs.buffer[progidx].uniforms;
+	const len = program_uniforms.length;
+	for (let i = 0; i < len; i++) {
+		if (program_uniforms[i].name === unif_name) {
+			return program_uniforms[i];
+		}
+	}
+	// return _programs.buffer[progidx].uniforms;
+}
 
 
 

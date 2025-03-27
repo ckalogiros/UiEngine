@@ -70,7 +70,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       switch0.state.mask &= ~MESH_STATE.ACTIVE;
 
       this.AddChild(switch0);
-      this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE)
+      this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
+
+      this.SetLayout(properties.layout);
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -479,16 +481,20 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
       const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+      
+      const offsetx = this.geom.pos[0];
+      const offsety = this.geom.pos[1];
+
       this.geom.pos[0] = pos_x + pad_x;
       this.geom.pos[1] = pos_y + pad_y;
 
       const switch_handle = this.children.buffer[0];
-      switch_handle.geom.pos[0] += pos_x + pad_x;
-      switch_handle.geom.pos[1] += pos_y + pad_y;
+      switch_handle.geom.pos[0] += pos_x + pad_x - offsetx;
+      switch_handle.geom.pos[1] += pos_y + pad_y - offsety;
 
       return {
-         dim_x: this.geom.dim[0] + pad_x / 2,
-         dim_y: this.geom.dim[1] + pad_y / 2,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };

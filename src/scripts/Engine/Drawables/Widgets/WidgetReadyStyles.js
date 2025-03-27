@@ -77,7 +77,8 @@ export function Inspect_and_correct_slider_properties(user_properties) {
 export function Style_rect_default_properties(user_properties) {
    const properties = {
       is_root: user_properties.is_root,
-      pos: user_properties.pos,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+
       dim: user_properties.dim,
       col: user_properties.col,
       num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
@@ -89,6 +90,8 @@ export function Style_rect_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id,
       variant_idx: user_properties.variant_idx,
 
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF,
+
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
 
@@ -96,11 +99,57 @@ export function Style_rect_default_properties(user_properties) {
   return properties;
 
 }
+/** */
+export function Style_text_default_properties(user_properties) {
+
+   const properties = {
+      is_root:user_properties.is_root,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+      align:user_properties.align !== undefined ? user_properties.align : ALIGN.HORIZONTAL, 
+      
+      text:user_properties.text !== undefined ? user_properties.text : 'UUnamed Multi Text', 
+      font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 
+      col:user_properties.col !== undefined ? user_properties.col : WHITE, 
+      pad:user_properties.pad !== undefined ? user_properties.pad : [0,0], 
+      texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 
+      variant_idx:user_properties.variant_idx,
+
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+   };
+
+
+  return properties;
+
+}
+/** */
+export function Style_multi_text_default_properties(user_properties) {
+
+   const properties = {
+      is_root:user_properties.is_root,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+      align:user_properties.align !== undefined ? user_properties.align : ALIGN.HORIZONTAL, 
+      
+      text:user_properties.text !== undefined ? user_properties.text : 'UUnamed Multi Text', 
+      font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 
+      col:user_properties.col !== undefined ? user_properties.col : WHITE, 
+      pad:user_properties.pad !== undefined ? user_properties.pad : [0,0], 
+      texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 
+      variant_idx:user_properties.variant_idx,
+
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+   };
+
+
+  return properties;
+
+}
+/** */
 export function Style_slider_simple_default_properties(user_properties) {
 
    const properties = {
       is_root: user_properties.is_root,
-      pos: user_properties.pos,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+
       dim: user_properties.dim,
       col: user_properties.col,
       hover_margin: user_properties.hover_margin !== undefined ? user_properties.hover_margin : [7, 7],
@@ -108,6 +157,8 @@ export function Style_slider_simple_default_properties(user_properties) {
       num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
       rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
+      
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
 
       handle: {
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : BLUEL[7],
@@ -121,6 +172,7 @@ export function Style_slider_simple_default_properties(user_properties) {
   return properties;
 
 }
+/** */
 export function Style_slider_default_properties(user_properties) {
 
    /**
@@ -138,7 +190,8 @@ export function Style_slider_default_properties(user_properties) {
 
    const properties = {
       is_root: user_properties.is_root,
-      pos: user_properties.pos,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+
       dim: user_properties.dim,
       col: user_properties.col,
       hover_margin: user_properties.hover_margin !== undefined ? user_properties.hover_margin : [7, 7],
@@ -150,6 +203,8 @@ export function Style_slider_default_properties(user_properties) {
       texture_id: user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? _ : user_properties.texture_id,
       // font_size: user_properties.font_size,
       variant_idx: user_properties.variant_idx,
+      
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
 
       bar: {
          // col:BLUEL[7],
@@ -218,28 +273,32 @@ export function Style_label_default_properties(user_properties) {
       // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
       is_root:user_properties.is_root,
       
-      pos:user_properties.pos !== undefined ? [0, 0, user_properties.pos[2]] : [0,0,0], 
-      col: user_properties.col !== undefined ? user_properties.col : BLUEL[4],
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+ 
+      col:user_properties.col !== undefined ? user_properties.col : BLUEL[4],
       dim:_,
-      text_col:WHITE, 
-
+      
       align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
-      
-      text:user_properties.text, 
-      text_pad:user_properties.text_pad !== undefined ? user_properties.text_pad : [10, 6], 
       style:style, 
+      
+      text:user_properties.text !== undefined ? user_properties.text : 'Label', 
+      text_pad:user_properties.text_pad !== undefined ? user_properties.text_pad : [10, 6], 
+      text_col: user_properties.text_col !== undefined ? user_properties.text_col : WHITE, 
       
       font_size:user_properties.font_size !== undefined ? user_properties.font_size : 8, 
       texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 
       sub_texture_id: user_properties.sub_texture_id !== undefined ? user_properties.sub_texture_id : _,
       variant_idx: user_properties.variant_idx !== undefined ? user_properties.variant_idx : _,
       
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
 
    return properties;
 }
+/** */
 export function Style_button_default_properties(user_properties) {
 
    const style = { rcorners: 8, feather: 0, border: 0 };
@@ -249,7 +308,8 @@ export function Style_button_default_properties(user_properties) {
       // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
       is_root:user_properties.is_root,
       
-      pos:[0, 0, user_properties.pos[2]], 
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+ 
       col: user_properties.col !== undefined ? user_properties.col : BLUEL[4],
       dim:_,
       text_col:user_properties.text_col !== undefined ? user_properties.text_col : WHITE, 
@@ -271,6 +331,7 @@ export function Style_button_default_properties(user_properties) {
 
    return properties;
 }
+/** */
 export function Style_switch_button_default_properties(user_properties) {
 
    const style = { rcorners: 8, feather: 0, border: 0 };
@@ -304,6 +365,7 @@ export function Style_switch_button_default_properties(user_properties) {
 
    return properties;
 }
+/** */
 export function Style_switch_default_properties(user_properties) {
 
    const style = { rcorners: 8, feather: 0, border: 0 };
@@ -317,7 +379,9 @@ export function Style_switch_default_properties(user_properties) {
       // pad:user_properties.pad !== undefined ? user_properties.pad : 0,
       pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
       style:user_properties.style !== undefined ? user_properties.style : style,
-      
+            
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+
       handle: {
          
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : GREY[8],
@@ -368,13 +432,14 @@ export function Style_section_default_properties(user_properties) {
       texture_id:user_properties.texture_id, 
       sub_texture_id:user_properties.sub_texture_id,
       variant_idx:user_properties.variant_idx,
-      
+            
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
 
    return properties;
 }
-
 /**
  * 
  * @param {*} user_properties:{
@@ -401,9 +466,10 @@ export function Style_dropdown_default_properties(user_properties) {
          is_root:user_properties.is_root,
          options:SECTION.VERTICAL, 
          
-         pos:user_properties.pos, 
+         pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+
          dim:_,
-         col:GREY[2],
+         col:user_properties.col !== undefined ? user_properties.col : GREY[2],
          
          // pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
          pad:[5,5],
@@ -414,7 +480,9 @@ export function Style_dropdown_default_properties(user_properties) {
          texture_id:_,
          sub_texture_id:_,
          variant_idx:_,
-         
+               
+         layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.RESIZE_PARENT|ALIGN_2.HORIZONTAL,
+
          is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
       },
       menu: { // Section class
@@ -422,15 +490,11 @@ export function Style_dropdown_default_properties(user_properties) {
          options:SECTION.VERTICAL, 
          
          pos:[0, 0, user_properties.pos[2]+1], 
-         // dim:_,
          dim:[100, 100],
-         // col:GREY[4],
-         col:YELLOWL[4],
-         // col:TRANSPARENCY(BLUEL[9], 1.),
+         col:user_properties.menu_col !== undefined ? user_properties.menu_col : YELLOWL[4],
          
-         // pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
-         pad:[5,5], 
-         // name:user_properties.name,
+         pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
+         // pad:[5,5], 
          num_face:1,
          style:style, 
          
@@ -446,7 +510,7 @@ export function Style_dropdown_default_properties(user_properties) {
          
          pos:[0, 0, user_properties.pos[2]+2], 
          // col: GREY[6],
-         col: user_properties.col !== undefined ? user_properties.col : BLUEL[4],
+         col: user_properties.btn_col !== undefined ? user_properties.btn_col : user_properties.col !== undefined ? user_properties.col : BLUEL[4],
          // col: BLUEL[4],
          dim:_,
          text_col:WHITE, 

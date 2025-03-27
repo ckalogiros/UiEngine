@@ -146,7 +146,8 @@ export class Mesh {
 
 
 
-        this.gfx_ctx_flags = 0x0;
+        // this.gfx_ctx_flags = 0x0;
+        this.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         this.gfx_ctx_parent = INT_NULL;
 
 
@@ -201,6 +202,8 @@ export class Mesh {
         this.current_event_callback_idx = INT_NULL;
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
+
+        this.rel_pos = [0,0];
 
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
@@ -746,7 +749,7 @@ export class Mesh {
 
             // case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.attr |= SID.ATTR.VPOS2; this.sid.pass |= SID.PASS.VPOS2; break; }
             case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
-            // case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS2; break; }
+            case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS3; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
             case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
@@ -787,7 +790,6 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
                 this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
                 this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
                 this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
@@ -894,10 +896,7 @@ export class Mesh {
     }
 
     
-    EnableGfxPass(flags) {
 
-        this.sid.pass |= flags;
-    }
 
 
     SetClbkGfxUniforms(unif_name, Clbk, clbk_params) {

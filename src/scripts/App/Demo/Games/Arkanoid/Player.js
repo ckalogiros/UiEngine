@@ -6,8 +6,10 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 
 
 
@@ -38,10 +40,9 @@ export class Player {
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(_, [posx, posy, 1], [PLAYER_DIM_X, PLAYER_DIM_Y], BLUEL[9], 'Player',);
-      mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
+      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, _);
 

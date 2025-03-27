@@ -4,11 +4,10 @@ import { Rect_Mesh } from '../Meshes/Rect_Mesh.js';
 import { Mouse_get_pos_dif } from '../../Controls/Input/Mouse.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
-import { AddArr2, CopyArr4, Max, Min } from '../../../Helpers/Math/MathOperations.js';
+import { AddArr2, CopyArr4, Min } from '../../../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from '../../Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
-import { BLUEL, GREY, REDL, WHITE, YELLOW } from '../Material/Base/Colors.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
@@ -86,6 +85,9 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
+      handle.rel_pos[0] = handle.geom.pos[0] - this.geom.pos[0];
+      handle.rel_pos[1] = handle.geom.pos[1] - this.geom.pos[1];
+
    }
    SetLayout(align_flags) {
 
@@ -150,7 +152,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
       const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
       this.geom.pos[0] = pos_x + pad_x;
-      // this.geom.pos[0] = pos_x ;
       this.geom.pos[1] = pos_y + pad_y;
 
       const handle = this.children.buffer[0];
@@ -158,8 +159,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       handle.geom.pos[1] += pos_y + pad_y;
 
       return {
-         dim_x: this.geom.dim[0] + pad_x / 2,
-         dim_y: this.geom.dim[1] + pad_y / 2,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };
@@ -870,7 +871,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // Align
 
       // Set bar to the bottom of the slider section
-      const bar_pos_y = (outer_pad + name_text.text_height*2 + handle.geom.dim[1]) ;
+      const bar_pos_y = (outer_pad + name_text.text_height*2 + handle.geom.dim[1]);
       bar.geom.pos[1] = bar_pos_y;
       handle.geom.pos[1] = (bar_pos_y+bar_height)-handle.geom.dim[1];
       
@@ -918,7 +919,9 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
 
-      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+      this.SetLayout(properties.layout);
 
    }
 
@@ -1717,46 +1720,43 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
    AlignNEW(pos_x, pos_y) {
 
+      const bar = this.children.buffer[this.bar_idx];
+      const handle = bar.children.buffer[0];
+      const name_text = this.text_mesh;
+      const value_text = this.children.buffer[this.value_text_idx];
+
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
       const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
+
+      const offsetx = this.geom.pos[0];
+      const offsety = this.geom.pos[1];
+
       this.geom.pos[0] = pos_x + pad_x;
       this.geom.pos[1] = pos_y + pad_y;
+      
+      bar.geom.pos[0] += pos_x + pad_x - offsetx;
+      bar.geom.pos[1] += pos_y + pad_y - offsety;
 
-      const bar = this.children.buffer[this.bar_idx];
-      // const bar_pad_x = bar.StylesGetPad(STYLES.AXIS.X);
-      // const bar_pad_y = bar.StylesGetPad(STYLES.AXIS.Y);
-      bar.geom.pos[0] += pos_x + pad_x;
-      bar.geom.pos[1] += pos_y + pad_y;
+      handle.geom.pos[0] += pos_x + pad_x - offsetx;
+      handle.geom.pos[1] += pos_y + pad_y - offsety;
 
+      name_text.geom.pos[0] += pos_x + pad_x - offsetx;
+      name_text.geom.pos[1] += pos_y + pad_y - offsety;
 
-      const handle = bar.children.buffer[0];
-      // const handle_pad_x = handle.StylesGetPad(STYLES.AXIS.X);
-      // const handle_pad_y = handle.StylesGetPad(STYLES.AXIS.Y);
-      handle.geom.pos[0] += pos_x + pad_x;
-      handle.geom.pos[1] += pos_y + pad_y;
-
-
-      const name_text = this.text_mesh;
-      const name_text_x = name_text.StylesGetPad(STYLES.AXIS.X);
-      // const name_text_y = name_text.StylesGetPad(STYLES.AXIS.Y);
-      name_text.geom.pos[0] = pos_x + pad_x + name_text_x;
-      name_text.geom.pos[1] += pos_y + pad_y;
-
-
-      const value_text = this.children.buffer[this.value_text_idx];
-      const value_text_x = value_text.StylesGetPad(STYLES.AXIS.X);
-      // const value_text_y = value_text.StylesGetPad(STYLES.AXIS.Y);
-      value_text.geom.pos[0] += pos_x;
-      // value_text.geom.pos[0] += pad_x;
-      value_text.geom.pos[1] += pos_y + pad_y;
+      value_text.geom.pos[0] += pos_x + pad_x - offsetx;
+      value_text.geom.pos[1] += pos_y + pad_y - offsety;
 
       return {
-         dim_x: this.geom.dim[0] + pad_x / 2,
-         dim_y: this.geom.dim[1] + pad_y / 2,
+         // dim_x: this.geom.dim[0] + pad_x / 2,
+         // dim_y: this.geom.dim[1] + pad_y / 2,
+         dim_x: this.geom.dim[0],
+         dim_y: this.geom.dim[1],
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };
    }
+
+
 
 
 

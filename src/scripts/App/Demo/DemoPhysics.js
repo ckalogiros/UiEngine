@@ -1,12 +1,13 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_multi_text, Create_widget_section, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
+import { Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
@@ -14,7 +15,9 @@ import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uni
 import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
+import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Contols_generic_uniforms_buffer } from "../Widgets/WidgetGenericControlsReady.js";
+import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 
 
 
@@ -63,7 +66,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
    /**********************************************************************************************************************************************/
    // Controls
-   const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y, 0], [0, 0], GREY[1]);
+   const controls_section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y, 0], [0, 0], GREY[1]);
    // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -114,7 +117,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
    /*********************************************************************************************************************************************/
    // Main Panel Section
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x + pad, y + total_height * 2, 0], [panel_height, panel_height], GREY[1]);
+   const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x + pad, y + total_height * 2, 0], [panel_height, panel_height], GREY[1]);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -277,7 +280,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
    /**********************************************************************************************************************************************/
    // Create Info Panel
    {
-      const info_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + pad, y + total_height * 2, 0], [0, 0], GREY[1]);
+      const info_section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x + pad, y + total_height * 2, 0], [0, 0], GREY[1]);
       // sat.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
       sat.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
       sat.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -543,17 +546,14 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    let total_height = 20;
 
    const scale_down = .6;
-   const feather = 2;
    const rcorners = 10;
 
    let controls_section = null;
 
 
    const pad = 10;
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [4, 4], [x + pad, y + total_height * 2, 0], elastic_collisions_panel_dim, GREY[1]);
-   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[4, 4], pos:[x + pad, y + total_height * 2, 0], dim:elastic_collisions_panel_dim, col:GREY[1]}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:rcorners,})
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('Elastic_collisions');
@@ -561,8 +561,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
    const balls_buffer = [], physics = [], info_buffer = [];
 
-   const test = Create_widget_text(_, `Explanation Here.`, [0, 400, 10], _, WHITE, _, _, TEXTURES.CONSOLAS_12px);
-   test.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   const test = Create_widget_text(Style_text_default_properties({text:`Explanation Here.`, pos:[0, 400, 10],}));
    section.AddItem(test);
 
 
@@ -580,13 +579,10 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
       const color = GetSequencedColor(9);
       // const color = RGB(i, 0.15, 0, 1.3);
-      const ball = Create_widget_section(_, SECTION.VERTICAL, [5, 5], [pos[0], pos[1], zpos++], dim, color, 'Ball' + i, [0, dim[0], 2]);
-      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      const ball = Create_rect_mesh(Style_rect_default_properties({pad:[5, 5], pos:[pos[0], pos[1], zpos++], dim:dim, col:color, name:'Ball' + i, }));
+      Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0],})
       ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       ball.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-
-      ball.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
-      ball.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
 
       // ball.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
@@ -655,22 +651,20 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    }
 
 
+
+// TODO: The ball needs a program.idx in order to create shader controls over uniforms
+
+
    /****************************************************************************************************************/
-   // Create slider controls
-
-
-
+   // Controls Create-Render
 
    if (controls_create) { // Create slider controls only if this is to be rendered from this function
 
-      const controls_section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, 500, 1], [0, 0], GREY[1], 'Emitter Window Panel', [0, 10, 2],);
-      // controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, 500, 1], col:GREY[1], name:'Emitter Window Panel', }));
+      Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:10,})
       controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      controls_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      const controls_buffer = Create_elastic_collisions_controls(balls_buffer, YELLOWL[3], [scale_down], params);
+      const controls_buffer = Create_elastic_collisions_controls(balls_buffer, YELLOWL[3], [scale_down], params, 'u_generic_controls');
 
       const len = controls_buffer.length;
       for (let i = 0; i < len; i++) {
@@ -684,8 +678,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          // Render 
          controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
-         controls_section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-         controls_section.Calc_no_gfx_update();
+
+         Align_pre_simple(controls_section);
 
          controls_section.Render();
          Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -702,14 +696,14 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
 
 
-
-
-
-
    /****************************************************************************************************************/
    // Render
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+
+
+   // Align_pre_simple(section);
+
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -721,6 +715,11 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
    // balls_buffer[0].GfxUniformSetAndUpdate('u_glow_params', [.7, 1., .4]);
    balls_buffer[0].GfxUniformSetAndUpdate('u_generic_controls', [1., .0, 1.]);
+
+
+
+
+
 
    total_height += elastic_collisions_panel_dim[1];
 
@@ -750,13 +749,11 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       section.GetPosY() + yy,
       0
    ];
-   const info_section_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[1]);
+   const info_section_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[5, 5], pos:pos, col:GREY[1]}));
+   Widget_gfx_ready_enable({mesh:info_section_panel, enable_sdf_rect:rcorners,})
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   info_section_panel.SetName(`InfoUi-info_section_panel`);
    {
-      // info_section_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      info_section_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-      info_section_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      if (!PLATFORM.ANY_SMARTPHONE_DEVICE) info_section_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      info_section_panel.SetName(`InfoUi-info_section_panel`);
       for (let i = 0; i < num_balls; i++) {
 
          const pos = [
@@ -764,10 +761,8 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
             section.GetPosY() + yy,
             0
          ];
-         const info_section = Create_widget_section(_, SECTION.VERTICAL, [5, 5], pos, [0, 0], GREY[2]);
-         // info_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-         info_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
-         info_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         const info_section = Create_rect_mesh(Style_rect_default_properties({pad:[5, 5], pos:pos, col:GREY[2]}));
+         Widget_gfx_ready_enable({mesh:info_section, enable_sdf_rect:rcorners,})
          info_section.SetName(`InfoUi-panel${i}`);
          const ball = balls_buffer[i];
 
@@ -784,7 +779,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          var info_text_mesh = null;
          let generic_time_interval = INT_NULL;
          { // Info
-            const nfo = Create_widget_multi_text(_, 'px:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
+            const nfo = Create_widget_multi_text(Style_multi_text_default_properties({text:'px:', pos:[0, 0, zpos + 1], font_size:font_size, col:WHITE, pad:pad1, texture_id:font}));
             info_section.AddItem(nfo);
 
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
@@ -799,7 +794,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
             info_text_mesh = nfo;
          }
          { // Info
-            const nfo = Create_widget_multi_text(_, 'vx:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
+            const nfo = Create_widget_multi_text(Style_multi_text_default_properties({text:'vx:', pos:[0, 0, zpos + 1], font_size:font_size, pad:pad1, texture_id:font}));
             info_section.AddItem(nfo);
 
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
@@ -812,7 +807,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
          }
          { // Info
-            const nfo = Create_widget_multi_text(_, 'accel x:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
+            const nfo = Create_widget_multi_text(Style_multi_text_default_properties({text:'accel x:', pos:[0, 0, zpos + 1], font_size:font_size, pad:pad1, texture_id:font}));
             info_section.AddItem(nfo);
 
             nfo.CreateNewText('000', font_size, COLOR, pad2, .9);
@@ -825,9 +820,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
             generic_time_interval = nfo.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
          }
          { // Info
-            // const ivev = [ball.geom.pos[0]-ball2.geom.pos[0], ball.geom.pos[1]-ball2.geom.pos[1]];
-            // const imag = Magnitude(ball.geom.pos[0], ball.geom.pos[1]);
-            const nfo = Create_widget_multi_text(_, 'magnitude: ', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1, font);
+            const nfo = Create_widget_multi_text(Style_multi_text_default_properties({text:'magnitude: ', pos:[0, 0, zpos + 1], font_size:font_size, pad:pad1, texture_id:font}));
             info_section.AddItem(nfo);
 
             nfo.CreateNewText('0000', font_size, COLOR, pad2, .9);
@@ -842,14 +835,13 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
       // Render
       info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+      
+      Align_pre_simple(info_section_panel);
+      
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, info_section_panel.mesh_bufferidx, true);
 
-
-      info_section_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-      info_section_panel.Calc_no_gfx_update();
 
       info_section_panel.Render();
       Root_group_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
@@ -901,7 +893,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
 
 /** For rendering the slider controls seperately from the ellastic collisions */
-export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], slider_init_values = null, params = null) {
+export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], slider_init_values = null, params = null, uniform_name) {
 
    let contols_buffer = [];
 
@@ -913,7 +905,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
       const slider_size = 120 * DEVICE.device_scale; // y:10 * DEVICE.device_scale;
       // const parameters = [0.2, .48, .5, .19, .08, .4, .04, .04, .55];
       const generic_controls_parameters = [1., 0., 1.];
-      contols_buffer = Contols_generic_uniforms_buffer(ball_mesh[0], slider_size, generic_controls_parameters);
+      contols_buffer = Contols_generic_uniforms_buffer(ball_mesh[0], slider_size, generic_controls_parameters, uniform_name);
    }
 
    const u_wpos_flags = {
