@@ -18,7 +18,7 @@ import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
 import { Demo_clbk_animations_text_create_contols, Demo_animations, Demo_animations_text, Demo_animations_with_slider_slope, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
-import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_smoke_particles, Create_smoke_particles_controls, Create_explosion_particles, Create_glow_particles_controls } from "./Demo/DemoParticles.js";
+import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_smoke_particles, Create_smoke_particles_controls, Create_explosion_particles, Create_particles_controls } from "./Demo/DemoParticles.js";
 import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
 import { Demo_widgets, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
 import { Game_snake } from "./Demo/Games/Tetris/Snake.js";
@@ -450,7 +450,7 @@ export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
 
       glow_particles_struct = Create_glow_particles(0, total_height+150, ROOT_WIDGETS.CREATE_ROOT, false, 1);
       // emitter, scale_down, color = GREY[2], parameters=null, u_scale_create=false, generic_contols_parameters=null
-      glow_particles_struct.controls_section = Create_glow_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values, true, glow_generic_controls_parameters);
+      glow_particles_struct.controls_section = Create_particles_controls(glow_particles_struct.emitter, .2, _, glow_slider_values, true, glow_generic_controls_parameters);
 
 
       Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
@@ -464,7 +464,7 @@ export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
       explosion_particles_struct = Create_explosion_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 256);
 
       // explosion_particles_struct.controls_section = Create_explosion_particles_controls(explosion_particles_struct.emitter, .2, _, explosion_slider_values);
-      explosion_particles_struct.controls_section = Create_glow_particles_controls(explosion_particles_struct.emitter, .2, _, explosion_slider_values, true, explosion_generic_controls_parameters);
+      explosion_particles_struct.controls_section = Create_particles_controls(explosion_particles_struct.emitter, .2, _, explosion_slider_values, true, explosion_generic_controls_parameters);
 
 
       Renderqueue_set_priority_by_vb(LAST, secondary_menu.gfx.vb.groupidx);
@@ -1063,7 +1063,7 @@ function Options_menu_callback(params) {
       const glow_slider_values = params.params.mnemonics.glow_slider_values;
       const glow_generic_controls_parameters = params.params.mnemonics.glow_generic_controls_parameters;
       if (glow_particles_contols === null) {
-         glow_particles_contols = Create_glow_particles_controls(emitter, scale_down, _, glow_slider_values, false, glow_generic_controls_parameters);
+         glow_particles_contols = Create_particles_controls(emitter, scale_down, _, glow_slider_values, false, glow_generic_controls_parameters);
       }
       for (let i = 0; i < glow_particles_contols.length; i++) {
          slider_section.AddItem(glow_particles_contols[i]);
@@ -1095,7 +1095,7 @@ function Options_menu_callback(params) {
       const explosion_generic_controls_parameters = params.params.mnemonics.explosion_generic_controls_parameters;
       if (explosion_particles_contols === null) {
          // explosion_particles_contols = Create_explosion_particles_controls(emitter, scale_down, _, explosion_slider_values);
-         explosion_particles_contols = Create_glow_particles_controls(emitter, scale_down, _, explosion_slider_values, true, explosion_generic_controls_parameters);
+         explosion_particles_contols = Create_particles_controls(emitter, scale_down, _, explosion_slider_values, true, explosion_generic_controls_parameters);
       }
       for (let i = 0; i < explosion_particles_contols.length; i++) {
          slider_section.AddItem(explosion_particles_contols[i]);

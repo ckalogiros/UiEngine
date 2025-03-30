@@ -57,7 +57,7 @@ export class Mesh {
 
     gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
     gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
-    
+
     align;           // Struct: Variables to define mesh's alignment
 
 
@@ -147,7 +147,7 @@ export class Mesh {
 
 
         // this.gfx_ctx_flags = 0x0;
-        this.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        this.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         this.gfx_ctx_parent = INT_NULL;
 
 
@@ -181,16 +181,16 @@ export class Mesh {
         this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
-        
+
         // this.align_flags = 0x0;
         this.align = {
-            flags:ALIGN_2.HORIZONTAL, // SEE: ALIGN_2 constant
-            pad_x:0,
-            pad_y:0,
-            margin_x:0,
-            margin_y:0,
-            margin_y:0,
-            row:0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
+            flags: ALIGN_2.HORIZONTAL, // SEE: ALIGN_2 constant
+            pad_x: 0,
+            pad_y: 0,
+            margin_x: 0,
+            margin_y: 0,
+            margin_y: 0,
+            row: 0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
         };
 
         this.parent = null;
@@ -203,7 +203,7 @@ export class Mesh {
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
 
-        this.rel_pos = [0,0];
+        this.rel_pos = [0, 0];
 
         this.rel_comp = null;
         this.root_posidx = INT_NULL;
@@ -564,14 +564,14 @@ export class Mesh {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
         if (this.event_clbks === null) this.event_clbks = New_generic_buffer(_, 'Mesh event_clbks');
-        
+
         // Automaticaly enable event callback if the first event callback is activated. 
         // For the rest of the callback events, the user is responsible to set the current active by setting current_event_callback_idx
         const evt_clbk_idx = this.event_clbks.Add(params);
         if (evt_clbk_idx === 0) this.current_event_callback_idx = evt_clbk_idx;
-        
+
         // User created function to resolve the event callback
-        if(event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn; 
+        if (event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn;
         return evt_clbk_idx;
     }
 
@@ -726,28 +726,11 @@ export class Mesh {
     }
 
 
-    /**
-     * Enable shader properties.
-     * In order for a mesh to be drawn in a certain way, specific shaders must be build.
-     * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
-    */
-    EnableGfxOperations(function_operation, blend_mode = SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
-
-        this.sid.shad_ops |= function_operation;
-        this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
-
-        if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
-            console.error('Shader Operation detected: Need SDF_RECT to function.');
-            alert('Shader Operation detected: Need SDF_RECT to function.');
-        }
-    }
-
 
     EnableGfx(which, params = null) {
 
         switch (which) {
 
-            // case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.attr |= SID.ATTR.VPOS2; this.sid.pass |= SID.PASS.VPOS2; break; }
             case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
             case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS3; break; }
             case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
@@ -769,7 +752,7 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
-            case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
+            // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
             case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
 
 
@@ -782,7 +765,7 @@ export class Mesh {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
                 this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
                 if (params !== null) {
-                    if ((params[0] instanceof Float32Array) === false) 
+                    if ((params[0] instanceof Float32Array) === false)
                         alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
                     if (this.mat.col[0] instanceof Float32Array) { CopyMat4(this.mat.col, params); CopyMat4(this.mat.defCol, params); }
                     else { this.mat.col = params; }
@@ -813,10 +796,10 @@ export class Mesh {
 
 
             // Shader Color Functions
-            case MESH_ENABLE.GFX.FX_NOISE: {
+            case MESH_ENABLE.GFX.FN_NOISE: {
                 // Exception: Use the 'params' to distinguish different worley noises 
-                if (!params || params === 1) { this.sid.fx |= SID.FX.FS_NOISE; break; }
-                else if (params === 2) { this.sid.fx |= SID.FX.FS_NOISE_2; break; }
+                if (!params || params === 1) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
+                else if (params === 2) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
             }
             case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
                 if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
@@ -855,6 +838,117 @@ export class Mesh {
     }
 
 
+    /**
+     * Enable shader properties.
+     * In order for a mesh to be drawn in a certain way, specific shaders must be build.
+     * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
+    */
+    EnableGfxOperations(function_operation, blend_mode = SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
+
+        this.sid.shad_ops |= function_operation;
+        this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
+
+        if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
+            console.error('Shader Operation detected: Need SDF_RECT to function.');
+            alert('Shader Operation detected: Need SDF_RECT to function.');
+        }
+    }
+    GfxEnableAttr(flags, params) {
+
+        if (flags & SID.ATTR.DIM2) { this.sid.attr |= SID.ATTR.DIM2; }
+        if (flags & SID.ATTR.TEX2) { this.sid.attr |= SID.ATTR.TEX2; }
+        if (flags & SID.ATTR.ANGLE) { this.sid.attr |= SID.ATTR.ANGLE; }
+        if (flags & SID.ATTR.TIME) { this.sid.attr |= SID.ATTR.TIME; if (params.time) this.geom.time = params.time; }
+        if (flags & SID.ATTR.GENERIC2) { this.sid.attr |= SID.ATTR.GENERIC2; if (params.generic) this.geom.generic = params.generic; }
+        if (flags & SID.ATTR.R_CORNERS) { this.sid.attr |= SID.ATTR.R_CORNERS; if (params.rcorners) this.mat.style.rcorners = params.rcorners; }
+        if (flags & SID.ATTR.COL4_PER_VERTEX) { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; if (params.col4_per_vertex) this.mat.col = params.col4_per_vertex; }
+
+    }
+    GfxPassAttr(flags) {
+
+        if (flags & SID.PASS.COL4_PER_VERTEX) { this.sid.pass |= SID.PASS.COL4_PER_VERTEX; }
+        if (flags & SID.PASS.VPOS2) this.sid.pass |= SID.PASS.VPOS2;
+        if (flags & SID.PASS.WPOS3) this.sid.pass |= SID.PASS.WPOS3;
+        if (flags & SID.PASS.WPOS2) this.sid.pass |= SID.PASS.WPOS2;
+        if (flags & SID.PASS.DIM2) { this.sid.pass |= SID.PASS.DIM2; }
+        if (flags & SID.PASS.TEX2) { this.sid.pass |= SID.PASS.TEX2; }
+        if (flags & SID.PASS.GENERIC2) { this.sid.pass |= SID.PASS.GENERIC2; }
+        if (flags & SID.PASS.RES2) this.sid.pass |= SID.PASS.RES2;
+        if (flags & SID.PASS.R_CORNERS) { this.sid.pass |= SID.PASS.R_CORNERS; }
+        if (flags & SID.PASS.ANGLE) { this.sid.pass |= SID.PASS.ANGLE; }
+        if (flags & SID.PASS.TIME) { this.sid.pass |= SID.PASS.TIME; }
+
+    }
+    GfxEnableFn(flags, params) {
+
+        // Enable shader function calls (from shader main())
+        if (flags === MESH_ENABLE.GFX.FN_GLOW) {
+            const param = { // Create default attribs values
+                time: params.time !== undefined ? params.time : 0,
+            };
+            this.sid.shad |= SID.SHAD.FN_GLOW;
+            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+        }
+        if (flags === MESH_ENABLE.GFX.FN_INNER_SHADOW) {
+            this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+        }
+        if (flags === MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE) {
+            const param = { // Create default attribs values
+                time: params.time !== undefined ? params.time : 0,
+                generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+            };
+            this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+        }
+        if (flags === MESH_ENABLE.GFX.FN_EXPLOSION_GLOW) {
+            const param = { // Create default attribs values
+                time: params.time !== undefined ? params.time : 0,
+                generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+            };
+            this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+        }
+        if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
+            this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+            this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+        }
+        if (flags === MESH_ENABLE.GFX.FN_NOISE) {
+            const param = { // Create default attribs values
+                time: params.time !== undefined ? params.time : 0,
+            };
+            this.sid.shad |= SID.SHAD.FN_NOISE;
+            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS2,); // Enable pass of the attributes to fragment shader
+        }
+        if (flags === MESH_ENABLE.GFX.FN_NOISE_WORLEY) {
+            // Exception: Use the 'params' to distinguish different worley noises 
+            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
+            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
+            else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
+        }
+        if (flags === MESH_ENABLE.GFX.FN_NOISE_VORONOI) {
+            // Exception: Use the 'params' to distinguish different worley noises 
+            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
+            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
+        }
+
+        if (params !== undefined) {
+            if (params.blend_mode !== undefined) {
+                this.sid.blend_options |= params.blend_mode;
+            }
+        }
+
+        // TODO
+        // case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
+        // case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+        // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+        // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
+        // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
+    }
     EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
@@ -871,9 +965,12 @@ export class Mesh {
          *          this might lead to unwilingly updating same loc of another program's uniform. 
          */
 
-        if (flags.unif) this.sid.unif |= flags.unif;
-        if (flags.pass) this.sid.pass |= flags.pass;
-        if (flags.fx) this.sid.fx |= flags.fx;
+        if (flags) {
+
+            if (flags.unif) this.sid.unif |= flags.unif;
+            if (flags.pass) this.sid.pass |= flags.pass;
+            if (flags.fx) this.sid.fx |= flags.fx;
+        }
 
         // Avoid duplicates
         const len = this.uniforms.length;
@@ -895,7 +992,7 @@ export class Mesh {
 
     }
 
-    
+
 
 
 

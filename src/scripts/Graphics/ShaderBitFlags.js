@@ -62,7 +62,7 @@ export class Shader_Attributes {
          FEATHER: BIT_FLAGS[_counter++],
          TIME: BIT_FLAGS[_counter++],
          ANGLE: BIT_FLAGS[_counter++],
-         GLOW_INTENSITY: BIT_FLAGS[_counter++],
+         // GLOW_INTENSITY: BIT_FLAGS[_counter++],
          SCALE2: BIT_FLAGS[_counter++],
          BORDER: BIT_FLAGS[_counter++],
          SDF: BIT_FLAGS[_counter++],
@@ -149,12 +149,12 @@ const ATTRIBUTES = [
    {FLAG:SID_ATTR.FEATHER,            IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'FEATHER',         ATTR_NAME:'feather'},
    {FLAG:SID_ATTR.TIME,               IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'TIME',            ATTR_NAME:'time'},
    {FLAG:SID_ATTR.ANGLE,              IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'ANGLE',           ATTR_NAME:'angle'},
-   {FLAG:SID_ATTR.GLOW_INTENSITY,     IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'GLOW_INTENSITY',  ATTR_NAME:'glow_intensity'},
    {FLAG:SID_ATTR.SCALE2,             IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SCALE2',          ATTR_NAME:'scale2'},
    {FLAG:SID_ATTR.BORDER,             IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'BORDER',          ATTR_NAME:'border'},
    {FLAG:SID_ATTR.SDF,                IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SDF',             ATTR_NAME:'sdf'},
    {FLAG:SID_ATTR.MSDF,               IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'MSDF',            ATTR_NAME:'msdf'},
    {FLAG:SID_ATTR.GENERIC2,           IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'GENERIC2',        ATTR_NAME:'generic2'},
+   // {FLAG:SID_ATTR.GLOW_INTENSITY,     IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'GLOW_INTENSITY',  ATTR_NAME:'glow_intensity'},
 ];
 
 const ATTRIBUTES_SIZE = ATTRIBUTES.length;
@@ -231,6 +231,7 @@ export function Attribute_get_type_extension(idx){
 _counter = 0;
 const SID_ATTR_PASS = new Int32Array([
    BIT_FLAGS[_counter++], // COL4:
+   BIT_FLAGS[_counter++], // WPOS3:
    BIT_FLAGS[_counter++], // WPOS2:
    BIT_FLAGS[_counter++], // VPOS2:
    BIT_FLAGS[_counter++], // DIM2:
@@ -238,12 +239,8 @@ const SID_ATTR_PASS = new Int32Array([
    BIT_FLAGS[_counter++], // R_CORNERS:
    BIT_FLAGS[_counter++], // BORDER:
    BIT_FLAGS[_counter++], // FEATHER:
-   BIT_FLAGS[_counter++], // GLOW_INTENSITY:
    BIT_FLAGS[_counter++], // TEX2:
-   // BIT_FLAGS[_counter++], // SCALE2:
-   // BIT_FLAGS[_counter++], // SDF:
-   // BIT_FLAGS[_counter++], // MSDF:
-   // BIT_FLAGS[_counter++], // COL4_PER_VERTEX:
+   BIT_FLAGS[_counter++], // GENERIC2:
 ]);
 const SID_ATTR_PASS_SIZE = _counter;
 export function Shader_bit_flags_build_SID_ATTR_PASS(){ return SID_ATTR_PASS; }
@@ -259,11 +256,8 @@ const ATTRIBUTES_PASS = [
    {FLAG:SID_ATTR_PASS.R_CORNERS,          TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'R_CORNERS',       ATTR_NAME:'rcorners'},
    {FLAG:SID_ATTR_PASS.BORDER,             TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'BORDER',          ATTR_NAME:'border'},
    {FLAG:SID_ATTR_PASS.FEATHER,            TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'FEATHER',         ATTR_NAME:'feather'},
-   {FLAG:SID_ATTR_PASS.GLOW_INTENSITY,     TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'GLOW_INTENSITY',  ATTR_NAME:'glow_intensity'},
    {FLAG:SID_ATTR_PASS.TEX2,               TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'TEX2',            ATTR_NAME:'tex2'},
-   // {FLAG:SID_ATTR.SCALE2,             TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SCALE2',          ATTR_NAME:'scale2'},
-   // {FLAG:SID_ATTR.SDF,                TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SDF',             ATTR_NAME:'sdf'},
-   // {FLAG:SID_ATTR.MSDF,               TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'MSDF',            ATTR_NAME:'msdf'},
+   {FLAG:SID_ATTR_PASS.GENERIC2,           TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'GENERIC2',        ATTR_NAME:'generic2'},
 ];
 const ATTRIBUTES_PASS_SIZE = ATTRIBUTES_PASS.length;
 console.log('$$$ ATTRIBUTES_PASS', ATTRIBUTES_PASS);

@@ -117,20 +117,21 @@ export class Ball {
          const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
 
 
-
          tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
          tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-         tail_emitter.EnableGfx(MESH_ENABLE.GFX.FX_NOISE); // TODO: Does nothing, there is no enable for '.FX_NOISE'
+         tail_emitter.EnableGfx(MESH_ENABLE.GFX.FN_NOISE); // TODO: Does nothing, there is no enable for '.FN_NOISE'
 
 
-         tail_emitter.EnableGfxUniforms({ fx: SID.FX.FS_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
+         // tail_emitter.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
+         tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS, }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
 
          tail_emitter.SetDir(1, 1);
 
          // Render 
          Particles_gen_gfx_ctx(tail_emitter, this.mesh);
          // Initialize values to uniforms
-         tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
+         // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
+         tail_emitter.GfxUniformSetAndUpdate('u_generic_controls', [.2, 0.4, .12, 0]);
 
 
          Particle_system_emitter_set_position_xy(tail_emitter_idx, this.mesh.geom.pos[0], this.mesh.geom.pos[1]);
@@ -478,7 +479,8 @@ export function Ball_animation_scale() {
          size: emitter_size,
          current_size: emitter_size,
          vb_groupidx: emitter.gfx.vb.groupidx,
-         ubidx: Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_noise_params'),
+         // ubidx: Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_noise_params'),
+         ubidx: Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls'),
          shader_uniform_index: 2,
       },
       function_slope: slope_params_pointer,

@@ -2118,8 +2118,8 @@ function Animation_scale_up_stop(params) {
    const posy = Grid_get_posy_from_rowidx(cell.rowidx);
    const posx = section_posx + Grid_get_posx_from_colidx(cell.colidx);
 
-   emitter.pos[0] = posx + tetris_panel_posx;
-   emitter.pos[1] = posy + tetris_panel_posy + TOKEN_SIZE;
+   emitter.geom.pos[0] = posx + tetris_panel_posx;
+   emitter.geom.pos[1] = posy + tetris_panel_posy + TOKEN_SIZE;
 
    emitter.mat.col[0] = mesh.mat.defCol[0];
    emitter.mat.col[1] = mesh.mat.defCol[1];

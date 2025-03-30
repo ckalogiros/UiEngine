@@ -16,7 +16,7 @@ import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_set_attr_round_corners, Gl_set_glow_intensity, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_y, Gl_add_vpos_x, Gl_set_angle } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_attr_round_corners, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_y, Gl_add_vpos_x, Gl_set_angle } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
 import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
@@ -428,7 +428,8 @@ export function Game_snake(y = 0, controls_create = true) {
    collectable.GfxUniformSetAndUpdate('u_scale2', [collectable_scale, 1]);
    // collectable.GfxUniformSetAndUpdate('u_generic_controls', [.5, .5, .9]);
    // Initialize shader attribute
-   Gl_set_glow_intensity(collectable.gfx, 1.);
+   // Gl_set_glow_intensity(collectable.gfx, 1.);
+   alert('Replace glow intensity attribute with generic attribute\nThis means an implementation of creating generic attributes automaticaly like generic uniforms ')
 
    { // Color animations
       Mesh_animations_create(ANIMATIONS.TYPE.COLOR | ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, collectable, .005, .1, .4, 0.0, .3, true);

@@ -1,6 +1,6 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
-import { Uniforms_block_buffer_create } from './Buffers/UniformBuffers.js';
+import { Uniforms_block_buffer_create, Uniforms_buffer_set_uniform } from './Buffers/UniformBuffers.js';
 import { New_generic_buffer, New_int8_buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
 
@@ -210,6 +210,9 @@ class Gl_Program {
 		this.ubidxs = New_generic_buffer(_, 'Program ubidxs');
 		this.attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(this.attribsidx);
 
+		/*******************************************************************************************************/
+		// Blend mode ubidx. Store the uniforms index for blending mode to have quick access for updating the uniform imidiately 
+		this.blend_mode_ubidx = INT_NULL;
 
 		// this.uniforms = uniforms;
 		this.uniforms = [];
@@ -237,8 +240,6 @@ class Gl_Program {
 					};
 				}
 			}
-
-
 			
 		}
 		console.log('Program::Uniforms', this.uniforms);
@@ -252,6 +253,7 @@ class Gl_Program {
 			},
 
 		};
+
 
 	}
 
@@ -280,6 +282,24 @@ class Gl_Program {
 
 
 };
+
+
+
+// export function Program_sinitialize_blend_mode_ubidx(progidx, blend_mode) {
+// 	const prog = _programs.buffer[progidx];
+// 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
+// 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
+// }
+// export function Program_set_and_update_blend_mode_uniform(progidx, blend_mode) {
+// 	const prog = _programs.buffer[progidx];
+// 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
+// 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
+// }
+/** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access throug Program */
+export function Program_stgore_blend_mode_ubidx(progidx, ubidx) {
+	const prog = _programs.buffer[progidx];
+	prog.blend_mode_ubidx = ubidx;
+}
 
 
 

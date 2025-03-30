@@ -210,60 +210,6 @@ function Find_field_by_name(file, word, at_line=0, start_from=0) {
 
 
 
-// Example usage
-// const Mock_find_uniform_info_in_shader = `
-// float glow = u_generic_controls[cnt++];
-// some other code
-// some other code
-// some other code
-// float intensity = u_generic_controls[cnt++];
-// `;
-// const Mock_find_uniform_info_in_shader = `
-//      float glow = u_generic_controls[cnt++];
-//    some other code
-//    some other code
-//    some other code
-//    float intensity = u_generic_controls[cnt++];
-//    some other code
-//    some other code
-//    float u_3 = u_generic_controls[cnt++];
-//    float u_4 = u_generic_controls[cnt++];
-   
-//    sd';sl;d;lsd
-//    sdlk
-   
-//    float u_5 = u_generic_controls[cnt++];
-
-//    sd;';sd
-//    sdlsd
-// `;
-const Mock_find_uniform_info_in_shader = `
-/*** Operation outer_glow_rect ***/
-#ifndef INTERNAL_OUTER_GLOW_RECT // Use this effect many times over with different blending modes
-  #define INTERNAL_OUTER_GLOW_RECT
-  vec4 outer_glow_rect_color = vec4(.0);
-#endif
-{
-  float glow_radius = u_generic_controls[u_gen_ctrl_map_cnt++];
-  float cog = glow_radius - d;
-  //float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
-  // float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
-  /* float commenetd = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
-  float glow_intensity = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
-  // cog = cog*abs(cog) * glow_intensity*5.;
-  cog = (cog*5.) * (abs(cog) * glow_intensity)*(1.-c)*(1.-c);
-  
-  // cog = mix(cog, c, c);
-  
-  // final_color = vec4(0.0); // Must reset the final color since we used it in the above mix functio
-
-  // outer_glow_rect_color = vec4(vec3(cog), 1.)* src_color;
-  outer_glow_rect_color = vec4(vec3(cog), cog)* src_color;
-}
-/*** Operation outer_glow_rect End ***/
-`;
-
-// TODO: Use the uniform name('u_generic_controls') to distinguish which vars are for which uniforms 
 // Uniform names are passed by the Program class constructor
 function Resolve_generic_uniforms_names(shader_code, uniform_name) {
 
@@ -343,70 +289,7 @@ function Resolve_generic_uniforms_names(shader_code, uniform_name) {
    return buffer;
 
 }
-/**SAVE */
-// function Resolve_generic_uniforms_names(shader_code, uniform_name) {
 
-   
-//    const buffer = [];
-   
-//    const word = uniform_name;
-//    const filelen = shader_code.length;
-   
-//    let i = 0;
-   
-//    let wordpos = { start: -1, end: -1, len: 0, line: -1 };
-   
-   
-//    // let i = word_position.start;
-//    while(i < filelen) {
-      
-//       let skip = false;
-//       wordpos = Find_field_by_name(shader_code, word, wordpos.line, wordpos.start);
-//       const from_where_it_left_off = wordpos.end;
-
-//       if(from_where_it_left_off === -1) break;
-
-//       i = wordpos.start;
-      
-//       // If word found, go to start of the line
-//       while((shader_code[i] !== '\n' && shader_code[i] !== ';') && i > 0) i--;
-      
-//       if(i > 0) i++; // Skip the \n character. Also includes the edge case of the uniform being the first line of code in the shader and has no '\n': 'float glow = u_generic_controls' 
-      
-//       // If word found, go to start of the line
-//       while(shader_code[i] === ' ' || shader_code[i] === '\n' && i < filelen) i++; // Skip any number of spaces till the next word
-//       if(shader_code[i] === '/') skip = true; // Avoid any commented code
-      
-//       if(!skip) {
-
-//          const struct = { type: '', name: '', };
-         
-//          // Get the type of the uniform
-//          while (shader_code[i] !== ' ' && i < filelen) {
-//             struct.type += shader_code[i];
-//             i++;
-//          }
-         
-//          // Get the name of the uniform
-//          while(shader_code[i] === ' ' && i < filelen) i++; // Skip any number of spaces till the next word
-         
-//          while (shader_code[i] !== ' ' && i < filelen) {
-//             struct.name += shader_code[i];
-//             i++;
-//          }
-      
-//          buffer.push(struct);
-//       }
-
-//       wordpos.start = from_where_it_left_off;
-
-//    }
-
-  
-//    if(DEBUG.SHADERS) console.log('uniform names in shader', buffer);
-//    return buffer;
-
-// }
 function Resolve_generic_uniforms_count(shader_code) {
 
    /**
@@ -516,16 +399,12 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
       else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2){
 
          shader_ops_code += shader_operations.fs_op_inner_shadow_rect_filled;
-         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
-         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
       }
       else if(fn_op & SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT){
 
          shader_ops_code += shader_operations.fs_op_outer_shadow_rect;
-         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_filled_color );`;
-         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_filled_color );`;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
       }
@@ -540,17 +419,11 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
          shader_ops_code += shader_operations.fs_op_outer_glow_rect;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, outer_glow_rect_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, outer_glow_rect_color );`;
-
-         Resolve_generic_uniforms_count(shader_operations.fs_op_outer_glow_rect);
-
-         // shader_ops_code += `  final_color = blend_color_mix( outer_glow_rect_color, final_color, final_color );`;
-         // shader_ops_code += `  final_color = blend_color_mix( final_color, outer_glow_rect_color, c );`;
+         // Resolve_generic_uniforms_count(shader_operations.fs_op_outer_glow_rect);
       }
       else if(fn_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT){
 
          shader_ops_code += shader_operations.fs_op_inner_shadow_rect;
-         // if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, sdf_rect_color );`;
-         // else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
          if(i===0) shader_ops_code += `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, inner_shadow_rect_color );`;
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, inner_shadow_rect_color );`;
       }
@@ -975,7 +848,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       
       '/********************************************************************************************/',
       '/********************************************************************************************/',
-      `// VERTEX SHADER {{ ${ID} }}`,
+      `// VERTEX SHADER {{ PROGRAM:${ID} }}`,
       '/********************************************************************************************/',
       '/********************************************************************************************/',
 
@@ -1121,7 +994,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       
       '/********************************************************************************************/',
       '/********************************************************************************************/',
-      `// FRAGMENT SHADER {{ ${ID} }}`,
+      `// FRAGMENT SHADER {{ PROGRAM:${ID} }}`,
       '/********************************************************************************************/',
       '/********************************************************************************************/',
 
@@ -1137,21 +1010,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '#include <precision_high>',
 
       (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
-      // TODO: Make use of 'U_RCORNERS_...' ready uniform
-      (sid.unif & SID.UNIF.FS_RCORNERS_FLOAT) ? '#define U_RCORNERS_FLOAT 1' : '', // NOTE: It is easier for uniforms specific to a shader not have a specific unif name for each uniform, rather use the sid.fx to #define all uniforms for that shader
-      (sid.unif & SID.UNIF.FS_RCORNERS_VEC2) ? '#define U_RCORNERS_VEC2 1' : '',
-      (sid.unif & SID.UNIF.FS_RCORNERS_VEC3) ? '#define U_RCORNERS_VEC3 1' : '',
-      (sid.fx & SID.FX.FS_GLOW_VEC3) ? '#define U_GLOW_PARAMS_VEC3 1' : '',
-      (sid.fx & SID.FX.FS_GLOW_VEC2) ? '#define U_GLOW_PARAMS_VEC2 1' : '',
+      // (sid.unif & SID.UNIF.BLEND_MODE) ? '#define U_BLEND_MODE 1' : '',
+
+      // TODO: REMOVE  U_SMOKE_PARAMS_VEC3 U_NOISE_PARAMS and replace with generic buffer
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
-      (sid.fx & SID.FX.FS_NOISE) ? '#define U_NOISE_PARAMS 1' : '', // TODO: We need to resolve same uniform parameters if both noises are in the same program
-      (sid.fx & SID.FX.FS_NOISE_2) ? '#define U_NOISE_PARAMS 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.ANGLE) ? '#define A_ANGLE 1' : '',
       (sid.attr & SID.ATTR.GLOW_INTENSITY) ? '#define A_GLOW_INTENSITY_FLOAT' : '',
-
+      
       // Include Funcions Defines
       (sid.blend_options) ? '#define BLEND_MODE 1' : '#define BLEND_MODE 1\n#define BLEND_MODE_MULTIPLY 1',  // If any 'blend_options', enable, else enable default blend 'multiply'
       (sid.blend_options) ? '#define BLEND_MODE 1' : '',  // If any 'blend_options', enable, 
@@ -1168,8 +1036,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MIX) ? '#define BLEND_MODE_MIX 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_MASK) ? '#define BLEND_MODE_MASK 1' : '',
       (sid.blend_options & SID.BLEND_OPTIONS.BLEND_MODE_ALPHA) ? '#define BLEND_MODE_ALPHA 1' : '',
-
-
+      
 
 
 
@@ -1205,6 +1072,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
+      // TODO: Is U_GENERIC_FLOAT needed?? REMOVE IT
+      // TODO: Is U_GENERIC_VECxxx needed?? REMOVE IT
       // Generic Uniforms
       (sid.unif & SID.UNIF.FS_TIME_FLOAT) ? '#define U_TIME_FLOAT 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
@@ -1247,6 +1116,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       '\n#include <blend_color_functions_overloads>',
 
+      '\n#include <blend_mode_decider>',
+
 
       '\n#include <smoothmin>',
       '\n#include <brightness_contrast>',
@@ -1261,14 +1132,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       /********************************************************************************************************/
       // Fx shader functions
-      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
-      (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
-      (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2 : '',
+      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
+      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise : '',
+      // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2 : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
       
       
       /********************************************************************************************************/
-      // Shader Color Functions
+      // Shader Functions
+      (sid.shad & SID.SHAD.FN_NOISE) ? frag_noise : '',
+      (sid.shad & SID.SHAD.FN_NOISE2) ? frag_noise_2 : '',
       (sid.shad & SID.SHAD.FN_GLOW) ? frag_glow : '',
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle : '',
@@ -1280,7 +1153,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1 : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2 : '',
       
-      // (sid.fx & SID.FX.FS_NOISE) ? frag_noise : '',
+      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise : '',
 
       /********************************************************** **********************************************/
       // Test shader functions
@@ -1328,18 +1201,24 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       Resolve_function_operations_called_from_main(shader_ops),
 
+
+
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
 
-      (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
+      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
       // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
-      (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
-      (sid.fx & SID.FX.FS_NOISE_2) ? frag_noise_2_call : '',
+      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
+      // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2_call : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
-      //TODO: Resolve the naming FS_ and FN_ and FX_ for SID
+
+      
+      // `  final_color = ${Resolve_blending_mode(sid.blend_options)}( final_color,\ `, 
       
       // Shader Color Functions
+      (sid.shad & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE2) ? frag_noise_2_call : '',
       (sid.shad & SID.SHAD.FN_GLOW) ? frag_glow_call : '',
       (sid.shad & SID.SHAD.FN_INNER_SHADOW) ? frag_inner_shadow_rhomboid_call : '',
       (sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) ? frag_explosion_circle_call : '',
@@ -1351,15 +1230,16 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2_call : '',
       
-      // (sid.fx & SID.FX.FS_NOISE) ? frag_noise_call : '',
+      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
       // Test Shaders
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
       (sid.shad & SID.SHAD.FS_TEST3) ? frag_test3_call : '',
       (sid.shad & SID.SHAD.FS_TEST4) ? frag_test4_call : '',
       // (sid.shad & SID.SHAD.FS_TEST5) ? frag_test5_bubble_call : '',
-
-
+      
+      
+      // '  );',
 
 
       // Resolve_function_operations_called_from_main(shader_ops),
@@ -1426,6 +1306,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
+      // '  if(u_blend_mode) bool a = false;',
+      '  if(u_blend_mode == 0) final_color *= 1.01;',
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
@@ -1475,17 +1357,17 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 }
 
 
-function Resolve_uniform_generic_contols_map(uniforms_info) {
+// function Resolve_uniform_generic_contols_map(uniforms_info) {
 
-   // let code = '';
-   // let u_generic_controls = null;
-   // const unif_len = uniforms_info.length;
-   // for(let i=0; i<unif_len; i++) {
-   //    if(uniforms_info[i].name === 'u_generic_controls')
-   //       u_generic_controls = uniforms_info[i];
-   // }
-   // for(let i=0; i<u_generic_controls.arr_size; i++) {
-   //    code += `float ctrl${cnt}`;
-   // }
-}
+//    // let code = '';
+//    // let u_generic_controls = null;
+//    // const unif_len = uniforms_info.length;
+//    // for(let i=0; i<unif_len; i++) {
+//    //    if(uniforms_info[i].name === 'u_generic_controls')
+//    //       u_generic_controls = uniforms_info[i];
+//    // }
+//    // for(let i=0; i<u_generic_controls.arr_size; i++) {
+//    //    code += `float ctrl${cnt}`;
+//    // }
+// }
 

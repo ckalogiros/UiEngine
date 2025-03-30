@@ -1,3 +1,6 @@
+* The enabling of attributes for a mesh could call a function to read the shader code and extract all essential variables 
+   and use them to create attributes and passes to fragment shader
+
 * The passing of [vpos, dim, etc] is the same values for the shaders
    vpos=[-dim, +dim], v_dim=[-dim, +dim]
    Remove either 

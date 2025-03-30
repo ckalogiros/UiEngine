@@ -1,5 +1,13 @@
 TODO
 
+* IMMIDIATELY:
+   Use only generic uniform buffer for creating uniforms of kind: Create smoke slider 'U_SMOKE_PARAMS_VEC3' and noise 'U_NOISE_PARAMS'
+   1. When enabling u_generic_controls for many meshes of the same program, we need to 'remember' all the sizes to add them up. this is happening in the Mesh.js EnableGfx
+      Actually, we need to give arr_size equivalent to the number of controls the shader needs. So it would be great to 'know' the size in advance of the u_generic creation
+      The 'Resolve_uniforms_from_sid()' in ShaderBuilder is using the .arr_size to set the size in the shader code. THIS HAPPENS IN VERTEX SHADER
+   2. Then on the shader side we already have a counter to pass through different functions, so we are OK in the shaders
+
+
 * Remove any anecessary vpos pass in Arkanoid
 * Add 'u_scale' to Widget_gfx_enable
 * Add 'attr_time' to Widget_gfx_enable

@@ -17,8 +17,6 @@ import { Widget_gfx_ready_enable } from "./WidgetGfxReady.js";
 
 
 
-/*****************************************************************************************************************************************************/
-// Widget-Slider
 /** */
 export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_val = .5, name, size = 120, col = GREY[5], handle_col = BLUEL[8]) {
 

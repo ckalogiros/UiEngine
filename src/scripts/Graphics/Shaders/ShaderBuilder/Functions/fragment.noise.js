@@ -1,5 +1,6 @@
 // export const frag_noise_call = `   final_color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
-export const frag_noise_call = `   final_color = Noise_procedural(scale_down);`;
+// export const frag_noise_call = `   final_color = Noise_procedural(scale_down, u_gen_ctrl_map_cnt);`;
+export const frag_noise_call = '   final_color = blend_decider( final_color, Noise_procedural(scale_down, u_gen_ctrl_map_cnt), u_blend_mode );';
 export const frag_noise = `\
 
 
@@ -22,106 +23,105 @@ export const frag_noise = `\
 
 
 
-vec4 Noise_procedural(float scale_down)
+// vec4 Noise_procedural(float scale_down)
+vec4 Noise_procedural(float scale_down, inout int u_gen_ctrl_map_cnt)
 {
 
-    #ifdef U_NOISE_PARAMS
-      float ctrl1 = u_noise_params[0];
-      float ctrl2 = u_noise_params[1];
-      float ctrl3 = u_noise_params[2];
-      float ctrl4 = u_noise_params[3];
-    #else
-      vec3 controls = vec2(1.);
-    #endif
-        
+  // Create uniform controls
+  float ${u}fire_variation = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}noise_complexity = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}ctrl4 = u_generic_controls[u_gen_ctrl_map_cnt++];
+      
 
-    vec2 res = u_screen_res;
-    vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
-    vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-    float time  = v_time;
-    float revT  = 1.-time; // Reverse time to be from 1 to 0
-    
-    // #ifndef UV_READY
-      #define UV_READY 1
-      uv = gl_FragCoord.xy;
-      pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
-      // uv_map_coordinates_zero_one(uv, dim);
-    // #endif
-    
-    vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
-    float res_ratio = res.y/res.x;
-    uv2.y *= res_ratio;
-   
-   
-   
-    float d2 = 1.- smoothstep(0.0, dim.y, length(uv));
-    float shape = d2 ;
-    shape *= revT * (MAX_SPEED) * .1;
-    
-    
-    float complexity = 2.;
-    vec2 ratio = vec2(dim.y,dim.x*2.)*ctrl3*.25; 
-    float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
-    float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
-    float n1 = noise1*revT*d2; // +1 for non negative values
-    
+  vec2 res = u_screen_res;
+  vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  float time  = v_time;
+  float revT  = 1.-time; // Reverse time to be from 1 to 0
+  
+  // #ifndef UV_READY
+    #define UV_READY 1
+    uv = gl_FragCoord.xy;
+    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+    // uv_map_coordinates_zero_one(uv, dim);
+  // #endif
+  
+  vec2 uv2 = (gl_FragCoord.xy-(res*.5))/res;
+  float res_ratio = res.y/res.x;
+  uv2.y *= res_ratio;
+  
+  
+  
+  float d2 = 1.- smoothstep(0.0, dim.y, length(uv));
+  float shape = d2 ;
+  shape *= revT * (MAX_SPEED) * .1;
+  
+  
+  float complexity = 2.;
+  vec2 ratio = vec2(dim.y,dim.x*2.)*${u}noise_complexity*.25; 
+  float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
+  float noise2 = fbm(5. * uv2 * vec2(2.* ratio.x, 2.* ratio.x));
+  float n1 = noise1*revT*d2; // +1 for non negative values
+  
 
 
 
-    // float sum = 1.-((src_color.r + src_color.g + src_color.b)/3.); // Make equal src_color intensity for all rgb combinations
-    // n1 *= sum * 2.0;
-    n1 *= .66;
+  // float sum = 1.-((src_color.r + src_color.g + src_color.b)/3.); // Make equal src_color intensity for all rgb combinations
+  // n1 *= sum * 2.0;
+  n1 *= .66;
 
 
 
-    vec3 col = src_color.rgb;
+  vec3 col = src_color.rgb;
 
-    
-    float F = pow(noise2, 3.) *2.; // Characterizes the noise into the src_color.
-    F *= d2;
+  
+  float F = pow(noise2, 3.) *2.; // Characterizes the noise into the src_color.
+  F *= d2;
 
-    
-    // TODO: Create controls for: [pow(.., X1), F*X2, X3*(time+.4))]
-    float mixer = pow((shape-n1)*F*2.5, 2.*(time+.4));
-    float mixer2 = pow((shape-n1)*F*2., 6.*(time+.4));
-    
+  
+  // TODO: Create controls for: [pow(.., X1), F*X2, X3*(time+.4))]
+  float mixer = pow((shape-n1)*F*2.5, 2.*(time+.4));
+  float mixer2 = pow((shape-n1)*F*2., 6.*(time+.4));
+  
 
-    // We want 0 alpha for the outer src_color(s1), and use 'F' for the alpha of the highlights(s2)
-    
-    // Color 1 
-    vec4 s1 = vec4(vec3(n1*n1*col), 0.);
-    
-    
-    // Color 2. Very Nice smoke like effect
-    vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), mixer); 
-    
-    
-    // Final Color
-    // vec4 c = mix(s1, s2, F);
-    // vec4 c = mix(s1, s2, mixer);
-    vec4 c = mix(s1, mix(s1, s2, mixer), ctrl4);
-    // vec4 c = mix(s1, mix(s1, s2, mixer), 1.);
-    // vec4 c = mix(s1, s2, ctrl4);
-    
-    
-    // // Brightness effect
-    vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*3.3), mixer); 
-    // vec4 bright2 = mix(s1, vec4(vec3(mixer2), F*6.3), mixer); 
-    c += mix(c, bright2, ctrl1);
+  // We want 0 alpha for the outer src_color(s1), and use 'F' for the alpha of the highlights(s2)
+  
+  // Color 1 
+  vec4 s1 = vec4(vec3(n1*n1*col), 0.);
+  
+  
+  // Color 2. Very Nice smoke like effect
+  vec4 s2 = vec4(vec3(col*pow((n1)*F*4.5, 2.)), mixer); 
+  
+  
+  // Final Color
+  // vec4 c = mix(s1, s2, F);
+  // vec4 c = mix(s1, s2, mixer);
+  vec4 c = mix(s1, mix(s1, s2, mixer), ${u}ctrl4);
+  // vec4 c = mix(s1, mix(s1, s2, mixer), 1.);
+  // vec4 c = mix(s1, s2, ${u}ctrl4);
+  
+  
+  // // Brightness effect
+  vec4 bright2 = mix(s1, vec4(vec3(mixer2), 1.-F*3.3), mixer); 
+  // vec4 bright2 = mix(s1, vec4(vec3(mixer2), F*6.3), mixer); 
+  c += mix(c, bright2, ${u}fire_variation);
 
-    
-    // vec4 bright1 = mix(s1, vec4(vec3(mixer), F), mixer); // EFFECT VERY BRIGHT
-    vec4 bright1 = mix(s1, vec4(vec3(mixer), F), F); // EFFECT VERY BRIGHT
-    c += bright1*revT*revT*revT*revT*revT*revT*revT*revT*6.*ctrl2;
-    
-    return c;
+  
+  // vec4 bright1 = mix(s1, vec4(vec3(mixer), F), mixer); // EFFECT VERY BRIGHT
+  vec4 bright1 = mix(s1, vec4(vec3(mixer), F), F); // EFFECT VERY BRIGHT
+  c += bright1*revT*revT*revT*revT*revT*revT*revT*revT*6.*${u}intensity;
+  
+  return c;
 }
 `;
 
 
 // NOTE: This is still a test noise shader function and it is not used
 // export const frag_noise_call = `   final_color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
-export const frag_noise_2_call = `   final_color = Noise_procedural_2(scale_down);`;
+// export const frag_noise_2_call = `   final_color = Noise_procedural_2(scale_down, u_gen_ctrl_map_cnt);`;
+export const frag_noise_2_call = '   final_color = blend_decider( final_color, Noise_procedural_2(scale_down, u_gen_ctrl_map_cnt), u_blend_mode );';
 export const frag_noise_2 = `\
 
 
@@ -165,7 +165,7 @@ float snoise(vec3 uv, float res)
 	return mix(r0, r1, f.z)*2.-1.;
 }
 
-vec4 Noise_procedural_2(float scale_down)
+vec4 Noise_procedural_2(float scale_down, inout int u_gen_ctrl_map_cnt)
 {
 
     #ifdef U_NOISE_PARAMS
@@ -178,6 +178,11 @@ vec4 Noise_procedural_2(float scale_down)
       vec3 controls = vec2(1.);
     #endif
         
+    // Create uniform controls
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    // float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    // float ${u}ctrl3 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    // float ${u}ctrl4 = u_generic_controls[u_gen_ctrl_map_cnt++];
 
     vec2 res = u_screen_res;
     vec2 dim = vec2(v_dim2_x, v_dim2_y) * scale_down;
@@ -204,7 +209,7 @@ vec4 Noise_procedural_2(float scale_down)
     
     
     float complexity = .6;
-    vec2 ratio = vec2(dim.y,dim.x*2.)*controls.z*.25; 
+    vec2 ratio = vec2(dim.y,dim.x*2.)*${u}ctrl1*.25; 
     float noise1 = fbm(complexity * uv2 * vec2(2.* ratio.x, 2.* ratio.x)) ;
     // float n1 = noise1*d2; // +1 for non negative values
     

@@ -259,11 +259,11 @@ const fs_op_outer_glow_rect = `
   vec4 outer_glow_rect_color = vec4(.0);
 #endif
 {
-  float glow_radius = u_generic_controls[u_gen_ctrl_map_cnt++];
-  float cog = glow_radius - d;
-  float glow_intensity = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
-  // cog = cog*abs(cog) * glow_intensity*5.;
-  cog = (cog*5.) * (abs(cog) * glow_intensity)*(1.-c)*(1.-c);
+  float ${u}glow_radius = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float cog = ${u}glow_radius - d;
+  float ${u}glow_intensity = u_generic_controls[u_gen_ctrl_map_cnt++] * 16.;
+  // cog = cog*abs(cog) * ${u}glow_intensity*5.;
+  cog = (cog*5.) * (abs(cog) * ${u}glow_intensity)*(1.-c)*(1.-c);
   
   // cog = mix(cog, c, c);
   
@@ -359,9 +359,9 @@ const fs_op_inner_shadow_rect = `
 /*** Operation inner_shadow_rect ***/
   vec4 inner_shadow_rect_color = vec4(.0);
   {
-    float control1 = u_generic_controls[u_gen_ctrl_map_cnt++];
-    float control2 = u_generic_controls[u_gen_ctrl_map_cnt++];
-    float control3 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}control1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}control2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}control3 = u_generic_controls[u_gen_ctrl_map_cnt++];
 
     vec2 res = u_screen_res;
     vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
@@ -403,17 +403,17 @@ const fs_op_inner_shadow_rect = `
     }
 
 
-  float cis = smoothmin(c_vert, c_hor, control1);
+  float cis = smoothmin(c_vert, c_hor, ${u}control1);
 
   
-  float to_min=0., to_max=1., from_min=0., from_max=(control2);
+  float to_min=0., to_max=1., from_min=0., from_max=(${u}control2);
   float factor = (cis - from_min) / (from_max - from_min);
   float result = to_min + factor * (to_max - to_min);
   
   // result *= c;
 
   vec3 color = vec3(result);
-  color = brightness_contrast(color, control3*.5, control3*2.);
+  color = brightness_contrast(color, ${u}control3*.5, ${u}control3*2.);
   
   color += .2; // HACK: just so it does not black the edges
 
@@ -446,6 +446,13 @@ const fs_op_flare = `
   { 
     vec2 point = vec2(.5, -.6);
 
+    float intensify = 1.8;
+    float ${u}flare = u_generic_controls[u_gen_ctrl_map_cnt++]*intensify;
+    float ${u}reflection = u_generic_controls[u_gen_ctrl_map_cnt++]*intensify;
+    float ${u}intensity = u_generic_controls[u_gen_ctrl_map_cnt++]*intensify;
+    // float ${u}test1 = u_generic_controls[u_gen_ctrl_map_cnt++]*10.;
+    // float ${u}test2 = u_generic_controls[u_gen_ctrl_map_cnt++]*10.;
+    // float ${u}test3 = u_generic_controls[u_gen_ctrl_map_cnt++]*10.;
 
     vec2 uv2 = uv;
     float d2 = length(uv);
@@ -477,10 +484,10 @@ const fs_op_flare = `
     flare_color.r+=f2+f4+f5+f6; 
     flare_color.g+=f22+f42+f52+f62; 
     flare_color.b+=f23+f43+f53+f63;
-    flare_color.rgb = flare_color.rgb*1.3 - vec3(length(uvd)*.05);
-    flare_color.rgb+=vec3(f0*u_generic_controls[u_gen_ctrl_map_cnt++]);
+    flare_color.rgb = flare_color.rgb*1.3*${u}reflection - vec3(length(uvd)*.05);
+    flare_color.rgb+=vec3(f0*${u}flare);
 
-    flare_color *= u_generic_controls[u_gen_ctrl_map_cnt++];
+    flare_color *= ${u}intensity;
 
     // flare_color *= src_color*2.;
   } 
@@ -503,11 +510,14 @@ const fs_op_bubble = `
 
   vec3 bubble_color = vec3(.0);
   {
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl3 = u_generic_controls[u_gen_ctrl_map_cnt++];
     float dist = length(uv);
-    float inner_feather = 25. * u_generic_controls[u_gen_ctrl_map_cnt++];
-    float outer_feather = .5*u_generic_controls[u_gen_ctrl_map_cnt++];
+    float inner_feather = 25. * ${u}ctrl1;
+    float outer_feather = .5*${u}ctrl2;
     vec3 c = vec3(pow(dist, inner_feather) * smoothstep(1., 1. - outer_feather, dist));
-    bubble_color = src_color.rgb * c * u_generic_controls[u_gen_ctrl_map_cnt++]*4.;
+    bubble_color = src_color.rgb * c * ${u}ctrl3*4.;
   } 
 /*** Operation Bubble End ***/
 
@@ -532,12 +542,15 @@ const fs_op_simple_glow = `
     // float time = v_time;
     float rev_time = 1. - time;
 
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
     /*
       Animate the ctrl1 from high to low
       Animate the ctrl2(smoothstep inner) from low to high
     */
-    float d = .7 - length(uv)*2.*u_generic_controls[u_gen_ctrl_map_cnt++]+(rev_time*.5);
-    float c = d * smoothstep(u_generic_controls[u_gen_ctrl_map_cnt++], 1.*rev_time, (d));
+    float d = .7 - length(uv)*2.*${u}ctrl1+(rev_time*.5);
+    float c = d * smoothstep(${u}ctrl2, 1.*rev_time, (d));
     
     c *=c;
 
@@ -566,21 +579,24 @@ const fs_op_simple_glow2 = `
   vec4 simple_glow2_color = vec4(.0);
   {
 
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
     uv *= .7;
 
     // Distance
     float c= 1.-length( vec2(uv.x, uv.y ));
-    // c = smoothstep(0., u_generic_controls[u_gen_ctrl_map_cnt++], c);
+    // c = smoothstep(0., ${u}ctrl1, c);
     c = smoothstep(0.0, 1.0, c);
     
     // Color 1
     float c1 = c;
     c1 = pow(c1, .4);
-    c1 += c*u_generic_controls[u_gen_ctrl_map_cnt++]*2.;
+    c1 += c*${u}ctrl1*2.;
     
     // Color 2
     float c2 = 1.;
-    c2 = (c+c) * u_generic_controls[u_gen_ctrl_map_cnt++] * 5.;
+    c2 = (c+c) * ${u}ctrl2 * 5.;
     
     // Mix Colors
     c1 += c2;
@@ -607,6 +623,8 @@ const fs_op_simple_glow2_rect = `
 
 vec4 simple_glow2_rect_color = vec4(.0);
 {
+  float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
 
   // NEW
   // float mn = min(local_res.x,local_res.y);
@@ -633,11 +651,11 @@ vec4 simple_glow2_rect_color = vec4(.0);
   // Color 1
   float c1 = c;
   c1 = pow(c1, .4);
-  c1 += c*u_generic_controls[u_gen_ctrl_map_cnt++]*2.;
+  c1 += c*${u}ctrl1*2.;
   
   // Color 2
   float c2 = 1.;
-  c2 = (c+c) * u_generic_controls[u_gen_ctrl_map_cnt++] * 5.;
+  c2 = (c+c) * ${u}ctrl2 * 5.;
   
   // Mix Colors
   c1 += c2;
@@ -664,17 +682,20 @@ const fs_op_inner_shadow_circle = `
   
   vec4 inner_shadow_circle_color = vec4(.0);
   {
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl3 = u_generic_controls[u_gen_ctrl_map_cnt++];
   
     float d = length(uv);
-    float c = smoothstep(1., .98*u_generic_controls[u_gen_ctrl_map_cnt++], d);
+    float c = smoothstep(1., .98*${u}ctrl1, d);
     
     vec3 color = vec3(c);
     
     // Shadow
     // float radius = sqrt(d);
     float radius = d;
-    float f = smoothstep(1.*u_generic_controls[u_gen_ctrl_map_cnt++], 1., radius);
-    color = mix(color, color * u_generic_controls[u_gen_ctrl_map_cnt++], f);
+    float f = smoothstep(1.*${u}ctrl2, 1., radius);
+    color = mix(color, color * ${u}ctrl3, f);
     
     // color *= src_color.rgb; // 
 
@@ -699,16 +720,21 @@ const fs_op_inner_specular_circle = `
   
   vec4 inner_specular_circle_color = vec4(.0);
   {
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl3 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl4 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
     float d = length(uv);
-    float c = smoothstep(1., .98*u_generic_controls[u_gen_ctrl_map_cnt++], d);
+    float c = smoothstep(1., .98*${u}ctrl1, d);
     vec3 color = vec3(c);
     
     // Specular
     vec3 spec_color = vec3(1.0, 1.0, 1.0); // Specular color
     // vec3 spec_color = vec3(1.-src_color.r, 1.0-src_color.g, 1.0-src_color.b); // Specular complementary color to source color
     vec2 spec_pos = vec2(.5, -.5); // Specuular location
-    float spec_shine = 5.*u_generic_controls[u_gen_ctrl_map_cnt++]; // Specular intensity
-    float f = 1.0 - smoothstep(-2.*u_generic_controls[u_gen_ctrl_map_cnt++], 1.5*u_generic_controls[u_gen_ctrl_map_cnt++], length(uv - spec_pos));
+    float spec_shine = 5.*${u}ctrl2; // Specular intensity
+    float f = 1.0 - smoothstep(-2.*${u}ctrl3, 1.5*${u}ctrl4, length(uv - spec_pos));
     color = f * spec_shine * spec_color * c;
     // color *= src_color.rgb; // Color the Specular with the source color 
 
@@ -723,8 +749,10 @@ const fs_op_outer_shadow_rect = `
 /*** Operation inner-shadow-rect-filled ***/
 
   {
-    float radius = 1.*u_generic_controls[u_gen_ctrl_map_cnt++]-d;
-    float f = smoothstep(1.*u_generic_controls[u_gen_ctrl_map_cnt++], 1., radius);
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float radius = 1.*${u}ctrl1-d;
+    float f = smoothstep(1.*${u}ctrl2, 1., radius);
     float c_shadow = f;
 
     sdf_rect_color = vec4(vec3(0.), c_shadow);
@@ -844,6 +872,9 @@ const fs_op_inner_shadow_rect_filled = `
   #endif
 vec4 inner_shadow_rect_filled_color = vec4(.0);
 {
+  float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
   // float d_shadow = min(d, max(abs(uv.x), abs(uv.y)) );
   // float d_shadow = 1.-d;
   
@@ -856,7 +887,7 @@ vec4 inner_shadow_rect_filled_color = vec4(.0);
   float d_shadow = d;
   
   float c_shadow = d_shadow;
-  c_shadow = smoothstep(0., 1.*u_generic_controls[u_gen_ctrl_map_cnt++], length(abs(uv)));
+  c_shadow = smoothstep(0., 1.*${u}ctrl1, length(abs(uv)));
 
   c_shadow = 1.-c_shadow;
   // c_shadow = min(c_shadow, min(abs(uv.x), abs(uv.y)) );
@@ -875,7 +906,7 @@ vec4 inner_shadow_rect_filled_color = vec4(.0);
   
   // Shadow
   float radius = d;
-  float f = smoothstep(1.*u_generic_controls[u_gen_ctrl_map_cnt++], 1., radius);
+  float f = smoothstep(1.*${u}ctrl2, 1., radius);
   // color = mix(color, color * u_generic_controls[u_gen_ctrl_map_cnt++], f);
   
   color *= src_color.rgb; // 
@@ -901,12 +932,14 @@ const fs_op_distance_rect_filled = `
 
   vec4 distance_rect_filled_color = vec4(.0);
   {
-    float rCorners = .96*(u_generic_controls[u_gen_ctrl_map_cnt++]+.04);
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float rCorners = .96*(${u}ctrl1+.04);
     // float d = length(max( (abs(uv) - (1.*u_generic_controls[u_gen_ctrl_map_cnt++])) + rCorners, 0.0) ) - rCorners;
     
     
     // Feather
-    d = smoothstep(0.0, 1.*u_generic_controls[u_gen_ctrl_map_cnt++], -d);
+    d = smoothstep(0.0, 1.*${u}ctrl2, -d);
     // d = smoothstep(0.0, 20.*u_generic_controls[u_gen_ctrl_map_cnt++], -d);
     
     

@@ -129,7 +129,7 @@ export function Style_multi_text_default_properties(user_properties) {
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
       align:user_properties.align !== undefined ? user_properties.align : ALIGN.HORIZONTAL, 
       
-      text:user_properties.text !== undefined ? user_properties.text : 'UUnamed Multi Text', 
+      text:user_properties.text !== undefined ? user_properties.text : 'Unamed Multi Text', 
       font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 
       col:user_properties.col !== undefined ? user_properties.col : WHITE, 
       pad:user_properties.pad !== undefined ? user_properties.pad : [0,0], 
@@ -316,6 +316,7 @@ export function Style_button_default_properties(user_properties) {
 
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
       
       text:user_properties.text, 
       text_pad:user_properties.text_pad, 

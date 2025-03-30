@@ -16,7 +16,7 @@ import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffe
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
-import { Contols_generic_uniforms_buffer } from "../Widgets/WidgetGenericControlsReady.js";
+import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../Widgets/WidgetGenericControlsReady.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 
 
@@ -905,7 +905,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
       const slider_size = 120 * DEVICE.device_scale; // y:10 * DEVICE.device_scale;
       // const parameters = [0.2, .48, .5, .19, .08, .4, .04, .04, .55];
       const generic_controls_parameters = [1., 0., 1.];
-      contols_buffer = Contols_generic_uniforms_buffer(ball_mesh[0], slider_size, generic_controls_parameters, uniform_name);
+      contols_buffer = Controls_create_slider_controls_from_shader_uniform_buffer(ball_mesh[0], slider_size, generic_controls_parameters, uniform_name);
    }
 
    const u_wpos_flags = {

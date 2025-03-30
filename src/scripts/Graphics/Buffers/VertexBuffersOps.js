@@ -1144,33 +1144,33 @@ export function Gl_set_uv(gfxInfo, uvs, num_faces = 1) {
 // VERTEX GENERIC ATTRIBUTES
 /**************************************************************************************************************************************/
 
-export function Gl_set_glow_intensity(gfxInfo, f, num_faces = 1) {
+// export function Gl_set_glow_intensity(gfxInfo, f, num_faces = 1) {
 
-   const vbidx = gfxInfo.vb.which_vb.dim_buf;
-   const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
-   const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vbidx = gfxInfo.vb.which_vb.dim_buf;
+//    const vb_info = VBI_get_byidx(gfxInfo.vb.idxs.buffer[vbidx]);
+//    const vb_data = Vertex_buffer_get_by_vbidx(gfxInfo.vb.idxs.buffer[vbidx]);
 
-   const attr_idx = vb_info.attribs_indexing.GLOW_INTENSITY;
-   const a_offset = vb_info.attribs_info.offsets[attr_idx];
-   const a_size = vb_info.attribs_info.sizes[attr_idx];
+//    const attr_idx = vb_info.attribs_indexing.GLOW_INTENSITY;
+//    const a_offset = vb_info.attribs_info.offsets[attr_idx];
+//    const a_size = vb_info.attribs_info.sizes[attr_idx];
 
-   const start = gfxInfo.vb.starts.buffer[vbidx];
+//    const start = gfxInfo.vb.starts.buffer[vbidx];
 
-   let index = start + a_offset;
-   let loop_count = num_faces;
-   if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
-   let stride = vb_info.attribs_info.count - a_size;
+//    let index = start + a_offset;
+//    let loop_count = num_faces;
+//    if (gfxInfo.vb.is_per_vertex.buffer[vbidx]) loop_count *= gfxInfo.vertsPerRect;
+//    let stride = vb_info.attribs_info.count - a_size;
 
-   while (loop_count) {
+//    while (loop_count) {
 
-      vb_data[index++] = f;
+//       vb_data[index++] = f;
 
-      index += stride;
-      loop_count--;
-   }
+//       index += stride;
+//       loop_count--;
+//    }
 
-   Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
-}
+//    Vertex_buffer_state_enable(gfxInfo.vb.groupidx, gfxInfo.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+// }
 
 
 
@@ -1643,6 +1643,46 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 
 // TODO: Implement correctly all fill functions for particles
 /** */
+export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners(vbidx, start, colors, positions,) {
+   // console.error('CALCULATE THE STRIDE CORRECTLY')
+
+   // const vb_info = VBI_get_byidx(vbidx);
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+
+   let index = start;
+
+
+   const col = colors;
+   const pos = positions;
+
+   // V1
+   vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+   vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
+   index += V_POS_COUNT;
+   index += 2; // FOR DIM2
+   index += 1; // FOR STYLE
+
+   // V2
+   vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+   vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
+   index += V_POS_COUNT;
+   index += 2; // FOR DIM2
+   index += 1; // FOR STYLE
+
+   // V3
+   vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+   vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
+   index += V_POS_COUNT;
+   index += 2; // FOR DIM2
+   index += 1; // FOR STYLE
+
+   // V4
+   vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+   vb_data[index++] = pos[0];vb_data[index++] = pos[1];   vb_data[index++] = pos[2];
+   index += V_POS_COUNT;
+   index += 2; // FOR DIM2
+   index += 1; // FOR STYLE
+}
 export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time(vbidx, start, colors, positions, time) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
 
@@ -2149,7 +2189,7 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time(vbidx, start, 
 
 }
 /** */
-export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2(vbidx, start, colors, positions, time) {
+export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2(vbidx, start, colors, positions, time, dim, rot, uv, generic) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
@@ -2172,9 +2212,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic
    index += V_POS_COUNT;
    index += 3; // FOR DIM2 AND RCORNERS
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
 
@@ -2190,9 +2230,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic
    index += V_POS_COUNT;
    index += 3; // FOR DIM2 AND RCORNERS
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
    // V3
@@ -2207,9 +2247,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic
    index += V_POS_COUNT;
    index += 3; // FOR DIM2 AND RCORNERS
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
    // V4
@@ -2224,13 +2264,13 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic
    index += V_POS_COUNT;
    index += 3; // FOR DIM2 AND RCORNERS
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 }
 /** */
-export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx, start, colors, positions, time) {
+export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx, start, colors, positions, time, dim, rot, uv, generic) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
@@ -2253,9 +2293,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
 
@@ -2271,9 +2311,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
    // V3
@@ -2288,9 +2328,9 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 
    // V4
@@ -2305,11 +2345,94 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   index += 2; // FOR GENERIC2  ATTR
-   // vb_data[index++] = geom.generic.a;
-   // vb_data[index++] = geom.generic.b;
+   // index += 2; // FOR GENERIC2  ATTR
+   vb_data[index++] = generic.a;
+   vb_data[index++] = generic.b;
 
 }
+/*********************************************************************************************************************************************/
+// Abstract attribs implementation
+/** */
+// export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx, start, colors, positions, time, dim, rot, uv, generic) {
+//    // console.error('CALCULATE THE STRIDE CORRECTLY')
+
+//    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+
+//    let index = start;
+
+
+//    const col = colors;
+//    const pos = positions;
+//    const t = time;
+
+//    // V1
+//    vb_data[index++] = col[0];
+//    vb_data[index++] = col[1];
+//    vb_data[index++] = col[2];
+//    vb_data[index++] = col[3];
+//    vb_data[index++] = pos[0];
+//    vb_data[index++] = pos[1];
+//    vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    vb_data[index++] = t;
+//    // index += 2; // FOR GENERIC2  ATTR
+//    vb_data[index++] = generic.a;
+//    vb_data[index++] = generic.b;
+
+
+
+//    // V2
+//    vb_data[index++] = col[0];
+//    vb_data[index++] = col[1];
+//    vb_data[index++] = col[2];
+//    vb_data[index++] = col[3];
+
+//    vb_data[index++] = pos[0];
+//    vb_data[index++] = pos[1];
+//    vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    vb_data[index++] = t;
+//    // index += 2; // FOR GENERIC2  ATTR
+//    vb_data[index++] = generic.a;
+//    vb_data[index++] = generic.b;
+
+
+//    // V3
+//    vb_data[index++] = col[0];
+//    vb_data[index++] = col[1];
+//    vb_data[index++] = col[2];
+//    vb_data[index++] = col[3];
+
+//    vb_data[index++] = pos[0];
+//    vb_data[index++] = pos[1];
+//    vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    vb_data[index++] = t;
+//    // index += 2; // FOR GENERIC2  ATTR
+//    vb_data[index++] = generic.a;
+//    vb_data[index++] = generic.b;
+
+
+//    // V4
+//    vb_data[index++] = col[0];
+//    vb_data[index++] = col[1];
+//    vb_data[index++] = col[2];
+//    vb_data[index++] = col[3];
+
+//    vb_data[index++] = pos[0];
+//    vb_data[index++] = pos[1];
+//    vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    vb_data[index++] = t;
+//    // index += 2; // FOR GENERIC2  ATTR
+//    vb_data[index++] = generic.a;
+//    vb_data[index++] = generic.b;
+
+// }
 
 
 

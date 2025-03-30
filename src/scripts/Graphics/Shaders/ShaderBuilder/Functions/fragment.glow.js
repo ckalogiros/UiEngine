@@ -13,12 +13,10 @@
  */
 
 export const frag_glow_call = `
-  // vec4 glowcol = Glow(final_color.a, scale_down);
-  vec4 glowcol = Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt);
-  final_color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
-  // final_color.rgb *= glowcol.rgb; // Adds the glow to the any previous function calculations
-  // final_color = blend_color_multiply( final_color, glowcol ); 
-  // final_color = blend_color_add( final_color, glowcol ); 
+  // vec4 glowcol = Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt);
+  // final_color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations
+  final_color = blend_decider( final_color, Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt).rgb, u_blend_mode );
+  // final_color = blend_color_add( final_color, Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt).rgb);
 `;
 
 

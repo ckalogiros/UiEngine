@@ -101,10 +101,6 @@ const GFX_GROUPS = {
  * Shader creation flags 
  */
 
-const SID_ATTR_NAMES_BUFFER = [
-
-];
-
 let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BIT7 = 0x1, BIT8 = 0x1, BITTEST = 0x1;
 const SID = {
 
@@ -116,6 +112,8 @@ const SID = {
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
 
         // Shader Color Manipulation Functions
+        FN_NOISE: BIT1 <<= 1,
+        FN_NOISE2: BIT1 <<= 1,
         FN_GLOW: BIT1 <<= 1,
         FN_INNER_SHADOW: BIT1 <<= 1,
         FN_EXPLOSION_CIRCLE: BIT1 <<= 1,
@@ -186,6 +184,7 @@ const SID = {
         COL4: BIT5 <<= 0x1,         // u_col4
         DIM2: BIT5 <<= 0x1,         // u_dim2
         SCALE2: BIT5 <<= 0x1,       // u_scale2
+        BLEND_MODE: BIT5 <<= 0x1,       // u_scale2
         ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
         FS_TIME_FLOAT: BIT5 <<= 0x1,         // u_time
         FS_RCORNERS_FLOAT: BIT5<<=0x1,
@@ -204,10 +203,10 @@ const SID = {
 
     // FX
     FX: {
-        FS_GLOW_VEC3: BIT6,
-        FS_GLOW_VEC2: BIT6<<=0x1,
-        FS_NOISE: BIT6<<=0x1,
-        FS_NOISE_2: BIT6<<=0x1,
+        // FS_GLOW_VEC3: BIT6,
+        // FS_GLOW_VEC2: BIT6<<=0x1,
+        // FN_NOISE: BIT6<<=0x1,
+        // FS_NOISE_2: BIT6<<=0x1,
         FS_SMOKE_VEC3: BIT6<<=0x1,
         FS_SMOKE_VEC2: BIT6<<=0x1,
     },
@@ -473,11 +472,12 @@ const MESH_ENABLE = {
         UNIF_TIME: _CNT++,
         
         // FX_GLOW: _CNT++,
-        FX_NOISE: _CNT++,
+        FN_NOISE: _CNT++,
         FX_SMOKE: _CNT++,
         
         // Pass from vertex to fragment shader
         PASS_COL4: _CNT++,
+        PASS_WPOS3: _CNT++,
         PASS_WPOS2: _CNT++,
         PASS_VPOS2: _CNT++,
         PASS_DIM2: _CNT++,

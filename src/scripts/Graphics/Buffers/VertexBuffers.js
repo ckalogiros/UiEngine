@@ -664,7 +664,7 @@ export function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
 
 
-export function Vertex_buffer_set_and_update_uniforms_no_gfx_binding(vb_groupidx) {
+export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx) {
 
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
     for (let i = 0; i <= uniform_bindings.boundary; i++) {

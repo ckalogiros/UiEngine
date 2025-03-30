@@ -45,6 +45,7 @@ function SetValueM3(gl, loc, val) { gl.uniformMatrix3fv(loc, false, val); }
 function SetValueM4(gl, loc, val) { gl.uniformMatrix4fv(loc, false, val); }
 
 // Array of integer / boolean
+function SetValue1i(gl, loc, val) { gl.uniform1i(loc, val); }
 function SetValueV1i(gl, loc, val) { gl.uniform1iv(loc, val); }
 
 // Array of integer / boolean vectors (from flat array)
@@ -118,13 +119,15 @@ class Uniform {
          case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Float32Array(1.1,2); break; } // F_VEC2
          case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Float32Array(0,0,0); break; } // F_VEC3
          case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Float32Array(0,0,0,0); break; } // F_VEC4
+         // TODO: Is the Float32Array resizable??? If not we need to create a large enough array
          case UNIF_TYPE.FARR: { this.UpdateUniform = SetValue1f; this.val = new Float32Array(0,0,0,0,0); break; } // F_ARRAY
 
          case UNIF_TYPE.MAT2: { this.UpdateUniform = SetValueM2; break; } // F_MAT2
          case UNIF_TYPE.MAT3: { this.UpdateUniform = SetValueM3; break; } // F_MAT3
          case UNIF_TYPE.MAT4: { this.UpdateUniform = SetValueM4; break; } // F_MAT4
 
-         case UNIF_TYPE.INT: { this.UpdateUniform = SetValueV1i; break; } // INT, BOOL
+         // case UNIF_TYPE.INT: { this.UpdateUniform = SetValueV1i; this.val = 0; break; } // INT, BOOL
+         case UNIF_TYPE.INT: { this.UpdateUniform = SetValue1i; this.val = 0; break; } // INT, BOOL
          case UNIF_TYPE.BOOL: { this.UpdateUniform = SetValueV1i; break; } // INT, BOOL
          case UNIF_TYPE.IVEC2: { this.UpdateUniform = SetValueV2i; break; } // I_VEC2
          case UNIF_TYPE.IVEC3: { this.UpdateUniform = SetValueV3i; break; } // I_VEC3
@@ -144,8 +147,12 @@ class Uniform {
 
    SetFromIndex(val, idx=null) {
 
-      if(idx !== null) 
+
+      if(idx !== null) {
+
+         if(this.val.length === 0) alert(`Forgot to initialize uniform buffer: ${this.name}`)
          this.val[idx] = val;
+      }
       else this.val = val;
       this.needs_update = true;
    }

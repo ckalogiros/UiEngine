@@ -107,7 +107,8 @@ export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], adva
 
     const pos = [0,0];
     // Check if any of the acceptable ALIGN flags are passed.
-    if((flags & (ALIGN.TOP | ALIGN.BOTTOM | ALIGN.LEFT | ALIGN.RIGHT)) === 0) {
+    // if((flags & (ALIGN.TOP | ALIGN.BOTTOM | ALIGN.LEFT | ALIGN.RIGHT)) === 0) {
+    if(!(flags & ALIGN.TOP) && !(flags & ALIGN.BOTTOM) && !(flags & ALIGN.LEFT) && !(flags & ALIGN.RIGHT)) {
         console.warn('NO APROPRIATE ALIGN FLAG IS PASSED');
         return pos;
     }

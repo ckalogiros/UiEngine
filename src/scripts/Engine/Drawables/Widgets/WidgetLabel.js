@@ -12,6 +12,7 @@ import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 
 
 
@@ -34,7 +35,7 @@ export class Widget_Label extends Rect_Mesh {
         const text = properties.text;
 
         const text_mesh = Create_text_mesh({text:text, pos:[0, 0, properties.pos[2]+1], col:properties.text_col, pad:properties.text_pad, font_size:properties.font_size, texture_id:properties.texture_id, sub_texture_id:properties.sub_texture_id, variant_idx:properties.variant_idx, is_debug_mesh:properties.is_debug_mesh});
-
+        Widget_gfx_ready_enable({mesh:text_mesh, enable_attr_dim:false,});
         text_mesh.StylesSetPad(properties.text_pad);
 
         // // HACK: Create equal x pad for the ratio dif of w/h

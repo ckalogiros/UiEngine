@@ -1,9 +1,10 @@
 
-export const frag_smoke_call = `
+// export const frag_smoke_call = `
 
-   vec4 shader_col = Smoke(scale_down);
-   final_color = shader_col;
-`;
+//    vec4 shader_col = Smoke(scale_down);
+//    final_color = shader_col;
+// `;
+export const frag_smoke_call = '   final_color = blend_decider( final_color, Smoke(scale_down), u_blend_mode );';
 
 export const frag_smoke = `
 

@@ -74,7 +74,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
 
 // export const frag_round_corners_call = '  color = blend_color_multiply( color, Round_corners(scale_down) );';
-export const frag_round_corners_call = '  final_color = Round_corners(scale_down);';
+// export const frag_round_corners_call = '  final_color = Round_corners(scale_down);';
+export const frag_round_corners_call = '   final_color = blend_decider( final_color, Round_corners(scale_down), u_blend_mode );';
 export const frag_round_corners = `
 
 /********************************************************************************************/
@@ -317,7 +318,8 @@ vec4 Round_corners(float scale_down)
 
 
 
-export const frag_style_call = '  final_color = blend_color_multiply( final_color, Stylize(scale_down) );';
+// export const frag_style_call = '  final_color = blend_color_multiply( final_color, Stylize(scale_down) );';
+export const frag_style_call = '   final_color = blend_decider( final_color, Stylize(scale_down), u_blend_mode );';
 export const frag_style_corners = `
 
 vec2 pos = vec2(.0);

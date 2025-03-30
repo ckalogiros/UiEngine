@@ -2,7 +2,7 @@ import { Texture_get_texture_unit_byidx } from '../Engine/Loaders/Textures/Textu
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
-import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_gfx_binding } from './Buffers/VertexBuffers.js';
+import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Renderer_webgl_begin_timer_query, Renderer_webgl_end_timer_query } from '../Engine/Renderers/Renderer.js';
 
@@ -64,7 +64,7 @@ export function Gl_draw(gl) {
         
         
         // TODO: Distinguish uniforms that will update with uniforms with constant value
-        Vertex_buffer_set_and_update_uniforms_no_gfx_binding(vb_groupidx); // OLD: Update via Vertex buffer
+        Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx); // OLD: Update via Vertex buffer
 
 
 

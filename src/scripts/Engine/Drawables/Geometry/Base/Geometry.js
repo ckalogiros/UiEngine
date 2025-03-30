@@ -23,6 +23,7 @@ export class Geometry2D {
         this.defDim = [0, 0];
         this.defScale = [0, 0];
         this.time = 1;
+        this.generic = {a:0,b:0};
         this.num_faces = num_faces;
         this.type = MESH_TYPE.GEOMETRY2D;
 

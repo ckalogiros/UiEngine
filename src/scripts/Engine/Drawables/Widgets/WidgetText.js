@@ -1,5 +1,6 @@
 "use strict";
 
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
@@ -28,6 +29,9 @@ export class Widget_Text extends Text_Mesh {
 		this.type |= MESH_TYPE.WIDGET_TEXT;
 
 		this.StylesSetPad(properties.pad);
+
+		// New align fix
+		this.align.flags = ALIGN_2.HORIZONTAL;
 
 		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -658,6 +662,9 @@ export class Widget_Multi_Text extends Widget_Text {
 			pad:pad,
 			is_debug_mesh:false,
 		});
+
+		Widget_gfx_ready_enable({mesh:new_text, enable_attr_dim:false,});
+
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 		new_text.align.flags = align_NEW;
 		// new_text.StylesSetPad(pad);
@@ -677,26 +684,31 @@ export class Widget_Multi_Text extends Widget_Text {
 		// Position horizontaly
 		// Align_between(this.alignment, prev_text_mesh.geom, new_text.geom, pad, new_text.StylesGetPad(), prev_text_mesh.advancex)
 
-		const first_pad = prev_text_mesh.StylesGetPad();
-		const second_pad = new_text.StylesGetPad();
+		// TODO: the alignment is no longer needed, use the new align system to align every multi_text
+
+		// const first_pad = prev_text_mesh.StylesGetPad();
+		// const second_pad = new_text.StylesGetPad();
 
 
 		if (this.alignment & ALIGN.VERTICAL) {
-			new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
-			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
-			new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
+			// new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
+			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
+			// new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
+			
+			// New align fix
+			new_text.align.flags = ALIGN_2.VERTICAL;
 		}
 		else if (this.alignment & ALIGN.HORIZONTAL) {
-			new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
-			new_text.geom.pos[0] += prev_text_mesh.text_width * 2 + second_pad[0];
-			new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
+			// new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
+			// new_text.geom.pos[0] += prev_text_mesh.text_width * 2 + second_pad[0];
+			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
+
+			// New align fix
+			new_text.align.flags = ALIGN_2.HORIZONTAL;
 		}
 
-
-		const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
-		AddArr2(new_text.geom.pos, pos_dif);
-		// AddArr2(new_text.geom.pos, [0, 0]);
-
+		// const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
+		// AddArr2(new_text.geom.pos, pos_dif);
 
 		return idx;
 	}
@@ -1011,7 +1023,8 @@ export class Widget_Multi_Text extends Widget_Text {
 		let max_height = this.text_height;
 		let posx = this.geom.pos[0] + this.text_width * 2;
 		let posy = this.geom.pos[1];
-		let accum_row_width = 0;
+		// let accum_row_width = this.text_width+pad_x;
+		let accum_row_width = this.geom.pos[0] + this.text_width;
 
 		for( let i=0; i<=this.children.boundary; i++) {
 			
@@ -1025,6 +1038,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			if(child.align.flags & ALIGN_2.HORIZONTAL){
 				
 				// posx += child_pad_x; // Add the padding of the current child
+				// posx = accum_row_width*2 + child_pad_x; // Add the padding of the current child
 				posx = accum_row_width*2 + child_pad_x; // Add the padding of the current child
 				child.geom.pos[0] = posx;
 				child.geom.pos[1] = posy;

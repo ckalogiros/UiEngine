@@ -192,6 +192,7 @@ float fbm(vec2 p){
  * Edit: changed the color dodge formula to match what wikipedia 1 says about it.
  */
 
+
 const blend_mode_add          = '( (a)+(b) )';
 const blend_mode_subtract     = '( (a)-(b) )';
 const blend_mode_multiply     = '( (a)*(b) )';
@@ -204,7 +205,7 @@ const blend_mode_screen       = '( 1.-(1.-(a))*(1.-(b)) )';
 const blend_mode_overlay      = `( (a)<=0.5 ) ? ( (2.*(a))*(b) ) : ( 1.-(1.-2.*((a)-0.5))*(1.-(b)) )`;
 const blend_mode_mix          = `( ((a)*(1.-(c))) + ((b)*(c)) )`;
 // const blend_mode_remove_b_from_a       = `( ((a)*(b/a)) )`;
-const blend_mode_remove_b_from_a       = `( (a>0.0) ? (a) : (b) )`;
+const blend_mode_remove_b_from_a       = `( ( (a) > (0.0) ) ? (a) : (b) )`;
 // const blend_mode_remove_b_from_a       = `( ((b) * (1.-a)) + (a*a) )`;
 // const blend_mode_remove_b_from_a       = `( ((a)*(1.-(a))) + ((b)*(b)) )`;
 
@@ -370,12 +371,79 @@ vec4 blend_color_overlay(vec4 a, vec4 b) { return ${blend_color_overlay_vec4   }
 vec4 blend_color_overlay(vec4 a, vec3 b) { return ${blend_color_overlay_vec4_3 }; }
 vec3 blend_color_overlay(vec3 a, vec3 b) { return ${blend_color_overlay_vec3   }; }
 vec4 blend_color_mask(vec4 a, vec4 b) { float m = median(a.r, a.g, a.b); return b*m; }
+vec3 blend_color_mask(vec4 a, vec3 b) { float m = median(a.r, a.g, a.b); return b*m; }
 vec4 blend_color_alpha(vec4 a, vec4 b) { float alpha = a.r*a.g*a.b; return vec4(b.rgb*alpha*6., alpha); }
+// vec3 blend_color_alpha(vec4 a, vec3 b) { float alpha = a.r*a.g*a.b; return vec4(b.rgb*alpha*6., alpha); }
 
 vec4 blend_color_remove_b_from_a(vec4 a, vec4 b) { return ${blend_color_blend_mode_remove_b_from_a_vec4  }; }
 vec4 blend_color_remove_b_from_a(vec4 a, vec3 b) { return ${blend_color_blend_mode_remove_b_from_a_vec4_3}; }
 vec3 blend_color_remove_b_from_a(vec3 a, vec3 b) { return ${blend_color_blend_mode_remove_b_from_a_vec3  }; }
 `;
+
+
+
+const blend_mode_decider = `
+
+#define u_blending_mode 0
+
+#define ADD   0
+#define SUB   1
+#define MUL   2
+#define DIV   3
+#define LIG   4
+#define DAR   5
+#define BUR   6
+#define DOG   7
+#define MIX   8
+#define SCR   9
+#define OVE   10
+#define MASK  11
+#define ALPHA 12
+#define REM   13
+
+vec4 blend_decider(in vec4 c1, in vec4 c2, in int mode) {
+
+  switch(mode) {
+    case ADD   : return blend_color_add(c1,c2);
+    case SUB   : return blend_color_subtract(c1, c2);
+    case MUL   : return blend_color_multiply(c1, c2);
+    case DIV   : return blend_color_divide(c1, c2);
+    case LIG   : return blend_color_lighten(c1, c2);
+    case DAR   : return blend_color_darken(c1, c2);
+    case BUR   : return blend_color_burn(c1, c2);
+    case DOG   : return blend_color_dodge(c1, c2);
+    case MIX   : return blend_color_mix(c1, c2, 0.5);
+    case SCR   : return blend_color_screen(c1, c2);
+    case OVE   : return blend_color_overlay(c1, c2);
+    case MASK  : return blend_color_mask(c1, c2);
+    case ALPHA : return blend_color_alpha(c1, c2);
+    case REM   : return blend_color_remove_b_from_a(c1, c2);
+    default    : return blend_color_subtract(c1, c2);
+  }
+
+}
+
+vec4 blend_decider(in vec4 c1, in vec3 c2, in int mode) {
+
+  switch(mode) {
+    case ADD   : return blend_color_add(c1,c2);
+    case SUB   : return blend_color_subtract(c1, c2);
+    case MUL   : return blend_color_multiply(c1, c2);
+    case DIV   : return blend_color_divide(c1, c2);
+    case LIG   : return blend_color_lighten(c1, c2);
+    case DAR   : return blend_color_darken(c1, c2);
+    case BUR   : return blend_color_burn(c1, c2);
+    case DOG   : return blend_color_dodge(c1, c2);
+    case MIX   : return blend_color_mix(c1, c2, 0.5);
+    case SCR   : return blend_color_screen(c1, c2);
+    case OVE   : return blend_color_overlay(c1, c2);
+    // case MASK  : return blend_color_mask(c1, c2);
+    // case ALPHA : return blend_color_alpha(c1, c2);
+    case REM   : return blend_color_remove_b_from_a(c1, c2);
+    default    : return blend_color_add(c1, c2);
+  }
+
+}`;
 
 
 
@@ -423,6 +491,7 @@ export const shader_chunks = {
   blend_mode_screen: blend_mode_screen,
   blend_mode_overlay: blend_mode_overlay,
   blend_mode_mix: blend_mode_mix,
+  blend_mode_decider: blend_mode_decider,
 };
 
 

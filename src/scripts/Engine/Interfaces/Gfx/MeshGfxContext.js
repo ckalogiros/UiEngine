@@ -4,7 +4,7 @@
 import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_change_uniform_value_clbk_params, Vertex_buffer_set_name_for_debuging, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_state_enable, Vertex_buffer_group_state_enable } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix } from "../../Scenes.js";
@@ -387,6 +387,10 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
                uniforms[i].ubidx = ubidx;
                // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
+               
+               if (uniforms[i].name === 'u_blend_mode') {
+                  Program_stgore_blend_mode_ubidx(progidx, ubidx);
+               }
 
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
                if (uniforms[i].name === 'u_wposxy') {
@@ -401,7 +405,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
                   if (mesh.root_posidx !== vb_groupidx)
-                     alert('root_posidx is NOT equal to vbidx');
+                     alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
 
                   // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
                   // has_unif_wpos_enabled = true;
@@ -599,10 +603,11 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set uup the callback here
                if (uniforms[i].name === 'u_wposxy') {
 
-                  // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
+                  // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.geom.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
                   const HAS_ABSOLUTE_POS = 0x0, HAS_STICKY_POS = 0x0, COPY_MESH_POS = false;
-                  emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
-                  if (emitter.root_posidx !== vb_groupidx) alert('root_posidx is NOT equal to vbidx');
+                  emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.geom.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  if (emitter.root_posidx !== vb_groupidx) 
+                     alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, emitter:${emitter.name}`);
 
                }
 
@@ -619,7 +624,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          const COPY_MESH_POS = (FLAGS) ? true : false;
 
          // Get the unif wpos that is already created for this vb
-         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS);
+         Mesh_unif_set_from_existing_vb_root_wpos(INT_NULL, emitter.geom.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS);
 
       }
 

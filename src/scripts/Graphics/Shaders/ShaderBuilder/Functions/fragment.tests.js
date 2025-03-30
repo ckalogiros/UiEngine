@@ -11,11 +11,12 @@
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
 
-export const frag_test1_call = `
-  vec4 new_color = frag_test1();
-  final_color = blend_mode_vec4( final_color, new_color );
-  // final_color = blend_color_mix( final_color, new_color, final_color.a );
-`;
+// export const frag_test1_call = `
+//   vec4 new_color = frag_test1();
+//   final_color = blend_mode_vec4( final_color, new_color );
+//   // final_color = blend_color_mix( final_color, new_color, final_color.a );
+// `;
+export const frag_test1_call = '  final_color = blend_decider( final_color, frag_test1(), u_blend_mode );';
 
 export const frag_test1 = `
 
@@ -76,11 +77,11 @@ vec4 frag_test1()
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
-  #ifndef UV_READY
+  // #ifndef UV_READY
     #define UV_READY 1
-    uv = gl_FragCoord.xy;
+    vec2 uv = gl_FragCoord.xy;
     pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
-  #endif 
+  // #endif 
   
   uv.x += v_dim2_x;
   uv.y += v_dim2_y;
@@ -152,11 +153,12 @@ vec4 frag_test1()
 /*************************************************************************************************************************/
 
 
-export const frag_test3_call = `
-  vec4 new_color = frag_test3();
-  // final_color = blend_color_mix( final_color, new_color, final_color.a );
-  final_color = blend_color_multiply( final_color, new_color );
-`;
+// export const frag_test3_call = `
+//   vec4 new_color = frag_test3();
+//   // final_color = blend_color_mix( final_color, new_color, final_color.a );
+//   final_color = blend_color_multiply( final_color, new_color );
+// `;
+export const frag_test3_call = '  final_color = blend_decider( final_color, frag_test3(), u_blend_mode );';
 
 export const frag_test3 = `
 
@@ -278,7 +280,7 @@ vec4 frag_test3()
 /*************************************************************************************************************************/
 
 /** Round Game-Map like shape */
-export const frag_test2_call = '   final_color = frag_test2();'
+export const frag_test2_call = '  final_color = blend_decider( final_color, frag_test2(), u_blend_mode );';
 export const frag_test2 = `
 
 /********************************************************************************************/
@@ -743,12 +745,13 @@ vec4 frag_test2()
 /*************************************************************************************************************************/
 
 
-export const frag_test4_call = `
-  final_color = frag_test4();
-  // vec4 new_color = frag_test4();
-  // // final_color = blend_color_mix( final_color, new_color, final_color.a );
-  // final_color = blend_color_multiply( final_color, new_color );
-`;
+export const frag_test4_call = '  final_color = blend_decider( final_color, frag_test4(), u_blend_mode );';
+// export const frag_test4_call = `
+//   final_color = frag_test4();
+//   // vec4 new_color = frag_test4();
+//   // // final_color = blend_color_mix( final_color, new_color, final_color.a );
+//   // final_color = blend_color_multiply( final_color, new_color );
+// `;
 
 // export const frag_test4 = `
 
@@ -975,7 +978,8 @@ vec4 frag_test4()
 /*************************************************************************************************************************/
 
 // export const frag_test5_bubble_call = '   final_color = blend_color_multiply( final_color, frag_test5_bubble() );'
-export const frag_test5_bubble_call = '   final_color = frag_test5_bubble();'
+export const frag_test5_bubble_call = '  final_color = blend_decider( final_color, frag_test5_bubble(), u_blend_mode );';
+// export const frag_test5_bubble_call = '   final_color = frag_test5_bubble();'
 
 export const frag_test5_bubble = `
 
@@ -1140,7 +1144,9 @@ vec4 frag_test5_bubble()
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
 
-export const frag_test6_ring_feathered_call = '   final_color = blend_color_multiply( final_color, frag_test6_ring_feathered() );'
+// export const frag_test6_ring_feathered_call = '   final_color = blend_color_multiply( final_color, frag_test6_ring_feathered() );'
+// export const frag_test6_ring_feathered_call = '   final_color = blend_decider( final_color, frag_test6_ring_feathered(), u_blend_mode );';
+export const frag_test6_ring_feathered_call = '  final_color = blend_decider( final_color, frag_test6_ring_feathered(), u_blend_mode );';
 
 export const frag_test6_ring_feathered = `
 
