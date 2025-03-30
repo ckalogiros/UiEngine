@@ -41,7 +41,7 @@ let renderer = null;
 export function AppInit() {
 
     SID.ATTR = Shader_bit_flags_build_SID_ATTR();
-    SID.PASS = Shader_bit_flags_build_SID_ATTR();
+    SID.ATTR = Shader_bit_flags_build_SID_ATTR();
     SID.Init();
 
 

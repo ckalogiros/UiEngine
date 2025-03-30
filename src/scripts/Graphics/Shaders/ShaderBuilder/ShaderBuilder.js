@@ -1185,13 +1185,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
    //  u_generic_controls[];
   int u_gen_ctrl_map_cnt = 0;
   #endif`,
-      (sid.pass & SID.PASS.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
+      (sid.pass & SID.ATTR.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
 
       (sid.unif & SID.UNIF.SCALE2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
       (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
       
-      (sid.pass & SID.PASS.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
+      (sid.pass & SID.ATTR.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
       '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
       // '  vec2 uv = gl_FragCoord.xy;', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color

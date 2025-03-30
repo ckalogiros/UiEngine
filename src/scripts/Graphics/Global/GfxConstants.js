@@ -158,7 +158,7 @@ const SID = {
     },
 
     ATTR: {},
-    PASS: {},
+    // PASS: {},
 
     INST:{
         COL4: BIT3,
@@ -370,14 +370,14 @@ const SID = {
     
         k++;
         if (sid.pass) str[k] += 'Passes:'
-        if (sid.pass & SID.PASS.COL4) str[k] += 'col4, '
-        if (sid.pass & SID.PASS.VPOS2) str[k] += 'pos2, '
-        if (sid.pass & SID.PASS.DIM2) str[k] += 'dim2, '
-        if (sid.pass & SID.PASS.WPOS2) str[k] += 'wpos2, '
-        if (sid.pass & SID.PASS.TEX2) str[k] += 'tex2, '
-        if (sid.pass & SID.PASS.TIME) str[k] += 'time1, '
-        if (sid.pass & SID.PASS.SDF2) str[k] += 'sdf2'
-        if (sid.pass & SID.PASS.STYLE3) str[k] += 'generir_attribs1'
+        if (sid.pass & SID.ATTR.COL4) str[k] += 'col4, '
+        if (sid.pass & SID.ATTR.VPOS2) str[k] += 'pos2, '
+        if (sid.pass & SID.ATTR.DIM2) str[k] += 'dim2, '
+        if (sid.pass & SID.ATTR.WPOS2) str[k] += 'wpos2, '
+        if (sid.pass & SID.ATTR.TEX2) str[k] += 'tex2, '
+        if (sid.pass & SID.ATTR.TIME) str[k] += 'time1, '
+        if (sid.pass & SID.ATTR.SDF2) str[k] += 'sdf2'
+        if (sid.pass & SID.ATTR.STYLE3) str[k] += 'generir_attribs1'
         // if (sid.pass) str[k] += '\n'
     
         return str;
@@ -399,7 +399,7 @@ const SID = {
 
 // if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
 // if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
-// if(SID.PASS > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
+// if(SID.ATTR > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
 
 
 

@@ -168,7 +168,7 @@ function Arkanoid_initialize_start_menu(x, y) {
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, y, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[4]}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, enable_pass_vpos:true, });
    section.SetName('Arkanoid-Start Menu Panel');
-   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
    // section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);

@@ -72,11 +72,11 @@ export function Sattelite_rotation(x = 0, y = 0) {
    controls_section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    controls_section.SetName('Sattelite_rotation->controls_section');
-   controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    const flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    };
 
    const slider_dim = [300, 10];
@@ -139,7 +139,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
 
       const ball = Create_rect_mesh(_, [pos[0], pos[1], 2], dim, BLUEL[9], 'Ball', [0, dim[0], 2]);
-      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ball.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
       ball.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dim[0]);
       ball.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -165,7 +165,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
    }
 
    const sat = Create_rect_mesh(_, _, [6, 12], YELLOWL[9]);
-   sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   sat.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // sat.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
    sat.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
    sat.EnableGfx(MESH_ENABLE.GFX.ATTR_ANGLE, 0);
@@ -173,7 +173,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
    section.AddItem(sat);
 
    // Render
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -367,7 +367,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
 
       // Render
-      info_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
       info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
@@ -634,7 +634,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
 
    const mnemonics = {
@@ -834,7 +834,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
 
       // Render
-      info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       
       Align_pre_simple(info_section_panel);
       
@@ -910,7 +910,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
 
 

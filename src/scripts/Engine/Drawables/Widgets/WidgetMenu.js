@@ -482,7 +482,7 @@ export class Close_Button extends Widget_Button {
       // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, pos, _, col, _, style,_, texture_id, sub_texture_id, is_debug_mesh);
 
       this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      this.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);

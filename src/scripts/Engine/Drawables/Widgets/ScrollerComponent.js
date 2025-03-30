@@ -51,7 +51,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
 
    const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar}));
-   bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    bar.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    bar.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -73,7 +73,7 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const handle_height = bar.geom.dim[1] - handle_pad[1];
    const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
    const handle = Create_rect_mesh(Style_rect_default_properties({pos:handle_pos, dim:[handle_width, handle_height], col:col_handle,}));
-   handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    handle.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
    handle.SetName('Handle');

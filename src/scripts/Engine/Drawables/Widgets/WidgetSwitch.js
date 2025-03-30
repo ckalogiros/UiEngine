@@ -61,13 +61,11 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          hover_margin:properties.handle.hover_margin, 
          is_debug_mesh:properties.is_debug_mesh
       }));
-      Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:switch_handle.geom.dim[1]});
+      Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:properties.size * (1 - ratio)});
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-      switch_handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, properties.size * (1 - ratio));
-      switch_handle.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       switch_handle.SetName('switch');
 
       switch_handle.mat.style.rcorners = properties.size - pad;

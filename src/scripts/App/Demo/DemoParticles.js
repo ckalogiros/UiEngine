@@ -1699,7 +1699,7 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
 
 
@@ -2088,7 +2088,7 @@ export function Test_noise_shader() {
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
 
    const controls_dp = Create_widget_dropdown(_, 'Emitter Test', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
@@ -2331,7 +2331,7 @@ export function Test_noise_shader() {
 
 
    // Render properties panel
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
@@ -2361,19 +2361,19 @@ export function Test_noise_shader() {
    /****************************************************************************************************************/
    const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [10, 60, 0], _, GREY[1],);
    s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
    const btn = Create_widget_button(_, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
    s.AddItem(btn);
    btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idxs] },)
 
 
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // s.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
    s.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT
    s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
@@ -2451,7 +2451,7 @@ function Create_side_panel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target
    if (render_target) {
 
 
-      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -2601,7 +2601,7 @@ function Create_side_panel_horizontal(root_widget = ROOT_WIDGETS.CREATE_ROOT, re
    if (render_target) {
 
 
-      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
       section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.RESIZE_PARENTY
       section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);

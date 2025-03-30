@@ -165,10 +165,10 @@ export class Material_Font extends Material {
       this.texture_file_id = texture_file_id;
 
       this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.pass |= SID.PASS.TEX2; //
+      this.sid.pass |= SID.ATTR.TEX2; //
       if (FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
-         // this.sid.pass |= SID.PASS.TEX2; //
+         // this.sid.pass |= SID.ATTR.TEX2; //
 
          // Catch WRONG texture config
          // if(variant_idx !== INT)
@@ -206,7 +206,7 @@ export class Material_Atlas_Texture extends Material {
       math.CopyArr2(this.sdf_params, sdf_params);
 
       this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.pass |= SID.PASS.TEX2; //
+      this.sid.pass |= SID.ATTR.TEX2; //
       if (FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
       }
@@ -243,7 +243,7 @@ export class Material_Atlas_Texture_Variant extends Material {
       math.CopyArr2(this.sdf_params, sdf_params);
 
       this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.pass |= SID.PASS.TEX2; //
+      this.sid.pass |= SID.ATTR.TEX2; //
       if (FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
       }
@@ -282,7 +282,7 @@ export class Material_Texture extends Material {
       super(col);
 
       this.sid.attr |= SID.ATTR.TEX2; // Enable texture coordinates for the vertex shader
-      this.sid.pass |= SID.PASS.TEX2;
+      this.sid.pass |= SID.ATTR.TEX2;
       this.type |= MESH_TYPE.TEXTURE_MATERIAL;
 
       let texture_type = TEXTURE_TYPE.TYPE_TEXTURE; // Initialize to comon texture

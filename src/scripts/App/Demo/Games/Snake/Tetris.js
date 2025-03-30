@@ -483,7 +483,7 @@ function Cell_create(offsetx = 0, offsety = 0, col) {
 
    const color = col !== undefined ? col : YELLOW[9];
    const mesh = Create_widget_section(_, _, [0, 0], [tetris_panel_pad + (TOKEN_SIZE * 2 * offsetx), tetris_panel_pad + (TOKEN_SIZE * 2 * offsety), 0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
-   mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
@@ -1343,7 +1343,7 @@ function Tetris_start_menu(section_, emitter_) {
    const r_corners = 20;
 
    const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, section_.GetPosY(), 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
-   menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
    menu_panel.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
@@ -1376,7 +1376,7 @@ function Tetris_start_menu(section_, emitter_) {
    const col_inner = GREY[0];
 
    const play_contols_info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREEN[5], .9), 'section',);
-   play_contols_info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   play_contols_info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    play_contols_info.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    play_contols_info.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
@@ -1387,7 +1387,7 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(col_inner, tr), 'section',);
       // const info = Create_widget_section(_, _, [10,10], [0, 0, 10], [100,10], TRANSPARENCY(BLUE[9], 1.3), 'section', );
-      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
       info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -1396,20 +1396,20 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = PURPLER[7];
       const ctrl = Create_widget_label(_, 'A', _, _, _, col, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 31);
       ctrl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.AddItem(ctrl);
 
       const expl = Create_widget_label(_, 'Rotate Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       expl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.AddItem(expl);
    }
    {
       const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(col_inner, tr), 'section',);
-      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
@@ -1417,13 +1417,13 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = PURPLEB[9];
       const ctrl = Create_widget_label(_, 'D', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
       info.AddItem(ctrl);
 
       const expl = Create_widget_label(_, 'Rotate Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       expl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.AddItem(expl);
@@ -1431,7 +1431,7 @@ function Tetris_start_menu(section_, emitter_) {
    }
    {
       const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(col_inner, tr), 'section',);
-      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
@@ -1439,20 +1439,20 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = BLUEL[9];
       const ctrl = Create_widget_label(_, '<', _, _, _, col, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 31);
       info.AddItem(ctrl);
 
       const expl = Create_widget_label(_, 'Move Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       expl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.AddItem(expl);
    }
    {
       const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(col_inner, tr), 'section',);
-      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
@@ -1460,13 +1460,13 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = BLUEL[9];
       const ctrl = Create_widget_label(_, '>', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
       info.AddItem(ctrl);
 
       const expl = Create_widget_label(_, 'Move Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       expl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.AddItem(expl);
@@ -1474,7 +1474,7 @@ function Tetris_start_menu(section_, emitter_) {
    }
    {
       const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(col_inner, tr), 'section',);
-      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
@@ -1482,13 +1482,13 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = YELLOW[7];
       const ctrl = Create_widget_label(_, 'V', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       ctrl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 32);
       info.AddItem(ctrl);
 
       const expl = Create_widget_label(_, 'Move Down', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       expl.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       info.AddItem(expl);
@@ -1503,7 +1503,7 @@ function Tetris_start_menu(section_, emitter_) {
    /*******************************************************************************************/
    // Start Game button
    const start_btn = Create_widget_close_btn(_, menu_panel, 'PLAY', [0, 0, zpos], 30, btn_col, WHITE, [dim[0] / 2 - pad * 2, 10], _, _, TEXTURES.CONSOLAS_32px);
-   start_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   start_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    start_btn.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    start_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
    start_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, start_btn.geom.dim[1]);
@@ -1577,7 +1577,7 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, a
 
 
    const section = Create_widget_section(root_widget, _, [10, 10], [VIEWPORT.WIDTH / 2 - (TETRIS_PANEL_WIDTH + tetris_panel_pad), y, 0], [(TETRIS_PANEL_WIDTH + tetris_panel_pad), TETRIS_PANEL_HEIGHT + tetris_panel_pad], GREY[0], 'TetrisSection');
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    section.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
    section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);

@@ -225,7 +225,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
 
    // const u_wpos_flags = {
    //    unif: SID.UNIF.ROOT_WPOS2,
-   //    pass: SID.PASS.WPOS3,
+   //    pass: SID.ATTR.WPOS3,
    // }
 
    const rcorners = 10
@@ -376,7 +376,7 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
    // Create panel to hold button panels
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
 
    const panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [x, y, 0], _, GREY[1]);
@@ -1182,7 +1182,7 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
 
    const u_wpos_flags = {
       unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.PASS.WPOS3,
+      pass: SID.ATTR.WPOS3,
    }
    let zpos = 0;
 

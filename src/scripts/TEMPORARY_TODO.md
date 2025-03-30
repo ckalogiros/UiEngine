@@ -55,7 +55,7 @@ Example
    remove OLD Align:ALIGN.HORIZONTAL OR rename it to corespond a specific alignment for multi-text,
 
 * What is the difference of 
-GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 AND
 GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 I tthink the pass.wpos3 is curently unused

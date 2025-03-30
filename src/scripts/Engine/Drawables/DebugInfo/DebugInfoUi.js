@@ -1883,7 +1883,7 @@ let u = 0;
 //             attr: (this.geom.sid.attr | this.mat.sid.attr),
 //             inst: (this.geom.sid.inst | this.mat.sid.inst),
 //             unif: this.mat.sid.unif,
-//             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
+//             pass: (this.geom.sid.pass | this.mat.sid.pass | SID.ATTR.COL4),
 //             gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
 //         };
 

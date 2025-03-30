@@ -25,7 +25,7 @@
 //    let zpos = 10;
    
 //    const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
-//    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//    menu_panel.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 //    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
 //    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0]/10);
 //    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -70,7 +70,7 @@
 //    /*******************************************************************************************/
 //    // Close button
 //    const close_btn = Create_widget_button(_, 'Close', _, [0, 0, zpos], 12, btn_col, WHITE, [dim[0]/2-pad*2, 6], _, _, TEXTURES.MTSDF_COMIC_1024);
-//    close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+//    close_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 //    close_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 //    close_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
 //    close_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, close_btn.geom.dim[1]);

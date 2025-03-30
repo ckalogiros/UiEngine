@@ -136,7 +136,7 @@ export class Mesh {
             attr: (this.geom.sid.attr | this.mat.sid.attr),
             inst: (this.geom.sid.inst | this.mat.sid.inst),
             unif: this.mat.sid.unif,
-            pass: (this.geom.sid.pass | this.mat.sid.pass | SID.PASS.COL4),
+            pass: (this.geom.sid.pass | this.mat.sid.pass | SID.ATTR.COL4),
             shad_ops: 0x0,
             fx: 0x0,
             blend_options: 0x0,
@@ -731,13 +731,13 @@ export class Mesh {
 
         switch (which) {
 
-            case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.PASS.VPOS2; break; }
-            case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.PASS.WPOS3; break; }
-            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.PASS.TEX2; break; }
+            case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.ATTR.VPOS2; break; }
+            case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.ATTR.WPOS3; break; }
+            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2; break; }
+            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.ATTR.TEX2; break; }
             case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
                 this.sid.attr |= SID.ATTR.GENERIC2;
-                this.sid.pass |= SID.PASS.GENERIC2;
+                this.sid.pass |= SID.ATTR.GENERIC2;
                 if (params !== null) {
                     this.geom.generic = params;
                 }
@@ -745,15 +745,15 @@ export class Mesh {
             }
             case MESH_ENABLE.GFX.ATTR_TIME: {
                 this.sid.attr |= SID.ATTR.TIME;
-                this.sid.pass |= SID.PASS.TIME;
+                this.sid.pass |= SID.ATTR.TIME;
                 if (params !== null) {
                     this.geom.time = params;
                 }
                 break;
             }
-            case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.PASS.ANGLE; break; }
-            // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.PASS.GLOW_INTENSITY; break; }
-            case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.PASS.RES2; break; }
+            case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.ATTR.ANGLE; break; }
+            // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.ATTR.GLOW_INTENSITY; break; }
+            case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.ATTR.RES2; break; }
 
 
             case MESH_ENABLE.GFX.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
@@ -763,7 +763,7 @@ export class Mesh {
 
             case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
                 this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-                this.sid.pass |= SID.PASS.COL4_PER_VERTEX;
+                this.sid.pass |= SID.ATTR.COL4_PER_VERTEX;
                 if (params !== null) {
                     if ((params[0] instanceof Float32Array) === false)
                         alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
@@ -773,23 +773,23 @@ export class Mesh {
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-                this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.PASS.R_CORNERS;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+                this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.ATTR.R_CORNERS;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
                 if (params !== null) this.mat.style.rcorners = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_FEATHER: {
-                this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.PASS.FEATHER;
-                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+                this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.ATTR.FEATHER;
+                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
                 if (params !== null) this.mat.style.feather = params;
                 break;
             }
             case MESH_ENABLE.GFX.ATTR_BORDER: {
-                this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.PASS.BORDER;
-                this.sid.pass |= SID.PASS.VPOS2 | SID.PASS.WPOS3;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.PASS.DIM2;
+                this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.ATTR.BORDER;
+                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
                 if (params !== null) this.mat.style.border = params;
                 break;
             }
@@ -874,17 +874,17 @@ export class Mesh {
     }
     GfxPassAttr(flags) {
 
-        if (flags & SID.PASS.VPOS2) this.sid.pass |= SID.PASS.VPOS2;
-        if (flags & SID.PASS.DIM2) { this.sid.pass |= SID.PASS.DIM2; }
-        if (flags & SID.PASS.WPOS2) this.sid.pass |= SID.PASS.WPOS2;
-        if (flags & SID.PASS.WPOS3) this.sid.pass |= SID.PASS.WPOS3;
-        if (flags & SID.PASS.TEX2) { this.sid.pass |= SID.PASS.TEX2; }
-        if (flags & SID.PASS.RES2) this.sid.pass |= SID.PASS.RES2;
-        if (flags & SID.PASS.TIME) { this.sid.pass |= SID.PASS.TIME; }
-        if (flags & SID.PASS.ANGLE) { this.sid.pass |= SID.PASS.ANGLE; }
-        if (flags & SID.PASS.R_CORNERS) { this.sid.pass |= SID.PASS.R_CORNERS; }
-        if (flags & SID.PASS.GENERIC2) { this.sid.pass |= SID.PASS.GENERIC2; }
-        if (flags & SID.PASS.COL4_PER_VERTEX) { this.sid.pass |= SID.PASS.COL4_PER_VERTEX; }
+        if (flags & SID.ATTR.VPOS2) this.sid.pass |= SID.ATTR.VPOS2;
+        if (flags & SID.ATTR.DIM2) { this.sid.pass |= SID.ATTR.DIM2; }
+        if (flags & SID.ATTR.WPOS2) this.sid.pass |= SID.ATTR.WPOS2;
+        if (flags & SID.ATTR.WPOS3) this.sid.pass |= SID.ATTR.WPOS3;
+        if (flags & SID.ATTR.TEX2) { this.sid.pass |= SID.ATTR.TEX2; }
+        if (flags & SID.ATTR.RES2) this.sid.pass |= SID.ATTR.RES2;
+        if (flags & SID.ATTR.TIME) { this.sid.pass |= SID.ATTR.TIME; }
+        if (flags & SID.ATTR.ANGLE) { this.sid.pass |= SID.ATTR.ANGLE; }
+        if (flags & SID.ATTR.R_CORNERS) { this.sid.pass |= SID.ATTR.R_CORNERS; }
+        if (flags & SID.ATTR.GENERIC2) { this.sid.pass |= SID.ATTR.GENERIC2; }
+        if (flags & SID.ATTR.COL4_PER_VERTEX) { this.sid.pass |= SID.ATTR.COL4_PER_VERTEX; }
 
     }
     /**

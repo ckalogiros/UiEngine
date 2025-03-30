@@ -31,30 +31,30 @@ export function Widget_gfx_ready_enable({
 }) {
 
    if (enable_unif_wpos) mesh.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   if(enable_unif_blend) mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
+   if (enable_unif_blend) mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
-   if (enable_attr_dim)  { mesh.GfxEnableAttr(SID.ATTR.DIM2);  mesh.GfxPassAttr(SID.PASS.DIM2); }
-   if (enable_pass_vpos) { mesh.GfxPassAttr(SID.PASS.VPOS2); }
-   if (enable_pass_wpos) { mesh.GfxPassAttr(SID.PASS.WPOS2); }
+   if (enable_attr_dim) { mesh.GfxEnableAttr(SID.ATTR.DIM2); mesh.GfxPassAttr(SID.ATTR.DIM2); }
+   if (enable_pass_vpos) { mesh.GfxPassAttr(SID.ATTR.VPOS2); }
+   if (enable_pass_wpos) { mesh.GfxPassAttr(SID.ATTR.WPOS2); }
 
 
    if (enable_sdf_rect !== undefined) {
-      
-      if (Array.isArray(enable_sdf_rect)) mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, enable_sdf_rect[0], enable_sdf_rect[1], enable_sdf_rect[2]); 
-      else mesh.GfxEnableAttr(SID.ATTR.R_CORNERS|SID.ATTR.DIM2, {rcorners:enable_sdf_rect});
-      mesh.GfxPassAttr(SID.PASS.R_CORNERS|SID.PASS.DIM2|SID.PASS.VPOS2);
+
+      if (Array.isArray(enable_sdf_rect)) mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, enable_sdf_rect[0], enable_sdf_rect[1], enable_sdf_rect[2]);
+      else mesh.GfxEnableAttr(SID.ATTR.R_CORNERS | SID.ATTR.DIM2, { rcorners: enable_sdf_rect });
+      mesh.GfxPassAttr(SID.ATTR.R_CORNERS | SID.ATTR.DIM2 | SID.ATTR.VPOS2);
 
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
    }
 
    if (enable_col_per_vertex !== undefined) {
       // mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, enable_col_per_vertex);
-      mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, );
+      mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX,);
    }
 
    if (enable_attr_angle !== undefined) {
-      mesh.GfxEnableAttr(SID.PASS.ANGLE, enable_attr_angle);
-      mesh.GfxPassAttr(SID.PASS.ANGLE);
+      mesh.GfxEnableAttr(SID.ATTR.ANGLE, enable_attr_angle);
+      mesh.GfxPassAttr(SID.ATTR.ANGLE);
    }
 
    if (enable_blend_mode !== undefined) {
