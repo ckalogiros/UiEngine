@@ -1,5 +1,6 @@
 "use strict";
 
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
@@ -31,11 +32,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    color_active;
    pad; // int, not array for x-y pad
 
-   // constructor(mesh_bufferidx, is_root, pos, size = 16, col = GREY[1], col2 = GREEN[2], _pad = 0, bold, style = { rcorners: 15, feather: 2, border: 0 }, is_debug_mesh) {
    constructor(mesh_bufferidx, properties) {
 
       const ratio = .2;
-      // const pad = (properties.pad !== 0) ? properties.pad : properties.size * ratio;
       const pad = properties.size * ratio;
       const switch_dim = [properties.size * 2, properties.size]
       properties.style.rcorners = properties.size;
@@ -53,30 +52,35 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.SetName('Switch Widget');
 
       this.evt_params = null;
-      // this.pad = pad;
-
       
       const switch_pos = [pad, pad, properties.pos[2] + 1];
-      const switch0 = Create_rect_mesh(Style_rect_default_properties({pos:switch_pos, dim:[properties.size - pad, properties.size - pad], col:properties.handle.col, hover_margin:properties.handle.hover_margin, is_debug_mesh:properties.is_debug_mesh}));
+      const switch_handle = Create_rect_mesh(Style_rect_default_properties({
+         pos:switch_pos, 
+         dim:[properties.size - pad, properties.size - pad], 
+         col:properties.handle.col, 
+         hover_margin:properties.handle.hover_margin, 
+         is_debug_mesh:properties.is_debug_mesh
+      }));
+      Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:switch_handle.geom.dim[1]});
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
-      switch0.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, properties.size * (1 - ratio));
-      switch0.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      switch0.SetName('switch');
+      switch_handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, properties.size * (1 - ratio));
+      switch_handle.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      switch_handle.SetName('switch');
 
-      switch0.mat.style.rcorners = properties.size - pad;
-      switch0.state.mask &= ~MESH_STATE.ACTIVE;
+      switch_handle.mat.style.rcorners = properties.size - pad;
+      switch_handle.state.mask &= ~MESH_STATE.ACTIVE;
 
-      this.AddChild(switch0);
+      this.AddChild(switch_handle);
       this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
 
       this.SetLayout(properties.layout);
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
-         switch0.root_bufferidx = this.root_bufferidx;
+         switch_handle.root_bufferidx = this.root_bufferidx;
       }
 
    }
@@ -145,13 +149,13 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   /** Must run for every mesh */
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+   // /** Must run for every mesh */
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      this.children.buffer[0].GfxUniformsEnable(flags, name, type, shader_flags);
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    this.children.buffer[0].GfxUniformsEnable(flags, name, type, shader_flags);
 
-   }
+   // }
 
 
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
@@ -413,7 +417,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
 
       const mesh = Mesh_buffer_get_mesh_byidx(params.meshidx);
-      const switch0 = mesh.children.buffer[0];
+      const switch_handle = mesh.children.buffer[0];
 
       mesh.isOn ^= 0x1;
       mesh.SetUpdateFrameBuffer();
@@ -421,13 +425,13 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);
-         switch0.geom.pos[0] += mesh.geom.dim[0];
-         switch0.geom.AddWposX(switch0.gfx, mesh.geom.dim[0],);
+         switch_handle.geom.pos[0] += mesh.geom.dim[0];
+         switch_handle.geom.AddWposX(switch_handle.gfx, mesh.geom.dim[0],);
       }
       else {
          Set_default_color_rgba(mesh);
-         switch0.geom.pos[0] -= mesh.geom.dim[0];
-         switch0.geom.AddWposX(switch0.gfx, -mesh.geom.dim[0],);
+         switch_handle.geom.pos[0] -= mesh.geom.dim[0];
+         switch_handle.geom.AddWposX(switch_handle.gfx, -mesh.geom.dim[0],);
       }
 
 

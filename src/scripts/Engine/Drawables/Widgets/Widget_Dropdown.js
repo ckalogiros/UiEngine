@@ -734,17 +734,17 @@ export class Widget_Dropdown extends Section {
    }
 
 
-   /** Must run for every mesh */
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+   // /** Must run for every mesh */
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
 
-      const btn = this.children.buffer[0];
-      btn.GfxUniformsEnable(flags, name, type, shader_flags);
+   //    const btn = this.children.buffer[0];
+   //    btn.GfxUniformsEnable(flags, name, type, shader_flags);
       
-      this.menu.GfxUniformsEnable(flags, name, type, shader_flags);
+   //    this.menu.GfxUniformsEnable(flags, name, type, shader_flags);
       
-   }
+   // }
 
   
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params){

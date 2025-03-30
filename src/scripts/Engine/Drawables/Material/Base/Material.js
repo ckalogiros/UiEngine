@@ -89,15 +89,15 @@ export class Material {
    }
 
 
-   SetStyle(style) {
+   // SetStyle(style) {
 
-      if (style !== undefined) {
+   //    if (style !== undefined) {
 
-         this.style.rcorners = style.rcorners;
-         this.style.feather = style.feather;
-         this.style.border = style.border;
-      }
-   }
+   //       this.style.rcorners = style.rcorners;
+   //       this.style.feather = style.feather;
+   //       this.style.border = style.border;
+   //    }
+   // }
 
 
    SetCopyColor(col) {
@@ -194,7 +194,7 @@ export class Material_Font extends Material {
 
 
 
-
+/** Used for texture atlases but not font rendering. The difference is that in a font atlas texture there are many characters to be represented via Text_Mesh class. */
 export class Material_Atlas_Texture extends Material {
 
 
@@ -231,7 +231,7 @@ export class Material_Atlas_Texture extends Material {
    }
 }
 
-
+/** Used for Font rendering. This is the case where many font sizes are on the same atlas, so the variant_idx refers to the font size texture characters. */
 export class Material_Atlas_Texture_Variant extends Material {
 
 

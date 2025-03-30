@@ -423,7 +423,6 @@ export class Widget_Menu_Bar extends Section {
 
       // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
-      mesh.SetStyle(Mesh_create_style_from_values(5, 2, 2));
 
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
       // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;

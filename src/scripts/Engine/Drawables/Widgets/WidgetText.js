@@ -1,14 +1,13 @@
 "use strict";
 
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
-import { AddArr2, CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
+import { CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
-import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
@@ -31,7 +30,7 @@ export class Widget_Text extends Text_Mesh {
 		this.StylesSetPad(properties.pad);
 
 		// New align fix
-		this.align.flags = ALIGN_2.HORIZONTAL;
+		this.align.flags = properties.layout;
 
 		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -312,6 +311,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		this.alignment = properties.align;
 		this.TEMPORARY_variant_idx = properties.variant_idx;
+
+		Widget_gfx_ready_enable({mesh:this, enable_attr_dim:false,});
 
 	}
 

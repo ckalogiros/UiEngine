@@ -595,11 +595,11 @@ export class Mesh {
     SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
 
 
-    SetStyle(style) {
-        this.SetUpdateFrameBuffer(); this.mat.SetStyle(style);
-        // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-        // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-    }
+    // SetStyle(style) {
+    //     this.SetUpdateFrameBuffer(); this.mat.SetStyle(style);
+    //     // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+    //     // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    // }
 
 
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
@@ -858,26 +858,41 @@ export class Mesh {
         if (flags & SID.ATTR.DIM2) { this.sid.attr |= SID.ATTR.DIM2; }
         if (flags & SID.ATTR.TEX2) { this.sid.attr |= SID.ATTR.TEX2; }
         if (flags & SID.ATTR.ANGLE) { this.sid.attr |= SID.ATTR.ANGLE; }
-        if (flags & SID.ATTR.TIME) { this.sid.attr |= SID.ATTR.TIME; if (params.time) this.geom.time = params.time; }
-        if (flags & SID.ATTR.GENERIC2) { this.sid.attr |= SID.ATTR.GENERIC2; if (params.generic) this.geom.generic = params.generic; }
-        if (flags & SID.ATTR.R_CORNERS) { this.sid.attr |= SID.ATTR.R_CORNERS; if (params.rcorners) this.mat.style.rcorners = params.rcorners; }
-        if (flags & SID.ATTR.COL4_PER_VERTEX) { this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; if (params.col4_per_vertex) this.mat.col = params.col4_per_vertex; }
+        if (flags & SID.ATTR.TIME) { this.sid.attr |= SID.ATTR.TIME; }
+        if (flags & SID.ATTR.GENERIC2) { this.sid.attr |= SID.ATTR.GENERIC2; }
+        if (flags & SID.ATTR.R_CORNERS) { this.sid.attr |= SID.ATTR.R_CORNERS; }
+        if (flags & SID.ATTR.COL4_PER_VERTEX)  this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; 
+        
+        if(params) {
+
+            if (params.time) { this.geom.time = params.time; }
+            if (params.generic) { this.geom.generic = params.generic; }
+            if (params.rcorners) this.mat.style.rcorners = params.rcorners; 
+            if (params.col4_per_vertex) { this.mat.col = params.col4_per_vertex; }
+        }
 
     }
     GfxPassAttr(flags) {
 
-        if (flags & SID.PASS.COL4_PER_VERTEX) { this.sid.pass |= SID.PASS.COL4_PER_VERTEX; }
         if (flags & SID.PASS.VPOS2) this.sid.pass |= SID.PASS.VPOS2;
-        if (flags & SID.PASS.WPOS3) this.sid.pass |= SID.PASS.WPOS3;
-        if (flags & SID.PASS.WPOS2) this.sid.pass |= SID.PASS.WPOS2;
         if (flags & SID.PASS.DIM2) { this.sid.pass |= SID.PASS.DIM2; }
+        if (flags & SID.PASS.WPOS2) this.sid.pass |= SID.PASS.WPOS2;
+        if (flags & SID.PASS.WPOS3) this.sid.pass |= SID.PASS.WPOS3;
         if (flags & SID.PASS.TEX2) { this.sid.pass |= SID.PASS.TEX2; }
-        if (flags & SID.PASS.GENERIC2) { this.sid.pass |= SID.PASS.GENERIC2; }
         if (flags & SID.PASS.RES2) this.sid.pass |= SID.PASS.RES2;
-        if (flags & SID.PASS.R_CORNERS) { this.sid.pass |= SID.PASS.R_CORNERS; }
-        if (flags & SID.PASS.ANGLE) { this.sid.pass |= SID.PASS.ANGLE; }
         if (flags & SID.PASS.TIME) { this.sid.pass |= SID.PASS.TIME; }
+        if (flags & SID.PASS.ANGLE) { this.sid.pass |= SID.PASS.ANGLE; }
+        if (flags & SID.PASS.R_CORNERS) { this.sid.pass |= SID.PASS.R_CORNERS; }
+        if (flags & SID.PASS.GENERIC2) { this.sid.pass |= SID.PASS.GENERIC2; }
+        if (flags & SID.PASS.COL4_PER_VERTEX) { this.sid.pass |= SID.PASS.COL4_PER_VERTEX; }
 
+    }
+    /**
+     * 
+     * @param {SEE global var: SID:{BLEND_OPTIONS}} blend_flags 
+     */
+    GfxEnableBlend(blend_flags){
+        this.sid.blend_options |= blend_flags;
     }
     GfxEnableFn(flags, params) {
 

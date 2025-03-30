@@ -695,8 +695,6 @@ class Emitter {
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
 
 
-   // SetStyle(style) { this.mat.SetStyle(style); }
-   SetStyle(style) { alert('this.mat.SetStyle(style);') }
 
 
    GetName() {

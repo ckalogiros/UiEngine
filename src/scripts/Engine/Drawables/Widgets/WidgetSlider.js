@@ -14,6 +14,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Ro
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Mesh_create_style_from_values } from '../Operations/MeshHelperFunctions.js';
 import { Style_rect_default_properties, Style_slider_simple_default_properties } from './WidgetReadyStyles.js';
+import { Widget_gfx_ready_enable } from '../../../App/Widgets/WidgetGfxReady.js';
 
 
 
@@ -43,7 +44,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
 
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.SetStyle(Mesh_create_style_from_values(2, .6, 0));
 
 
       this.slider_val = 0;
@@ -51,17 +51,15 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       // For efficiensy: So both meshes register to the same vertex buffer 
       const handle_color = (properties.col[0] instanceof Float32Array) ? [properties.handle.col, properties.handle.col, properties.handle.col, properties.handle.col] :properties.handle.col;
       const handle = Create_rect_mesh(Style_rect_default_properties({
-         // pos:[properties.pos[0] - properties.handle.dim[0] + properties.dim[0], properties.pos[1] - properties.handle.dim[1] + properties.dim[1], properties.pos[2] + 1], 
          pos:[0-properties.handle.dim[0] + properties.dim[0], 0 - properties.handle.dim[1] + properties.dim[1], properties.pos[2] + 1], 
          dim:properties.handle.dim, 
          col:handle_color, 
       }));
+      Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:handle.geom.dim[0],});
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
-      // if (properties.col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [handle.mat.col, handle.mat.col, handle.mat.col, handle.mat.col]);
       if (properties.col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
 
-      handle.SetStyle(Mesh_create_style_from_values(Min(properties.handle.dim[0], properties.handle.dim[1]), 3., 4));
 
 
 
@@ -204,13 +202,13 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 
 
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      const handle = this.children.buffer[0];
-      handle.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    const handle = this.children.buffer[0];
+   //    handle.EnableGfxUniforms(flags, name, type, shader_flags);
 
-   }
+   // }
 
 
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
@@ -815,8 +813,9 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          is_debug_mesh: is_debug_mesh, 
          // sub_texture_id, 
       });
+      Widget_gfx_ready_enable({mesh:name_text, enable_attr_dim:false,});
       name_text.StylesSetPad([outer_pad, outer_pad]);
-
+      
       const value_text = Create_widget_text({
          is_root:_, 
          pos:[0, 0, 1], 
@@ -829,6 +828,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          is_debug_mesh: is_debug_mesh, 
          // sub_texture_id, 
       });
+      Widget_gfx_ready_enable({mesh:value_text, enable_attr_dim:false,});
       value_text.StylesSetPad([outer_pad, outer_pad]);
 
 
@@ -845,7 +845,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
-      this.SetStyle(Mesh_create_style_from_values(6, 2, 0));
       // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -857,7 +856,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // const bar_color = (col[0] instanceof Float32Array) ? [GREY[8], GREY[8], GREY[8], GREY[8]] : GREY[8];
       // const bar = Create_widget_slider_simple(_, [outer_pad, 0, _pos[2] + 1], [bar_width, bar_height], slider_bar_color, hover_margin, properties.handle.dim, slider_handle_color, 1, is_debug_mesh);
       const bar = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[outer_pad, 0, _pos[2] + 1], dim:[bar_width, bar_height], col:slider_bar_color, hover_margin:hover_margin, handle_dim:properties.handle.dim, handle_col:slider_handle_color, is_debug_mesh:is_debug_mesh}));
-      bar.SetStyle(Mesh_create_style_from_values(2, .6, 0));
+      Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[1],});
       bar.StylesSetPad([outer_pad, outer_pad]);
       
       
@@ -981,21 +980,21 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
 
-      const name_text = this.text_mesh;
-      name_text.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    const name_text = this.text_mesh;
+   //    name_text.EnableGfxUniforms(flags, name, type, shader_flags);
 
-      const value_text = this.children.buffer[this.value_text_idx];
-      value_text.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    const value_text = this.children.buffer[this.value_text_idx];
+   //    value_text.EnableGfxUniforms(flags, name, type, shader_flags);
 
-      const bar = this.children.buffer[this.bar_idx];
-      bar.GfxUniformsEnable(flags, name, type, shader_flags);
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    bar.GfxUniformsEnable(flags, name, type, shader_flags);
 
-   }
+   // }
 
 
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {

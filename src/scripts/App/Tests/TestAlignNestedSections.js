@@ -8,6 +8,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Style_rect_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_angle, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 import { Widget_ready_label, Widget_ready_slider } from "../Widgets/WidgetReadyWidgets.js";
 
 
@@ -1366,11 +1367,9 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
    /********************************************************************************************************************************************************/
    // Create
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, dim: [0, 0], pos: [0, 0, 0], pad: [20, 20], col: TRANSPARENCY(GREY[0], 1.), name: 'MAIN_SECTION' }));
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.PASS.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 2);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
    section.StylesSetPad([10, 10]);
    section.StylesSetMargin([0, 0]);
@@ -3362,16 +3361,17 @@ function Test_slider_control_pad(x, y) {
 /********************************************************************************** */
 // MOCK UPS
 /** */
-function Create_rect_t1(parent, color, name, align, pad = [10, 10], enable_hover = true, dim = [0, 0]) {
+function Create_rect_t1(parent, color, name, align=0x0, pad = [10, 10], enable_hover = true, dim = [0, 0]) {
 
    // const s = Create_widget_section(_, _, pad, [0, 0, 1], _, TRANSPARENCY(color, 1), name);
-   const s = Create_rect_mesh(Style_rect_default_properties({ pad: pad, pos: [0, 0, 1], col: color, name: name, dim: dim }));
+   const s = Create_rect_mesh(Style_rect_default_properties({ pad: pad, pos: [0, 0, 1], col: color, name: name, dim: dim, layout:ALIGN_2.RESIZE_SELF|align}));
+   Widget_gfx_ready_enable({mesh:s, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD})
    s.StylesSetPad(pad);
-   s.align.flags = ALIGN_2.RESIZE_SELF | align;
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if (enable_hover) s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-   s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   // s.align.flags = ALIGN_2.RESIZE_SELF | align;
+   // s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+   // s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    parent.AddItem(s);
 
    return s;

@@ -1,5 +1,6 @@
 "use strict"
 
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
@@ -60,16 +61,18 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const scale = .6;
       
       if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
+      // super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
+      super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:[GREY[1], GREY[3], GREY[1], GREY[3]], name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
+      Widget_gfx_ready_enable({mesh:this, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
       
       
       // Multi color vertex
-      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      super.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
+      // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // super.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
       this.options |= SECTION.RESIZE_PARENT;
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
+      // this.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
 
       this.label_r = null;
       this.label_g = null;
@@ -84,18 +87,21 @@ export class Widget_Color_Picker extends Rect_Mesh {
       /******************************************************************************/
       // Create panel to align further meshes
       style.feather = 10;
-      
+      const color = [ORANGER[7], GREY[3], GREY[1], GREEN[3]];
+
       // const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
       // const panel = Create_widget_section(Style_section_default_properties({options:SECTION.HORIZONTAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:[GREY[2], GREY[4], GREY[2], GREY[4]], name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
       // const panel = Create_rect_mesh(Style_rect_default_properties({is_root:_, options:SECTION.HORIZONTAL, pad:[10 * scale, 10 * scale], pos:[0, 0, 1], col:[GREY[1], GREY[3], GREY[1], GREY[3]], name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:_, options:SECTION.HORIZONTAL, pad:[10 * scale, 10 * scale], pos:[0, 0, 1], col:[ORANGER[7], GREY[3], GREY[1], GREEN[3]], name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
+      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:_, options:SECTION.HORIZONTAL, pad:[10 * scale, 10 * scale], pos:[0, 0, 1], col:color, name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
+      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:color, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
       // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
-      panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      panel.options |= SECTION.RESIZE_PARENT;
-      // panel.StylesSetPad([0,0]);
-      panel.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
-      panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      
+      // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      // panel.options |= SECTION.RESIZE_PARENT;
+      // // panel.StylesSetPad([0,0]);
+      // panel.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
+      // panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // panel.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // panel.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
       panel_idx = this.AddItem(panel)
       
       
@@ -106,10 +112,13 @@ export class Widget_Color_Picker extends Rect_Mesh {
       /******************************************************************************/
       // Create the color picker panel
       const color_pick = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 2], dim:[150 * scale, 150 * scale], col:[WHITE, BLACK, YELLOW[9], BLACK,], pad:[10, 0], name:'Color Picker', num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      color_pick.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      color_pick.StylesSetPad([0,0]);
-      color_pick.align.flags = ALIGN_2.HORIZONTAL;
-      color_pick.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      Widget_gfx_ready_enable({mesh:color_pick, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+      // color_pick.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      // color_pick.StylesSetPad([0,0]);
+      // color_pick.align.flags = ALIGN_2.HORIZONTAL;
+      // color_pick.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // color_pick.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // color_pick.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
@@ -120,22 +129,28 @@ export class Widget_Color_Picker extends Rect_Mesh {
       // Create panel for the color presentation and info labels
       // const panel2 = Create_widget_section(Style_section_default_properties({options:SECTION.VERTICAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
       const panel2 = Create_rect_mesh(Style_rect_default_properties({pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      panel2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      panel2.options |= SECTION.RESIZE_PARENT;
-      panel2.StylesSetMargin([10, 0]);
-      panel2.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
-      panel2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      Widget_gfx_ready_enable({mesh:panel2, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+      // panel2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      // panel2.options |= SECTION.RESIZE_PARENT;
+      // panel2.StylesSetMargin([10, 0]);
+      // panel2.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
+      // panel2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // panel2.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // panel2.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
       panel2_idx = panel.AddItem(panel2);
 
 
 
       /******************************************************************************/
       // Create the color present mesh
-      const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 2], dim:[75 * scale, 45 * scale], col:[YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], name:'Color Present', num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      color_present_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 2], dim:[75 * scale, 45 * scale], col:[YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], name:'Color Present', num_meshes:1, layout:ALIGN_2.HORIZONTAL, is_debug_mesh:is_debug_mesh}));
+      Widget_gfx_ready_enable({mesh:color_present_mesh, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+      // color_present_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       color_present_mesh.StylesSetMargin([0, 0]);
-      color_present_mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      color_present_mesh.align.flags = ALIGN_2.HORIZONTAL;
+      // color_present_mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // color_present_mesh.align.flags = ALIGN_2.HORIZONTAL;
+      // color_present_mesh.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+      // color_present_mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
       
       this.color_pick_click_pos = [color_pick.geom.dim[0] * 2, 0];
       color_present_idx = panel2.AddItem(color_present_mesh);
@@ -151,58 +166,66 @@ export class Widget_Color_Picker extends Rect_Mesh {
          const grad_grey = {_1:GREY[7], _2:GREY[1]};
          // const grad_grey = {_1:GREY[1], _2:GREY[5]};
          {
-            const label_col = Create_widget_label(Style_label_default_properties({text:'R', pos:[0, 0, 13], font_size:fontsize, col:[REDL[5], REDL[5], REDL[5], REDL[5]], pad:[0,5], text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_col.align.flags = ALIGN_2.VERTICAL;
-            label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_col = Create_widget_label(Style_label_default_properties({text:'R', pos:[0, 0, 13], font_size:fontsize, col:[REDL[5], REDL[5], REDL[5], REDL[5]], pad:[0,5], text_col:WHITE, text_pad:label_pad, style:label_style, layout:ALIGN_2.VERTICAL}));
+            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_col.align.flags = ALIGN_2.VERTICAL;
+            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_col);
             
-            const label_val = Create_widget_label(Style_label_default_properties({text:'R1111', pos:[0, 0, 13], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2),  pad:[5,5], text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_val.align.flags = ALIGN_2.HORIZONTAL;
-            label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_val = Create_widget_label(Style_label_default_properties({text:'R1111', pos:[0, 0, 13], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2),  pad:[5,5], text_col:WHITE, text_pad:label_pad, style:label_style, layout:ALIGN_2.VERTICAL}));
+            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_val.align.flags = ALIGN_2.HORIZONTAL;
+            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_val);
             this.label_r = label_val;
          }
          {
             const label_col = Create_widget_label(Style_label_default_properties({text:'G', pos:[0, 0, 3], font_size:fontsize, col:[GREEN[4], GREEN[4], GREEN[4], GREEN[4]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_col.align.flags = ALIGN_2.VERTICAL;
-            label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_col.align.flags = ALIGN_2.VERTICAL;
+            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_col);
             
             const label_val = Create_widget_label(Style_label_default_properties({text:'G1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_val.align.flags = ALIGN_2.HORIZONTAL;
-            label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_val.align.flags = ALIGN_2.HORIZONTAL;
+            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_val);
             this.label_g = label_val;
          }
          {
             const label_col = Create_widget_label(Style_label_default_properties({text:'G', pos:[0, 0, 3], font_size:fontsize, col:[BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_col.align.flags = ALIGN_2.VERTICAL;
-            label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_col.align.flags = ALIGN_2.VERTICAL;
+            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_col);
             
             const label_val = Create_widget_label(Style_label_default_properties({text:'B1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_val.align.flags = ALIGN_2.HORIZONTAL;
-            label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_val.align.flags = ALIGN_2.HORIZONTAL;
+            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_val);
             this.label_b = label_val;
          }
          {
             const label_col = Create_widget_label(Style_label_default_properties({text:'A', pos:[0, 0, 3], font_size:fontsize, col:[GREY[8], GREY[8], GREY[8], GREY[8]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_col.align.flags = ALIGN_2.VERTICAL;
-            label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_col.align.flags = ALIGN_2.VERTICAL;
+            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_col);
             
             const label_val = Create_widget_label(Style_label_default_properties({text:'A1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            label_val.align.flags = ALIGN_2.HORIZONTAL;
-            label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+            // label_val.align.flags = ALIGN_2.HORIZONTAL;
+            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             panel2.AddItem(label_val);
             this.label_a = label_val;
          }
@@ -223,11 +246,12 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const TRANSPARENCY_BAR_COLOR = COLOR_GRADIENT_VERTICAL(YELLOW[9], GREY[3]);
       
       // const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 13], dim:[12 * scale, 150 * scale], col:TRANSPARENCY_BAR_COLOR, [10, 10], [16 * scale, 3 * scale], WHITE, 1);
-      const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 13], dim:[12 * scale, 150 * scale], pad:[10, 0], col:TRANSPARENCY_BAR_COLOR, hover_margin:[10, 10], handle_dim:[16 * scale, 4 * scale], handle_col:WHITE, num_faces:1}));
-      slider_tran.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 13], dim:[12 * scale, 150 * scale], pad:[10, 0], col:TRANSPARENCY_BAR_COLOR, hover_margin:[10, 10], handle_dim:[16 * scale, 4 * scale], handle_col:WHITE, num_faces:1, layout:ALIGN_2.HORIZONTAL}));
+      Widget_gfx_ready_enable({mesh:slider_tran, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+      // slider_tran.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
       slider_tran.SetName('Slider Transparency');
-      slider_tran.align.flags = ALIGN_2.HORIZONTAL;
-      slider_tran.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // slider_tran.align.flags = ALIGN_2.HORIZONTAL;
+      // slider_tran.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
       slider_trans_idx = panel.AddItem(slider_tran);
 
@@ -251,76 +275,19 @@ export class Widget_Color_Picker extends Rect_Mesh {
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
-      const slider_hue = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 2], dim:[dim[0] * scale, 20 * scale], pad:[0, 10], col:HUE_COLOR, hover_margin:[10, 10], handle_dim:[4 * scale, 24 * scale], handle_col:WHITE, num_faces:vertices_count}));
+      const slider_hue = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 2], dim:[dim[0] * scale, 20 * scale], pad:[0, 10], col:HUE_COLOR, hover_margin:[10, 10], handle_dim:[4 * scale, 24 * scale], handle_col:WHITE, num_faces:vertices_count, layout:ALIGN_2.VERTICAL}));
+      Widget_gfx_ready_enable({mesh:slider_hue, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      slider_hue.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
-      // slider_hue.StylesSetPad([0, 10]);
+      // slider_hue.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
       slider_hue.SetName('Slider Hue');
-      slider_hue.align.flags = ALIGN_2.VERTICAL;
-      slider_hue.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // slider_hue.align.flags = ALIGN_2.VERTICAL;
+      // slider_hue.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider_hue_idx = this.AddItem(slider_hue);
 
 
    }
-   
-   // SetLayout(self_align_flags = null, panel_align_flags = null, color_pick_align_flags = null, pane2_align_flags = null, color_present_align_flags = null, slider_trans_align_flags = null, handle_trans_align_flags=null, slider_hue_align_flags = null, labels_align_flags = null) {
 
-   //    super.align.flags = self_align_flags;
-
-   //    const slider_hue = this.children.buffer[slider_hue_idx];
-   //    slider_hue.align.flags = slider_hue_align_flags;
-
-   //    const panel = this.children.buffer[panel_idx];
-   //    panel.align.flags = panel_align_flags;
-
-   //    const color_pick = panel.children.buffer[color_pick_idx];
-   //    color_pick.align.flags = color_pick_align_flags;
-
-   //    const slider_trans = panel.children.buffer[slider_trans_idx];
-   //    slider_trans.align.flags = slider_trans_align_flags, handle_trans_align_flags;
-
-   //    const panel2 = panel.children.buffer[panel2_idx];
-   //    panel2.align.flags = pane2_align_flags;
-
-   //    const color_present = panel2.children.buffer[color_present_idx];
-   //    color_present.align.flags = color_present_align_flags;
-
-
-   //    for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
-   //       const label = panel2.children.buffer[i];
-   //       label.align.flags = labels_align_flags;
-   //    }
-   // }
-
-   // AddLayout(self_align_flags = null, panel_align_flags = null, color_pick_align_flags = null, pane2_align_flags = null, color_present_align_flags = null, slider_trans_align_flags = null, handle_trans_align_flags=null, slider_hue_align_flags = null, labels_align_flags = null) {
-
-   //    super.align.flags = self_align_flags;
-
-   //    const slider_hue = this.children.buffer[slider_hue_idx];
-   //    slider_hue.align.flags |= slider_hue_align_flags;
-
-   //    const panel = this.children.buffer[panel_idx];
-   //    panel.align.flags |= panel_align_flags;
-
-   //    const color_pick = panel.children.buffer[color_pick_idx];
-   //    color_pick.align.flags |= color_pick_align_flags;
-
-   //    const slider_trans = panel.children.buffer[slider_trans_idx];
-   //    slider_trans.align.flags |= slider_trans_align_flags, handle_trans_align_flags;
-
-   //    const panel2 = panel.children.buffer[panel2_idx];
-   //    panel2.align.flags |= pane2_align_flags;
-
-   //    const color_present = panel2.children.buffer[color_present_idx];
-   //    color_present.align.flags |= color_present_align_flags;
-
-
-   //    for (let i = color_present_idx + 1; i <= panel2.children.boundary; i++) {
-   //       const label = panel2.children.buffer[i];
-   //       label.align.flags |= labels_align_flags;
-   //    }
-   // }
 
 
    /****************************************************************************************************************************************************/
@@ -398,15 +365,15 @@ export class Widget_Color_Picker extends Rect_Mesh {
    }
 
 
-   /** Must run for every mesh */
-   GfxUniformsEnable(flags, name, type, shader_flags) {
+   // /** Must run for every mesh */
+   // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-      super.EnableGfxUniforms(flags, name, type, shader_flags);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
-      }
-   }
+   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
+   //    for (let i = 0; i <= this.children.boundary; i++) {
+   //       const child = this.children.buffer[i];
+   //       if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
+   //    }
+   // }
 
 
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {

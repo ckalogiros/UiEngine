@@ -672,12 +672,12 @@ const fs_op_inner_shadow_circle = `
 /*** Operation inner-shadow-circle ***/
   // #ifndef UV_READY_MODEL_SPACE_0_1 // A way to neglect any unecessary pixel coord calculations
   //   #define UV_READY_MODEL_SPACE_0_1
-    uv = gl_FragCoord.xy;
-    uv.x -= v_wpos3_x;
-    uv.y = res.y - uv.y;
-    uv.y -= v_wpos3_y;
-    uv /= local_res;
-    uv /=  scale_down; 
+    // uv = gl_FragCoord.xy;
+    // uv.x -= v_wpos3_x;
+    // uv.y = res.y - uv.y;
+    // uv.y -= v_wpos3_y;
+    // uv /= local_res;
+    // uv /=  scale_down; 
   // #endif
   
   vec4 inner_shadow_circle_color = vec4(.0);

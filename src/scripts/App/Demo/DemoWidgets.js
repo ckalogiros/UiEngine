@@ -1151,10 +1151,12 @@ The engine supports two primary text rendering implementations.\
     */
    const text_sample_explainer2 = `\
 1. Regular Font Textures
-Each font size is represented by its own font atlas.  
+Each font size is represented by its own font texture. 
+The engine combines different font size textures
+in to one atlas texture, usualy per font type. 
 Drawback:
 - Dynamic scaling of text is not supported with this method,
-     as each font size requires its own pre-rendered texture atlas.\
+  as each font size requires its own pre-rendered texture atlas.\
    `;
    /**  
       Pros: Dynamic scaling is fully supported, providing flexibility for various font sizes.
@@ -1177,7 +1179,6 @@ Adjust the font size using the slider.
 
 
 
-   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, options:SECTION.VERTICAL, pad:[20, 20], pos:[x + l_pad, y + t_pad, 0], dim:[0, 0], cpl:TRANSPARENCY(GREY[3], .4)}));
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [20, 20], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[3], .9) }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 4, });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1189,54 +1190,39 @@ Adjust the font size using the slider.
 
 
    /** Create the info for the user */
-   // const s = Create_rect_mesh(Style_rect_default_properties({options:SECTION.VERTICAL, pad:[10, 10], pos:[x + l_pad, y + t_pad, 0], dim:[0, 0], cpl:TRANSPARENCY(GREY[1], .4)}));
    const s = Create_rect_mesh(Style_rect_default_properties({ options: SECTION.VERTICAL, pad: [10, 10], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[1], .4) }));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: 4, });
    s.SetName('Msdf_text_info_sub_section');
    s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    section.AddItem(s);
-
+   
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = 10;
    const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
-   {
-      info1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-      info1.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
-      s.AddItem(info1);
-   }
+   Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
+   info1.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   s.AddItem(info1);
+
    const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
-   {
-      info2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-      info2.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
-      s.AddItem(info2);
-   }
+   Widget_gfx_ready_enable({ mesh: info2, enable_sdf_rect: 4, });
+   info2.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   s.AddItem(info2);
+
    const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
-   {
-      info3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-      info3.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
-      s.AddItem(info3);
-   }
+   Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: 4, });
+   info3.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   s.AddItem(info3);
+   
    const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
-   {
-      info4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-      info4.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
-      s.AddItem(info4);
-   }
+   Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: 4, });
+   info4.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   s.AddItem(info4);
 
 
    /********************************************************************************************************************************************************/
    // Align
-   const ret = Align_pre_simple(section);
+   Align_pre_simple(section);
    Align_expand(section)
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   // section.geom.pos[0] = pos[0];
-   // section.geom.pos[1] = pos[1];
-
 
 
    /**************************************************************************************************************************************************/
@@ -1244,9 +1230,6 @@ Adjust the font size using the slider.
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
-
-   // const ret = Align_pre_simple(section);
-   // Align_expand(section, section.align.flags,)
 
    section.Render()
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1258,7 +1241,7 @@ Adjust the font size using the slider.
 
 
 
-   info1.text_mesh.SetColorRGBSpecificIndex(YELLOWL[7], 0, 14);
+   info1.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 14);
 
 
 
@@ -1317,7 +1300,10 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
    if (c4 === null) c4 = c2;
 
    const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y, 0], [w, h], [c1, c2, c3, c4], _, Mesh_create_style_from_values(10, 2, 0));
-   picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // Widget_gfx_ready_enable({mesh:picker, enable_sdf_rect:10,})
+   // picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   picker.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   picker.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
    const tarnsparency_handle = picker.GetTransparencySliderHandle();
    const tarnsparency_handle_rcorners = Min(tarnsparency_handle.geom.dim[0], tarnsparency_handle.geom.dim[1])
    picker.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 8, 6, 4, 4, 4, tarnsparency_handle_rcorners, 4, 4);

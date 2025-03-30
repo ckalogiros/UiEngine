@@ -106,7 +106,6 @@ export function Create_widget_text(properties) {
    // Create a new mesh_buffer element and add a new section mesh
    const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(properties));
 
-
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
    _mesh_buffer.buffer[mesh_bufferidx].SetName(`WidgetText[${mesh_bufferidx}]{${properties.text}}`);

@@ -36,7 +36,6 @@ export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      slider.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       slider.Render();
       Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
@@ -65,9 +64,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
    }));
 
    // Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 8, });
-   Widget_gfx_ready_enable({ mesh: slider });
-   slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 6);
-   slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect:8, });
    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
    slider.SetInitialValue(initial_val);
@@ -87,7 +84,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
 
 }
 /** */
-export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4], handle_col=GREY[7], hover_margin=[6,6]) {
+export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4], handle_col=GREY[7], hover_margin=[6,6], on_click_clbk=null) {
 
    const pos = [x, y, 0];
    const switch1 = Create_widget_switch_simple(Style_switch_default_properties({ 
@@ -102,7 +99,9 @@ export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4],
    Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1]});
    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
+
+   if(on_click_clbk) switch1.Bind(on_click_clbk);
+   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
 
    if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
@@ -119,7 +118,7 @@ export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4],
    return switch1;
 }
 /** */
-export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], font_size=8, text_pad=[12, 6]) {
+export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], font_size=8, text_pad=[12, 6], on_click_clbk=null) {
 
    const pos = [x, y, 0];
    const switch1 = Create_widget_switch_button(Style_switch_button_default_properties({ 
@@ -136,7 +135,9 @@ export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], f
    Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: 6});
    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
+
+   if(on_click_clbk) switch1.Bind(on_click_clbk);
+   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
 
    if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
@@ -168,9 +169,6 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
       texture_id: texture_id,
       font_size: font_size,
       text_col: color_text,
-      // sub_texture_id: user_properties.sub_texture_id !== undefined ? user_properties.sub_texture_id : _,
-      // variant_idx: user_properties.variant_idx !== undefined ? user_properties.variant_idx : _,
-
       is_debug_mesh: false,
    }));
 
@@ -311,9 +309,10 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
       text_col: WHITE,
       is_debug_mesh: false,
    }));
-   msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-   msdf_text.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   Widget_gfx_ready_enable({mesh:msdf_text, enable_sdf_rect:4});
+   // msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
+   // msdf_text.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 

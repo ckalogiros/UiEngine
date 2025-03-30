@@ -174,14 +174,14 @@ export class Widget_Switch extends Widget_Button {
 
    }
 
-   SetLayout(rect_align_flags) {
+   SetLayout(align_flags) {
 
-      this.SetLayout(rect_align_flags);
+      this.align.flags = align_flags;
    }
    
-   AddLayout(rect_align_flags) {
+   AddLayout(align_flags) {
       
-      this.AddLayout(rect_align_flags);
+      tthis.align.flags |= align_flags;
    }
 
 

@@ -21,8 +21,8 @@ vec4 Sdf(float inner, float outer){
 /**************************************************************************************************
  * MSDF Text Rendering Shader
 */
-// export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) * src_color;';
-export const frag_msdf_call = '  final_color = blend_decider( final_color, Msdf(v_tex_coord), u_blend_mode ) * src_color;';
+export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) * src_color;';
+// export const frag_msdf_call = '  final_color = blend_decider( final_color, Msdf(v_tex_coord), u_blend_mode ) * src_color;';
 // export const frag_msdf_call = '   final_color = Msdf(v_tex_coord) ;';
 export const frag_msdf = `
 
@@ -112,8 +112,10 @@ export const frag_tex = `
     float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
     float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
   #else
-    float ${u}ctrl1 = 3.0;
-    float ${u}ctrl2 = 4.0;
+    // float ${u}ctrl1 = 3.0;
+    // float ${u}ctrl2 = 4.0;
+    float ${u}ctrl1 = 1.0;
+    float ${u}ctrl2 = 1.0;
   #endif
 
 
@@ -129,7 +131,6 @@ export const frag_tex = `
   
   // float distance = max(texel.r, max(texel.g, texel.b));
   float distance = max(texel.r, max(texel.g, texel.b))*(20.*${u}ctrl1);
-
 
 
   // TODO: Add to the final color to create thickness

@@ -1,5 +1,13 @@
 TODO
 
+* IMMIDIATELY: Separate font-symbols and texture rendering shaders
+
+* Deal with the SetStyle function, It is not used with the sdf_rect implementation
+   OR implement at LAST! a style configurator to set:
+   pads, margins, hover margins, LOCALLY in the Mesh object
+   etc...
+
+
 * IMMIDIATELY:
    Use only generic uniform buffer for creating uniforms of kind: Create smoke slider 'U_SMOKE_PARAMS_VEC3' and noise 'U_NOISE_PARAMS'
    1. When enabling u_generic_controls for many meshes of the same program, we need to 'remember' all the sizes to add them up. this is happening in the Mesh.js EnableGfx

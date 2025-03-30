@@ -54,16 +54,12 @@ export class Widget_Label extends Rect_Mesh {
             dim:properties.dim,
             col:properties.col,
             pad:properties.pad,
-
             name:properties.pad,
             style:properties.pad,
             num_faces:properties.num_faces,
-
             is_debug_mesh:properties.is_debug_mesh,
-
         }));
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        this.SetStyle(properties.style)
         this.SetName(properties.text)
         
         this.text_mesh = text_mesh;
@@ -173,13 +169,13 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    /** Must run for every mesh */
-    GfxUniformsEnable(flags, name, type, shader_flags) {
+    // /** Must run for every mesh */
+    // GfxUniformsEnable(flags, name, type, shader_flags) {
 
-        super.EnableGfxUniforms(flags, name, type, shader_flags);
-        this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
+    //     super.EnableGfxUniforms(flags, name, type, shader_flags);
+    //     this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
 
-    }
+    // }
 
 
     GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
