@@ -113,7 +113,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer(targe
    
    /***********************************************************************************************************************************/
    // Create scale controls
-   if(target_mesh.sid.unif & SID.UNIF.SCALE2) {
+   if(target_mesh.sid.unif & SID.UNIF.U_SCALE_VEC2) {
       const rcorners = 10;
       const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:ORANGE[8], name:'Scale', layout:ALIGN_2.VERTICAL, texture_id:default_font}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
@@ -128,6 +128,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer(targe
          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
          emitter.geom.scale[0] = slider_val;
+         // console.log('---------------------------',emitter.geom.scale[0])
          }, { emitter:target_mesh },
       );
    }
@@ -236,17 +237,18 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
 
    /***********************************************************************************************************************************/
    // Create scale controls
-   if(target_mesh.sid.unif & SID.UNIF.SCALE2) {
+   if(target_mesh.sid.unif & SID.UNIF.U_SCALE_VEC2) {
       const rcorners = 10;
       const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:ORANGE[8], name:'Scale', layout:ALIGN_2.VERTICAL, texture_id:default_font}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
       controls_buffer.push(slider);
-      slider.SetInitialValue(target_mesh.geom.scale);
+      slider.SetInitialValue(target_mesh.geom.scale[0]);
 
       // Connect sliders to gfx program uniforms 
       Slider_connect(slider, (params, slider_val) => {
          const emitter = params.clbk_params.emitter;
-         emitter.geom.scale = slider_val;
+         emitter.geom.scale[0] = slider_val;
+         emitter.GfxUniformSetAndUpdate('u_scale2', slider_val, 0);
          }, { emitter:target_mesh },
       );
    }
@@ -261,7 +263,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
    // Render 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
       Align_pre_simple(controls_section);

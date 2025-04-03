@@ -295,8 +295,8 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
 
 
 
-export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
-   const vb_info_count = Vertex_buffer_fn_table_operation_add[fnidx](vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset);
+export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset, vCount) {
+   const vb_info_count = Vertex_buffer_fn_table_operation_add[fnidx](vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset, vCount);
    return vb_info_count;
 }
 
@@ -1653,15 +1653,16 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, _, vCount) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_rect+2;
    const col_len = mat.col.length - 1;
 
-   for (let i = 0; i < len; i++) {
+   // for (let i = 0; i < len; i++) {
+   for (let i = 0; i < vCount; i++) {
 
       // Case some meshes have one color for all vertices, but still use color per vertex buffer.
       const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;

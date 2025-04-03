@@ -56,21 +56,27 @@ export class Widget_Color_Picker extends Rect_Mesh {
    label_b;
    label_a;
 
-   constructor(mesh_bufferidx, is_root, options = (SECTION.VERTICAL), margin, pos, dim = [100, 100], col = GREY[1], name = 'Color Picker', style = {rcorners:10, feather:2, border:0}, num_faces, is_debug_mesh) {
+   // constructor(mesh_bufferidx, is_root, margin, pos, dim = [100, 100], col = GREY[1], name = 'Color Picker', style = { rcorners: 10, feather: 2, border: 0 }, num_faces, is_debug_mesh) {
+   constructor(mesh_bufferidx, properties) {
 
       const scale = .6;
-      
-      if (col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      // super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
-      super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:[GREY[1], GREY[3], GREY[1], GREY[3]], name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
-      Widget_gfx_ready_enable({mesh:this, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      
-      
-      // Multi color vertex
-      // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // super.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
-      this.options |= SECTION.RESIZE_PARENT;
 
+      if (properties.col !== _ && properties.col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
+      // super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
+   // super(mesh_bufferidx, { 
+   //    is_root: is_root, pad: [margin[0] * scale, margin[1] * scale], 
+   //    pos, dim: [dim[0] * scale, dim[1] * scale], col: [GREY[1], GREY[3], GREY[1], GREY[3]], 
+   //    name: name, style: style, num_faces: num_faces, 
+   //    layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL, is_debug_mesh: is_debug_mesh,
+   // });
+
+      properties.col = COLOR_GRADIENT_VERTICAL(GREY[8], GREY[4]);
+      super(mesh_bufferidx, properties);
+      Widget_gfx_ready_enable({ mesh: this, enable_sdf_rect: properties.rcorners.color_picker, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
+      this.AlignNEW.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
+
+      // Multi color vertex
+      this.options |= SECTION.RESIZE_PARENT;
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       // this.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
 
@@ -86,39 +92,30 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       /******************************************************************************/
       // Create panel to align further meshes
-      style.feather = 10;
-      const color = [ORANGER[7], GREY[3], GREY[1], GREEN[3]];
+      // style.feather = 10;
+      const color = [GREY[7], GREY[3], GREY[2], GREY[1]];
 
-      // const panel = Create_widget_section(_, SECTION.HORIZONTAL, [10 * scale, 10 * scale], [0, 0, 1], _, [GREY[1], GREY[3], GREY[1], GREY[3]], 'Color Picker Panel', style, 1, _, is_debug_mesh);
-      // const panel = Create_widget_section(Style_section_default_properties({options:SECTION.HORIZONTAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:[GREY[2], GREY[4], GREY[2], GREY[4]], name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      // const panel = Create_rect_mesh(Style_rect_default_properties({is_root:_, options:SECTION.HORIZONTAL, pad:[10 * scale, 10 * scale], pos:[0, 0, 1], col:[GREY[1], GREY[3], GREY[1], GREY[3]], name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:_, options:SECTION.HORIZONTAL, pad:[10 * scale, 10 * scale], pos:[0, 0, 1], col:color, name:'Color Picker Panel', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:color, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, [GREY[1], GREY[3], GREY[1], GREY[3]]);
-      // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      // panel.options |= SECTION.RESIZE_PARENT;
-      // // panel.StylesSetPad([0,0]);
-      // panel.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
-      // panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // panel.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // panel.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
+      const panel = Create_rect_mesh(Style_rect_default_properties({
+         is_root: _, pad: [10 * scale, 10 * scale],
+         pos: [0, 0, 1], col: color, name: 'Color Picker Panel', num_meshes: 1,
+         layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF, is_debug_mesh: properties.is_debug_mesh
+      }));
+      Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: properties.rcorners.panel, enable_col_per_vertex: color, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       panel_idx = this.AddItem(panel)
-      
-      
-      
-      
+
+
+
+
 
 
       /******************************************************************************/
       // Create the color picker panel
-      const color_pick = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 2], dim:[150 * scale, 150 * scale], col:[WHITE, BLACK, YELLOW[9], BLACK,], pad:[10, 0], name:'Color Picker', num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      Widget_gfx_ready_enable({mesh:color_pick, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      // color_pick.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      // color_pick.StylesSetPad([0,0]);
-      // color_pick.align.flags = ALIGN_2.HORIZONTAL;
-      // color_pick.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // color_pick.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // color_pick.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
+      const color_pick = Create_rect_mesh(Style_rect_default_properties({ 
+         pos: [0, 0, 2], dim: [150 * scale, 150 * scale], col: [WHITE, BLACK, YELLOW[9], BLACK,], 
+         pad: [10, 10], name: 'Color Picker', num_meshes: 1, 
+         layout: ALIGN_2.HORIZONTAL, is_debug_mesh: properties.is_debug_mesh, 
+      }));
+      Widget_gfx_ready_enable({ mesh: color_pick, enable_sdf_rect: properties.rcorners.color_pick, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
       color_pick.state.mask &= ~MESH_STATE.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
@@ -128,115 +125,85 @@ export class Widget_Color_Picker extends Rect_Mesh {
       /******************************************************************************/
       // Create panel for the color presentation and info labels
       // const panel2 = Create_widget_section(Style_section_default_properties({options:SECTION.VERTICAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      const panel2 = Create_rect_mesh(Style_rect_default_properties({pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
-      Widget_gfx_ready_enable({mesh:panel2, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      // panel2.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-      // panel2.options |= SECTION.RESIZE_PARENT;
-      // panel2.StylesSetMargin([10, 0]);
-      // panel2.align.flags = ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL;
-      // panel2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // panel2.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // panel2.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
+      const panel2 = Create_rect_mesh(Style_rect_default_properties({ 
+         pad: [20 * scale, 20 * scale], pos: [0, 0, 1], col: COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), 
+         name: 'Inner Panel 1', num_meshes: 1, is_debug_mesh: properties.is_debug_mesh, 
+         layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL, 
+      }));
+      Widget_gfx_ready_enable({ mesh: panel2, enable_sdf_rect: properties.rcorners.panel2, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       panel2_idx = panel.AddItem(panel2);
 
 
 
       /******************************************************************************/
       // Create the color present mesh
-      const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 2], dim:[75 * scale, 45 * scale], col:[YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], name:'Color Present', num_meshes:1, layout:ALIGN_2.HORIZONTAL, is_debug_mesh:is_debug_mesh}));
-      Widget_gfx_ready_enable({mesh:color_present_mesh, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      // color_present_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({ 
+         pos: [0, 0, 2], dim: [75 * scale, 45 * scale], col: [YELLOW[9], YELLOW[9], YELLOW[9], YELLOW[9]], 
+         name: 'Color Present', num_meshes: 1, layout: ALIGN_2.HORIZONTAL, is_debug_mesh: properties.is_debug_mesh 
+      }));
+      Widget_gfx_ready_enable({ mesh: color_present_mesh, enable_sdf_rect: properties.rcorners.color_present, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       color_present_mesh.StylesSetMargin([0, 0]);
-      // color_present_mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // color_present_mesh.align.flags = ALIGN_2.HORIZONTAL;
-      // color_present_mesh.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // color_present_mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
-      
+
       this.color_pick_click_pos = [color_pick.geom.dim[0] * 2, 0];
       color_present_idx = panel2.AddItem(color_present_mesh);
-      
-      
+
+
       const fontsize = 14 * scale;
       const label_pad = [15 * scale * scale, 9 * scale * scale];
       const label_style = [10 * scale, 0, 1.2];
-      
+
       /******************************************************************************/
       // Create Label RGBA color Info meshes
       {
-         const grad_grey = {_1:GREY[7], _2:GREY[1]};
-         // const grad_grey = {_1:GREY[1], _2:GREY[5]};
+         const grad_grey = { _1: GREY[7], _2: GREY[1] };
          {
-            const label_col = Create_widget_label(Style_label_default_properties({text:'R', pos:[0, 0, 13], font_size:fontsize, col:[REDL[5], REDL[5], REDL[5], REDL[5]], pad:[0,5], text_col:WHITE, text_pad:label_pad, style:label_style, layout:ALIGN_2.VERTICAL}));
-            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_col.align.flags = ALIGN_2.VERTICAL;
-            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_col = Create_widget_label(Style_label_default_properties({ text: 'R', pos: [0, 0, 13], font_size: fontsize, col: [REDL[5], REDL[5], REDL[5], REDL[5]], pad: [0, 5], text_col: WHITE, text_pad: label_pad, layout: ALIGN_2.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: label_col, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
+            label_col.align.flags = ALIGN_2.VERTICAL;
             panel2.AddItem(label_col);
-            
-            const label_val = Create_widget_label(Style_label_default_properties({text:'R1111', pos:[0, 0, 13], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2),  pad:[5,5], text_col:WHITE, text_pad:label_pad, style:label_style, layout:ALIGN_2.VERTICAL}));
-            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_val.align.flags = ALIGN_2.HORIZONTAL;
-            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+            const label_val = Create_widget_label(Style_label_default_properties({ text: 'R1111', pos: [0, 0, 13], font_size: fontsize, col: COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad: [5, 5], text_col: WHITE, text_pad: label_pad, }));
+            Widget_gfx_ready_enable({ mesh: label_val, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_val);
             this.label_r = label_val;
          }
          {
-            const label_col = Create_widget_label(Style_label_default_properties({text:'G', pos:[0, 0, 3], font_size:fontsize, col:[GREEN[4], GREEN[4], GREEN[4], GREEN[4]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_col.align.flags = ALIGN_2.VERTICAL;
-            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_col = Create_widget_label(Style_label_default_properties({ text: 'G', pos: [0, 0, 3], font_size: fontsize, col: [GREEN[4], GREEN[4], GREEN[4], GREEN[4]], text_col: WHITE, pad: [0, 5], text_pad: label_pad, layout: ALIGN_2.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: label_col, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_col);
-            
-            const label_val = Create_widget_label(Style_label_default_properties({text:'G1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_val.align.flags = ALIGN_2.HORIZONTAL;
-            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+            const label_val = Create_widget_label(Style_label_default_properties({ text: 'G1111', pos: [0, 0, 3], font_size: fontsize, col: COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad: [5, 5], text_col: WHITE, text_pad: label_pad, }));
+            Widget_gfx_ready_enable({ mesh: label_val, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_val);
             this.label_g = label_val;
          }
          {
-            const label_col = Create_widget_label(Style_label_default_properties({text:'G', pos:[0, 0, 3], font_size:fontsize, col:[BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_col.align.flags = ALIGN_2.VERTICAL;
-            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_col = Create_widget_label(Style_label_default_properties({ text: 'G', pos: [0, 0, 3], font_size: fontsize, col: [BLUEL[6], BLUEL[6], BLUEL[6], BLUEL[6]], text_col: WHITE, pad: [0, 5], text_pad: label_pad, layout: ALIGN_2.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: label_col, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_col);
-            
-            const label_val = Create_widget_label(Style_label_default_properties({text:'B1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_val.align.flags = ALIGN_2.HORIZONTAL;
-            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+            const label_val = Create_widget_label(Style_label_default_properties({ text: 'B1111', pos: [0, 0, 3], font_size: fontsize, col: COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad: [5, 5], text_col: WHITE, text_pad: label_pad, }));
+            Widget_gfx_ready_enable({ mesh: label_val, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_val);
             this.label_b = label_val;
          }
          {
-            const label_col = Create_widget_label(Style_label_default_properties({text:'A', pos:[0, 0, 3], font_size:fontsize, col:[GREY[8], GREY[8], GREY[8], GREY[8]], text_col:WHITE, pad:[0,5],  text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_col, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_col.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_col.align.flags = ALIGN_2.VERTICAL;
-            // label_col.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            const label_col = Create_widget_label(Style_label_default_properties({ text: 'A', pos: [0, 0, 3], font_size: fontsize, col: [GREY[8], GREY[8], GREY[8], GREY[8]], text_col: WHITE, pad: [0, 5], text_pad: label_pad, layout: ALIGN_2.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: label_col, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_col);
-            
-            const label_val = Create_widget_label(Style_label_default_properties({text:'A1111', pos:[0, 0, 3], font_size:fontsize, col:COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad:[5,5],  text_col:WHITE, text_pad:label_pad, style:label_style, }));
-            Widget_gfx_ready_enable({mesh:label_val, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-            // label_val.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
-            // label_val.align.flags = ALIGN_2.HORIZONTAL;
-            // label_val.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+            const label_val = Create_widget_label(Style_label_default_properties({ text: 'A1111', pos: [0, 0, 3], font_size: fontsize, col: COLOR_GRADIENT_HORIZONTAL(grad_grey._1, grad_grey._2), pad: [5, 5], text_col: WHITE, text_pad: label_pad, }));
+            Widget_gfx_ready_enable({ mesh: label_val, enable_sdf_rect: properties.rcorners.labels, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
             panel2.AddItem(label_val);
             this.label_a = label_val;
          }
-         
-         
+
+
       }
-      
-      
+
+
       /******************************************************************************/
       // Create the tranparency slider
-      
       // const TRANSPARENCY_BAR_COLOR = [
       //    RED[9],
       //    GREY[3],
@@ -244,14 +211,14 @@ export class Widget_Color_Picker extends Rect_Mesh {
       //    GREY[3],
       // ];
       const TRANSPARENCY_BAR_COLOR = COLOR_GRADIENT_VERTICAL(YELLOW[9], GREY[3]);
-      
-      // const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 13], dim:[12 * scale, 150 * scale], col:TRANSPARENCY_BAR_COLOR, [10, 10], [16 * scale, 3 * scale], WHITE, 1);
-      const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 13], dim:[12 * scale, 150 * scale], pad:[10, 0], col:TRANSPARENCY_BAR_COLOR, hover_margin:[10, 10], handle_dim:[16 * scale, 4 * scale], handle_col:WHITE, num_faces:1, layout:ALIGN_2.HORIZONTAL}));
-      Widget_gfx_ready_enable({mesh:slider_tran, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-      // slider_tran.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      const slider_tran = Create_widget_slider_simple(Style_slider_simple_default_properties({ 
+         pos: [0, 0, 13], dim: [12 * scale, 150 * scale], pad: [10, 0], col: TRANSPARENCY_BAR_COLOR, 
+         hover_margin: [10, 10], handle_dim: [16 * scale, 4 * scale], handle_col: WHITE, 
+         num_faces: 1, layout: ALIGN_2.HORIZONTAL, 
+      }));
+      Widget_gfx_ready_enable({ mesh: slider_tran, enable_sdf_rect: properties.rcorners.slider_trans, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       slider_tran.SetName('Slider Transparency');
       // slider_tran.align.flags = ALIGN_2.HORIZONTAL;
-      // slider_tran.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
       slider_trans_idx = panel.AddItem(slider_tran);
 
@@ -275,14 +242,15 @@ export class Widget_Color_Picker extends Rect_Mesh {
       ];
 
       const vertices_count = (HUE_COLOR.length / 2) - 1;
-      const slider_hue = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[0, 0, 2], dim:[dim[0] * scale, 20 * scale], pad:[0, 10], col:HUE_COLOR, hover_margin:[10, 10], handle_dim:[4 * scale, 24 * scale], handle_col:WHITE, num_faces:vertices_count, layout:ALIGN_2.VERTICAL}));
-      Widget_gfx_ready_enable({mesh:slider_hue, enable_sdf_rect:10, enable_col_per_vertex:true, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
+      const slider_hue = Create_widget_slider_simple(Style_slider_simple_default_properties({ 
+         pos: [0, 0, 2], dim: [properties.dim[0] * scale, 20 * scale], pad: [0, 10], col: HUE_COLOR, hover_margin: [10, 10], 
+         handle_dim: [4 * scale, 24 * scale], handle_col: WHITE, num_faces: vertices_count, layout: ALIGN_2.VERTICAL, 
+      }));
+      Widget_gfx_ready_enable({ mesh: slider_hue, enable_sdf_rect: properties.rcorners.slider_hue, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      // slider_hue.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX);
       slider_hue.SetName('Slider Hue');
       // slider_hue.align.flags = ALIGN_2.VERTICAL;
-      // slider_hue.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       slider_hue_idx = this.AddItem(slider_hue);
 
 
@@ -335,7 +303,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
    }
 
 
-   EnableGfx(which, self_params = null, panel_params = null, color_pick_params = null, pane2_params = null, color_present_params = null, slider_trans_params = null, handle_trans_params=null, slider_hue_params = null, labels_params = null) {
+   EnableGfx(which, self_params = null, panel_params = null, color_pick_params = null, pane2_params = null, color_present_params = null, slider_trans_params = null, handle_trans_params = null, slider_hue_params = null, labels_params = null) {
 
       super.EnableGfx(which, self_params);
 
@@ -349,7 +317,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
       color_pick.EnableGfx(which, color_pick_params);
 
       const slider_trans = panel.children.buffer[slider_trans_idx];
-      slider_trans.EnableGfx(which, slider_trans_params, handle_trans_params, );
+      slider_trans.EnableGfx(which, slider_trans_params, handle_trans_params,);
 
       const panel2 = panel.children.buffer[panel2_idx];
       panel2.EnableGfx(which, pane2_params);
@@ -398,13 +366,13 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
 
    GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
-      
+
       if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
 
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
 
-         if(recurse){
+         if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
                if (child) child.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
@@ -421,7 +389,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
 
-         if(recurse){
+         if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
                const child = this.children.buffer[i];
                if (child) child.GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
@@ -710,14 +678,14 @@ export class Widget_Color_Picker extends Rect_Mesh {
       // TODO: We need to update only the top-right vertex color, NOT all vertices colors
       const percentagex = (xx / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage, x coord
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1] / 2); // Calc the percentage, y coord
-      const hue = Mix_vec3_float32Array([1,1,1,1], c, percentagex);
-      const intensity = Mix_vec3_float32Array([0,0,0,1], hue, percentagey);
+      const hue = Mix_vec3_float32Array([1, 1, 1, 1], c, percentagex);
+      const intensity = Mix_vec3_float32Array([0, 0, 0, 1], hue, percentagey);
 
       const alpha = slider_tran.slider_val; // Get the alpha from the transparency slider
       // Contruct the final color
       const final_color = new Float32Array([intensity[0], intensity[1], intensity[2], alpha]);
       CopyMat4_arr4(color_present_mesh.mat.col, final_color);
-      if (color_present_mesh.gfx) 
+      if (color_present_mesh.gfx)
          Gl_set_rgba(color_present_mesh.gfx, final_color, color_present_mesh.geom.num_faces);
 
 
@@ -733,7 +701,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       CopyArr4(slider_tran.mat.col[0], final_color);
       CopyArr4(slider_tran.mat.col[2], final_color);
-      if (slider_tran.gfx) 
+      if (slider_tran.gfx)
          Gl_set_rgba_per_vertex(slider_tran.gfx, slider_tran.mat.col)
 
 
@@ -857,23 +825,23 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const percentagex = (x / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage 
       const percentagey = 1 - (y / color_pick_mesh.geom.dim[1] / 2); // Calc the percentage 
       // console.log('percentagex', percentagex, 'percentagey', percentagey)
-      
-      
+
+
       // Finally calculate the interpolated rgb values from the percenage of the click and the colors of all 4 vertices of the color pick mesh
       /**
        * The x axis controls the color hue. That is white on the left and the right's vertex color to the right
        * The y axis controls the color intensity. That is black on the bottom and full color to the top
       */
-     
-     const color = color_pick_mesh.mat.col[2]; // is the v4 or the upper right vertex
-     const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
-     const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
-     
-     
-     
-     /*****************************************************************************************************/
+
+      const color = color_pick_mesh.mat.col[2]; // is the v4 or the upper right vertex
+      const hue = Mix_vec4_float32Array(WHITE, color, percentagex);
+      const intensity = Mix_vec4_float32Array(BLACK, hue, percentagey);
+
+
+
+      /*****************************************************************************************************/
       // Assign the color to the top vertices of the transparency slider
-      
+
       const transp_slider = panel.children.buffer[slider_trans_idx];
       CopyArr3(transp_slider.mat.col[0], intensity);
       CopyArr3(transp_slider.mat.col[2], intensity);

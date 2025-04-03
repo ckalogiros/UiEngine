@@ -18,7 +18,7 @@ import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations
 import { Widget_msdf_text_with_scale_slider, Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from '../Widgets/WidgetReadyWidgets.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
 import { Align_expand, Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
-import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
+import { Style_button_default_properties, Style_color_picker_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
 
 
@@ -293,14 +293,12 @@ nested layouts with well-aligned items.\
 
 
    /** Create the info for the uuser */
-   // const info = Create_widget_label(_, text_sample_sections, _, [0, 0, 0], default_font_size, GREY[4], WHITE, [10, 10], _, _, default_font,);
-   // info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   // info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   // root_s.AddItem(info);
+   const info = Create_widget_label(Style_label_default_properties({ text: text_sample_sections, pos: [0, 0, 0], font_size: font_size, col: GREY[4], text_pad: [10, 10], texture_id: default_font }));
+   Widget_gfx_ready_enable({ mesh: info, enable_sdf_rect: 10 });
+   root_s.AddItem(info);
 
 
-   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr) }));
+   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr), layout: ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF }));
    l1_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s, enable_sdf_rect: rcorners });
    l1_s.SetName('Section l1_s');
@@ -765,6 +763,63 @@ ensuring they remain accessible when reopening a parent dropdown.\
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
 
+
+                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some SDF font symbols', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: GREEN[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: REDL[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20, layout: ALIGN_2.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: YELLOWR[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21, layout: ALIGN_2.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+
+                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
+                  {
+                     const sub_dp1_count = 2;
+                     const sub_dp2_count = 3;
+                     const text_pad = [12, 6];
+                     const pad = [6, 6];
+                     const font_size = 8;
+                     const dp_rcorners = 7;
+                     const dp_col = GREY[4];
+                     const menu_col = GREY[2];
+                     const col = YELLOWR[7];
+                     for (let i = 0; i < sub_dp1_count; i++) {
+
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                        Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, })
+                        dpsub4.AddToMenu(dp_1);
+                        dp_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+                        const col1 = TRANSPARENCY(PURPLEB[6], 1.);
+                        for (let j = 0; j < sub_dp2_count; j++) {
+
+                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                           Widget_gfx_ready_enable({ mesh: dp_2, enable_sdf_rect: dp_rcorners, })
+                           dp_1.AddToMenu(dp_2);
+                           dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                           dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                           const col2 = TRANSPARENCY(GREEN[6], 1.)
+
+                           for (let k = 0; k < sub_dp2_count; k++) {
+
+                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                              Widget_gfx_ready_enable({ mesh: dp_3, enable_sdf_rect: dp_rcorners, })
+                              dp_2.AddToMenu(dp_3);
+                              dp_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                              dp_3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                              const col3 = TRANSPARENCY(YELLOW[6], 1.)
+                              for (let n = 0; n < 6; n++) {
+
+                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                                 Widget_gfx_ready_enable({ mesh: dp_4, enable_sdf_rect: dp_rcorners, })
+                                 dp_3.AddToMenu(dp_4);
+                                 dp_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                                 dp_4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                              }
+                           }
+                        }
+                     }
+                  }
                }
 
             }
@@ -793,6 +848,62 @@ ensuring they remain accessible when reopening a parent dropdown.\
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
 
+
+                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some simple textures', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [256 / 2, 256 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.SMOKE_1, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [32 / 2, 32 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.COIN, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [64 / 2, 73 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.TEST_APPLE, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
+                  {
+                     const sub_dp1_count = 2;
+                     const sub_dp2_count = 3;
+                     const text_pad = [12, 6];
+                     const pad = [6, 6];
+                     const font_size = 8;
+                     const dp_rcorners = 7;
+                     const dp_col = GREY[4];
+                     const menu_col = GREY[2];
+                     const col = YELLOWR[7];
+                     for (let i = 0; i < sub_dp1_count; i++) {
+
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                        Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, })
+                        dpsub4.AddToMenu(dp_1);
+                        dp_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+
+                        const col1 = TRANSPARENCY(PURPLEB[6], 1.);
+                        for (let j = 0; j < sub_dp2_count; j++) {
+
+                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                           Widget_gfx_ready_enable({ mesh: dp_2, enable_sdf_rect: dp_rcorners, })
+                           dp_1.AddToMenu(dp_2);
+                           dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                           dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                           const col2 = TRANSPARENCY(GREEN[6], 1.)
+
+                           for (let k = 0; k < sub_dp2_count; k++) {
+
+                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                              Widget_gfx_ready_enable({ mesh: dp_3, enable_sdf_rect: dp_rcorners, })
+                              dp_2.AddToMenu(dp_3);
+                              dp_3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                              dp_3.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                              const col3 = TRANSPARENCY(YELLOW[6], 1.)
+                              for (let n = 0; n < 6; n++) {
+
+                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                                 Widget_gfx_ready_enable({ mesh: dp_4, enable_sdf_rect: dp_rcorners, })
+                                 dp_3.AddToMenu(dp_4);
+                                 dp_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+                                 dp_4.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+
+                              }
+                           }
+                        }
+                     }
+                  }
                }
 
             }
@@ -820,9 +931,9 @@ ensuring they remain accessible when reopening a parent dropdown.\
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
    View_build_group_from_root_mesh(section);
 
-   // Color some words
-   info.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 8);
-   info.text_mesh.SetColorRGBSpecificIndex(GREEN[7], 8, 13);
+   // // Color some words
+   // info.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 8);
+   // info.text_mesh.SetColorRGBSpecificIndex(GREEN[7], 8, 13);
 
    return section;
 }
@@ -994,7 +1105,7 @@ GENERIC WIDGETS\
 
       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 1], dim: [100, 10], col: TRANSPARENCY(GREY[2], .6), name: 'Test slider', texture_id: default_font, font_size: font_size }));
       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, });
-      slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners, 6);
+      // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners, 6);
       slider.align.flags = ALIGN_2.VERTICAL;
       slider.SetInitialValue(0);
       s.AddItem(slider);
@@ -1076,7 +1187,8 @@ WIDGET: COLOR-PICKER\
    section.AddItem(info);
 
 
-   const colorpicker = Demo_widgets_colorpicker(0x0, 0, 0, _, _, _, _, _, _, 0x0,);
+   // const colorpicker = Demo_widgets_colorpicker(0x0, 0, 0, _, _, _, _, _, _, 0x0,);
+   const colorpicker = Demo_widgets_colorpicker(0x0, 0, 0, _, _, _, _, _, _, 0x0);
    colorpicker.align.flags = ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF;
    colorpicker.SetTransparencySliderSetInitialValue(1);
    colorpicker.SetHueSliderSetInitialValue(.2);
@@ -1195,7 +1307,7 @@ Adjust the font size using the slider.
    s.SetName('Msdf_text_info_sub_section');
    s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
    section.AddItem(s);
-   
+
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = 10;
    const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
@@ -1212,7 +1324,7 @@ Adjust the font size using the slider.
    Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: 4, });
    info3.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
    s.AddItem(info3);
-   
+
    const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
    Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: 4, });
    info4.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
@@ -1299,14 +1411,25 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
    if (c3 === null) c3 = c1;
    if (c4 === null) c4 = c2;
 
-   const picker = Create_widget_color_picker(root_widget, SECTION.VERTICAL, [20, 20], [x, y, 0], [w, h], [c1, c2, c3, c4], _, Mesh_create_style_from_values(10, 2, 0));
-   // Widget_gfx_ready_enable({mesh:picker, enable_sdf_rect:10,})
-   // picker.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   picker.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   picker.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
-   const tarnsparency_handle = picker.GetTransparencySliderHandle();
-   const tarnsparency_handle_rcorners = Min(tarnsparency_handle.geom.dim[0], tarnsparency_handle.geom.dim[1])
-   picker.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 8, 6, 4, 4, 4, tarnsparency_handle_rcorners, 4, 4);
+   // const picker = Create_widget_color_picker(root_widget, [20, 20], [x, y, 0], [w, h], [c1, c2, c3, c4], _, Mesh_create_style_from_values(10, 2, 0));
+   const picker = Create_widget_color_picker(Style_color_picker_default_properties({is_root:root_widget, pad:[20, 20], pos:[x, y, 0], 
+      dim:[w, h], col:_, 
+      // rcorners: {
+      //    color_picker:  10,
+      //    panel:         10,
+      //    color_pick:    10,
+      //    panel2:        10,
+      //    color_present: 10,
+      //    slider_trans:  4,
+      //    handle_trans:  2,
+      //    slider_hue:    6,
+      //    labels:        10,
+      // },
+   }));
+
+   // const tarnsparency_handle = picker.GetTransparencySliderHandle();
+   // const tarnsparency_handle_rcorners = Min(tarnsparency_handle.geom.dim[0], tarnsparency_handle.geom.dim[1])
+   // picker.GfxEnableAttr(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 8, 6, 4, 4, 4, tarnsparency_handle_rcorners, 4, 4);
 
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -1318,8 +1441,6 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      // picker.StateEnable(MESH_STATE.IS_RESIZEABLE);
-      // picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, picker.mesh_bufferidx, true);
       picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
       picker.GenGfxCtx();
       Align_pre_simple(picker);
@@ -1401,9 +1522,10 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const colors = [REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],];
 
       const section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], dim: [20, 20], col: TRANSPARENCY(GREY[0], 1.) }));
+      Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15 });
       section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
-      section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
+      // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       section.align.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
 
 
@@ -1411,8 +1533,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       for (let i = 0; i < num_items; i++) {
 
          const label = Create_widget_label(Style_label_default_properties({ text: `${i}`, font_size: font_size, col: TRANSPARENCY(colors[i], .8), text_pad: [6, 4] }))
-         label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+         // label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+         // label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          label.align.flags = ALIGN_2.VERTICAL;
          label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
          section.AddItem(label);
@@ -1539,8 +1662,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
 
    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-   dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
-   dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: 15 });
+   // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
+   // dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    dp.align.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1560,8 +1684,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const align_l1 = (i % 2) ? ALIGN_2.HORIZONTAL : ALIGN_2.VERTICAL;
 
       const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-      dpsub1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
-      dpsub1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+      // dpsub1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
+      // dpsub1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       dpsub1.align.flags = align_l1 | ALIGN_2.RESIZE_SELF
       dp.AddToMenu(dpsub1);
@@ -1576,8 +1701,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          const align_l2 = ALIGN_2.VERTICAL;
 
          const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-         dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
-         dpsub2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+         // dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
+         // dpsub2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          dpsub2.align.flags = align_l2 | ALIGN_2.RESIZE_SELF
          dpsub1.AddToMenu(dpsub2);
@@ -1588,8 +1714,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          for (let k = 0; k < sub_dp2_count; k++) {
 
             const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}${k}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-            dpsub3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
-            dpsub3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+            Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+            // dpsub3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
+            //    dpsub3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             dpsub2.AddToMenu(dpsub3);
 

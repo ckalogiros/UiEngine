@@ -12,10 +12,10 @@ import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widg
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
-import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
+import { Abs, Floor, Min, Mult_arr3_scalar } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_combo_counter_add, Arkanoid_create_update_game_loop, Arkanoid_get_panel_dim_x, Arkanoid_get_panel_pos_x, Arkanoid_get_panel_right, ARKANOID_SECTION_DIM_X } from "./Arkanoid.js";
-import { ARK_STATE, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoisConstants.js";
+import { ARK_STATE, ARKANOID_COLORS, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoisConstants.js";
 import { Coin_create } from "./Coin.js";
 import { Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
 import { Powup_create, Powup_get_byidx, Powup_remove_byidx, Powup_resolve_hit } from "./PowerUps.js";
@@ -83,10 +83,16 @@ function Bricks_init() {
 /** */
 function Bricks_resolve_color_from_flag(FLAG) {
 
-   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_GREEN) return GREEN[6];
-   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_BLUE) return BLUEL[9];
-   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_PURPLE) return PURPLE[6];
-   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_YELLOW) return YELLOWR[6];
+   // .7, .65, 1., .5
+   // const yellow = new Float32Array([1, .65, 0, 1]);   Mult_arr3_scalar(yellow, .7);
+   // const purple = new Float32Array([.75, 0, 1., 1]);  Mult_arr3_scalar(purple, .65);
+   // const blue = new Float32Array([0, .5, 1, 1]);       Mult_arr3_scalar(blue, 1.);
+   // const green = new Float32Array([0., 1., 0., 1]);    Mult_arr3_scalar(green, .5);
+   // if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_GREEN) return GREEN[4];
+   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_GREEN) return ARKANOID_COLORS.green;
+   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_BLUE) return ARKANOID_COLORS.blue;
+   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_PURPLE) return ARKANOID_COLORS.purple;
+   if (FLAG & ARKANOID_FLAGS.BRICK_COLOR_YELLOW) return ARKANOID_COLORS.yellow;
 
 }
 /** */
@@ -131,18 +137,21 @@ export class Brick {
       const posy = y;
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col:color, name:name,}));
-      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
-      // const mesh = Create_rect_mesh(_, [0, 0, 1], [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], color, name,);
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:true, });
 
 
-      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, BRICKS.R_CORNERS);
-      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      
+      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      this.generic_control_values = [1., .5, .3, .0];
+      // this.generic_control_values = [1., 1., 1., .5];
+      // this.generic_control_values = [1., .5, .5, .0];
+      // this.generic_control_values = [.4, .75, 1., .23];
+      // this.generic_control_values = [.4, 1., .4, .0];
+      // this.generic_control_values = [1., .26, .8, .0];
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.generic_control_values.length);
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
       
@@ -151,7 +160,12 @@ export class Brick {
       mesh.geom.pos[1] = posy;
 
       mesh.Render();
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      // // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
+      mesh.GfxUniformsSetClbk('u_generic_controls', ()=>{ 
+         return this.generic_control_values; 
+      }, mesh.gfx.vb.groupidx);
+      // mesh.GfxUniformSetAndUpdate('u_scale2', [1, 1]);
 
       mesh.geom.dim[0] = BRICKS.DIM_X;
       mesh.geom.dim[1] = BRICKS.DIM_Y;
@@ -217,8 +231,15 @@ export function Bricks_init_buffer(group_idx, parent_root_posidx, parent_mesh_bu
       Brick_remove_byidx(brick.idx);
    }
 
-   _bricks_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_controls', [.4, .6, .0]); // Sdf-InnerShadow-Glow
-   _bricks_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_scale2', [BRICKS.SCALE_DOWN, 1]);
+   const br = _bricks_buffer.buffer[0];
+
+   // br.mesh.GfxUniformSetAndUpdate('u_scale2', [BRICKS.SCALE_DOWN, 1]);
+   // br.mesh.GfxUniformSetAndUpdate('u_scale2', [1, 1]);
+   // br.mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, br.mesh.gfx.vb.groupidx);
+   // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
+   // br.mesh.GfxUniformsSetClbk('u_generic_controls', ()=>{ 
+   //    return br.generic_control_values; 
+   // }, br.mesh.gfx.vb.groupidx);
 
    BRICKS.VB_GROUP_IDX = vb_groupidx;
 

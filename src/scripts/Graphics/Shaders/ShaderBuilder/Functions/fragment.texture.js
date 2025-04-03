@@ -109,11 +109,9 @@ export const frag_tex = `
 
   // Create uniform controls
   #ifdef U_GENERIC_CONTROLS
-    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
-    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++]*20.;
+    float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++]*5.;
   #else
-    // float ${u}ctrl1 = 3.0;
-    // float ${u}ctrl2 = 4.0;
     float ${u}ctrl1 = 1.0;
     float ${u}ctrl2 = 1.0;
   #endif
@@ -130,7 +128,7 @@ export const frag_tex = `
   
   
   // float distance = max(texel.r, max(texel.g, texel.b));
-  float distance = max(texel.r, max(texel.g, texel.b))*(20.*${u}ctrl1);
+  float distance = max(texel.r, max(texel.g, texel.b))*(${u}ctrl1);
 
 
   // TODO: Add to the final color to create thickness
@@ -138,9 +136,10 @@ export const frag_tex = `
 
   final_color *= src_color.a; // Allow alpha from attribute color
   
-  // final_color.rgb *= distance*.3; // Remove all black final_color from the rgb channels
+  // final_color.rgb *= distance; // Remove all black final_color from the rgb channels
   // final_color.a *= distance*${u}ctrl2; // Remove all black final_color from the rgb channels
-  final_color.a *= pow(distance, ${u}ctrl2*5.); // Remove all black final_color from the rgb channels
+  // final_color.a *= pow(distance, ${u}ctrl2*5.); // Remove all black final_color from the rgb channels
+  final_color.a *= pow(distance, ${u}ctrl2); // Remove all black final_color from the rgb channels
   
   
   // final_color.a = .4;

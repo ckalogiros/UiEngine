@@ -110,6 +110,7 @@ const SID = {
         INDEXED_PATT_DISCONTINUE_4: BIT1 <<= 1, // Break vertex indices
         INDEXED_PATT_DISCONTINUE_6: BIT1 <<= 1, // Break vertex indices
         PRE_MULTIPLIED_ALPHA: BIT1 <<= 1,
+        ENABLE_SRC_COLOR_IN_FRAG_MAIN: BIT1 <<= 1,
 
         // Shader Color Manipulation Functions
         FN_NOISE: BIT1 <<= 1,
@@ -122,6 +123,7 @@ const SID = {
         FN_NOISE_WORLEY_1: BIT1 <<= 1,
         FN_NOISE_WORLEY_2: BIT1 <<= 1,
         FN_NOISE_WORLEY_3_TYPES: BIT1 <<= 1,
+        FN_NOISE_WORLEY_3D: BIT1 <<= 1,
         FN_NOISE_VORONOI_1: BIT1 <<= 1,
         FN_NOISE_VORONOI_2: BIT1 <<= 1,
         
@@ -183,7 +185,7 @@ const SID = {
         // Individual Uniforms
         COL4: BIT5 <<= 0x1,         // u_col4
         DIM2: BIT5 <<= 0x1,         // u_dim2
-        SCALE2: BIT5 <<= 0x1,       // u_scale2
+        U_SCALE_VEC2: BIT5 <<= 0x1,       // u_scale2
         BLEND_MODE: BIT5 <<= 0x1,       // u_scale2
         ROOT_WPOS2: BIT5 <<= 0x1,   // u_wposxy
         FS_TIME_FLOAT: BIT5 <<= 0x1,         // u_time
@@ -250,10 +252,10 @@ const SID = {
         const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
         const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
         
-        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
-        // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+        // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
+        // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
+        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
+        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
 
         const  shad1 = sid1.shad;
         const  shad2 = sid2.shad;
@@ -332,7 +334,7 @@ const SID = {
         if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
         if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
         if (sid.attr & SID.ATTR.ANGLE) str[k] += 'angle, '
-        if (sid.attr & SID.ATTR.SCALE2) str[k] += 'scale2, '
+        if (sid.attr & SID.ATTR.U_SCALE_VEC2) str[k] += 'scale2, '
         if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
         if (sid.attr & SID.ATTR.WPOS3) str[k] += 'wpos4, '
         if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
@@ -387,7 +389,7 @@ const SID = {
 
         if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
         else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
-        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.SCALE2) ? true : false;
+        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.U_SCALE_VEC2) ? true : false;
         else if(unif_name === 'u_wposxy') return (sid_unif & this.UNIF.ROOT_WPOS2) ? true : false;
         else if(unif_name === 'u_time') return (sid_unif & this.UNIF.TIME) ? true : false;
 

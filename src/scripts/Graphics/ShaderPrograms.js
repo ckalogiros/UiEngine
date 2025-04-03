@@ -139,6 +139,8 @@ function Create_program(sid, uniforms, shader_ops_idxs) {
 	const progidx = _programs.Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
+	// console.log('Program:', progidx, '_shader_operations index:', prog.shader_ops)
+
 
 	/****************************************************************************************************/
 	// Shared-Block uniforms
@@ -193,8 +195,9 @@ class Gl_Program {
 		this.idx = INT_NULL; // Self index to the Programs buffer
 
 		this.shader_ops = null; // Init the array
-		if (shader_ops_idxs !== null)
+		if (shader_ops_idxs !== null) {
 			this.AddShaderOperation(shader_ops_idxs); // Build the array
+		}
 
 
 		const ret = Shaders_load(gfxCtx.gl, sid, uniforms, this.shader_ops);
@@ -242,7 +245,7 @@ class Gl_Program {
 			}
 			
 		}
-		console.log('Program::Uniforms', this.uniforms);
+		// console.log('Program::Uniforms', this.uniforms);
 
 
 		/****************************************************************************************************/
@@ -274,9 +277,15 @@ class Gl_Program {
 
 			for (let i = 0; i <= shader_operations_idxs.boundary; i++) {
 
-				if (shader_operations_idxs.buffer[i] !== INT_NULL)
+				if (shader_operations_idxs.buffer[i] !== INT_NULL) {
+
 					this.shader_ops[i] = Program_get_stored_shader_operation_byidx(shader_operations_idxs.buffer[i]);
+
+					// console.log('Program:', this.idx, '_shader_operations index:', this.shader_ops[i])
+				}
 			}
+
+			Program_reset_stored_shader_operation();
 		}
 	}
 
@@ -415,23 +424,42 @@ export function Program_get_uniform_from_name(progidx, unif_name) {
 const _shader_operations = New_generic_buffer(_, 'Program shader_ops storage buffer');
 
 export function Program_store_shader_operations(function_operation, blend_mode) {
-	// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
-	// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
-	const idx = _shader_operations.Add({ fn_op: function_operation, blend_mode: blend_mode });
-	return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
+	
+	
+	if(!Program_shader_operation_exists(function_operation)) { // Avoid storing multiples of the same shader operation per Program
+
+		// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
+		// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
+		const idx = _shader_operations.Add({ fn_op: function_operation, blend_mode: blend_mode });
+		console.log('_shader_operations:', idx, 'fn_op:', function_operation)
+		return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
+	}
 }
 
 
 
-export function Program_reset_stored_shader_operation() {
+export function Program_shader_operation_exists(function_operation) {
+
+	for(let i=0; i<=_shader_operations.boundary; i++) {
+
+		if (_shader_operations.buffer[i].fn_op === function_operation) return true;
+	}
+	return false;
+}
+
+export function Program_full_reset_stored_shader_operation() {
 	_shader_operations.ResetFull();
+}
+
+export function Program_reset_stored_shader_operation() {
+	_shader_operations.Reset();
 }
 
 
 
 function Program_get_stored_shader_operation_byidx(shader_op_idx) {
 	if (_shader_operations.buffer[shader_op_idx] === _)
-		console.error()
+		console.error('551443122133144, _shader_operations')
 	return _shader_operations.buffer[shader_op_idx];
 }
 

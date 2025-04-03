@@ -664,7 +664,7 @@ export function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
 
 
-export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx) {
+export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, debug_progidx) {
 
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
     for (let i = 0; i <= uniform_bindings.boundary; i++) {
@@ -675,6 +675,10 @@ export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx
 
         Uniforms_buffer_set_uniform_val_from_index(ubidx, val, params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);
+
+        // if(vb_groupidx===10)
+        // if(debug_progidx===5)
+        // console.log(params, val, ubidx)
     }
 
 }
@@ -975,7 +979,9 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
         const attribs_count = vb_info.attribs_info.count;
 
-        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
+        vb_info.vCount = meshSize / vb_info.attribs_info.count;
+
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset, vb_info.vCount);
 
         vb_info.count += meshSize;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;

@@ -594,16 +594,7 @@ export class Mesh {
     SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
     SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
 
-
-    // SetStyle(style) {
-    //     this.SetUpdateFrameBuffer(); this.mat.SetStyle(style);
-    //     // this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-    //     // this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-    // }
-
-
     SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
-
 
     // TODO: Update the .pos of the mesh for the rest of the methods
     SetWposXY(x, y) {
@@ -727,115 +718,115 @@ export class Mesh {
 
 
 
-    EnableGfx(which, params = null) {
+    // EnableGfx(which, params = null) {
 
-        switch (which) {
+    //     switch (which) {
 
-            case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.ATTR.VPOS2; break; }
-            case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.ATTR.WPOS3; break; }
-            case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2; break; }
-            case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.ATTR.TEX2; break; }
-            case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
-                this.sid.attr |= SID.ATTR.GENERIC2;
-                this.sid.pass |= SID.ATTR.GENERIC2;
-                if (params !== null) {
-                    this.geom.generic = params;
-                }
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_TIME: {
-                this.sid.attr |= SID.ATTR.TIME;
-                this.sid.pass |= SID.ATTR.TIME;
-                if (params !== null) {
-                    this.geom.time = params;
-                }
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.ATTR.ANGLE; break; }
-            // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.ATTR.GLOW_INTENSITY; break; }
-            case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.ATTR.RES2; break; }
-
-
-            case MESH_ENABLE.GFX.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
-            case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
-            case MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
-            case MESH_ENABLE.GFX.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
-
-            case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
-                this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-                this.sid.pass |= SID.ATTR.COL4_PER_VERTEX;
-                if (params !== null) {
-                    if ((params[0] instanceof Float32Array) === false)
-                        alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
-                    if (this.mat.col[0] instanceof Float32Array) { CopyMat4(this.mat.col, params); CopyMat4(this.mat.defCol, params); }
-                    else { this.mat.col = params; }
-                }
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-                this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.ATTR.R_CORNERS;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-                if (params !== null) this.mat.style.rcorners = params;
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_FEATHER: {
-                this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.ATTR.FEATHER;
-                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-                if (params !== null) this.mat.style.feather = params;
-                break;
-            }
-            case MESH_ENABLE.GFX.ATTR_BORDER: {
-                this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.ATTR.BORDER;
-                this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-                this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-                if (params !== null) this.mat.style.border = params;
-                break;
-            }
+    //         case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.ATTR.VPOS2; break; }
+    //         case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.ATTR.WPOS3; break; }
+    //         case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2; break; }
+    //         case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.ATTR.TEX2; break; }
+    //         case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
+    //             this.sid.attr |= SID.ATTR.GENERIC2;
+    //             this.sid.pass |= SID.ATTR.GENERIC2;
+    //             if (params !== null) {
+    //                 this.geom.generic = params;
+    //             }
+    //             break;
+    //         }
+    //         case MESH_ENABLE.GFX.ATTR_TIME: {
+    //             this.sid.attr |= SID.ATTR.TIME;
+    //             this.sid.pass |= SID.ATTR.TIME;
+    //             if (params !== null) {
+    //                 this.geom.time = params;
+    //             }
+    //             break;
+    //         }
+    //         case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.ATTR.ANGLE; break; }
+    //         // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.ATTR.GLOW_INTENSITY; break; }
+    //         case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.ATTR.RES2; break; }
 
 
-            // Shader Color Functions
-            case MESH_ENABLE.GFX.FN_NOISE: {
-                // Exception: Use the 'params' to distinguish different worley noises 
-                if (!params || params === 1) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
-                else if (params === 2) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
-            }
-            case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
-                if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-                // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-                this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
-            }
-            case MESH_ENABLE.GFX.FN_NOISE_WORLEY: {
-                // Exception: Use the 'params' to distinguish different worley noises 
-                if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
-                else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
-                else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
-            }
-            case MESH_ENABLE.GFX.FN_NOISE_VORONOI: {
-                // Exception: Use the 'params' to distinguish different worley noises 
-                if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
-                else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
-            }
+    //         case SID.SHAD.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
+    //         case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
+    //         case SID.SHAD.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
+    //         case SID.SHAD.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
 
-            case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
+    //         case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
+    //             this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+    //             this.sid.pass |= SID.ATTR.COL4_PER_VERTEX;
+    //             if (params !== null) {
+    //                 if ((params[0] instanceof Float32Array) === false)
+    //                     alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
+    //                 if (this.mat.col[0] instanceof Float32Array) { CopyMat4(this.mat.col, params); CopyMat4(this.mat.defCol, params); }
+    //                 else { this.mat.col = params; }
+    //             }
+    //             break;
+    //         }
+    //         case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
+    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+    //             this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.ATTR.R_CORNERS;
+    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
+    //             if (params !== null) this.mat.style.rcorners = params;
+    //             break;
+    //         }
+    //         case MESH_ENABLE.GFX.ATTR_FEATHER: {
+    //             this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.ATTR.FEATHER;
+    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
+    //             if (params !== null) this.mat.style.feather = params;
+    //             break;
+    //         }
+    //         case MESH_ENABLE.GFX.ATTR_BORDER: {
+    //             this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.ATTR.BORDER;
+    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
+    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
+    //             if (params !== null) this.mat.style.border = params;
+    //             break;
+    //         }
+
+
+    //         // Shader Color Functions
+    //         case SID.SHAD.FN_NOISE: {
+    //             // Exception: Use the 'params' to distinguish different worley noises 
+    //             if (!params || params === 1) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
+    //             else if (params === 2) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
+    //         }
+    //         case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
+    //             if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+    //             // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
+    //             this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
+    //         }
+    //         case MESH_ENABLE.GFX.FN_NOISE_WORLEY: {
+    //             // Exception: Use the 'params' to distinguish different worley noises 
+    //             if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
+    //             else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
+    //             else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
+    //         }
+    //         case MESH_ENABLE.GFX.FN_NOISE_VORONOI: {
+    //             // Exception: Use the 'params' to distinguish different worley noises 
+    //             if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
+    //             else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
+    //         }
+
+    //         case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
 
 
 
-            case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-            case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-            case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
-            case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-            // case MESH_ENABLE.GFX.FLARE: {
-            //     // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
-            //     // if(params === null) alert('665518665518 params should not be null');
-            //     if (params !== null) this.shader_ops_idxs.Add(Program_store_shader_operations(params.function_operation, params.blend_mode));
-            //     break;
-            // }
+    //         case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+    //         case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+    //         case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
+    //         case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
+    //         // case MESH_ENABLE.GFX.FLARE: {
+    //         //     // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
+    //         //     // if(params === null) alert('665518665518 params should not be null');
+    //         //     if (params !== null) this.shader_ops_idxs.Add(Program_store_shader_operations(params.function_operation, params.blend_mode));
+    //         //     break;
+    //         // }
 
-        }
+    //     }
 
-    }
+    // }
 
 
     /**
@@ -846,12 +837,66 @@ export class Mesh {
     EnableGfxOperations(function_operation, blend_mode = SID.BLEND_OPTIONS.BLEND_MODE_ADD) {
 
         this.sid.shad_ops |= function_operation;
+        // console.log(this.shader_ops_idxs)
+        // console.log(function_operation)
         this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
 
         if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
             console.error('Shader Operation detected: Need SDF_RECT to function.');
             alert('Shader Operation detected: Need SDF_RECT to function.');
         }
+
+        if (function_operation & SID.SHADER_OPERATIONS.DIST_RECT_FILLED) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.SIMPLE_GLOW) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.SIMPLE_GLOW2) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.SIMPLE_GLOW2_RECT) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.BUBBLE) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.FLARE) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.OUTER_GLOW_RECT) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+            // this.GfxEnableAttr(SID.ATTR.DIM2); // Enable attribute and store attribs value to cuurrent mesh
+            // this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+        if (function_operation & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2) {
+            this.GfxEnableAttr(SID.ATTR.DIM2);
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2)
+        }
+
     }
     GfxEnableAttr(flags, params) {
 
@@ -861,13 +906,13 @@ export class Mesh {
         if (flags & SID.ATTR.TIME) { this.sid.attr |= SID.ATTR.TIME; }
         if (flags & SID.ATTR.GENERIC2) { this.sid.attr |= SID.ATTR.GENERIC2; }
         if (flags & SID.ATTR.R_CORNERS) { this.sid.attr |= SID.ATTR.R_CORNERS; }
-        if (flags & SID.ATTR.COL4_PER_VERTEX)  this.sid.attr |= SID.ATTR.COL4_PER_VERTEX; 
-        
-        if(params) {
+        if (flags & SID.ATTR.COL4_PER_VERTEX) this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
+
+        if (params) {
 
             if (params.time) { this.geom.time = params.time; }
             if (params.generic) { this.geom.generic = params.generic; }
-            if (params.rcorners) this.mat.style.rcorners = params.rcorners; 
+            if (params.rcorners) this.mat.style.rcorners = params.rcorners;
             if (params.col4_per_vertex) { this.mat.col = params.col4_per_vertex; }
         }
 
@@ -891,33 +936,36 @@ export class Mesh {
      * 
      * @param {SEE global var: SID:{BLEND_OPTIONS}} blend_flags 
      */
-    GfxEnableBlend(blend_flags){
+    GfxEnableBlend(blend_flags) {
         this.sid.blend_options |= blend_flags;
     }
     GfxEnableFn(flags, params) {
 
         // Enable shader function calls (from shader main())
-        if (flags === MESH_ENABLE.GFX.FN_GLOW) {
+        if (flags === SID.SHAD.FN_GLOW) {
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
             };
             this.sid.shad |= SID.SHAD.FN_GLOW;
             this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_INNER_SHADOW) {
+        // TODO: See if attr enable and passes are required, It seems NOT
+        if (flags === SID.SHAD.FN_INNER_SHADOW) {
             this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+            this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE) {
+        if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
                 generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
             };
             this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
             this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_EXPLOSION_GLOW) {
+        if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
                 generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
@@ -931,7 +979,7 @@ export class Mesh {
             this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
             this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_NOISE) {
+        if (flags === SID.SHAD.FN_NOISE) {
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
             };
@@ -939,17 +987,12 @@ export class Mesh {
             this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
             this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_NOISE_WORLEY) {
-            // Exception: Use the 'params' to distinguish different worley noises 
-            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
-            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
-            else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
-        }
-        if (flags === MESH_ENABLE.GFX.FN_NOISE_VORONOI) {
-            // Exception: Use the 'params' to distinguish different worley noises 
-            if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
-            else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
-        }
+        if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
+        if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
+        if (flags === SID.SHAD.FN_NOISE_WORLEY_3_TYPES) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
+        if (flags === SID.SHAD.FN_NOISE_WORLEY_3D) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3D; }
+        if (flags === SID.SHAD.FN_NOISE_VORONOI_1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
+        if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
 
         if (params !== undefined) {
             if (params.blend_mode !== undefined) {
@@ -1006,11 +1049,6 @@ export class Mesh {
         }
 
     }
-
-
-
-
-
     SetClbkGfxUniforms(unif_name, Clbk, clbk_params) {
 
         // Find uniform
@@ -1052,8 +1090,6 @@ export class Mesh {
 
 
     }
-
-
     GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
         /**ERROR */ if (this.gfx === null) alert('Try to update uniform before mesh has gfx.')

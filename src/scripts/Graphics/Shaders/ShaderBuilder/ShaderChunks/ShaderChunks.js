@@ -127,9 +127,9 @@ const brightness_contrast = `
 vec3 brightness_contrast(vec3 color, float brightness, float contrast) {
   float a = 1.0 + contrast;
   float b = brightness - contrast * 0.5f;
-  color.x = max(a * color.x + b, 0.0f);
-  color.y = max(a * color.y + b, 0.0f);
-  color.z = max(a * color.z + b, 0.0f);
+  color.r = max(a * (color.r + b), 0.0f);
+  color.g = max(a * (color.g + b), 0.0f);
+  color.b = max(a * (color.b + b), 0.0f);
   return color;
 }`;
 const gamma_correction = `

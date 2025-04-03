@@ -1,6 +1,6 @@
 // export const frag_noise_voronoi_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_1() );'
 // export const frag_noise_voronoi_1_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_1() );'
-export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1();'
+export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1(scale_down, u_gen_ctrl_map_cnt, time);'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
 export const frag_noise_voronoi_1 = `
@@ -44,29 +44,23 @@ export const frag_noise_voronoi_1 = `
 
 
 
-vec4 frag_noise_voronoi_1()
+vec4 frag_noise_voronoi_1(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
 {
-
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
+  float ${u}control1 = (u_generic_controls[u_gen_ctrl_map_cnt++]+.07)*2.;
+  float ${u}control2 = (u_generic_controls[u_gen_ctrl_map_cnt++]);
+  float ${u}control3 = ((u_generic_controls[u_gen_ctrl_map_cnt++]));
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-  float time = control3*10.;
+  // float time = ${u}control3*10.;
   
   
   
   // #ifndef UV_READY
   #define UV_READY 1
   uv = gl_FragCoord.xy;
-  pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+  // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
   uv_map_coordinates_zero_one(uv, dim);
   // #endif
   
@@ -82,8 +76,8 @@ vec4 frag_noise_voronoi_1()
   {          
     vec2 iuv = floor(uv) + .5;                                                    // tile center 
     vec2 g = iuv + vec2(k%N, k/N) - 1.;                                           // neighbor cell
-    vec2 p =  g+ srnd2(g, control1) * R -uv                                       // vector to jittered cell node
-              +.1 * sin(time + vec2(1.6,0) + PI * srnd2(g, control1));             // time jittering
+    vec2 p =  g+ srnd2(g, ${u}control1) * R -uv                                       // vector to jittered cell node
+              +.1 * sin(time + vec2(1.6,0) + PI * srnd2(g, ${u}control1));             // time jittering
     vec2 q = p * mat2(1, -1, 1, 1) * .707;                                             // pi/4 rotation
     c = min(c,length(p));            // L2 distance to node (to display node)
       
@@ -104,12 +98,12 @@ vec4 frag_noise_voronoi_1()
   // color = vec4(sin(30.*v)) ;              // iso-lines
   // color = vec4( 1.-v );                   // raw distance
   // color = vec4(.025,.05,.1,0)/v;          // Voronoi diagram + chromatic effect
-  color = vec4(smoothstep(0., 4., 100.*v*control1)); // Voronoi contours
+  color = vec4(smoothstep(0., 4., 100.*v*${u}control1)); // Voronoi contours
   // color = vec4(sin(30.*m));               // cell iso-lines
   // color = vec4( 1.-m );                   // cell raw distance
 
-  // color = vec4(smoothstep(0., 2.,100.*v*control1));
-  // color = vec4(smoothstep(0.2, 1., 100.*v*control1));
+  // color = vec4(smoothstep(0., 2.,100.*v*${u}control1));
+  // color = vec4(smoothstep(0.2, 1., 100.*v*${u}control1));
 
   
   // color.a = 0.;
@@ -251,7 +245,7 @@ vec4 frag_noise_voronoi_1()
 
 /**********************************************************************************************************************************************************************************/
 // export const frag_noise_voronoi_2_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_2() );'
-export const frag_noise_voronoi_2_call = '   final_color = frag_noise_voronoi_2();'
+export const frag_noise_voronoi_2_call = '   final_color = frag_noise_voronoi_2(scale_down, u_gen_ctrl_map_cnt, time);'
 // export const frag_noise_voronoi_2_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_2() );'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
@@ -317,6 +311,8 @@ vec2 hash2( vec2 p )
 
 vec3 voronoi( in vec2 x, in float time)
 {
+
+
   vec2 ip = floor(x);
   vec2 fp = fract(x);
 
@@ -374,29 +370,24 @@ vec3 voronoi( in vec2 x, in float time)
 
 
 
-vec4 frag_noise_voronoi_2()
+vec4 frag_noise_voronoi_2(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
 {
 
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
+  float ${u}control1 = (u_generic_controls[u_gen_ctrl_map_cnt++]+.07)*2.;
+  float ${u}control2 = (u_generic_controls[u_gen_ctrl_map_cnt++]);
+  float ${u}control3 = ((u_generic_controls[u_gen_ctrl_map_cnt++]));
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-  float time = control3*10.;
+  // float time = control3*10.;
   
   
   
   // #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+    // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     uv_map_coordinates_zero_one(uv, dim);
   // #endif
   
@@ -405,8 +396,8 @@ vec4 frag_noise_voronoi_2()
 
   vec2 p = uv;
 
-  float scale = 2.0 * (control1+.5);
-  // float scale = 2.0 * (control1+.1);
+  float scale = 2.0 * (${u}control1+.5);
+  // float scale = 2.0 * (${u}control1+.1);
   vec3 c = voronoi(scale * p, time);
   
   vec3 col = vec3(.2);
@@ -414,7 +405,7 @@ vec4 frag_noise_voronoi_2()
 	// isolines
   const float iso_lines = 128.0;
   const float intensity = 2.0;
-  // col = c.x * (0.5 + 0.5 * sin(iso_lines * c.x * control2)) * vec3(1.0) * intensity;
+  // col = c.x * (0.5 + 0.5 * sin(iso_lines * c.x * ${u}control2)) * vec3(1.0) * intensity;
   
   // borders	
 	float dd = length( c.yz );

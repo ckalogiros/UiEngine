@@ -11,6 +11,7 @@ import { Performance_timer_start, Performance_timer_stop } from "../../Timers/Pe
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
+import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 
 
 

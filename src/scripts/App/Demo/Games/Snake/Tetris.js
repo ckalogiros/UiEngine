@@ -484,7 +484,7 @@ function Cell_create(offsetx = 0, offsety = 0, col) {
    const color = col !== undefined ? col : YELLOW[9];
    const mesh = Create_widget_section(_, _, [0, 0], [tetris_panel_pad + (TOKEN_SIZE * 2 * offsetx), tetris_panel_pad + (TOKEN_SIZE * 2 * offsety), 0], [TOKEN_SIZE, TOKEN_SIZE], color, 'mesh');
    mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
    mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, cell_round_corners);
@@ -1344,7 +1344,7 @@ function Tetris_start_menu(section_, emitter_) {
 
    const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, section_.GetPosY(), 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   menu_panel.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   menu_panel.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
    menu_panel.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
@@ -1578,7 +1578,7 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, a
 
    const section = Create_widget_section(root_widget, _, [10, 10], [VIEWPORT.WIDTH / 2 - (TETRIS_PANEL_WIDTH + tetris_panel_pad), y, 0], [(TETRIS_PANEL_WIDTH + tetris_panel_pad), TETRIS_PANEL_HEIGHT + tetris_panel_pad], GREY[0], 'TetrisSection');
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   section.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
    section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
@@ -2188,16 +2188,16 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4) {
 
    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, 0);
-   emitter.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
+   emitter.EnableGfx(SID.SHAD.FN_GLOW);
 
    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
    emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
-   emitter.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
+   emitter.EnableGfx(SID.SHAD.FN_EXPLOSION_CIRCLE);
    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a: 0.01, b: 0.0 });
 
 
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   emitter.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
    emitter.SetConeOfDirection(-.1, .1, .1, -.1);

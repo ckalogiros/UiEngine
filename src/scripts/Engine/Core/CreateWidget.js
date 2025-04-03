@@ -318,11 +318,11 @@ export function Create_widget_text_for_debug_ui_only(is_root = 0x0, text, pos, f
 
 
 
-export function Create_widget_color_picker(is_root = 0x0, options, margin, pos, dim, col, name, style, is_debug_mesh = 0x0) {
+export function Create_widget_color_picker(is_root = 0x0, margin, pos, dim, col, name, style, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Color_Picker(mesh_bufferidx, is_root, options, margin, pos, dim, col, name, style, _, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Color_Picker(mesh_bufferidx, is_root, margin, pos, dim, col, name, style, _, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

@@ -58,7 +58,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:handle.geom.dim[0],});
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
-      if (properties.col[0] instanceof Float32Array) handle.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, );
+      if (properties.col[0] instanceof Float32Array) handle.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, );
 
 
 
@@ -185,21 +185,21 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 
 
-   EnableGfx(which, bar_params = null, handle_params = null) {
+   // EnableGfx(which, bar_params = null, handle_params = null) {
 
-      super.EnableGfx(which, bar_params);
-      // super.EnableGfx(which, this.geom.dim[1]);
-      const handle = this.children.buffer[0];
-      handle.EnableGfx(which, handle_params);
-   }
+   //    super.EnableGfx(which, bar_params);
+   //    // super.EnableGfx(which, this.geom.dim[1]);
+   //    const handle = this.children.buffer[0];
+   //    handle.EnableGfx(which, handle_params);
+   // }
 
 
-   EnableGfxOperations(function_operation, blend_mode) {
+   // EnableGfxOperations(function_operation, blend_mode) {
 
-      super.EnableGfxOperations(function_operation, blend_mode);
-      const handle = this.children.buffer[0];
-      handle.EnableGfxOperations(function_operation, blend_mode);
-   }
+   //    super.EnableGfxOperations(function_operation, blend_mode);
+   //    const handle = this.children.buffer[0];
+   //    handle.EnableGfxOperations(function_operation, blend_mode);
+   // }
 
 
    // GfxUniformsEnable(flags, name, type, shader_flags) {
@@ -916,7 +916,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.SetName('Widget_Slider_XX1');
 
 
-      this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
+      // this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
 
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
 
@@ -970,6 +970,17 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
+   SetRcornersTEMPORARY(params) {
+
+      
+      this.GfxEnableAttr(params.slider);
+
+      const bar = this.children.buffer[this.bar_idx];
+      bar.GfxEnableAttr(params.bar);
+      
+      const handle = bar.children.buffer[0];
+      handle.GfxEnableAttr(params.bar);
+   }
    SetGfxEnable(which, params) {
 
       this.EnableGfx(which, params);

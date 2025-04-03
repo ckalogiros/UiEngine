@@ -307,7 +307,8 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10],) {
          else { // If this is the last child
             max_size_y += row_max_size_y / 2;
          }
-         accum_row_size_x += ret.dim_x + cur_pad_x;
+         accum_row_size_x += ret.dim_x + (cur_pad_x/2);
+         // accum_row_size_x += ret.dim_x ;
          
       }
 

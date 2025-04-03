@@ -1,5 +1,8 @@
 TODO
 
+* For the comet we need to tell the shader builder not to assign any src_color at the end of the fragment shader:
+   Use flags???
+
 * IMMIDIATELY: Separate font-symbols and texture rendering shaders
 
 * Deal with the SetStyle function, It is not used with the sdf_rect implementation

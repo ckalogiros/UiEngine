@@ -286,8 +286,9 @@ export class Rect_Mesh extends Mesh {
       const mat = (properties.texture_id === undefined) ? new Material(properties.col) : 
       (properties.sub_texture_id !== INT_NULL && properties.sub_texture_id !== undefined) ? new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _) : new Material_Texture(properties.col, properties.texture_id);
 
-
+      
       super(geom, mat);
+      // console.log(properties.name, properties.col)
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
 
@@ -306,20 +307,14 @@ export class Rect_Mesh extends Mesh {
 
       this.SetLayout(properties.layout)
    }
-
    SetLayout(align_flags) {
 
       this.align.flags = align_flags;
    }
-
    AddLayout(align_flags) {
 
       this.align.flags |= align_flags;
    }
-
-
-   
-
    AddItem(mesh, options = 0x0) {
 
       this.options |= options;
@@ -337,9 +332,6 @@ export class Rect_Mesh extends Mesh {
 
       return idx;
    }
-
-   
-
    AddChild(mesh) {
 
       mesh.idx = this.children.Add(mesh);
@@ -351,13 +343,8 @@ export class Rect_Mesh extends Mesh {
 
 
 
-
-   /****************************************************************************************************************************************************/
    /****************************************************************************************************************************************************/
    // OVERIDEN METHODS
-   /****************************************************************************************************************************************************/
-
-
    Destroy() {
 
       for (let i = 0; i <= this.children.boundary; i++) {
@@ -365,8 +352,6 @@ export class Rect_Mesh extends Mesh {
       }
       return super.Destroy();
    }
-
-
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -374,8 +359,6 @@ export class Rect_Mesh extends Mesh {
          if (this.children.buffer[i]) this.children.buffer[i].Activate();
       }
    }
-
-
    Deactivate() {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
@@ -383,25 +366,9 @@ export class Rect_Mesh extends Mesh {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
    }
-
-
-   StateEnable(MASK = 0x0) {
-
-      this.state.mask |= MASK;
-   }
-
-
-   StateDisable(MASK = 0x0) {
-
-      this.state.mask &= ~MASK;
-   }
-
-
-   SetTypeDebug() {
-      this.type |= MESH_TYPE.DEBUG_MESH;
-   }
-
-
+   StateEnable(MASK = 0x0) { this.state.mask |= MASK; }
+   StateDisable(MASK = 0x0) { this.state.mask &= ~MASK; }
+   SetTypeDebug() { this.type |= MESH_TYPE.DEBUG_MESH; }
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
@@ -414,28 +381,21 @@ export class Rect_Mesh extends Mesh {
       }
 
    }
-
-
-   // TODO: This is wrong, cause we assume the children are NOT widgets with more children/meshes in them
+   
    GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
       if(this.gfx_ctx_parent === INT_NULL) {
          
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
-   
-         if(recurse){
+
+         if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
-               if (this.children.buffer[i]) {
-                  this.children.buffer[i].gfx_ctx_flags = FLAGS;
-                  this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
-               }
+               if (this.children.buffer[i]) this.children.buffer[i].GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
             }
          }
       }
    }
-   
-   
    GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
       
       if(this.gfx_ctx_parent === INT_NULL) {
@@ -443,28 +403,13 @@ export class Rect_Mesh extends Mesh {
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
          
-         if(recurse){
+         if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
-               if (this.children.buffer[i]) this.children.buffer[i].gfx_ctx_flags |= FLAGS;
-               this.children.buffer[i].gfx_ctx_parent = gfx_ctx_parent;
+               if (this.children.buffer[i]) this.children.buffer[i].GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
             }
          }
       }
    }
-
-
-   // GfxUniformsEnable(flags, name, type, shader_flags) {
-
-   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
-   //    for (let i = 0; i <= this.children.boundary; i++) {
-   //       const child = this.children.buffer[i];
-   //       if (child) child.GfxUniformsEnable(flags, name, type, shader_flags);
-   //       // if (child) child.EnableGfxUniforms(flags, name, type, shader_flags);
-   //    }
-
-   // }
-
-
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
@@ -474,8 +419,6 @@ export class Rect_Mesh extends Mesh {
          if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
       }
    }
-
-
    SetIsGfxInserted(flag) {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
    }
@@ -484,22 +427,6 @@ export class Rect_Mesh extends Mesh {
 
    /*******************************************************************************************************************************************************/
    // Graphics
-   /*******************************************************************************************************************************************************/
-
-   // GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
-
-   //    // if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
-
-   //    const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
-   //    for (let i = 0; i <= this.children.boundary; i++) {
-   //       const child = this.children.buffer[i];
-   //       if (child) child.GenGfxCtx(FLAGS, specific_vb_groupidx);
-   //    }
-   //    return gfx;
-   // }
-
-
-
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
@@ -515,7 +442,6 @@ export class Rect_Mesh extends Mesh {
       }
 
    }
-
    Render(run_for_children = true) {
 
       if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) {
@@ -541,7 +467,6 @@ export class Rect_Mesh extends Mesh {
 
       return this.gfx.vb.start;
    }
-
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
@@ -559,8 +484,6 @@ export class Rect_Mesh extends Mesh {
 
    /*******************************************************************************************************************************************************/
    // Alignment
-   /*******************************************************************************************************************************************************/
-
    AlignNEW(pos_x, pos_y) {
 
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
@@ -581,9 +504,6 @@ export class Rect_Mesh extends Mesh {
 
    /*******************************************************************************************************************************************************/
    // Listeners
-   /*******************************************************************************************************************************************************/
-
-
    /**
     * Constructs all listen events enabled for this classs widget.
     * 
@@ -614,9 +534,6 @@ export class Rect_Mesh extends Mesh {
 
       return true;
    }
-
-   
-   
    OnClick(params) {
 
       const section = params.evt_params.target_mesh;
@@ -701,8 +618,6 @@ export class Rect_Mesh extends Mesh {
       return true;
 
    }
-
-
    OnResize(params) {
 
       const root = params.params;
@@ -772,7 +687,6 @@ export class Rect_Mesh extends Mesh {
          // Root_group_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
       }
    }
-
    RotateZ(angle) {
 
       super.RotateZ(angle);

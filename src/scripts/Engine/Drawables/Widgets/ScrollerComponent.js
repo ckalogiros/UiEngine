@@ -1,5 +1,6 @@
 "use strict";
 
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../../Core/Buffers.js";
@@ -50,13 +51,10 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const pos = [0,0,20];
 
 
-   const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar}));
-   bar.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   bar.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   bar.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
+   const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar, name:'ScrollBar'}));
+   Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2,})
    bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
-   bar.SetName('ScrollBar');
 
    bar.OnClick = Scroller_component_onClick;
 
@@ -72,11 +70,8 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    const handle_width = bar.geom.dim[0] - handle_pad[0];
    const handle_height = bar.geom.dim[1] - handle_pad[1];
    const handle_pos = [handle_height+handle_pad[0], handle_pad[1], pos[2]+1]
-   const handle = Create_rect_mesh(Style_rect_default_properties({pos:handle_pos, dim:[handle_width, handle_height], col:col_handle,}));
-   handle.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   handle.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   handle.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, bar.geom.dim[0]/2);
-   handle.SetName('Handle');
+   const handle = Create_rect_mesh(Style_rect_default_properties({pos:handle_pos, dim:[handle_width, handle_height], col:col_handle, name:'Handle'}));
+   Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:bar.geom.dim[0]/2,})
    handle.StylesSetPad(handle_pad);
 
    

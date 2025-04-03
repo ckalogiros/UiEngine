@@ -69,9 +69,6 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    const scale_down = .2;
    const particles_size = 20;
    const rcorners = 10;
-   const font_size = 10;
-   const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   const text_pad = [16, 10];
 
 
 
@@ -81,25 +78,19 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
    let emitter1_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame, scale_down);
    let emitter = Particles_get_particle_system(emitter1_idx);
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true})
    emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-   // emitter.EnableGfxUniforms({ unif:SID.UNIF.BLEND_MODE } , 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-   // emitter.EnableProperties(PARTICLES.HAS_JIGGLE, {jigglex:1.5, jiggley:2});
    emitter.EnableProperties(PARTICLES.HAS_FADE);
 
-
-   // emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE, {time:.0, generic:{a:.5, b:.3}});
-   emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_GLOW, {time:0,});
-   emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
-   emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+   emitter.GfxEnableFn(SID.SHAD.FN_GLOW, {time:0,});
 
    
 
    {
 
-      // emitter.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
+      // emitter.EnableGfx(SID.SHAD.FN_GLOW);
    
       // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
       // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -222,10 +213,6 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
 
    const scale_down = .2;
    const rcorners = 10;
-   const font_size = 10;
-   const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   const text_pad = [16, 10];
-
 
 
 
@@ -234,29 +221,23 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
 
    let emitter1_idx = Particle_system_create_emitter('Particle System Emitter: Tests', TRANSPARENCY(BLUEL[9], .2), [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame, scale_down);
    let emitter = Particles_get_particle_system(emitter1_idx);
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
+   // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true, });
+   Widget_gfx_ready_enable({mesh:emitter, enable_unif_scale:true, });
 
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 3.5, jiggley: 6 });
 
    // emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
-   // emitter.EnableProperties(PARTICLES.HAS_FADE);
+   emitter.EnableProperties(PARTICLES.HAS_FADE);
 
 
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
-   // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   
-   // New attrib Enable implementation
-   // emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE, {time: .4, generic:{ a: 0.1, b: 0.5 }});
-   emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE, {time:.0, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
+   emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.0, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
 
-   // emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_INNER_SHADOW, {blend_mode:flag++});
+   // emitter.GfxEnableFn(SID.SHAD.FN_INNER_SHADOW, {blend_mode:flag++});
    // emitter.EnableGfxUniforms({ unif:SID.UNIF.BLEND_MODE } , 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
 
-   // emitter.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
+   // emitter.EnableGfx(SID.SHAD.FN_GLOW);
 
    // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
    // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -348,7 +329,9 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
    }
 
 
-   controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
+   controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION| GFX_CTX_FLAGS.ABSOLUTE_POSITION, _, true);
+   controls_section.GfxCtxAddFlag(_, controls_section.mesh_bufferidx, true);
+   // controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
 
 
    /****************************************************************************************************************/
@@ -396,17 +379,18 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
 
    let emitter1_idx = Particle_system_create_emitter('Emitter:Sparkles', PURPLEB[9], [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame, scale_down);
    let emitter = Particles_get_particle_system(emitter1_idx);
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
+   // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true,})
+   Widget_gfx_ready_enable({mesh:emitter, enable_unif_scale:true,})
 
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);emitter.EnableProperties(PARTICLES.HAS_FADE);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 1.5, jiggley: 2 });
+   emitter.EnableProperties(PARTICLES.HAS_FADE);
 
    
    // New attrib Enable implementation
-   emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE, {time:.8, generic:{a:.02, b:.6}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
+   emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.8, generic:{a:.02, b:.6}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
 
-   // emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_INNER_SHADOW, {blend_mode:flag++});
+   // emitter.GfxEnableFn(SID.SHAD.FN_INNER_SHADOW, {blend_mode:flag++});
    // emitter.EnableGfxUniforms({ unif:SID.UNIF.BLEND_MODE } , 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
 
@@ -513,13 +497,9 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
 
 export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame = 10) { // 3 control Sliders 
 
-
-   const scale_down = .2;
+   const scale_down = .14;
    const particles_size = 20;
    const rcorners = 10;
-   const font_size = 10;
-   const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   const text_pad = [16, 10];
 
 
 
@@ -528,16 +508,17 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    const emitter1_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame, scale_down);
    const emitter = Particles_get_particle_system(emitter1_idx);
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-
+   Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true, });
+   
    emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
    emitter.EnableProperties(PARTICLES.HAS_FADE);
+   
+   emitter.GfxEnableFn(SID.SHAD.FN_GLOW, {time:0,});
+   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
+   // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
-   emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_GLOW, {time:0,});
-   emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
-   emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
+   const contols_values = [0, .6, .3];
+   emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, contols_values.length);
 
    emitter.SetConeOfDirection(-.1, .1, .1, -.1);
 
@@ -590,9 +571,9 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
       // 'Direction in X'
       // const parameters = [scale_down, .11, .02, .21, .5, 1., .5, .5, .5, .05, .05, .5];
       const parameters = [0.08, .5, 1., .5, .5, .5, .05, .05, .5];
-      const generic_controls_parameters = [.7, 1., .26];
+      // const generic_controls_parameters = [.7, 1., .26];
       // const controls_buffer = Create_explosion_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters);
-      const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, 'u_generic_controls');
+      const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, contols_values, 'u_generic_controls');
 
       const len = controls_buffer.length;
       for (let i = 0; i < len; i++) {
@@ -658,27 +639,20 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
 export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create = true) {
 
-   /**
-    * // TODO: The "u_smoke_params" is one float instead of vec3 that we are passing 
-    */
-
    const emitters = [];
    const emitter_idxs = [];
    const speed = 10;
-   let cnt = 0;
-   // const dim = [150*DEVICE.device_scale, 150*DEVICE.device_scale];
    const scale_down = .2;
    const particles_size = 40;
    const rcorners = 10;
-   const font_size = 10;
-   const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   const text_pad = [16, 10];
+   let cnt = 0;
 
 
    // Create Particle emitters
-   // const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', YELLOWR[9], [-90, y + 530, 0], dim, 1.5, 1, 2, .98, -.1, 3, TEXTURES.SMOKE_1);
    const emitter_idx = Particle_system_create_emitter('SmokeParticles 1', YELLOWR[9], [x, y, 0], [particles_size, particles_size], 0.015, 1, 2, .98, -.1, 3, TEXTURES.SMOKE_1, 1, scale_down);
    const emitter = Particles_get_particle_system(emitter_idx);
+   Widget_gfx_ready_enable({mesh:emitter, })
+
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_ROTATION);
    emitter.EnableProperties(PARTICLES.HAS_SCALE, 10);
@@ -686,27 +660,19 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    emitter.speed = speed;
 
    emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
-
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TEX2);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-
-   emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TEX2);
-   emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, 0.0);
    
    emitter.GfxEnableAttr(SID.ATTR.DIM2|SID.ATTR.TIME|SID.ATTR.TEX2, {time:0});
    emitter.GfxPassAttr(SID.ATTR.DIM2|SID.ATTR.TIME|SID.ATTR.TEX2);
 
-   { // Test Shaders
-      // emitter.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
+
+   { // Some Test Shaders
+      // emitter.EnableGfx(SID.SHAD.FN_EXPLOSION_CIRCLE);
       // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:0.01, b:0.0 });
+      // emitter.EnableGfx(SID.SHAD.FN_GLOW);
+      // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
+      // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
    }
 
-   // emitter.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
-   // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
 
    Particles_gen_gfx_ctx(emitter);
 
@@ -779,7 +745,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    // Render 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
       Align_pre_simple(controls_section);
@@ -841,7 +807,7 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
    // [.71, .71, .78, .5, ]
    // [.48, .08, .48, .0, .5]
    // Contols for shader params
-   if (emitter.sid.unif & SID.UNIF.SCALE2) {
+   if (emitter.sid.unif & SID.UNIF.U_SCALE_VEC2) {
       const slider = Create_slider_control(slider_dim, slider_col, 'Scale', slider_rcorners, default_font, );
       controls_buffer.push(slider);
       slider.SetInitialValue(parameters ? parameters[0] : scale_down);
@@ -1260,14 +1226,12 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    const glow_size = 20;
    const scale_down = .22;
    const rcorners = 10;
-   const font_size = 10;
    const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
    const text_pad = [16, 10];
 
 
 
    
-   // const particles_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [x, y, 0], [width, height], TRANSPARENCY(GREY[1], 1.), 'Particles Bouncing Ball Tail',)
    const particles_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:[width, height], col:TRANSPARENCY(GREY[1], 1.), name:'articles Bouncing Ball Tail', }));
    Widget_gfx_ready_enable({mesh:particles_panel, enable_sdf_rect:20,})
    
@@ -1278,7 +1242,6 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       /****************************************************************************************************************/
       // Balltail particles
       const dim = [comet_size, comet_size]
-      // const pos = GetRandomPos([0, 0], [particles_panel.geom.dim[0], particles_panel.geom.dim[1]])
       const pos = [100, 100]
 
       const ball = Create_rect_mesh(Style_rect_default_properties({pos:[pos[0], pos[1], 2], dim:dim, col:WHITE, name:'Ball', }));
@@ -1295,37 +1258,34 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       const particles_size = dim[1] * scale;
       const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1, scale_down);
       const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
+      Widget_gfx_ready_enable({mesh:tail_emitter, enable_src_color_in_main:false}); // Just to enable u_wposxy and u_blend_mode
+      // Widget_gfx_ready_enable({mesh:tail_emitter, enable_src_color_in_main:true}); // Just to enable u_wposxy and u_blend_mode
 
-
-      tail_emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_NOISE, {time:0}); // TODO: Does nothing, there is no enable for '.FN_NOISE'
+      tail_emitter.EnableProperties(PARTICLES.HAS_FADE);
+      tail_emitter.GfxEnableFn(SID.SHAD.FN_NOISE, {time:0});
       tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
-
 
 
       /****************************************************************************************************************/
       // Secondary particles
 
-      // const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .5, 1., 2, .989, 0, 8);
       const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .005, 1., 1.8, .99, 0, 16, _, 1, scale_down);
       const glow_emitter = Particles_get_particle_system(glow_emitter_idx);
-      glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      Widget_gfx_ready_enable({mesh:glow_emitter, enable_sdf_rect:particles_size, enable_unif_scale:true})
+
+      glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
       
       glow_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
       glow_emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 1, jiggley: 2 });
       glow_emitter.EnableProperties(PARTICLES.HAS_FADE);
+
+      
+      glow_emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+      glow_emitter.EnableProperties(PARTICLES.HAS_FADE);
+
+      glow_emitter.GfxEnableFn(SID.SHAD.FN_GLOW, {time:0,});
       
       
-      
-      // glow_emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_GLOW_SPHERE, );
-      glow_emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_GLOW, {time:0});
-      glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-      glow_emitter.GfxEnableFn(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE, {time:.0, generic:{a:.5, b:.3}});
-
-      glow_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, particles_size);
-      glow_emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-
-
 
       glow_emitter.SetDir(-1, -1);
       const amt = .05;
@@ -1355,7 +1315,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    /****************************************************************************************************************/
    // Render 
 
-   particles_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, particles_panel.mesh_bufferidx, true);
+   particles_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, particles_panel.mesh_bufferidx, true);
    particles_panel.GenGfxCtx();
 
    particles_panel.Render();
@@ -1376,7 +1336,6 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       Particles_gen_gfx_ctx(glow_emitter, particles_panel);
       // Initialize values to uniforms
       glow_emitter.GfxUniformSetAndUpdate('u_scale2', [.12, 1]);
-      // glow_emitter.GfxUniformSetAndUpdate('u_generic_controls', [.3, 1, .2]);
       glow_emitter.GfxUniformSetAndUpdate('u_generic_controls', [0., 1, .31]);
 
 
@@ -1389,7 +1348,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    }
 
 
-   const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
+   const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x+particles_panel.geom.dim[0]*2, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
    Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
    controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -1509,7 +1468,6 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       const particles_len = glow_particles_buffer.length;
       for (let i = 0; i < particles_len; i++) {
 
-         // const ctrl = Create_particles_controls(glow_particles_buffer[i], scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, 'u_generic_controls');
          const glow_contols_buffer = Create_particles_controls(glow_particles_buffer[i], scale_down, YELLOWL[4], _, true, [0., 1, .31], 'u_generic_controls', false);
 
          const contols_len = glow_contols_buffer.length;
@@ -1536,7 +1494,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       /****************************************************************************************************************/
       // Render 
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
+      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
       Align_pre_simple(controls_section);
@@ -2407,322 +2365,6 @@ export function Test_noise_shader() {
 
 
 
-
-
-/*********************************************************************************************************************************************************************************************/
-/** Side-Panel
- * Create a collapsed menu panel (with button),
- * to add any kind of controls/options
- */
-/*********************************************************************************************************************************************************************************************/
-
-function Create_side_panel(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target = false, width = 300) {
-
-   const height = VIEWPORT.HEIGHT / 2;
-   const pad = 4;
-
-   // const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, 2], [VIEWPORT.RIGHT - (width+250 - pad * 2+10), 0, 0], [width, height], GREY[1], 'SidePanel', [0, 1, 1.8]);
-   const section = Create_widget_section(root_widget, SECTION.HORIZONTAL, [pad, 2], [VIEWPORT.RIGHT - (width + 50 - pad * 2 + 10), 0, 0], [width, height], GREY[1], 'SidePanel', [0, 1, 1.8]);
-   // section.state.mask |= MESH_STATE.STICKY_POSX;
-
-
-   const properties_btn = Create_rect_mesh(_, [0, 0, 11], [8, height], TRANSPARENCY(Interpolate_rgb_to_01(2, 32, 60), 1.5), 'Btn', [10, 0, 1.8]);
-   properties_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   properties_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   // properties_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   properties_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   properties_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // properties_btn.EnableGfx(MESH_ENABLE.ATTR_STYLE);
-   section.AddItem(properties_btn)
-
-   const s = Create_widget_section(_, SECTION.VERTICAL, [6, 4], [0, 0, 2], [0, 800], TRANSPARENCY(GREY[2], 1), 'InnerPanel', [0, 10, 1.8]);
-   // s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   section.AddItem(s);
-
-   const heading = Create_widget_label(_, 'Properties Panel', _, [0, 0, 4], _, GREY[1], BLUEL[9], [10, 4], _, [0, 8, 1.8]);
-   // heading.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   heading.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   heading.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   s.AddItem(heading);
-
-
-   if (render_target) {
-
-
-      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      // section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
-      section.options = SECTION.HORIZONTAL | SECTION.EXPAND | SECTION.RESIZE_PARENTX
-      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-      section.Calc_no_gfx_update();
-      section.Render();
-      Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-
-      section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-      Construct_listen_events_from_mesh_tree(section);
-      Construct_listen_events_relations_from_mesh_tree(section);
-
-      View_build_group_from_root_mesh(section);
-
-
-      // Create the panel button click evnt and animation 
-      const params = {
-         isOn: true,
-      };
-      properties_btn.ChangeListenEvent(E.C,
-         (params) => {
-
-            console.log('[][][][]][][][][][][');
-
-            const section = params.evt_params.section;
-            const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
-            const isOn = params.evt_params.rest_params.isOn;
-            const reduce_val = 25;
-            console.log(isOn)
-
-            if (isOn) {
-
-               Callback_animations_create( // Close Panel
-                  (params) => { // Run Animation
-                     // console.log(params)
-
-                     let reduce_val = params.reduce_val;
-                     const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-                     if (unif_wpos + reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0] * 2 - 5) {
-                        // console.log('unif_wpos', unif_wpos)
-                        const section = params.section;
-                        Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
-
-                        // params.reduce_val *= 1.03
-                        params.reduce_val *= .9
-                        // console.log('reduce_val', params.reduce_val)
-
-                        return true;
-                     }
-
-                     // Mesh_unif_add_vb_root_wposx(section.root_posidx, section.geom.dim[0]*2 - btn.geom.dim[0]*2 - 5);
-
-                     return false;
-                  },
-                  () => { // Stop Animation
-
-                     return false;
-                  },
-                  { section: section, reduce_val: reduce_val }
-               );
-
-               params.evt_params.rest_params.isOn = false;
-            }
-            else { // Open Panel
-
-               Callback_animations_create(
-                  (params) => { // Run Animation
-
-                     let reduce_val = params.reduce_val;
-                     const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-                     if (unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0] * 2 || reduce_val < 1) {
-
-                        const section = params.section;
-                        Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
-
-                        params.reduce_val *= .9
-                        // console.log('unif_wpos', unif_wpos, 'reduce_val',VIEWPORT.WIDTH - btn.geom.dim[0])
-
-                        return true;
-                     }
-
-                     return false;
-                  },
-                  () => { // Stop Animation
-
-                     return false;
-                  },
-                  { section: section, reduce_val: reduce_val }
-               );
-
-               params.evt_params.rest_params.isOn = true;
-            }
-
-
-         }
-         , { section: section, rest_params: params },
-      );
-   }
-
-
-   return section;
-}
-
-
-
-function Create_side_panel_horizontal(root_widget = ROOT_WIDGETS.CREATE_ROOT, render_target = false, height = 300) {
-
-   // const height = VIEWPORT.HEIGHT/2;
-   const pad = 4;
-
-   const section = Create_widget_section(root_widget, SECTION.VERTICAL, [pad, 2], [0, VIEWPORT.HEIGHT - height, 0], [VIEWPORT.WIDTH, height / 2], GREY[1], 'SidePanel', [0, 1, 1.8]);
-   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // section.state.mask |= MESH_STATE.STICKY_POSX;
-
-
-   // const properties_btn = Create_rect_mesh(_, [0, 2, 11], [VIEWPORT.WIDTH/2, 8], TRANSPARENCY(Interpolate_rgb_to_01(2, 32, 60), 1.), 'Btn', [0, 10, 1.8]);
-   const properties_btn = Create_rect_mesh(_, [0, 2, 11], [VIEWPORT.WIDTH / 2 - pad, 8], TRANSPARENCY(Interpolate_rgb_to_01(10, 72, 160), 1.), 'Btn', [0, 100, 1.8]);
-   // properties_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   properties_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
-   properties_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // properties_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   properties_btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   // properties_btn.EnableGfx(MESH_ENABLE.ATTR_STYLE);
-   section.AddItem(properties_btn)
-
-   const s = Create_widget_section(_, SECTION.VERTICAL, [6, 4], [0, 20, 2], [0, 800], TRANSPARENCY(GREY[2], 1), 'InnerPanel', [0, 10, 1.8]);
-   // s.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   s.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
-   s.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   section.AddItem(s);
-
-   const heading = Create_widget_label(_, 'Properties Panel', _, [0, 0, 4], _, GREY[1], BLUEL[9], [10, 4], _, [0, 8, 1.8]);
-   // heading.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   heading.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
-   heading.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   s.AddItem(heading);
-
-   // section.geom.pos[0] -= 200
-
-
-
-   if (render_target) {
-
-
-      section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // section.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
-      section.options = SECTION.VERTICAL | SECTION.EXPAND | SECTION.RESIZE_PARENTY
-      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-      section.Calc_no_gfx_update();
-      section.Render();
-      // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-
-      section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-      Construct_listen_events_from_mesh_tree(section);
-      Construct_listen_events_relations_from_mesh_tree(section);
-
-      View_build_group_from_root_mesh(section);
-
-
-      // // Create the panel button click evnt and animation 
-      // const params = {
-      //    isOn: true,
-      // };
-      // properties_btn.ChangeListenEvent(E.C,
-      //    (params) => {
-
-      //       console.log('[][][][]][][][][][][');
-
-      //       const section = params.evt_params.section;
-      //       const btn = Mesh_buffer_get_mesh_byidx(params.meshidx);
-      //       const isOn = params.evt_params.rest_params.isOn;
-      //       const reduce_val = 25;
-      //       console.log(isOn)
-
-      //       if (isOn) {
-
-      //          Callback_animations_create( // Close Panel
-      //             (params) => { // Run Animation
-      //                // console.log(params)
-
-      //                let reduce_val = params.reduce_val;
-      //                const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-      //                if (unif_wpos + reduce_val < VIEWPORT.WIDTH - btn.geom.dim[0] * 2 - 5) {
-      //                   // console.log('unif_wpos', unif_wpos)
-      //                   const section = params.section;
-      //                   Mesh_unif_add_vb_root_wposx(section.root_posidx, reduce_val);
-
-      //                   // params.reduce_val *= 1.03
-      //                   params.reduce_val *= .9
-      //                   // console.log('reduce_val', params.reduce_val)
-
-      //                   return true;
-      //                }
-
-      //                // Mesh_unif_add_vb_root_wposx(section.root_posidx, section.geom.dim[0]*2 - btn.geom.dim[0]*2 - 5);
-
-      //                return false;
-      //             },
-      //             () => { // Stop Animation
-
-      //                return false;
-      //             },
-      //             { section: section, reduce_val: reduce_val }
-      //          );
-
-      //          params.evt_params.rest_params.isOn = false;
-      //       }
-      //       else { // Open Panel
-
-      //          Callback_animations_create(
-      //             (params) => { // Run Animation
-
-      //                let reduce_val = params.reduce_val;
-      //                const unif_wpos = Mesh_unif_get_vb_root_wposx(section.root_posidx);
-      //                if (unif_wpos > VIEWPORT.WIDTH - section.geom.dim[0] * 2 || reduce_val < 1) {
-
-      //                   const section = params.section;
-      //                   Mesh_unif_add_vb_root_wposx(section.root_posidx, -reduce_val);
-
-      //                   params.reduce_val *= .9
-      //                   // console.log('unif_wpos', unif_wpos, 'reduce_val',VIEWPORT.WIDTH - btn.geom.dim[0])
-
-      //                   return true;
-      //                }
-
-      //                return false;
-      //             },
-      //             () => { // Stop Animation
-
-      //                return false;
-      //             },
-      //             { section: section, reduce_val: reduce_val }
-      //          );
-
-      //          params.evt_params.rest_params.isOn = true;
-      //       }
-
-
-      //    }
-      //    , { section: section, rest_params: params },
-      // );
-   }
-
-
-   return section;
-}
-/*********************************************************************************************************************************************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*********************************************************************************************************************************************************************************************/
 /** 
  * Helper-Mesh construction functions
@@ -2744,11 +2386,9 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
       Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:12,})
       panel.AddItem(label);
 
-      const emitt_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, z + 2], size:18, col:YELLOWR[8], layout:ALIGN_2.HORIZONTAL}));
+      const emitt_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, z + 2], size:18, col:YELLOWR[8], layout:ALIGN_2.HORIZONTAL, name:`${emitter.name}_emitt_switch`}));
       Widget_gfx_ready_enable({mesh:emitt_switch, enable_sdf_rect:emitt_switch.geom.dim[1],})
-      emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-      emitt_switch.SetName(`${emitter.name}_emitt_switch`);
+      emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       panel.AddItem(emitt_switch);
 
       const evt_params = { target_params: [emitter.idx] };
@@ -2756,17 +2396,14 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
    }
    if(emitt_options.button_pres_emitt) {
 
-      const emitt_btn = Create_widget_button(Style_button_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.VERTICAL}));
+      const emitt_btn = Create_widget_button(Style_button_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.VERTICAL, name:`${emitter.name}_emitt_button`}));
       Widget_gfx_ready_enable({mesh:emitt_btn, enable_sdf_rect:emitt_btn.geom.dim[1],})
       emitt_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      emitt_btn.SetName(`${emitter.name}_emitt_button`);
       panel.AddItem(emitt_btn);
 
       const evt_params = { target_params: [emitter.idx] };
       emitt_btn.Bind(Particle_system_emitt, _, evt_params);
    }
-
-
 
    return panel;
 } 

@@ -537,13 +537,15 @@ export function Mesh_per_vb_print_loop() {
 
       if (_mesh_per_vertex_buffer.buffer[i]) {
 
-         console.log('vb', i,);
+         
+         console.log('vb', i, );
          for (let j = 0; j <= _mesh_per_vertex_buffer.buffer[i].boundary; j++) {
-
+            
             const mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[i].buffer[j]];
             if(mesh && mesh !== undefined)
-            console.log(j,
+               console.log(j,
                ' mbidx:', mesh.mesh_bufferidx,
+               ' prog:', mesh.gfx.prog.idx,
                'start:', mesh.gfx.vb.starts.buffer,
                'name:', mesh.GetName(),
             );

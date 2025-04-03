@@ -62,13 +62,13 @@ class Effect_Mesh_Explosion_Circle {
       // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
       // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, enable_pass_vpos:true, });
       // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
-      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, enable_src_color_in_main:false, });
 
 
-      mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:ring_diameter, b:intensity });
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+      mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:0, generic:{a:.01, b:0}});
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:ring_diameter, b:intensity });
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
       
       // TODO: Remove uniform. Attribute is anabled
       // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
@@ -291,10 +291,10 @@ class Effect_Mesh_Explosion_Glow {
       // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, });
       // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
       // Widget_gfx_ready_enable({mesh:mesh, });
-      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, enable_src_color_in_main:false});
 
-      mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_GLOW);
-      mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
+      mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_GLOW, {time:0});
+      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
       // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
       // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_WPOS2);
 

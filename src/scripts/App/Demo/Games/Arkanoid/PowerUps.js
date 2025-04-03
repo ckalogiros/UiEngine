@@ -11,7 +11,7 @@ import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/Re
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_get_panel_dim_x } from "./Arkanoid.js";
-import { ARKANOID_FLAGS } from "./ArkanoisConstants.js";
+import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoisConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
 import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
@@ -20,10 +20,14 @@ import { Player_create_animation_scale } from "./Player.js";
 
 /** */
 const POWUP_COLORS_ARRAY = [
-   GREEN[9],
-   BLUEL[9],
-   PURPLEB[9],
-   YELLOW[9],
+   // GREEN[9],
+   // BLUEL[9],
+   // PURPLEB[9],
+   // YELLOW[9],
+   ARKANOID_COLORS.green,
+   ARKANOID_COLORS.blue,
+   ARKANOID_COLORS.purple,
+   ARKANOID_COLORS.yellow,
 ];
 /** */
 const POWUP_INIT_SIZE = 26;
@@ -56,12 +60,20 @@ class Powup {
 
       // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], color, 'PowupMesh', _, _, _,);
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[POWUP_INIT_SIZE, POWUP_INIT_SIZE], col:color, name:'PowupMesh', }));
-      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, enable_src_color_in_main:false,});
 
 
+      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 8);
+      // this.control_values = [1, 1, 1, 1, .02, .99];
+      // this.control_values = [1, 1., 1., .55, .14, 1,];
+      // this.control_values = [.22, .24, .34, 1, 1, 1,];
+      // this.control_values = [1, 1., 1., 1., .14, 1,];
+      // this.control_values = [1, 1., 1., 1., .44, 1,];
+      this.control_values = [.59, .78, 1., .18, .09, .36];
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.control_values.length);
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 
@@ -151,7 +163,9 @@ export function Powup_init_buffer(group_idx, parent_root_posidx, parent_mesh_buf
       Powup_remove_byidx(powup.idx);
    }
 
-   _powup_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_controls', [.22, .24, .34, 1, 1, 1, 1, 1]);
+   const control_values = _powup_buffer.buffer[0].control_values
+   // _powup_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_controls', [.22, .24, .34, 1, 1, 1, 1, 1]);
+   _powup_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_controls', control_values);
 
    return powup;
 }

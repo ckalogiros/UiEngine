@@ -31,10 +31,11 @@ const DISABLE_DEBUG = true;
  */
 
 // Array of scalars
-function SetValue1f(gl, loc, val) { gl.uniform1fv(loc, val); }
+// function SetValue1f(gl, loc, val) { gl.uniform1fv(loc, val); }
+function SetValue1f(gl, loc, val) { gl.uniform1f(loc, val); }
 
 // Array of vectors (from flat array or array of THREE.VectorN)
-function SetValueV1f(gl, loc, val) { gl.uniform1f(loc, val); } // Update 1 float in a vector array of floats, with index
+function SetValueV1f(gl, loc, val) { gl.uniform1fv(loc, val); } // Update 1 float in a vector array of floats, with index
 function SetValueV2f(gl, loc, val) { gl.uniform2fv(loc, val); }
 function SetValueV3f(gl, loc, val) { gl.uniform3fv(loc, val); }
 function SetValueV4f(gl, loc, val) { gl.uniform4fv(loc, val); }
@@ -115,17 +116,16 @@ class Uniform {
          // From THREE.js
          // TODO: Initialize the rest of the Arrays
          case UNIF_TYPE.FLOAT: { this.UpdateUniform = SetValue1f; this.val = 0; break; } // FLOAT
-         // case UNIF_TYPE.FVEC1: { this.UpdateUniform = SetValueV1f; this.val = 0; break; } // FLOAT
-         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Float32Array(1.1,2); break; } // F_VEC2
-         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Float32Array(0,0,0); break; } // F_VEC3
-         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Float32Array(0,0,0,0); break; } // F_VEC4
+         case UNIF_TYPE.FVEC2: { this.UpdateUniform = SetValueV2f; this.val = new Float32Array([0,0]); break; } // F_VEC2
+         case UNIF_TYPE.FVEC3: { this.UpdateUniform = SetValueV3f; this.val = new Float32Array([0,0,0]); break; } // F_VEC3
+         case UNIF_TYPE.FVEC4: { this.UpdateUniform = SetValueV4f; this.val = new Float32Array([0,0,0,0]); break; } // F_VEC4
          // TODO: Is the Float32Array resizable??? If not we need to create a large enough array
-         case UNIF_TYPE.FARR: { this.UpdateUniform = SetValue1f; this.val = new Float32Array(0,0,0,0,0); break; } // F_ARRAY
+         case UNIF_TYPE.FARR: { this.UpdateUniform = SetValueV1f; this.val = new Float32Array([0,0,0,0,0]); break; } // F_ARRAY
 
          case UNIF_TYPE.MAT2: { this.UpdateUniform = SetValueM2; break; } // F_MAT2
          case UNIF_TYPE.MAT3: { this.UpdateUniform = SetValueM3; break; } // F_MAT3
          case UNIF_TYPE.MAT4: { this.UpdateUniform = SetValueM4; break; } // F_MAT4
-
+         
          // case UNIF_TYPE.INT: { this.UpdateUniform = SetValueV1i; this.val = 0; break; } // INT, BOOL
          case UNIF_TYPE.INT: { this.UpdateUniform = SetValue1i; this.val = 0; break; } // INT, BOOL
          case UNIF_TYPE.BOOL: { this.UpdateUniform = SetValueV1i; break; } // INT, BOOL
@@ -610,11 +610,11 @@ export function Uniforms_buffer_print() {
    console.log('_uniforms_buffer\ncount:', _uniforms_buffer.active_count,);
    for(let i=0; i <= _uniforms_buffer.boundary; i++){
       console.log(
+         'progidx', _uniforms_buffer.buffer[i].progidx,
          'ubidx', i,
+         'vb_groupidx', _uniforms_buffer.buffer[i].vb_groupidx,
          'name', _uniforms_buffer.buffer[i].name,
          'val', _uniforms_buffer.buffer[i].val,
-         'progidx', _uniforms_buffer.buffer[i].progidx,
-         'vb_groupidx', _uniforms_buffer.buffer[i].vb_groupidx,
       );
    }
 }

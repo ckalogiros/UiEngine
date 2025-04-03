@@ -95,9 +95,9 @@ function Index_buffer_create(type, size) {
 
 
 const _index_buffers_info = New_generic_buffer(_, 'GFX Index Buffer Info');
-export function Index_buffer_info_reset_buffer() { 
+export function Index_buffer_info_reset_buffer() {
    Gl_index_buffer_info_ibo_delete_all();
-   _index_buffers_info.ResetFull(); 
+   _index_buffers_info.ResetFull();
 }
 
 
@@ -111,7 +111,7 @@ export function Gl_index_buffer_info_ibo_delete(ibidx) {
 
 function Gl_index_buffer_info_ibo_delete_all() {
 
-   for(let i=0; i <= _index_buffers_info.boundary; i++){
+   for (let i = 0; i <= _index_buffers_info.boundary; i++) {
 
       const ibo = _index_buffers_info.buffer[i].ibo;
       gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, null);
@@ -161,11 +161,12 @@ class Index_Buffer_Info {
       this.sid = sid;             // Bit field: Shader ID
 
       this.discontinue_offset = 0; // An offset where the break of the indices happen. Used for connected vertices
-      if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) this.discontinue_offset = 4; // Break vertex connection every 4 vertices, for a type of geometry with 4 vertices per face
-      else if(sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) this.discontinue_offset = 6; // Break vertex connection every 6 vertices, for a type of geometry with 6 vertices per face
-      
+      if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) this.discontinue_offset = 4; // Break vertex connection every 4 vertices, for a type of geometry with 4 vertices per face
+      else if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) this.discontinue_offset = 6; // Break vertex connection every 6 vertices, for a type of geometry with 6 vertices per face
+
       this.connect_offset = 0; // An offset of the vertex index at which the next face will be connected to
-      if(sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) this.connect_offset = 2; // Connect to the second previous index 
+      if (sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
+         this.connect_offset = 2 // Connect to the second previous index 
 
       console.log('##### INDEX BUFFER:', ibidx, 'connect_offset:', this.connect_offset)
 
@@ -182,7 +183,7 @@ class Index_Buffer_Info {
 
       let k = this.vCount;
       for (let i = 0; i < num_faces; ++i) {
-         
+
          for (let j = 0; j < 2; j++) {
 
             data[this.count++] = k + j;
@@ -193,13 +194,13 @@ class Index_Buffer_Info {
          k += this.discontinue_offset;
          this.vCount += this.discontinue_offset;
 
-         k-=this.connect_offset;
+         k -= this.connect_offset;
          this.vCount -= this.connect_offset;
       }
-      
-      k+=this.connect_offset;
+
+      k += this.connect_offset;
       this.vCount += this.connect_offset;
-      
+
 
       if ((this.vCount % 1) !== 0) console.error('index buffer count mismatch')
 
@@ -289,7 +290,7 @@ export function Index_buffer_info_create(sid = 0, size = 6) {
 
 function Index_buffer_add_indices(ibidx, num_faces) {
 
-   const ib_info = _index_buffers_info.buffer[ibidx];  
+   const ib_info = _index_buffers_info.buffer[ibidx];
 
    ib_info.Add(num_faces)
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -297,14 +298,14 @@ function Index_buffer_add_indices(ibidx, num_faces) {
 
 
 
-export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert){
+export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert) {
 
-   const ib_info = _index_buffers_info.buffer[ibidx];  
+   const ib_info = _index_buffers_info.buffer[ibidx];
 
    const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
 
-   
-   if(total_draw_count > ib_info.count){
+
+   if (total_draw_count > ib_info.count) {
 
       // Check for buffer realloc
       if (total_draw_count > ib_info.size) {
@@ -320,13 +321,13 @@ export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, nu
 }
 
 
-export function Index_buffer_reset(ibidx){
-   
+export function Index_buffer_reset(ibidx) {
+
    const ib_info = _index_buffers_info.buffer[ibidx];
 
    ib_info.count = 0;
    ib_info.vCount = 0;
-   
+
 
 }
 

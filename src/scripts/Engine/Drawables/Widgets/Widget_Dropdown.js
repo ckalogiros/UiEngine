@@ -18,6 +18,8 @@ import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorb
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties, Style_section_default_properties } from "./WidgetReadyStyles.js";
 import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
+import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 
 
 
@@ -91,7 +93,8 @@ export function Dropdown_roots_print_root_buffer() {
 
 
 
-export class Widget_Dropdown extends Section {
+// export class Widget_Dropdown extends Section {
+export class Widget_Dropdown extends Rect_Mesh {
 
    isOn; // Bool for checking a dropdown's menu expanded/contructed.
    menu_active; // H to preserve the 'expanded' state, even if the current dp is deactivated by a parent dp. 
@@ -115,9 +118,8 @@ export class Widget_Dropdown extends Section {
       this.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
 
       properties.dp.pos[2] += 1;
-      // this.menu = Create_widget_section(Style_section_default_properties(properties.menu));
-      // this.menu = Create_rect_mesh(Style_rect_default_properties(properties.menu));
       this.menu = Create_rect_mesh(properties.menu);
+      Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10,})
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
@@ -127,6 +129,7 @@ export class Widget_Dropdown extends Section {
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
       const btn = Create_widget_button(properties.btn);
+      Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10,})
       btn.align.flags = ALIGN_2.VERTICAL
 
 

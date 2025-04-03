@@ -536,3 +536,39 @@ export function Style_dropdown_default_properties(user_properties) {
 
    return properties;
 }
+export function Style_color_picker_default_properties(user_properties) {
+
+   const properties = {
+
+      is_root: user_properties.is_root,
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+
+      dim: user_properties.dim,
+      col: user_properties.col,
+      num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
+      name: user_properties.name !== undefined ? user_properties.name : 'Rect Mesh UNAMED',
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
+
+      texture_id:user_properties.texture_id, 
+      sub_texture_id: user_properties.sub_texture_id,
+      variant_idx: user_properties.variant_idx,
+
+      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF,
+
+      rcorners:{
+         color_picker:  user_properties.rcorners!==undefined && user_properties.rcorners.color_picker !== undefined ? user_properties.rcorners.color_picker : 10, 
+         panel:         user_properties.rcorners!==undefined && user_properties.rcorners.panel !== undefined ? user_properties.rcorners.panel : 10, 
+         color_pick:    user_properties.rcorners!==undefined && user_properties.rcorners.color_pick !== undefined ? user_properties.rcorners.color_pick : 10, 
+         panel2:        user_properties.rcorners!==undefined && user_properties.rcorners.panel2 !== undefined ? user_properties.rcorners.panel2 : 10, 
+         color_present: user_properties.rcorners!==undefined && user_properties.rcorners.color_present !== undefined ? user_properties.rcorners.color_present : 8, 
+         slider_trans:  user_properties.rcorners!==undefined && user_properties.rcorners.slider_trans !== undefined ? user_properties.rcorners.slider_trans : 5, 
+         handle_trans:  user_properties.rcorners!==undefined && user_properties.rcorners.handle_trans !== undefined ? user_properties.rcorners.handle_trans : 2, 
+         slider_hue:    user_properties.rcorners!==undefined && user_properties.rcorners.slider_hue !== undefined ? user_properties.rcorners.slider_hue : 6, 
+         labels:        user_properties.rcorners!==undefined && user_properties.rcorners.labels !== undefined ? user_properties.rcorners.labels : 5,
+      },
+
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+   };
+
+   return properties;
+}

@@ -581,7 +581,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       // const color = RGB(i, 0.15, 0, 1.3);
       const ball = Create_rect_mesh(Style_rect_default_properties({pad:[5, 5], pos:[pos[0], pos[1], zpos++], dim:dim, col:color, name:'Ball' + i, }));
       Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0],})
-      ball.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      ball.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       ball.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
 
 
@@ -590,11 +590,11 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, 0.4);
 
       { // Test Shaders
-         // ball.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_CIRCLE);
+         // ball.EnableGfx(SID.SHAD.FN_EXPLOSION_CIRCLE);
          // ball.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:0.01, b:0.0 });
       }
 
-      ball.EnableGfx(MESH_ENABLE.GFX.FN_GLOW);
+      ball.EnableGfx(SID.SHAD.FN_GLOW);
 
       section.AddItem(ball);
 

@@ -1,5 +1,7 @@
 "use strict";
 
+import { Mult_arr3_scalar, Mult_arr4_scalar } from "../../../../Helpers/Math/MathOperations";
+
 
 
 let _flag_counter = 0x1;
@@ -29,6 +31,7 @@ export const ARK_STATE = {
 };
 
 ARK_STATE.RESET(ARK_STATE.START);
+// ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
 
 
@@ -77,6 +80,24 @@ export function Arkanoid_initialize_flags() {
    ARKANOID_FLAGS.POWUP_ = (ARKANOID_FLAGS.POWUP_SCALE_PLAYER|ARKANOID_FLAGS.POWUP_NEW_BALL|ARKANOID_FLAGS.POWUP_SCALE_BALL|ARKANOID_FLAGS.POWUP_FIRE_BULLET);
 }
 
+
+
+
+
+
+/************************************************************************************************/
+// Colors
+const color_brightness_ctrl_val = { yellow:.75, purple:.65, blue:1., green:.5, };
+export const ARKANOID_COLORS = {
+   yellow:  new Float32Array([1, .65, 0, 1]),
+   purple:  new Float32Array([.75, 0, 1., 1]),
+   blue:    new Float32Array([0, .5, 1, 1]),
+   green:   new Float32Array([0., 1., 0., 1]),
+};
+Mult_arr3_scalar(ARKANOID_COLORS.yellow, color_brightness_ctrl_val.yellow)
+Mult_arr3_scalar(ARKANOID_COLORS.purple, color_brightness_ctrl_val.purple)
+Mult_arr3_scalar(ARKANOID_COLORS.blue, color_brightness_ctrl_val.blue)
+Mult_arr3_scalar(ARKANOID_COLORS.green, color_brightness_ctrl_val.green)
 
 
 

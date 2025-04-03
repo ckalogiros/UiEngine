@@ -12,7 +12,7 @@ import { Shader_attributes_create } from '../../ShaderAttributes.js';
 import { frag_explosion_circle, frag_explosion_circle_call, frag_explosion_glow, frag_explosion_glow_call, frag_glow_sphere, frag_glow_sphere_call, frag_inner_shadow_rhomboid, frag_inner_shadow_rhomboid_call } from './Functions/fragment.misc.js';
 import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_attr_info_from_index, Shader_bit_flags_get_attr_key_name_from_flag, Shader_bit_flags_get_attr_size } from '../../ShaderBitFlags.js';
 import { frag_noise_voronoi_1, frag_noise_voronoi_1_call, frag_noise_voronoi_2, frag_noise_voronoi_2_call } from './Functions/fragment.noise_voronoi.js';
-import { frag_noise_worley_1, frag_noise_worley_1_call, frag_noise_worley_2, frag_noise_worley_2_call, frag_noise_worley_3_types, frag_noise_worley_3_types_call } from './Functions/fragment.noise_worley.js';
+import { frag_noise_worley_1, frag_noise_worley_1_call, frag_noise_worley_2, frag_noise_worley_2_call, frag_noise_worley_3_types, frag_noise_worley_3_types_call, frag_noise_worley_3D, frag_noise_worley_3D_call } from './Functions/fragment.noise_worley.js';
 import { shader_operations } from './ShaderChunks/ShaderOperations.js';
 
 
@@ -798,6 +798,8 @@ function Vertex_shader_resolve_attributes_out() {
          const attrib = locations[i].attr[j];
          if (attrib.is_passing) {
             attributes_out_code += `out float ${attrib.out_name};\n`;
+
+            // console.log('Vertex Shader outs: ', attrib.out_name)
          }
       }
    }
@@ -858,7 +860,7 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       // Defines
       '\n// DIRECTIVES',
       '#define PI 3.14159',
-      ((sid.unif & SID.UNIF.SCALE2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE 1' : '',
+      ((sid.unif & SID.UNIF.U_SCALE_VEC2) && (uniforms_info & UNIFORM.IN_VS)) ? '#define U_SCALE_VEC2 1' : '',
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '#define U_SCREEN_RESOLUTION 1' : '',
 
 
@@ -1009,9 +1011,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '\n// ---------- DIRECTIVES ----------',
       '#include <precision_high>',
 
-      (sid.unif & SID.UNIF.SCALE2) ? '#define U_SCALE 1' : '',
-      // (sid.unif & SID.UNIF.BLEND_MODE) ? '#define U_BLEND_MODE 1' : '',
-
       // TODO: REMOVE  U_SMOKE_PARAMS_VEC3 U_NOISE_PARAMS and replace with generic buffer
       (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
       (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
@@ -1075,6 +1074,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // TODO: Is U_GENERIC_FLOAT needed?? REMOVE IT
       // TODO: Is U_GENERIC_VECxxx needed?? REMOVE IT
       // Generic Uniforms
+      (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '#define U_SCALE_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_TIME_FLOAT) ? '#define U_TIME_FLOAT 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
@@ -1150,6 +1150,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1 : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2 : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3_TYPES) ? frag_noise_worley_3_types : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3D) ? frag_noise_worley_3D : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1 : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2 : '',
       
@@ -1181,13 +1182,24 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       true ? 'void main(void) ' : '',
       '{',
       // Include uniforms-controls
-      `  #ifdef U_GENERIC_CONTROLS
-   //  u_generic_controls[];
-  int u_gen_ctrl_map_cnt = 0;
-  #endif`,
+      `
+  #ifdef U_GENERIC_CONTROLS
+    int u_gen_ctrl_map_cnt = 0; // Indexing: u_generic_controls[] buffer
+  #endif
+  #ifdef U_SCALE_VEC2
+     float scale_down = u_scale2.x;
+  #else 
+     float scale_down = 1.0; 
+  #endif
+  #ifdef U_TIME_FLOAT
+    float time = u_time;
+  #else
+    float time = 1.;
+  #endif
+  `,
       (sid.pass & SID.ATTR.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
 
-      (sid.unif & SID.UNIF.SCALE2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
+      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
       (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
       
@@ -1196,6 +1208,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // '  vec2 uv = gl_FragCoord.xy;', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
+      // '  final_color = src_color;', // The final output color
 
 
 
@@ -1227,6 +1240,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_1) ? frag_noise_worley_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_2) ? frag_noise_worley_2_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3_TYPES) ? frag_noise_worley_3_types_call : '',
+      (sid.shad & SID.SHAD.FN_NOISE_WORLEY_3D) ? frag_noise_worley_3D_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2_call : '',
       
@@ -1289,9 +1303,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       
       // '  frag_color = src_color;',
       // '  frag_color = final_color * src_color;',
-      '  frag_color = final_color;',
       // '   frag_color = 1.- final_color;',
       // '   frag_color.rgb = 1.- final_color.rgb;',
+
+      // '  frag_color = final_color;',
+      // '  frag_color = final_color * src_color;',
+      (sid.shad & SID.SHAD.ENABLE_SRC_COLOR_IN_FRAG_MAIN) ? '  frag_color = final_color * src_color;' : '  frag_color = final_color;',
 
 
 
@@ -1300,19 +1317,19 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       /********************************************************************************************************/
       // HACK: prevent optimizer from removing the uniform u_scale2
-      // (sid.unif & SID.UNIF.SCALE2) ? '  if(u_scale2.x == 0.) ;' : '', 
+      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  if(u_scale2.x == 0.) ;' : '', 
       (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '  if(u_generic_float == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
       // '  if(u_blend_mode) bool a = false;',
-      '  if(u_blend_mode == 0) final_color *= 1.01;',
+      '  if(u_blend_mode == 0) final_color *= 1.0;',
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
-      // (sid.unif & SID.UNIF.SCALE2) ? '  frag_color.xyz *= u_scale2.x;' : '',
+      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  frag_color.xyz *= u_scale2.x;' : '',
       // true ? 'frag_color = vec4(1.);' : '',
 
       true ? '}' : '',

@@ -208,7 +208,7 @@ export function Game_snake(y = 0, controls_create = true) {
    const collectable = Create_widget_section(_, _, [0, 0], [300, 300, 0], collectable_dim, REDL[3], 'section', [collectable_size, 6, 3]);
 
    collectable.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   collectable.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   collectable.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    // collectable.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
    // collectable.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
    collectable.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 6);
@@ -272,7 +272,7 @@ export function Game_snake(y = 0, controls_create = true) {
       const col = GetSequencedColor(9);
       const body_mesh = Create_widget_section(_, _, [0, 0], [next_posx, next_posy, 1], [calc_size, calc_size], col, 'body_mesh', style);
       body_mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
       body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
       section.AddItem(body_mesh);
@@ -1256,7 +1256,7 @@ function Animation_scale_down_stop(params) {
 
 
       body_mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.SCALE2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, snake.style.feather);
       body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
 

@@ -81,7 +81,6 @@ export class Ball {
       const posx = x;
       const posy = y;
 
-      // const mesh = Create_rect_mesh(_, [posx, posy, 1], [BALL_DIM_X, BALL_DIM_Y], color, 'Ball',);
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[BALL_DIM_X, BALL_DIM_Y], col:color, name:'Ball',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BALL_DIM_X, });
 
@@ -115,15 +114,20 @@ export class Ball {
          const mod = BALL_SPEED * .002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
          const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, color, [0, 0, 1], [particles_size, particles_size], 0.015 + mod, 1, 0, _, _, 4, _, 1);
          const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
+         Widget_gfx_ready_enable({mesh:tail_emitter, enable_src_color_in_main:false, }); // Just to enable u_wposxy and u_blend_mode
+
+         tail_emitter.EnableProperties(PARTICLES.HAS_FADE);
+         tail_emitter.GfxEnableFn(SID.SHAD.FN_NOISE, {time:0});
+         tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
+
+         // // tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
+         // // tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+         // // tail_emitter.EnableGfx(SID.SHAD.FN_NOISE); // TODO: Does nothing, there is no enable for '.FN_NOISE'
+         // tail_emitter.GfxEnableFn(SID.SHAD.FN_NOISE, {time:0}); // TODO: Does nothing, there is no enable for '.FN_NOISE'
 
 
-         tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-         tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-         tail_emitter.EnableGfx(MESH_ENABLE.GFX.FN_NOISE); // TODO: Does nothing, there is no enable for '.FN_NOISE'
-
-
-         // tail_emitter.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-         tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS, }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
+         // // tail_emitter.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
+         // tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS, }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
 
          tail_emitter.SetDir(1, 1);
 

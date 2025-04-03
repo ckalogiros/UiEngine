@@ -1,4 +1,4 @@
-export const frag_noise_worley_3_types_call = '   final_color = blend_mode_vec4( final_color, frag_noise_worley_3_types() );'
+export const frag_noise_worley_3_types_call = '   final_color = blend_mode_vec4( final_color, frag_noise_worley_3_types(scale_down, u_gen_ctrl_map_cnt, time) );'
 // export const frag_noise_worley_3_types_call = '   final_color = frag_noise_worley_3_types();'
 
 /**WorleyNoise 3 Types - FROM: https://www.shadertoy.com/view/McyBRd */
@@ -129,30 +129,24 @@ vec2 worley(int type, vec3 p)
 
 
 
-vec4 frag_noise_worley_3_types()
+vec4 frag_noise_worley_3_types(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
 {
-
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
+  
+  float ${u}control1 = (u_generic_controls[u_gen_ctrl_map_cnt++]+.07)*2.;
+  float ${u}control2 = (u_generic_controls[u_gen_ctrl_map_cnt++]);
+  float ${u}control3 = ((u_generic_controls[u_gen_ctrl_map_cnt++]));
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-  float time = control1*10.;
-  
+  // float time = ${u}control1*10.;
   
   
 
   #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+    // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     uv_map_coordinates_zero_one(uv, dim);
   #endif  
   
@@ -167,9 +161,14 @@ vec4 frag_noise_worley_3_types()
 
   // split image adapted from Inigo Quilez; https://www.shadertoy.com/view/ll2GD3
   float ry = uv.y / res.y;
-  vec3 col_type1 = lake(rescale(w.x, vec2(0.0, 1.0)));
-  vec3 col_type2 = lake(rescale(length(w.xy)/(w.y + w.x) - w.x, vec2(0.0, 1.4)));
-  vec3 col_type3 = lake(rescale((2.0 * w.y * w.x)/(w.y + w.x) - w.x, vec2(0.0, 0.3)));
+
+  vec3 col_type1 = lake( rescale(w.x, vec2(0.0, 1.0))      );
+  vec3 col_type2 = lake( rescale(length(w.xy)/(w.y + w.x) - w.x, vec2(0.0, 1.4))     );
+  vec3 col_type3 = lake( rescale((2.0 * w.y * w.x)/(w.y + w.x) - w.x, vec2(0.0, 0.3))  );
+  // vec3 col_type1 = lake( pow( rescale(w.x, vec2(0.0, 1.0)),      ${u}control1));
+  // vec3 col_type2 = lake( pow( rescale(length(w.xy)/(w.y + w.x) - w.x, vec2(0.0, 1.4)),     ${u}control1) );
+  // vec3 col_type3 = lake( pow( rescale((2.0 * w.y * w.x)/(w.y + w.x) - w.x, vec2(0.0, 0.3)), ${u}control1) );
+
   
   // if ( ry > (1.0/3.0) ) col = lake(rescale(length(w.xy)/(w.y + w.x) - w.x, vec2(0.0, 1.4)));
   // if ( ry > (2.0/3.0) ) col = lake(rescale((2.0 * w.y * w.x)/(w.y + w.x) - w.x, vec2(0.0, 0.3)));
@@ -177,8 +176,14 @@ vec4 frag_noise_worley_3_types()
   // borders
   // col *= smoothstep( 0.5, 0.48, abs(fract(3.0 * ry) - 0.5) );
 
+  col_type1 = pow(col_type1, vec3(${u}control1));
+  col_type2 = pow(col_type2, vec3(${u}control1));
+  col_type3 = pow(col_type3, vec3(${u}control1));
+  // col_type1 /= col_type1/col_type1;
+  // col_type2 /= col_type2/col_type2;
+  // col_type3 /= col_type3/col_type3;
 
-  vec4 color = vec4( mix(mix(col_type1, col_type2, control2), col_type3, control3), 1.);
+  vec4 color = vec4( mix(mix(col_type1, col_type2, ${u}control2), col_type3, ${u}control3), 1.);
   return color;
 
 }
@@ -194,7 +199,7 @@ vec4 frag_noise_worley_3_types()
 
 /*************************************************************************************************************************************************************/
 
-export const frag_noise_worley_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_worley_1() );'
+export const frag_noise_worley_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_worley_1(scale_down, u_gen_ctrl_map_cnt, time) );'
 // export const frag_noise_worley_1_call = '   final_color = blend_color_multiply( final_color, frag_noise_worley_1() );'
 
 /**WorleyNoise 2 - FROM: https://www.shadertoy.com/view/MstGRl */
@@ -225,81 +230,82 @@ export const frag_noise_worley_1 = `
 
 ////////////////////////////////////////////////////////////////////////////////////
 // From: FROM: https://www.shadertoy.com/view/MstGRl
-#define NUM_CELLS 12.0
+#define NUM_CELLS 2.5
 
 // Arbitrary random, can be replaced with a function of your choice
 float rand(vec2 co, float ctrl2)
 {
-  // return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453*(ctrl2*.0001)); // GOOD for lava like shaders when animating ctrl2
-  return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
+  return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453*(ctrl2)); // GOOD for lava like shaders when animating ctrl2
+  // return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
 }
 
 // Returns the point in a given cell
-vec2 get_cell_point(ivec2 cell, float ctrl2) 
+vec2 get_cell_point(ivec2 cell, float num_cells, float ctrl2) 
 {
-	vec2 cell_base = vec2(cell) / NUM_CELLS;
+	vec2 cell_base = vec2(cell) / num_cells;
 	float noise_x = rand(vec2(cell), ctrl2);
   float noise_y = rand(vec2(cell.yx), ctrl2);
-  // return cell_base + (0.5 + 1.5 * vec2(noise_x, noise_y)) / NUM_CELLS;
-  return cell_base + (0.5 + 1.5 * vec2(noise_x*ctrl2, noise_y*ctrl2)) / NUM_CELLS;
+  return cell_base + (0.5 + 1.5 * vec2(noise_x, noise_y)) / num_cells;
+  // return cell_base + (0.5 + 1.5 * vec2(noise_x*ctrl2, noise_y*ctrl2)) / num_cells;
 }
 
 // Performs worley noise by checking all adjacent cells and comparing the distance to their points
-float worley(vec2 coord, float ctrl1, float ctrl2) 
+float worley(vec2 coord, float ctrl1, float ctrl2, float scale, float ctrl4) 
 {
-  ivec2 cell = ivec2(coord * NUM_CELLS);
+  float num_cells = 12.0*scale;
+  ivec2 cell = ivec2(coord * num_cells);
   float dist = 1.0;
   
   // Search in the surrounding 5x5 cell block
-  for (int x = 0; x < 5; x++) 
+  int block_size = 5;
+  for (int x = 0; x < block_size; x++) 
   { 
-    for (int y = 0; y < 5; y++) 
+    for (int y = 0; y < block_size; y++) 
     {
-      vec2 cell_point = get_cell_point(cell + ivec2(x-2, y-2), ctrl2);
+      vec2 cell_point = get_cell_point(cell + ivec2(x-2, y-2), num_cells, ctrl2);
       dist = min(dist, distance(cell_point, coord));
 
     }
   }
   
-  dist /= length(vec2(1.0 / NUM_CELLS))*ctrl1;
-  dist = 1.0 - dist;
+  dist /= length(vec2(1.0 / num_cells))*ctrl1;
+  dist = (1.0 - dist)/ctrl4;
   return dist;
 }
 
 
 
-vec4 frag_noise_worley_1()
+vec4 frag_noise_worley_1(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
 {
-
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
 
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
-  
-  
-  
 
   #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
-    // pixel_apply_world_position_offset_x(uv.x, v_wpos3_x); 
-    // pixel_apply_reverse_y_coordinates(uv.y, dim.y); 
-    // pixel_apply_world_position_offset_y(uv.y, v_wpos3_y); 
     uv_map_coordinates_zero_one(uv, dim);
   #endif  
+
+  float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}ctrl2 = (u_generic_controls[u_gen_ctrl_map_cnt++]+1.) * 10.;
+  // float ${u}ctrl2 = (u_generic_controls[u_gen_ctrl_map_cnt++]+.01) * 100.;
+  float ${u}scale = u_generic_controls[u_gen_ctrl_map_cnt++]+1.;
+  // float ${u}scale = ((u_generic_controls[u_gen_ctrl_map_cnt++]*2.)-1.)*2.;
+  float ${u}ctrl4 = u_generic_controls[u_gen_ctrl_map_cnt++];
+
+  // time *= 0.000001;
+  time *= 0.00001;
+  time *= ${u}ctrl2;
+
   
-  
-  float n = worley(uv, control1, control2);
+  // float n = worley(uv, ${u}ctrl1, ${u}ctrl2*time, ${u}scale, ${u}ctrl4);
+  // float n = worley(uv, ${u}ctrl1, ${u}ctrl2, ${u}scale, ${u}ctrl4);
+  float n = worley(uv, ${u}ctrl1, time, ${u}scale, ${u}ctrl4);
   vec4 color = vec4(n*n);
+  
+  // if(${u}ctrl1 >= 1.0) return vec4(1.);
   return color;
 
 }
@@ -407,7 +413,7 @@ vec4 frag_noise_worley_1()
 /*************************************************************************************************************************************************************/
 
 // export const frag_noise_worley_2_call = '   final_color = blend_mode_vec4( color, frag_noise_worley_2() );'
-export const frag_noise_worley_2_call = '   final_color = frag_noise_worley_2();'
+export const frag_noise_worley_2_call = '   final_color = frag_noise_worley_2(scale_down, u_gen_ctrl_map_cnt, time);'
 // export const frag_noise_worley_2_call = '   final_color = blend_color_multiply( final_color, frag_noise_worley_2() );'
 
 /**WorleyNoise 2 - Works with mesh world position move */
@@ -442,75 +448,62 @@ export const frag_noise_worley_2 = `
 // inspired from simplified https://www.shadertoy.com/view/MtlyR8 (Voronoï with various metrics)
 // + tilability, multiple seed per cell
 
-#define CELL_SIZE 100.  // cell size
+#define CELL_SIZE 20.  // cell size
 #define B  2.  // number of blob per cell. B=1 -> Poisson disk. Large or random B -> Poisson
 #define R  .5  // jittering blob location. .5 = anywhere in the tile. could be < or >
 #define dr .5  // blob radius fluctuates in [1-r,1+r]
 #define N  3   // tested neighborhood. Make it odd > 3 if R is high 
 
 #define srnd(p, ctrl)  ( 2.* fract(43758.5453*sin( dot(p, vec2(12.9898, 78.233))      ) ) - 1. )
-// #define srnd(p, ctrl)  ( 2.* fract(43758.5453*sin( dot(p, vec2(12.9898, 78.233) *ctrl)      ) ) - 1. )
-// #define srnd(p, ctrl)  ( 1.* fract(43758.5453*sin( dot(p, vec2(12.9898, 78.233)) *ctrl) ) - 1. )
-#define srnd2(U, ctrl) ( 2.* fract( 4567.89 * sin(4567.8*(U)* mat2(1,-13.17,377.1,-78.7) )*ctrl ) - 1. )
-// #define srnd2(U, ctrl) ( 2.* fract( 4567.89*ctrl * sin(4567.8*(U)* mat2(1,-13.17,377.1,-78.7) ) ) - 1. )
-// #define srnd2(U, ctrl) ( 2.* fract(4567.89* sin(4567.8*(U)* mat2(1,-13.17,377.1,-78.7) ) ) - 1. )
+#define srnd2(U, ctrl) ( 2.* fract( 4567.8+1667.357 * sin( 4567.8-1667.357 * (U) * mat2(1, -13.17, 377.1, -78.7) ) ) - 1. )
 
 
 
-vec4 frag_noise_worley_2()
+vec4 frag_noise_worley_2(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
 {
-
-  #ifdef U_GENERIC_VEC3
-    #include <u_generic_vec3>
-  #elif defined(U_GENERIC_VEC2)
-    #include <u_generic_vec2>
-  #elif defined(U_GENERIC_FLOAT)
-    #include <u_generic_float>
-  #endif
-
-
   vec2 res = u_screen_res;
   vec2 dim = vec2(v_dim2_x, v_dim2_y);
   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
   
   
-  
-  
   #ifndef UV_READY
     #define UV_READY 1
     uv = gl_FragCoord.xy;
-    pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+    // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
     uv_map_coordinates_zero_one(uv, dim);
   #endif
   
 
   vec4 color = vec4(1.);
 
-  float H = res.y;
-  float size = round(res.y/(CELL_SIZE*control2));             // make number of cells integer for tilability
+  float ${u}color_intensity = u_generic_controls[u_gen_ctrl_map_cnt++]*4.;
+  float ${u}color_pow = (u_generic_controls[u_gen_ctrl_map_cnt++]+.1);
+  float ${u}scale = ((u_generic_controls[u_gen_ctrl_map_cnt++])+.0001)*1.;
+  float ${u}radius_fluctuation = sin(time*u_generic_controls[u_gen_ctrl_map_cnt++]*10.);
+  float ${u}ctrl5 = u_generic_controls[u_gen_ctrl_map_cnt++]*8.;
+  float ${u}type = u_generic_controls[u_gen_ctrl_map_cnt++];
 
-  // if (uv.x > 1.) { 
-  //   color-=color; 
-  //   return color; 
-  // }   
+  float size = round(res.y/(CELL_SIZE));             // make number of cells integer for tilability
+  float jitter = (sin(time*${u}ctrl5)+1.)*.5;
+  jitter = jitter*.5+.5;
 
-  uv *= size; 
+  uv *= size*${u}scale;
+  uv += + time; 
   float m=1e9, v, r, r0=1e2;
   
   // neihborhood
   for (int k=0; k<N*N; k++)                  
   {
     // B blobs per cell
+    // for (float i=0.; i<B*${u}ctrl4; i++)  
     for (float i=0.; i<B; i++)  
     {                
       vec2 iuv = floor(uv);
       vec2 g = mod( iuv + vec2(k%N, k/N) - 1., size ); // cell location within neighborhood
-      // vec2 p = g+.5 + R* srnd2(g+i*.1, (control3*.0000001+.8)) ;          // blob location
-      vec2 p = g+.5 + R* srnd2(g+i*.1, ( (control3*.001) +.9) ) ;          // blob location
+      vec2 p = g+.5 + jitter* srnd2(g+i*.1, ( (${u}ctrl3*.001) +.9) ) ;          // blob location
       
       p = mod( p - uv +size/2., size) - size/2.; // distance to blob center
-      r =  1. + dr* srnd(g + i*.1 + .1, control3*.0000001+1.1);              // blob radius
-      // v = length(p) / (r*control2);                          // distance in blob referential
+      r =  1. + dr* srnd(g + i*.1 + .1, .0000001+1.1)*${u}radius_fluctuation;              // blob radius
       v = length(p) / (r);                          // distance in blob referential
 
       // if (v < 1. && r < r0 ) m = v,r0 = r;     // smallest blob win
@@ -518,16 +511,135 @@ vec4 frag_noise_worley_2()
     }
   }
   
-  // color =   vec4( 1.-(m*m) );
-  // color =   vec4( 1.-m );
-  // color =   vec4( 1.-(m*(m*control1)) );
-
-  // color =   vec4( (m*m) );
-  color =   vec4( (m*(m*control1)) );
+  // color =   vec4( pow(m,${u}color_pow*3.) *${u}color_intensity);
+  // color =   vec4( 1. - (pow(m,${u}color_pow*3.) *${u}color_intensity));
+  // color =   vec4( (m*(m*${u}color_intensity)) );
+  if(${u}type > .5) color = vec4( 1. - (pow(m,${u}color_pow*3.) *${u}color_intensity));
+  else color =   vec4( (pow(m,${u}color_pow*3.) *${u}color_intensity));
   
   
   return color;
 
 }
+
+`;
+
+
+
+
+
+
+
+/*************************************************************************************************************************************************************/
+
+// export const frag_noise_worley_2_call = '   final_color = blend_mode_vec4( color, frag_noise_worley_2() );'
+export const frag_noise_worley_3D_call = '   final_color = frag_noise_worley_3D(scale_down, u_gen_ctrl_map_cnt, time);'
+// export const frag_noise_worley_2_call = '   final_color = blend_color_multiply( final_color, frag_noise_worley_2() );'
+
+/**WorleyNoise 2 - Works with mesh world position move */
+export const frag_noise_worley_3D = `
+
+/********************************************************************************************/
+// SHADER UNIT: frag_noise_worley_2
+/********************************************************************************************/
+
+/*****************************************************/
+// GENERIC GLOBAL VARIABLES DECLERATIONS
+#ifndef UV_READY
+    vec2 uv = vec2(0,0);
+#endif
+
+
+/*****************************************************/
+// FUNCTION DECLERATIONS
+
+
+/*****************************************************/
+// BLEND MODES FUNCTION DECLERATIONS
+#ifdef BLEND_MODE 
+   #include <blend_mode_directives>
+#endif
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// From https://www.shadertoy.com/view/MtXSzH
+
+float noise3D(vec3 p) { return fract(sin(dot(p ,vec3(12.9898,78.233,126.7235))) * 43758.5453); }
+
+float worley3D(vec3 p)
+{					 					 
+	float r = 3.0;
+  vec3 f = floor(p);
+  vec3 x = fract(p);
+	for(int i = -1; i<=1; i++)
+	{
+		for(int j = -1; j<=1; j++)
+		{
+			for(int k = -1; k<=1; k++)
+			{
+        vec3 q = vec3(float(i),float(j),float(k));
+        vec3 v = q + vec3(noise3D((q+f)*1.11), noise3D((q+f)*1.14), noise3D((q+f)*1.17)) - x;
+        float d = dot(v, v);
+				r = min(r, d);
+			}
+		}
+	}
+  return sqrt(r);
+}	
+
+
+
+vec4 frag_noise_worley_3D(in float scale_down, inout int u_gen_ctrl_map_cnt, in float time)
+{
+  vec2 res = u_screen_res;
+  vec2 dim = vec2(v_dim2_x, v_dim2_y);
+  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+  
+  
+  #ifndef UV_READY
+    #define UV_READY 1
+    uv = gl_FragCoord.xy;
+    // pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+    uv_map_coordinates_zero_one(uv, dim);
+  #endif
+  
+
+  vec4 color = vec4(1.);
+
+  float ${u}color_intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}color_pow = (u_generic_controls[u_gen_ctrl_map_cnt++]+.1);
+  float ${u}scale = ((u_generic_controls[u_gen_ctrl_map_cnt++])+.0001)*1.;
+  float ${u}R = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}G = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}B = u_generic_controls[u_gen_ctrl_map_cnt++];
+
+  vec2 p = uv;
+
+  p*=20.0*${u}scale;
+  float f = worley3D(vec3(p, time*0.2));
+
+  f= pow(f, ${u}color_intensity);
+  
+  
+  if(uv.y>1.) f =1.-f; 
+  if(uv.x>1.) f = worley3D(vec3(p * 0.5, 1.0) *f *${u}color_pow ); 
+  
+  vec3 col = vec3(f);
+	col*=vec3(${u}R, ${u}G, ${u}B) * f * f;
+  col*=exp(1.0-col);
+
+	// color = vec4(col,f); // Trenparent
+	color = vec4(col,1.); // Trenparent
+
+  // else color =   vec4( (pow(m,${u}color_pow*3.) *${u}color_intensity));
+
+
+  return color;
+
+}
+
+
 
 `;

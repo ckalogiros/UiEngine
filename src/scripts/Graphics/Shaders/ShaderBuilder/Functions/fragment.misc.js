@@ -164,17 +164,6 @@ export const frag_inner_shadow_rhomboid = `
 
 vec4 inner_shadow_rhomboid(in float scale_down, inout int u_gen_ctrl_map_cnt)
 {
-
-  // #ifdef U_GENERIC_VEC3
-  //   #include <u_generic_vec3>
-  // #elif defined(U_GENERIC_VEC2)
-  //   #include <u_generic_vec2>
-  // #elif defined(U_GENERIC_FLOAT)
-  //   #include <u_generic_float>
-  // #endif
-
-  // int u_gen_ctrl_map_cnt = 0;
-
   float ${u}control1 = u_generic_controls[u_gen_ctrl_map_cnt++];
   float ${u}control2 = u_generic_controls[u_gen_ctrl_map_cnt++];
   float ${u}control3 = u_generic_controls[u_gen_ctrl_map_cnt++];
@@ -297,7 +286,7 @@ vec4 frag_explosion_circle(in float scale_down)
   #endif
 
   #ifdef U_TIME_FLOAT
-    float u_time = u_time_float;
+    float u_time = u_time;
   #endif
 
 

@@ -179,7 +179,7 @@ export class Bullet {
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR, name:'Bullet', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
-      // mesh.EnableGfx(MESH_ENABLE.GFX.FN_EXPLOSION_GLOW);
+      // mesh.EnableGfx(SID.SHAD.FN_EXPLOSION_GLOW);
       // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
       // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
       // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 5);
