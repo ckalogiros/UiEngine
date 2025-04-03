@@ -195,13 +195,8 @@ const fs_op_sdf_rect = `
       angle = v_angle;
     #endif
 
-    // FOR TESTING
-    float ctrl1 = 1.0;
-    float ctrl2 = 1.0;
     // float ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
     // float ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
-    scale_down *= ctrl1;
-    // FOR TESTING
     
     local_res *= scale_down;
     vec2 rCorners = vec2(v_rcorners) * scale_down;
@@ -220,10 +215,11 @@ const fs_op_sdf_rect = `
     }
     else vpos = abs(vpos);
     
-    float feather = 2.0;
+    float feather = 2.;
     
     vec2 dimentions = local_res-feather;
-    d = (length( max((vpos - (dimentions )) + rCorners.x*ctrl2, 0.0) ) - rCorners.x*ctrl2);
+    // d = length( max( (vpos - dimentions) + rCorners.x, 0.0) ) - rCorners.x; // Old impl, feather created  anomalies
+    d = length( max( (vpos - dimentions) + rCorners.x-feather, 0.0) ) - rCorners.x+feather;
     
     /** Smooth outline **/
     c = d;
@@ -235,24 +231,24 @@ const fs_op_sdf_rect = `
     sdf_rect_color = vec4(color, c);
 
 
-    /***********************************************/
+    // /***********************************************/
     // // Create shadow effect
-    // float intensity = 14.;
+    // float intensity = 4.;
     // float x = abs((v_pos2_x*.5 + (v_dim2_x/2.))/local_res.x) -0.;
     // float y = abs((v_pos2_y*.5 + (v_dim2_y/2.))/local_res.y) -0.;
 
-    // // if(x>y) sdf_rect_color.rgb *= max(min(sqrt(intensity*x*(1.0-y))*1.5, 1.), .3);
-    // // else  sdf_rect_color.rgb *= max(min(sqrt(intensity*y*(1.0-y))*1.5, 1.), .3);
+    // if(x>y) sdf_rect_color.rgb *= max(min(sqrt(intensity*x*(1.0-y))*1.5, 1.), .3);
+    // else  sdf_rect_color.rgb *= max(min(sqrt(intensity*y*(1.0-y))*1.5, 1.), .3);
 
     // // Calculate shadow
-    // // sdf_rect_color.rgb *= sqrt(intensity*x*(1.0-x));
-    // // sdf_rect_color.rgb *= sqrt(intensity*y*(1.0-y));
+    // sdf_rect_color.rgb *= sqrt(intensity*x*(1.0-x));
+    // sdf_rect_color.rgb *= sqrt(intensity*y*(1.0-y));
     // // clamp high color values
     // // sdf_rect_color.rgb *= min(sqrt(intensity*x*(1.0-x))*1.5, 1.);
     // // sdf_rect_color.rgb *= min(sqrt(intensity*y*(1.0-y))*1.5, 1.);
     // // Reduce black-ness
-    // sdf_rect_color.rgb *= max(min(sqrt(intensity*x*(1.0-x))*1.5, 1.), .3);
-    // sdf_rect_color.rgb *= max(min(sqrt(intensity*y*(1.0-y))*1.5, 1.), .3);
+    // // sdf_rect_color.rgb *= max(min(sqrt(intensity*x*(1.0-x))*1.5, 1.), .3);
+    // // sdf_rect_color.rgb *= max(min(sqrt(intensity*y*(1.0-y))*1.5, 1.), .3);
 
 
     /***********************************************/

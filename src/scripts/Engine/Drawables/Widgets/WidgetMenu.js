@@ -65,9 +65,9 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       // this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       
-      // this.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL | ALIGN_2.EXPAND;
-      this.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL | ALIGN_2.FIXED_WIDTH;
-      label.align.flags = ALIGN_2.HORIZONTAL;
+      // this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.EXPAND;
+      this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.FIXED_WIDTH;
+      label.align.flags = LAYOUT.HORIZONTAL;
       
       this.close_btn_idx = INT_NULL;
       this.minimize_btn_idx = INT_NULL;
@@ -488,7 +488,7 @@ export class Close_Button extends Widget_Button {
       this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.align.flags = ALIGN_2.HORIZONTAL|ALIGN_2.FLOAT_RIGHT;
+      this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT;
       
       this.SetName('close_btn');
 

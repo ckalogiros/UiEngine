@@ -84,8 +84,6 @@ export class Ball {
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[BALL_DIM_X, BALL_DIM_Y], col:color, name:'Ball',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BALL_DIM_X, });
 
-      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, vb_groupidx);
 
       mesh.Render();

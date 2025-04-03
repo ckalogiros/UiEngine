@@ -94,7 +94,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    const pad = 10;
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: GREY[1] }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners })
-   section.align.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
+   section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.StateEnable(MESH_STATE.IS_RESIZEABLE);
    section.SetName('BoardRotationsPanel');
@@ -108,7 +108,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    let k = 0;
    const cols = 5, rows = 12;
    const inner_pad = [size/8, size/16];
-   let align = ALIGN_2.HORIZONTAL
+   let align = LAYOUT.HORIZONTAL
    for (let i = 0; i < cols * rows; i++) {
 
       k += 1; if (k >= 4) k = 0;
@@ -124,7 +124,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pad: inner_pad, dim: dim, col: color }));
       Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color });
-      mesh.align.flags = (i % cols === 0) ? ALIGN_2.VERTICAL : align;
+      mesh.align.flags = (i % cols === 0) ? LAYOUT.VERTICAL : align;
       mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       section.AddItem(mesh);
 

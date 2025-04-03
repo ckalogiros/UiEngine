@@ -63,7 +63,7 @@ pressing the \"p\" key on the keyboard.\
 
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
-   section.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets');
 
@@ -74,7 +74,7 @@ pressing the \"p\" key on the keyboard.\
    /** Create the info for the user */
    const s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], col: TRANSPARENCY(GREY[1], .4), }));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
-   s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    s.SetName('Demo_widgets');
    section.AddItem(s);
 
@@ -85,22 +85,22 @@ pressing the \"p\" key on the keyboard.\
    // const info1 = Create_widget_label(_, text_sample_explainer1, _, [0, 0, 2], default_font, GREY[4], WHITE, [10, 10], _, _, font,);
    const info1 = Create_widget_label(Style_label_default_properties({ text: text_sample_explainer1, col: GREY[4], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: rcorners, });
-   info1.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info1.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info1);
 
    const info2 = Create_widget_label(Style_label_default_properties({ text: text_sample_explainer2, col: GREY[4], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info2, enable_sdf_rect: rcorners, });
-   info2.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info2.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info2);
 
    const info3 = Create_widget_label(Style_label_default_properties({ text: text_sample_explainer3, col: GREY[4], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: rcorners, });
-   info3.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info3.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info3);
 
    const info4 = Create_widget_label(Style_label_default_properties({ text: text_sample_explainer4, col: GREY[4], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: rcorners, });
-   info4.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info4.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info4);
 
 
@@ -158,20 +158,20 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [10, 20], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], col: TRANSPARENCY(GREY[3], .8) }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
-   section.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets_scrolled_labels');
 
 
    const info = Create_widget_label(Style_label_default_properties({ text: text_sample_scroller, col: GREY[2], text_col: GREENL[9], text_pad: text_pad, texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info, enable_sdf_rect: rcorners, });
-   info.align.flags = ALIGN_2.HORIZONTAL;
+   info.align.flags = LAYOUT.HORIZONTAL;
    info.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    section.AddItem(info);
 
    const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [15, 15], col: TRANSPARENCY(GREY[1], .8) }));
    Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, });
-   scrolled_section.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+   scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
 
    scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
    scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
@@ -190,7 +190,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       // const label = Create_widget_label(Style_label_default_properties({text:`${i}`, pos:[0, 0, 2], col:TRANSPARENCY(GetRandomColor(), 1.), text_pad:text_pad, texture_id:default_font, font_size:font_size}));
       const label = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 2], col: color, text_pad: text_pad, texture_id: default_font, font_size: font_size }));
       Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: rcorners, });
-      label.align.flags = ALIGN_2.VERTICAL;
+      label.align.flags = LAYOUT.VERTICAL;
       label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
       scrolled_section.AddItem(label);
       label.SetName(`${i}`);
@@ -298,34 +298,34 @@ nested layouts with well-aligned items.\
    root_s.AddItem(info);
 
 
-   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr), layout: ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF }));
+   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
    l1_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s, enable_sdf_rect: rcorners });
    l1_s.SetName('Section l1_s');
    root_s.AddItem(l1_s);
 
 
-   const l1_s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL }));
+   const l1_s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL }));
    Widget_gfx_ready_enable({ mesh: l1_s1, enable_sdf_rect: rcorners });
    l1_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    l1_s.AddItem(l1_s1);
    {
       {
-         const a = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[4], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL }));
+         const a = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[4], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL }));
          a.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: a, enable_sdf_rect: rcorners });
          l1_s1.AddItem(a);
-         const red111 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(YELLOWL[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+         const red111 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(YELLOWL[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
          red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: red111, enable_sdf_rect: rcorners });
          a.AddItem(red111);
-         const yel_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+         const yel_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
          yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: yel_1, enable_sdf_rect: rcorners });
          a.AddItem(yel_1);
       }
       {
-         const l4_s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREY[4], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL }));
+         const l4_s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREY[4], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL }));
          l4_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: l4_s1, enable_sdf_rect: rcorners });
          l1_s1.AddItem(l4_s1);
@@ -347,15 +347,15 @@ nested layouts with well-aligned items.\
          l4_s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: l4_s1, enable_sdf_rect: rcorners });
          l1_s1.AddItem(l4_s1);
-         const a = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+         const a = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
          a.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: a, enable_sdf_rect: rcorners });
          l4_s1.AddItem(a);
-         const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+         const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
          b.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: b, enable_sdf_rect: rcorners });
          l4_s1.AddItem(b);
-         const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+         const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
          c.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          Widget_gfx_ready_enable({ mesh: c, enable_sdf_rect: rcorners });
          l4_s1.AddItem(c);
@@ -363,7 +363,7 @@ nested layouts with well-aligned items.\
    }
 
 
-   const l1_s2 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+   const l1_s2 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [12, 12], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
    l1_s2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s2, enable_sdf_rect: rcorners });
    l1_s.AddItem(l1_s2);
@@ -372,23 +372,23 @@ nested layouts with well-aligned items.\
       a.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: a, enable_sdf_rect: rcorners });
       l1_s2.AddItem(a);
-      const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [13, 21], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [13, 21], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       b.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: b, enable_sdf_rect: rcorners });
       a.AddItem(b);
-      const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       c.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: c, enable_sdf_rect: rcorners });
       a.AddItem(c);
-      const red_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [30, 14], dim: min_size, col: TRANSPARENCY(PURPLER[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const red_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [30, 14], dim: min_size, col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: red_4, enable_sdf_rect: rcorners });
       a.AddItem(red_4);
-      const d = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [20, 20], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const d = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [20, 20], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       d.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: d, enable_sdf_rect: rcorners });
       a.AddItem(d);
-      const e = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [25, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[8], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const e = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [25, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[8], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       e.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: e, enable_sdf_rect: rcorners });
       a.AddItem(e);
@@ -399,42 +399,42 @@ nested layouts with well-aligned items.\
       a.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: a, enable_sdf_rect: rcorners });
       l1_s2.AddItem(a);
-      const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const b = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLE[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       b.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: b, enable_sdf_rect: rcorners });
       a.AddItem(b);
-      const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const c = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(BLUEL[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       c.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: c, enable_sdf_rect: rcorners });
       a.AddItem(c);
-      const d = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const d = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(GREEN[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       d.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: d, enable_sdf_rect: rcorners });
       a.AddItem(d);
-      const e = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[8], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const e = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(YELLOWR[8], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       e.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: e, enable_sdf_rect: rcorners });
       a.AddItem(e);
-      const red_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLER[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const red_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       red_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: red_4, enable_sdf_rect: rcorners });
       a.AddItem(red_4);
-      const yel_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLEB[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const yel_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(PURPLEB[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       yel_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: yel_4, enable_sdf_rect: rcorners });
       a.AddItem(yel_4);
-      const ora_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(ORANGEL[8], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const ora_4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(ORANGEL[8], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       ora_4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: ora_4, enable_sdf_rect: rcorners });
       a.AddItem(ora_4);
-      const yel = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(YELLOW[8], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+      const yel = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [14, 10], dim: min_size, col: TRANSPARENCY(YELLOW[8], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
       yel.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       Widget_gfx_ready_enable({ mesh: yel, enable_sdf_rect: rcorners });
       a.AddItem(yel);
    }
 
 
-   const aaa = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+   const aaa = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
    aaa.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: aaa, enable_sdf_rect: rcorners });
    l1_s.AddItem(aaa);
@@ -447,7 +447,7 @@ nested layouts with well-aligned items.\
          {
             {
 
-               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(ORANGEL[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(ORANGEL[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                Widget_gfx_ready_enable({ mesh: gry1_1, enable_sdf_rect: rcorners });
                l2_s1.AddItem(gry1_1);
@@ -469,7 +469,7 @@ nested layouts with well-aligned items.\
             }
             {
 
-               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREENL[7], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(GREENL[7], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                Widget_gfx_ready_enable({ mesh: gry1_1, enable_sdf_rect: rcorners });
                l2_s1.AddItem(gry1_1);
@@ -500,7 +500,7 @@ nested layouts with well-aligned items.\
          {
             {
 
-               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLER[8], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLER[8], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                Widget_gfx_ready_enable({ mesh: gry1_1, enable_sdf_rect: rcorners });
                l2_s1.AddItem(gry1_1);
@@ -522,7 +522,7 @@ nested layouts with well-aligned items.\
             }
             {
 
-               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLEB[9], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+               const gry1_1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: min_size, col: TRANSPARENCY(PURPLEB[9], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
                gry1_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                Widget_gfx_ready_enable({ mesh: gry1_1, enable_sdf_rect: rcorners });
                l2_s1.AddItem(gry1_1);
@@ -547,7 +547,7 @@ nested layouts with well-aligned items.\
       }
    }
 
-   const l1_s4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+   const l1_s4 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
    l1_s4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s4, enable_sdf_rect: rcorners });
    l1_s.AddItem(l1_s4);
@@ -577,7 +577,7 @@ nested layouts with well-aligned items.\
       Widget_gfx_ready_enable({ mesh: br, enable_sdf_rect: rcorners });
       l1_s4.AddItem(br);
    }
-   const l1_s5 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL }));
+   const l1_s5 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[2], tr), layout: LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL }));
    l1_s5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s5, enable_sdf_rect: rcorners });
    l1_s.AddItem(l1_s5);
@@ -634,41 +634,41 @@ ensuring they remain accessible when reopening a parent dropdown.\
    `;
 
    const Create_many_circles = (rcorners) => {
-      const s = Create_rect_mesh(Style_rect_default_properties({ pad: [2, 2], pos: [0, 0, 4], col: TRANSPARENCY(GREY[2], .8), layout: ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF }));
+      const s = Create_rect_mesh(Style_rect_default_properties({ pad: [2, 2], pos: [0, 0, 4], col: TRANSPARENCY(GREY[2], .8), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
       s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(BLUEL[9], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(BLUEL[9], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOWR[8], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOWR[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLEB[8], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLEB[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLER[7], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLER[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(ORANGEL[8], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(ORANGEL[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOW[8], .8), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOW[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
          s1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); s.AddItem(s1)
       }
@@ -687,7 +687,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
    // if (!PLATFORM.ANY_SMARTPHONE_DEVICE) font_size = 8;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), layout: ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets_dropdown')
@@ -764,12 +764,12 @@ ensuring they remain accessible when reopening a parent dropdown.\
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
 
 
-                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some SDF font symbols', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: GREEN[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: REDL[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20, layout: ALIGN_2.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: YELLOWR[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21, layout: ALIGN_2.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some SDF font symbols', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: GREEN[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: REDL[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20, layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: YELLOWR[9], texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21, layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
 
-                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
+                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
                   {
                      const sub_dp1_count = 2;
                      const sub_dp2_count = 3;
@@ -782,7 +782,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                      const col = YELLOWR[7];
                      for (let i = 0; i < sub_dp1_count; i++) {
 
-                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
                         Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, })
                         dpsub4.AddToMenu(dp_1);
                         dp_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -790,7 +790,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                         const col1 = TRANSPARENCY(PURPLEB[6], 1.);
                         for (let j = 0; j < sub_dp2_count; j++) {
 
-                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
                            Widget_gfx_ready_enable({ mesh: dp_2, enable_sdf_rect: dp_rcorners, })
                            dp_1.AddToMenu(dp_2);
                            dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -849,11 +849,11 @@ ensuring they remain accessible when reopening a parent dropdown.\
                   { const s = Create_many_circles(rcorners); dpsub4.AddToMenu(s); }
 
 
-                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some simple textures', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [256 / 2, 256 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.SMOKE_1, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [32 / 2, 32 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.COIN, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [64 / 2, 73 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.TEST_APPLE, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: ALIGN_2.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
+                  const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some simple textures', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [256 / 2, 256 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.SMOKE_1, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [32 / 2, 32 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.COIN, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [64 / 2, 73 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.TEST_APPLE, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
                   {
                      const sub_dp1_count = 2;
                      const sub_dp2_count = 3;
@@ -866,7 +866,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                      const col = YELLOWR[7];
                      for (let i = 0; i < sub_dp1_count; i++) {
 
-                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
                         Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, })
                         dpsub4.AddToMenu(dp_1);
                         dp_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -874,7 +874,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                         const col1 = TRANSPARENCY(PURPLEB[6], 1.);
                         for (let j = 0; j < sub_dp2_count; j++) {
 
-                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL }));
+                           const dp_2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
                            Widget_gfx_ready_enable({ mesh: dp_2, enable_sdf_rect: dp_rcorners, })
                            dp_1.AddToMenu(dp_2);
                            dp_2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -956,7 +956,7 @@ GENERIC WIDGETS\
 
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, options: SECTION.HORIZONTAL, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], dim: [100, 100], col: TRANSPARENCY(GREY[3], .6), }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
-   section.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets');
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -968,7 +968,7 @@ GENERIC WIDGETS\
    /** Create the info for the uuser */
    const info = Create_widget_label(Style_label_default_properties({ text: text_sample_widgets, col: GREY[4], text_col: WHITE, text_pad: [10, 10], texture_id: default_font, font_size: font_size, }));
    Widget_gfx_ready_enable({ mesh: info, enable_sdf_rect: rcorners, });
-   info.align.flags = ALIGN_2.HORIZONTAL;
+   info.align.flags = LAYOUT.HORIZONTAL;
    section.AddItem(info);
 
 
@@ -978,19 +978,19 @@ GENERIC WIDGETS\
    {
       const s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[3], .4) }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
-      s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+      s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
       s.SetName('Button panel');
       section.AddItem(s);
 
       const btn = Create_widget_button(Style_button_default_properties({ text: 'Button', align: ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, col: BLUEL[7], text_col: WHITE, text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
       Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: rcorners, });
-      btn.align.flags = ALIGN_2.HORIZONTAL;
+      btn.align.flags = LAYOUT.HORIZONTAL;
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       s.AddItem(btn);
 
       const label = Create_widget_label(Style_label_default_properties({ text: '000', col: GREY[2], text_col: GREENL[9], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
       Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: rcorners, });
-      label.align.flags = ALIGN_2.HORIZONTAL
+      label.align.flags = LAYOUT.HORIZONTAL
       s.AddItem(label);
 
       const params = { counter: 0, }
@@ -1008,7 +1008,7 @@ GENERIC WIDGETS\
    {
       const s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[3], .4), }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
-      s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+      s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
       s.SetName('Switches panel');
       section.AddItem(s);
 
@@ -1017,13 +1017,13 @@ GENERIC WIDGETS\
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[4], .4), }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
-         s1.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         s1.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
          s1.SetName('One Switch panel');
          s.AddItem(s1);
 
          const switch1 = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 0], size: switch_size, col: YELLOWR[7], pad: switch_pad, }));
          Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], });
-         switch1.align.flags = ALIGN_2.VERTICAL;
+         switch1.align.flags = LAYOUT.VERTICAL;
          s1.AddItem(switch1);
          switch1.Bind(
             () => {
@@ -1037,18 +1037,18 @@ GENERIC WIDGETS\
          );
          const label = Create_widget_label(Style_label_default_properties({ text: 'off', col: GREY[2], text_col: GREY[5], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: switch1.geom.dim[1], });
-         label.align.flags = ALIGN_2.HORIZONTAL;
+         label.align.flags = LAYOUT.HORIZONTAL;
          s1.AddItem(label);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[4], .4), }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
-         s1.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         s1.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
          s1.SetName('One Switch panel');
          s.AddItem(s1);
          const switch1 = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 0], size: switch_size, col: PURPLER[7], pad: switch_pad, }));
          Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], });
-         switch1.align.flags = ALIGN_2.HORIZONTAL;
+         switch1.align.flags = LAYOUT.HORIZONTAL;
          s1.AddItem(switch1);
          switch1.Bind(
             () => {
@@ -1062,19 +1062,19 @@ GENERIC WIDGETS\
          );
          const label = Create_widget_label(Style_label_default_properties({ text: 'off', col: GREY[2], text_col: GREY[5], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: switch1.geom.dim[1], });
-         label.align.flags = ALIGN_2.HORIZONTAL;
+         label.align.flags = LAYOUT.HORIZONTAL;
          s1.AddItem(label);
 
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[4], .4), }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, });
-         s1.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+         s1.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
          s1.SetName('One Switch panel');
          s.AddItem(s1);
          const switch1 = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 0], size: switch_size, col: BLUEL[7], pad: switch_pad, }));
          Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], });
-         switch1.align.flags = ALIGN_2.VERTICAL;
+         switch1.align.flags = LAYOUT.VERTICAL;
          s1.AddItem(switch1);
          switch1.Bind(
             () => {
@@ -1088,7 +1088,7 @@ GENERIC WIDGETS\
          );
          const label = Create_widget_label(Style_label_default_properties({ text: 'off', col: GREY[2], text_col: GREY[5], text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: switch1.geom.dim[1], });
-         label.align.flags = ALIGN_2.HORIZONTAL;
+         label.align.flags = LAYOUT.HORIZONTAL;
          s1.AddItem(label);
       }
 
@@ -1099,20 +1099,20 @@ GENERIC WIDGETS\
    {
       const s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[3], .4) }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
-      s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+      s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
       s.SetName('Slider panel');
       section.AddItem(s);
 
       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 1], dim: [100, 10], col: TRANSPARENCY(GREY[2], .6), name: 'Test slider', texture_id: default_font, font_size: font_size }));
       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, });
       // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners, 6);
-      slider.align.flags = ALIGN_2.VERTICAL;
+      slider.align.flags = LAYOUT.VERTICAL;
       slider.SetInitialValue(0);
       s.AddItem(slider);
 
       const label = Create_widget_label(Style_label_default_properties({ text: 'Move slider', col: GREY[5], texture_id: default_font, font_size: font_size - 1, }));
       Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: rcorners, });
-      label.align.flags = ALIGN_2.VERTICAL;
+      label.align.flags = LAYOUT.VERTICAL;
       s.AddItem(label);
 
       const clbk_params = { label: label, posx: s.geom.pos[0] + label.geom.pos[0] };
@@ -1123,9 +1123,11 @@ GENERIC WIDGETS\
             if (label.gfx === null) return;
 
             const dist = label.geom.pos[0] + (label.geom.dim[0]) * (slider_val + 1);
-            label.SetPosX(dist);
+            // label.SetWposXFromAddWPos(dist);
+            label.SetWposX(dist);
+            // label.AddWposX(dist);
             const pad = label.StylesGetPad(STYLES.AXIS.X);
-            label.text_mesh.SetPosX(dist - label.geom.dim[0] + pad * 2);
+            label.text_mesh.SetWposXFromAddWPos(dist - label.text_mesh.text_width + pad * 2);
          },
          clbk_params,
       );
@@ -1189,7 +1191,7 @@ WIDGET: COLOR-PICKER\
 
    // const colorpicker = Demo_widgets_colorpicker(0x0, 0, 0, _, _, _, _, _, _, 0x0,);
    const colorpicker = Demo_widgets_colorpicker(0x0, 0, 0, _, _, _, _, _, _, 0x0);
-   colorpicker.align.flags = ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF;
+   colorpicker.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF;
    colorpicker.SetTransparencySliderSetInitialValue(1);
    colorpicker.SetHueSliderSetInitialValue(.2);
 
@@ -1295,7 +1297,7 @@ Adjust the font size using the slider.
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 4, });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Msdf_text_info');
-   section.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
 
 
 
@@ -1305,29 +1307,29 @@ Adjust the font size using the slider.
    const s = Create_rect_mesh(Style_rect_default_properties({ options: SECTION.VERTICAL, pad: [10, 10], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[1], .4) }));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: 4, });
    s.SetName('Msdf_text_info_sub_section');
-   s.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.HORIZONTAL;
+   s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    section.AddItem(s);
 
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = 10;
    const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
    Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-   info1.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info1.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info1);
 
    const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
    Widget_gfx_ready_enable({ mesh: info2, enable_sdf_rect: 4, });
-   info2.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info2.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info2);
 
    const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
    Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: 4, });
-   info3.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info3.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info3);
 
    const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
    Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: 4, });
-   info4.align.flags = ALIGN_2.VERTICAL | ALIGN_2.EXPAND;
+   info4.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info4);
 
 
@@ -1470,48 +1472,48 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
       const blu = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(BLUEL[7], tr), [15, 15],);
       blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      blu.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+      blu.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
 
 
       const red = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(REDL[7], tr));
-      red.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+      red.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
       red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       blu.AddItem(red);
 
 
       {
          const black1 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREY[1], tr),);
-         black1.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+         black1.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
          black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          red.AddItem(black1);
 
          const grey11 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREY[4], tr),);
-         grey11.SetLayout(ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF);
+         grey11.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
          grey11.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(grey11);
 
          const red111 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(REDL[7], tr),);
-         red111.SetLayout(ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF);
+         red111.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
          red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          grey11.AddItem(red111);
 
          const yel_1 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(YELLOWR[7], tr),);
-         yel_1.SetLayout(ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF);
+         yel_1.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
          yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          grey11.AddItem(yel_1);
 
          const purp12 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(PURPLE[7], tr),);
-         purp12.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+         purp12.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
          purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(purp12);
 
          const blue13 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(BLUEL[5], tr),);
-         blue13.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+         blue13.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
          blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(blue13);
 
          const green14 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREEN[5], tr),);
-         green14.SetLayout(ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF);
+         green14.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
          green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(green14);
       }
@@ -1526,7 +1528,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
       // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
       // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      section.align.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
+      section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
 
 
 
@@ -1536,7 +1538,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
          // label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          // label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-         label.align.flags = ALIGN_2.VERTICAL;
+         label.align.flags = LAYOUT.VERTICAL;
          label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
          section.AddItem(label);
       }
@@ -1599,51 +1601,51 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    // Widget creation functions
    const Many_labels = (panel_col, align) => {
       const panel = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(panel_col, .4));
-      panel.align.flags = ALIGN_2.RESIZE_SELF | align;
-      { const l = Widget_ready_label(0x0, 'Hi', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
-      { const l = Widget_ready_label(0x0, 'This is', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
-      { const l = Widget_ready_label(0x0, 'a sample', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
-      { const l = Widget_ready_label(0x0, 'of labels', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
+      panel.align.flags = LAYOUT.RESIZE_SELF | align;
+      { const l = Widget_ready_label(0x0, 'Hi', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
+      { const l = Widget_ready_label(0x0, 'This is', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
+      { const l = Widget_ready_label(0x0, 'a sample', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
+      { const l = Widget_ready_label(0x0, 'of labels', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, GREY[4], _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
       return panel;
    }
    /** Test: Many section */
    const Many_sections = (panel_col, align) => {
       const panel = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(panel_col, .4));
-      panel.align.flags = ALIGN_2.RESIZE_SELF | align;
-      { const l = Widget_ready_label(0x0, 'Hover Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
+      panel.align.flags = LAYOUT.RESIZE_SELF | align;
+      { const l = Widget_ready_label(0x0, 'Hover Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
       const sections = Many_sections_builder();
-      sections.align.flags = ALIGN_2.RESIZE_SELF | ALIGN_2.VERTICAL;
+      sections.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
       panel.AddItem(sections);
       return panel;
    }
    /** Test: Sliders */
    const Many_sliders = (panel_col, align) => {
       const panel = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(panel_col, .4));
-      panel.align.flags = ALIGN_2.RESIZE_SELF | align;
-      { const l = Widget_ready_label(0x0, 'Slide Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
+      panel.align.flags = LAYOUT.RESIZE_SELF | align;
+      { const l = Widget_ready_label(0x0, 'Slide Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
       const slider = Widget_ready_slider(_, _,);
-      slider.align.flags = ALIGN_2.VERTICAL;
+      slider.align.flags = LAYOUT.VERTICAL;
       panel.AddItem(slider);
       return panel;
    }
    /** Test: Switches */
    const Many_switches = (panel_col, align) => {
       const panel = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(panel_col, .4));
-      panel.align.flags = ALIGN_2.RESIZE_SELF | align;
-      { const l = Widget_ready_label(0x0, 'Switch Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
-      { const switch1 = Widget_ready_switch(); switch1.align.flags = ALIGN_2.VERTICAL; panel.AddItem(switch1); }
-      { const switch1 = Widget_ready_switch(); switch1.align.flags = ALIGN_2.VERTICAL; panel.AddItem(switch1); }
-      { const switch1 = Widget_ready_switch(); switch1.SetLayout(ALIGN_2.VERTICAL); panel.AddItem(switch1); }
+      panel.align.flags = LAYOUT.RESIZE_SELF | align;
+      { const l = Widget_ready_label(0x0, 'Switch Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
+      { const switch1 = Widget_ready_switch(); switch1.align.flags = LAYOUT.VERTICAL; panel.AddItem(switch1); }
+      { const switch1 = Widget_ready_switch(); switch1.align.flags = LAYOUT.VERTICAL; panel.AddItem(switch1); }
+      { const switch1 = Widget_ready_switch(); switch1.SetLayout(LAYOUT.VERTICAL); panel.AddItem(switch1); }
       return panel;
    }
    /** Test: Scroller */
    const Many_scrollers = (panel_col, align) => {
       const panel = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(panel_col, .4));
-      panel.align.flags = ALIGN_2.RESIZE_SELF | align;
-      { const l = Widget_ready_label(0x0, 'Scroll Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = ALIGN_2.HORIZONTAL; }
+      panel.align.flags = LAYOUT.RESIZE_SELF | align;
+      { const l = Widget_ready_label(0x0, 'Scroll Me!', TEXTURES.MTSDF_CONSOLAS_1024, _, _, 10, panel_col, _, _,); panel.AddItem(l); l.align.flags = LAYOUT.HORIZONTAL; }
       const { scroller, clbk } = Many_labels_in_scroller();
       todo.clbk = clbk;
-      scroller.align.flags = ALIGN_2.VERTICAL | ALIGN_2.RESIZE_SELF;
+      scroller.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF;
       panel.AddItem(scroller);
       return panel;
    }
@@ -1665,7 +1667,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: 15 });
    // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
    // dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   dp.align.flags = ALIGN_2.HORIZONTAL | ALIGN_2.RESIZE_SELF;
+   dp.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -1681,14 +1683,14 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    let col = GetSequencedColor(color_intensity)
    for (let i = 0; i < sub_dp1_count; i++) {
 
-      const align_l1 = (i % 2) ? ALIGN_2.HORIZONTAL : ALIGN_2.VERTICAL;
+      const align_l1 = (i % 2) ? LAYOUT.HORIZONTAL : LAYOUT.VERTICAL;
 
       const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
       Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
       // dpsub1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
       // dpsub1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      dpsub1.align.flags = align_l1 | ALIGN_2.RESIZE_SELF
+      dpsub1.align.flags = align_l1 | LAYOUT.RESIZE_SELF
       dp.AddToMenu(dpsub1);
 
       { const l = Widget_ready_label(_, 'LEVEL 2!', _, _, _, _, ORANGE[5]); dpsub1.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
@@ -1697,15 +1699,15 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       col = GetSequencedColor(color_intensity)
       for (let j = 0; j < sub_dp2_count; j++) {
 
-         // const align_l2 = (j % 2) ? ALIGN_2.HORIZONTAL : ALIGN_2.VERTICAL; 
-         const align_l2 = ALIGN_2.VERTICAL;
+         // const align_l2 = (j % 2) ? LAYOUT.HORIZONTAL : LAYOUT.VERTICAL; 
+         const align_l2 = LAYOUT.VERTICAL;
 
          const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
          // dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
          // dpsub2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-         dpsub2.align.flags = align_l2 | ALIGN_2.RESIZE_SELF
+         dpsub2.align.flags = align_l2 | LAYOUT.RESIZE_SELF
          dpsub1.AddToMenu(dpsub2);
 
          { const l = Widget_ready_label(_, 'LEVEL 3!', _, _, _, _, ORANGE[7]); dpsub2.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
@@ -1722,18 +1724,18 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
             // { const l = Widget_ready_label(_, 'LEVEL 4!',_,_,_,_,ORANGE[9]); dpsub3.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
 
-            { const w = Many_labels(GetSequencedColor(color_intensity), ALIGN_2.VERTICAL); dpsub3.AddToMenu(w); }
-            { const w = Many_sections(GetSequencedColor(color_intensity), ALIGN_2.VERTICAL); dpsub3.AddToMenu(w); }
-            { const w = Many_switches(GetSequencedColor(color_intensity), ALIGN_2.HORIZONTAL); dpsub3.AddToMenu(w); }
-            { const w = Many_sliders(GetSequencedColor(color_intensity), ALIGN_2.VERTICAL); dpsub3.AddToMenu(w); }
-            // { const w = Many_scrollers(GetSequencedColor(color_intensity), ALIGN_2.VERTICAL); dpsub3.AddToMenu(w); }
+            { const w = Many_labels(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
+            { const w = Many_sections(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
+            { const w = Many_switches(GetSequencedColor(color_intensity), LAYOUT.HORIZONTAL); dpsub3.AddToMenu(w); }
+            { const w = Many_sliders(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
+            // { const w = Many_scrollers(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
 
          }
       }
 
    }
 
-   // { const w = Many_scrollers(GetSequencedColor(color_intensity), ALIGN_2.VERTICAL); dp.AddToMenu(w); }
+   // { const w = Many_scrollers(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dp.AddToMenu(w); }
 
 
    Align_pre_simple(dp)

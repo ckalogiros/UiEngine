@@ -161,70 +161,70 @@ export function Root_group_view_buffer_remove_root_byidx(root_bufferidx) {
 
 
 
-/** SAVE-DO NOT DELETE-remove widget_root with bach removal */
-export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, mesh_bufferidx, num_faces) {
+// /** SAVE-DO NOT DELETE-remove widget_root with bach removal */
+// export function Root_group_view_buffer_remove_element_byidx(root_bufferidx, batch_buffer_vbidx, mesh_bufferidx, num_faces) {
 
-   const HACK_INDEX = 0; // HACK: This is used only for none instanced geometries, where the vb and the start index of a mesh is the 0th element.
-   // TODO: To correct this, we must provide the vb responsible for the provided starts (of the attributes). 
+//    const HACK_INDEX = 0; // HACK: This is used only for none instanced geometries, where the vb and the start index of a mesh is the 0th element.
+//    // TODO: To correct this, we must provide the vb responsible for the provided starts (of the attributes). 
 
-   if (root_group_view_buffer.buffer[root_bufferidx] !== INT_NULL) {
+//    if (root_group_view_buffer.buffer[root_bufferidx] !== INT_NULL) {
 
-      const elem_found = Root_group_view_buffer_find_element_byidx(root_bufferidx, mesh_bufferidx);
+//       const elem_found = Root_group_view_buffer_find_element_byidx(root_bufferidx, mesh_bufferidx);
 
-      if (elem_found !== INT_NULL) {
-
-
-         /*********************************************************************************************************************************/
-         // Batch Remove num_faces
-
-         // For widget_root, active or inactive, the num_faces must be decrement, compare to widget_groups.
-         // const is_batch_vb_empty = Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces);
-         // // If batch-vb has 0 num_faces, set the batch-vb-meshidx to null.
-         // if (is_batch_vb_empty) _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
+//       if (elem_found !== INT_NULL) {
 
 
-         /**
-          * Replace the meshidx of the batch-vb(which is the root mesh for the spesific batch-vb[]),
-          * if it is the mesh to be removed, with any other available meshidx from the same batch-vb 
-          */
+//          /*********************************************************************************************************************************/
+//          // Batch Remove num_faces
 
-         // If the removed mesh happens to be root of any of the batch-vbs, we MUST replace it with the FIRST, same SID, mesh_bufferidx.
-         // else 
-
-         if (_root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx === mesh_bufferidx) {
-
-            // Unfortunately we have no other option but to search the meshes through widget_root_buffer
-
-            const len = root_group_view_buffer.buffer[root_bufferidx].boundary;
-            let new_root_meshidx = INT_NULL;
-            let min_start = 0xffff;
-            for (let i = 0; i < len; i++) {
-               const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[root_bufferidx].buffer[i]); // Get meshes through wigdet_root_buffer
+//          // For widget_root, active or inactive, the num_faces must be decrement, compare to widget_groups.
+//          // const is_batch_vb_empty = Widget_root_batch_update_decrement_accumulator(root_bufferidx, batch_buffer_vbidx, num_faces);
+//          // // If batch-vb has 0 num_faces, set the batch-vb-meshidx to null.
+//          // if (is_batch_vb_empty) _root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx = INT_NULL;
 
 
-               if (mesh &&
-                  mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
-                  mesh.gfx.vb.starts[HACK_INDEX] < min_start) {
+//          /**
+//           * Replace the meshidx of the batch-vb(which is the root mesh for the spesific batch-vb[]),
+//           * if it is the mesh to be removed, with any other available meshidx from the same batch-vb 
+//           */
 
-                  min_start = mesh.gfx.vb.starts[HACK_INDEX];
-                  new_root_meshidx = mesh.mesh_bufferidx;
-               }
+//          // If the removed mesh happens to be root of any of the batch-vbs, we MUST replace it with the FIRST, same SID, mesh_bufferidx.
+//          // else 
 
-            }
+//          if (_root_per_vb_meshidx_buffer.buffer[root_bufferidx].vb[batch_buffer_vbidx].meshidx === mesh_bufferidx) {
 
-         }
+//             // Unfortunately we have no other option but to search the meshes through widget_root_buffer
+
+//             const len = root_group_view_buffer.buffer[root_bufferidx].boundary;
+//             let new_root_meshidx = INT_NULL;
+//             let min_start = 0xffff;
+//             for (let i = 0; i < len; i++) {
+//                const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[root_bufferidx].buffer[i]); // Get meshes through wigdet_root_buffer
 
 
-         /*********************************************************************************************************************************/
-         // Batch Remove
-         root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxNoGapsVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
+//                if (mesh &&
+//                   mesh.batch_buffer_vbidx === batch_buffer_vbidx &&
+//                   mesh.gfx.vb.starts[HACK_INDEX] < min_start) {
 
-      }
-      else
-         console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
+//                   min_start = mesh.gfx.vb.starts[HACK_INDEX];
+//                   new_root_meshidx = mesh.mesh_bufferidx;
+//                }
 
-   }
-}
+//             }
+
+//          }
+
+
+//          /*********************************************************************************************************************************/
+//          // Batch Remove
+//          root_group_view_buffer.buffer[root_bufferidx].RemoveByIdxNoGapsVersion(elem_found, root_bufferidx, 'Root_group_view_buffer_remove_element_byidx');
+
+//       }
+//       else
+//          console.error('Widget root FAILED to remove element. root idx:', root_bufferidx, 'mesh_bufferidx', mesh_bufferidx, ' element idx:', elem_found,);
+
+//    }
+// }
 
 
 
@@ -884,7 +884,6 @@ export function Root_group_buffer_print_w1() {
                if (!mesh.gfx) {
                   console.warn('   ', j,
                      'ridx:', root_group_view_buffer.buffer[i].buffer[j],
-                     'batchidx', mesh.batch_buffer_vbidx,
                      'gfxidx', mesh.per_vb_bufferidx,
                      'msbidx', mesh.mesh_bufferidx,
                      'state', mesh.state.mask,
@@ -898,7 +897,6 @@ export function Root_group_buffer_print_w1() {
                      'msbidx', mesh.mesh_bufferidx,
                      'ridx:', mesh.root_bufferidx,
                      // 'is_gfx_inserted:', mesh.is_gfx_inserted,
-                     // 'batchidx', mesh.batch_buffer_vbidx,
                      // 'gfxidx', mesh.per_vb_bufferidx,
                      'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
                      'root_pos', mesh.root_posidx,

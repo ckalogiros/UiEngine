@@ -12,17 +12,8 @@ import { Texture_metrics_get_texture_pixel_size, Uv_get_uv_coords } from '../../
 
 
 
+/** */
 export class Material {
-
-   // sid;  Bitfield: Shader id for the material
-   // type;  Bitfield: 
-   // col;  Array: of[red,green,blue,alpha]
-   // defCol;  Array: Store the initial color, used as a storage buffer
-   // style;  Array: of [];
-   // uv;  Array: of [v1,u1,v2,u2]
-   // metrics_idx;  Value: The index of the uvmap data for the texture 
-   // texture_file_id;  Value: The textuure id of type 'TEXTURE.'
-   // texidx;  Value: The index of the texture
 
    // TODO
    // col_id; // An index to the Str_buffer. As a name, is the name of the shader's color attribute. 
@@ -46,8 +37,6 @@ export class Material {
       this.texture_file_id = INT_NULL;
       this.texidx = INT_NULL;
 
-
-      // if (Array.isArray(col[0])) {
       if (col[0].constructor === Float32Array) {
 
          const len = col.length;
@@ -68,84 +57,23 @@ export class Material {
       }
 
    }
-
-
    SetColorAllRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
       math.CopyArr3(this.defCol, col);
       Gl_set_rgb(gfx, this.col, num_faces);
    }
-
-
    SetColorRGB(col, gfx, num_faces) {
       math.CopyArr3(this.col, col);
       Gl_set_rgb(gfx, this.col, num_faces);
    }
-
-
    SetColorRGBA(col, gfx, num_faces) {
       math.CopyArr4(this.col, col);
       Gl_set_rgba(gfx, this.col, num_faces);
    }
 
-
-   // SetStyle(style) {
-
-   //    if (style !== undefined) {
-
-   //       this.style.rcorners = style.rcorners;
-   //       this.style.feather = style.feather;
-   //       this.style.border = style.border;
-   //    }
-   // }
-
-
-   SetCopyColor(col) {
-
-      // if((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !Array.isArray(col[0])){
-      if ((this.sid.attr & SID.ATTR.COL4_PER_VERTEX) && !(col[0].constructor === Float32Array)) {
-         alert('8816772');
-         return;
-      }
-
-      const len = this.col.length;
-      for (let i = 0; i < len; i++) {
-         const len2 = this.col[i].length;
-         for (let j = 0; j < len2; j++) {
-            this.col[i][j] = col[i][j];
-            this.defCol[i][j] = col[i][j];
-         }
-      }
-
-   }
-
-
-   Copy(mat = {}) {
-      alert('00188723')
-      if (mat instanceof Material) {
-
-         this.shad = mat.sid.shad;
-         this.attr = mat.sid.attr;
-         this.unif = mat.sid.unif;
-         this.pass = mat.sid.pass;
-         math.CopyArr4(this.col, mat.col);
-         math.CopyArr4(this.defCol, mat.defCol);
-         math.CopyArr4(this.uv, mat.uv);
-         math.CopyArr3(this.style, mat.style);
-         this.type = mat.type;
-         this.texture_file_id = mat.texture_file_id;
-         this.texidx = mat.texidx;
-         this.metrics_idx = mat.metrics_idx;
-
-      }
-   }
 }
-
-
-
-
+/** */
 export class Material_Font extends Material {
-
 
    constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, text = '', sdf_params = [.5, .5], variant_idx) {
 
@@ -168,11 +96,6 @@ export class Material_Font extends Material {
       this.sid.pass |= SID.ATTR.TEX2; //
       if (FONT_IS_MSDF(texture_file_id)) {
          this.sid.attr |= SID.ATTR.MSDF; // 
-         // this.sid.pass |= SID.ATTR.TEX2; //
-
-         // Catch WRONG texture config
-         // if(variant_idx !== INT)
-
       }
       this.type |= MESH_TYPE.FONT_MATERIAL;
 
@@ -191,12 +114,8 @@ export class Material_Font extends Material {
       }
    }
 }
-
-
-
 /** Used for texture atlases but not font rendering. The difference is that in a font atlas texture there are many characters to be represented via Text_Mesh class. */
 export class Material_Atlas_Texture extends Material {
-
 
    constructor(col = [1, 1, 1, 1], texture_file_id = INT_NULL, sub_tex_idx = INT_NULL, sdf_params = [.5, .5]) {
 
@@ -205,10 +124,10 @@ export class Material_Atlas_Texture extends Material {
       this.sdf_params = [0, 0];
       math.CopyArr2(this.sdf_params, sdf_params);
 
-      this.sid.attr |= SID.ATTR.TEX2; // 
-      this.sid.pass |= SID.ATTR.TEX2; //
+      this.sid.attr |= SID.ATTR.TEX2;
+      this.sid.pass |= SID.ATTR.TEX2;
       if (FONT_IS_MSDF(texture_file_id)) {
-         this.sid.attr |= SID.ATTR.MSDF; // 
+         this.sid.attr |= SID.ATTR.MSDF;
       }
       this.type |= MESH_TYPE.ATLAS_TEXTURE_MATERIAL;
 
@@ -230,7 +149,6 @@ export class Material_Atlas_Texture extends Material {
       }
    }
 }
-
 /** Used for Font rendering. This is the case where many font sizes are on the same atlas, so the variant_idx refers to the font size texture characters. */
 export class Material_Atlas_Texture_Variant extends Material {
 
@@ -267,7 +185,6 @@ export class Material_Atlas_Texture_Variant extends Material {
       }
    }
 }
-
 /**
  * If texture is an atlas imported from the engine,
  *    we should have metrics for it, so we get the uvs from it's metrics storage.

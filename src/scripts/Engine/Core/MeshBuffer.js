@@ -6,7 +6,7 @@ import { Create_widget_button, Create_widget_dropdown, Create_widget_section, Cr
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
-import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_element_byidx, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
+import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
 
 
 
@@ -87,9 +87,11 @@ export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferi
 
    const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
    temp_no_allocation_buffer[0][0] = pos[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   // temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
+   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2;
    temp_no_allocation_buffer[1][0] = pos[1];
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2;
+   // temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
 
    return temp_no_allocation_buffer;
 }
@@ -121,7 +123,7 @@ export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {
    else { // ...remove element, BUT the removed mesh may be root of a batch-vb or group-groupdata-vb
 
       // Root_group_view_buffer_remove_element_byidx(mesh.root_bufferidx, mesh_bufferidx);
-      Root_group_view_buffer_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
+      // Root_group_view_buffer_remove_element_byidx(mesh.root_bufferidx, mesh.batch_buffer_vbidx, mesh_bufferidx, mesh.geom.num_faces);
 
    }
 
@@ -498,7 +500,6 @@ export function Mesh_buffer_print_loop() {
             'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
             'vbgroupidx:', vb_groupidx,
             'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
-            'batchidx:', _mesh_buffer.buffer[i].batch_buffer_vbidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
             'child idx:', _mesh_buffer.buffer[i].idx,
             'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,

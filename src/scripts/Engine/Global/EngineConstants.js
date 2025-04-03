@@ -522,9 +522,8 @@ const ALIGN = {
 
 
 _CNT = 0x1;
-const ALIGN_2 = {
+const LAYOUT = {
 
-	RESIZE_PARENT: _CNT,
 	HORIZONTAL: _CNT <<= 0x1,
 	VERTICAL: _CNT <<= 0x1,
 	RESIZE_SELF: _CNT <<= 0x1,

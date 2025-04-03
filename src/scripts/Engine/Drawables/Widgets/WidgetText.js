@@ -633,7 +633,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL) {
+	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -697,7 +697,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
 			
 			// New align fix
-			new_text.align.flags = ALIGN_2.VERTICAL;
+			new_text.align.flags = LAYOUT.VERTICAL;
 		}
 		else if (this.alignment & ALIGN.HORIZONTAL) {
 			// new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
@@ -705,7 +705,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
 
 			// New align fix
-			new_text.align.flags = ALIGN_2.HORIZONTAL;
+			new_text.align.flags = LAYOUT.HORIZONTAL;
 		}
 
 		// const pos_dif = Align_self_get_dif(this.alignment, this.geom, new_text.geom, pad, prev_text_mesh.advancex);
@@ -948,18 +948,13 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	SetPosXY(x, y) {
-		super.SetPosXY(x, y);
+	SetWposXFromAddWPos(x) {
+		this.geom.SetWposXFromAddWPos(x);
 	}
 
 
-	SetPosX(x) {
-		super.SetPosX(x);
-	}
-
-
-	SetPosY(y) {
-		super.SetPosX(y);
+	SetWposYFromAddWPos(y) {
+		this.geom.SetWposYFromAddWPos(y);
 	}
 
 
@@ -1036,7 +1031,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// Set max width before current child calculation
 			if(max_width < accum_row_width) max_width = accum_row_width;
 
-			if(child.align.flags & ALIGN_2.HORIZONTAL){
+			if(child.align.flags & LAYOUT.HORIZONTAL){
 				
 				// posx += child_pad_x; // Add the padding of the current child
 				// posx = accum_row_width*2 + child_pad_x; // Add the padding of the current child
@@ -1045,7 +1040,7 @@ export class Widget_Multi_Text extends Widget_Text {
 				child.geom.pos[1] = posy;
 				accum_row_width += child.text_width+child_pad_x/2;
 			}
-			else if(child.align.flags & ALIGN_2.VERTICAL){
+			else if(child.align.flags & LAYOUT.VERTICAL){
 				
 				posx = pos_x+pad_x+child_pad_x;
 				posy = max_height*2 + child_pad_y

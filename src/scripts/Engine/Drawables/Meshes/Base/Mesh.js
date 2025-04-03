@@ -52,7 +52,6 @@ export class Mesh {
     type;       // BitField: All different class types of this mesh. 
     state;      // BitField: Mesh state. 
     event_flags;// Bitfield: Event flags
-    // alignment;  // BitField: Control this mesh's children alignment.
     gfx_pool_request;  // BitField: 
 
     gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
@@ -61,38 +60,26 @@ export class Mesh {
     align;           // Struct: Variables to define mesh's alignment
 
 
-
-    hover_margin; // Value: A margin to be set for hovering. // TODO: Abstract to a struct.
-    styles; // Array: Indexes to style_buffer, for margin, pdding, etc
-
-
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
     idx;        // Value: This is the index of the mesh in the parents's children buffer.
     sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
-    // scene_rootidx; // Value: An index that stores the mesh's location in a scene root_meshes[] buffer.
     fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
     root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
     per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
-    batch_fnidx; // Value: An index to the batch buffer of function pointers
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
     batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
-    batchidx;   // Value: An index to the mesh refference in the batch buffer. 
     group_bufferidxs; // Array[3]: The [0] is the index of the group in the group buffer. The [1] is the index to the elem of the array representing the vertex buffer of this mesh, and [2] is the index of the buffer this mesh's index is stored to. 
 
     parent;     // Pointer: to the parent mesh.
     children;   // Buffer: of pointers to children mesh.
-    // children_all; // Indexes of mesh's all children (active and inactive).. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove variable
-    // children_removed; // Indexes of mesh's removed children. Indexes to MeshBuffer storage buffer. // TODO: Try not to use. If succeded, remove the variable
 
     geom;   // Class: Geometry: position, dimentions, ...
     mat;    // Class: Material: color, texture coordinates, ...
     gfx;    // Class: Graphics: start index, attributes count, vertexbuffer, shader program, ...
 
-    // is_batched_temp; // Bool: A way to tell if the mesh has been set to update in the batch buffer.
     is_gfx_inserted; // Bool: A way to tell if the mesh has been inserted to the graphics buffers.
     isFramebufferRendered; // Value: Stores the index of the framebuffer the mesh is rendered to. Else INT_NULL for no framebuffer rendering for this mesh.
 
-    // attrParams1; // Array: A vec4 array which a mesh can pass any values to the shaders.
     uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
     shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
 
@@ -115,17 +102,11 @@ export class Mesh {
     menu_options;       // Struct: A callback and an index. Constructs the options popup menu for the mesh
     menu_options_idx;   // Value: An index to the menu options handler's buffer
 
-
     name; // String:
     nameidx; // Index to Str buffer:
 
 
-    temp_align;
-
-
     constructor(geom = null, mat = null) {
-
-        this.temp_align = 0x0;
 
         this.geom = geom;
         this.mat = mat;
@@ -144,21 +125,14 @@ export class Mesh {
         };
 
 
-
-
-        // this.gfx_ctx_flags = 0x0;
         this.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         this.gfx_ctx_parent = INT_NULL;
 
 
-
-        // this.shader_ops_idxs = new Int8Array([INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, INT_NULL, ]);
         this.shader_ops_idxs = New_int8_buffer(8, 'Mesh.shader_ops_idxs');
         this.uniforms = [];
         if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-
-
 
 
         this.type = MESH_TYPE.MESH;
@@ -173,18 +147,14 @@ export class Mesh {
         this.idx = INT_NULL;
         this.sceneidx = STATE.scene.active_idx;
         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
-        this.batch_fnidx = INT_NULL;
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
         this.per_vb_bufferidx = INT_NULL;
-        this.batch_buffer_vbidx = INT_NULL;
-        this.batchidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
 
-        // this.align_flags = 0x0;
         this.align = {
-            flags: ALIGN_2.HORIZONTAL, // SEE: ALIGN_2 constant
+            flags: LAYOUT.HORIZONTAL, // SEE: LAYOUT constant
             pad_x: 0,
             pad_y: 0,
             margin_x: 0,
@@ -213,16 +183,9 @@ export class Mesh {
         this.has_children_scrollers = false;
 
 
-        this.hover_margin = [0, 0];
         this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
-
-        // TODO: IMPLEMENT
-        this.properties = {
-            padd: { x: 0, y: 0 },
-            margin: { x: 0, y: 0 },
-            hover_margin: { x: 0, y: 0 },
-        };
+        
 
 
         // IMIDIATELY: the .data is used only 3 times by DebugInfoUi.js. Same with .evtidx field. So maybe those 2 are separated to the DebugInfoUi.js file
@@ -234,17 +197,7 @@ export class Mesh {
 
     }
 
-
-    RemoveChildren() {
-
-        const count = this.children.boundary;
-        for (let i = 0; i < count; i++) {
-
-            this.children.RemoveByIdx(i);
-        }
-    }
-
-
+    /** */
     RemoveChildByIdx(idx) {
 
         this.children.RemoveByIdx(idx);
@@ -262,8 +215,7 @@ export class Mesh {
         if (print_res) console.log(msg)
         return ret
     }
-
-
+    /** */
     Destroy() {
         // console.log('DSTROY-Mesh class:', this.GetName())
 
@@ -396,8 +348,6 @@ export class Mesh {
 
         return shift_children;
     }
-
-
     /** Destoys only alocated buffers by the Mesh */
     DestroyAlocatedBuffers() {
 
@@ -418,37 +368,7 @@ export class Mesh {
         // if (this.rel_comp) this.rel_comp.Destroy();
 
     }
-
-
-    ActivateAndChildren() {
-        this.state.mask |= MESH_STATE.ACTIVE;
-        for (let i = 0; i <= this.children.boundary; i++) {
-            const child = this.children.buffer[i];
-            if (child) child.state.mask |= MESH_STATE.ACTIVE;
-        }
-    }
-
-
-    ActivateAndChildrenRecursive() {
-        this.state.mask |= MESH_STATE.ACTIVE;
-        for (let i = 0; i <= this.children.boundary; i++) {
-
-            const child = this.children.buffer[i];
-            if (child) {
-
-                child.StateEnable(MESH_STATE.ACTIVE);
-                // child.state.mask |= MESH_STATE.ACTIVE;
-
-                if (child.children.boundary) {
-                    child.ActivateAndChildrenRecursive()
-                    if (child.text_mesh)
-                        child.text_mesh.state.mask |= MESH_STATE.ACTIVE;
-                }
-            }
-        }
-    }
-
-
+    /** */
     StateCheck(bit) { return this.state.mask & bit; }
 
 
@@ -461,6 +381,7 @@ export class Mesh {
     // Listeners
     /*******************************************************************************************************************************************************/
 
+    /** */
     CreateListenEvent(etype, is_fake_event = false) {
 
         if (!this.listeners) {
@@ -500,9 +421,8 @@ export class Mesh {
         }
 
     }
-
-
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
+    /** */
     AddListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
@@ -515,9 +435,8 @@ export class Mesh {
         const is_fake = (this.state.mask & MESH_STATE.IS_FAKE_EVENT) ? true : false;
         this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
     }
-
-
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
+    /** */
     ChangeListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
@@ -525,41 +444,20 @@ export class Mesh {
             Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
         }
     }
-
-
+    /** */
     RemoveAllListenEvents() {
-        // TODO The if's maybe better implemented in EventListeners class RemoveEvent()???
 
         if (!this.listeners) return;
 
-        // console.log('Removing listen events of', this.GetName())
         for (let i = 0; i <= this.listeners.boundary; i++) {
 
             if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
                 Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
-                // Listener_batch_destroy_store(i, this.listeners.buffer[i]);
                 this.listeners.buffer[i] = INT_NULL;
             }
         }
     }
-
-
-    /** Remove all mesh's listen events from the Listeners buffer struct, but keep the .listeners intact so that we may re-constuct the events for the mesh */
-    RemoveAllListenEventsNotSelf_RenameMe() {
-
-        if (!this.listeners) return;
-
-        console.log('Removing listen events NotSelf of', this.GetName())
-        for (let i = 0; i <= this.listeners.boundary; i++) {
-
-            if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
-                this.parent_event = Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
-                // this.listeners.buffer[i] = INT_NULL;
-            }
-        }
-    }
-
-
+    /** */
     CreateEventCallback(params = null, event_clbks_resolve_fn = null) {
 
         if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
@@ -576,10 +474,6 @@ export class Mesh {
     }
 
 
-    SetActiveEventCallback(evt_clbk_idx) {
-        this.current_event_callback_idx = evt_clbk_idx;
-    }
-
 
 
 
@@ -589,56 +483,22 @@ export class Mesh {
     // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
-
+    /** */
     SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+    /** */
     SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
+    /** */
     SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
-
-    SetDefaultPosXY() { this.SetUpdateFrameBuffer(); this.geom.SetDefaultPosXY(this.gfx); }
-
-    // TODO: Update the .pos of the mesh for the rest of the methods
-    SetWposXY(x, y) {
-        this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x - this.geom.dim[0];
-        this.geom.pos[1] = y - this.geom.dim[1];
-        this.geom.SetWposXY(this.gfx, x, y,);
-    }
-    SetWposX(x) {
-        this.SetUpdateFrameBuffer();
-        this.geom.pos[0] = x - this.geom.dim[0];
-        this.geom.SetWposX(this.gfx, x);
-    }
-    SetWposY(y) {
-        this.SetUpdateFrameBuffer();
-        this.geom.pos[1] = y - this.geom.dim[1];
-        this.geom.SetWposY(this.gfx, y);
-    }
-
-
-    SetPosXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y); }
-    SetPosX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
-    SetPosY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
-
+    /** */
+    SetWposXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y,); }
+    /** */
+    SetWposX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
+    /** */
+    SetWposY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
 
     SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
 
-
-    GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
-
-
-    GetPosXYZ() {
-
-        const pos = [0, 0, this.geom.pos[2]];
-
-        const p = this.GetPosXY();
-        pos[0] += p[0];
-        pos[1] += p[1];
-
-
-        return pos;
-    }
-
-
+    /** */
     GetPosXY() {
 
         const p = Mesh_unif_get_vb_root_wpos(this.root_posidx);
@@ -648,8 +508,7 @@ export class Mesh {
         pos[1] += this.geom.pos[1];
         return pos;
     }
-
-
+    /** */
     GetPosX() {
 
         // let p = Mesh_unif_get_vb_root_wposx(this.root_posidx) + Screen_wpos_get_x();
@@ -657,176 +516,47 @@ export class Mesh {
 
         return p + this.geom.pos[0];
     }
-
-
+    /** */
     GetPosY() {
 
         let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
         return p + this.geom.pos[1];
     }
-
-
-    AddWposXY(x, y) {
-        alert('776557776556 NOT TO BE USED')
-        // this.SetUpdateFrameBuffer();
-        // this.geom.pos[0] = x-this.geom.dim[0];
-        // this.geom.pos[1] = y-this.geom.dim[1];
-        // this.geom.AddWposXY(this.gfx, x, y);
-    }
-
-
+    /** */
     SetTime(t) {
         this.geom.time = t;
     }
 
 
 
+    /** */
     RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
+    /** */
     RotateAddZ(angle) { Gl_rotate_add_z_2d(this.gfx, this.geom.dim, angle); }
+    /** */
     RotateY(angle) { Gl_rotate_y_2d(this.gfx, this.geom.dim, angle); }
 
-
+    /** */
     StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
-
-
+    /** */
     StylesGetHoverMargin(axis = STYLES.AXIS.ALL) { return Styles_hover_margin_get(axis, this.styles); }
-
-
+    /** */
     StylesGetPad(axis = STYLES.AXIS.ALL) { return Styles_pad_get(axis, this.styles); }
-
-
+    /** */
     StylesSetMargin(margin) { Styles_margin_set(this.styles, margin); }
-
-
+    /** */
     StylesSetHoverMargin(margin) { Styles_hover_margin_set(this.styles, margin); }
-
-
+    /** */
     StylesSetPad(pad) { Styles_pad_set(this.styles, pad); }
+    /** */
     StylesSetPadX(pad_x) { Styles_pad_x_set(this.styles, pad_x); }
+    /** */
     StylesSetPadY(pad_y) { Styles_pad_y_set(this.styles, pad_y); }
 
-
+    /** */
     SetUpdateFrameBuffer() {
         if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
     }
-
-
-    SetName(name = null) {
-        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
-        /**DEBUG*/this.name = name
-    }
-
-
-
-    // EnableGfx(which, params = null) {
-
-    //     switch (which) {
-
-    //         case MESH_ENABLE.GFX.PASS_VPOS2: { this.sid.pass |= SID.ATTR.VPOS2; break; }
-    //         case MESH_ENABLE.GFX.PASS_WPOS2: { this.sid.pass |= SID.ATTR.WPOS3; break; }
-    //         case MESH_ENABLE.GFX.ATTR_DIM2: { this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2; break; }
-    //         case MESH_ENABLE.GFX.ATTR_TEX2: { this.sid.attr |= SID.ATTR.TEX2; this.sid.pass |= SID.ATTR.TEX2; break; }
-    //         case MESH_ENABLE.GFX.ATTR_GENERIC_VEC2: {
-    //             this.sid.attr |= SID.ATTR.GENERIC2;
-    //             this.sid.pass |= SID.ATTR.GENERIC2;
-    //             if (params !== null) {
-    //                 this.geom.generic = params;
-    //             }
-    //             break;
-    //         }
-    //         case MESH_ENABLE.GFX.ATTR_TIME: {
-    //             this.sid.attr |= SID.ATTR.TIME;
-    //             this.sid.pass |= SID.ATTR.TIME;
-    //             if (params !== null) {
-    //                 this.geom.time = params;
-    //             }
-    //             break;
-    //         }
-    //         case MESH_ENABLE.GFX.ATTR_ANGLE: { this.sid.attr |= SID.ATTR.ANGLE; this.sid.pass |= SID.ATTR.ANGLE; break; }
-    //         // case MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY: { this.sid.attr |= SID.ATTR.GLOW_INTENSITY; this.sid.pass |= SID.ATTR.GLOW_INTENSITY; break; }
-    //         case MESH_ENABLE.GFX.PASS_RES2: { this.sid.pass |= SID.ATTR.RES2; break; }
-
-
-    //         case SID.SHAD.FN_GLOW: { this.sid.shad |= SID.SHAD.FN_GLOW; break; }
-    //         case MESH_ENABLE.GFX.FN_INNER_SHADOW: { this.sid.shad |= SID.SHAD.FN_INNER_SHADOW; break; }
-    //         case SID.SHAD.FN_EXPLOSION_CIRCLE: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE; break; }
-    //         case SID.SHAD.FN_EXPLOSION_GLOW: { this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW; break; }
-
-    //         case MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX: {
-    //             this.sid.attr |= SID.ATTR.COL4_PER_VERTEX;
-    //             this.sid.pass |= SID.ATTR.COL4_PER_VERTEX;
-    //             if (params !== null) {
-    //                 if ((params[0] instanceof Float32Array) === false)
-    //                     alert('988701199872 Color must be an array of colors for COL4_PER_VERTEX')
-    //                 if (this.mat.col[0] instanceof Float32Array) { CopyMat4(this.mat.col, params); CopyMat4(this.mat.defCol, params); }
-    //                 else { this.mat.col = params; }
-    //             }
-    //             break;
-    //         }
-    //         case MESH_ENABLE.GFX.ATTR_R_CORNERS: {
-    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-    //             this.sid.attr |= SID.ATTR.R_CORNERS; this.sid.pass |= SID.ATTR.R_CORNERS;
-    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-    //             if (params !== null) this.mat.style.rcorners = params;
-    //             break;
-    //         }
-    //         case MESH_ENABLE.GFX.ATTR_FEATHER: {
-    //             this.sid.attr |= SID.ATTR.FEATHER; this.sid.pass |= SID.ATTR.FEATHER;
-    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-    //             if (params !== null) this.mat.style.feather = params;
-    //             break;
-    //         }
-    //         case MESH_ENABLE.GFX.ATTR_BORDER: {
-    //             this.sid.attr |= SID.ATTR.BORDER; this.sid.pass |= SID.ATTR.BORDER;
-    //             this.sid.pass |= SID.ATTR.VPOS2 | SID.ATTR.WPOS3;
-    //             this.sid.attr |= SID.ATTR.DIM2; this.sid.pass |= SID.ATTR.DIM2;
-    //             if (params !== null) this.mat.style.border = params;
-    //             break;
-    //         }
-
-
-    //         // Shader Color Functions
-    //         case SID.SHAD.FN_NOISE: {
-    //             // Exception: Use the 'params' to distinguish different worley noises 
-    //             if (!params || params === 1) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
-    //             else if (params === 2) { this.sid.fx |= SID.SHAD.FN_NOISE; break; }
-    //         }
-    //         case MESH_ENABLE.GFX.FN_GLOW_SPHERE: {
-    //             if (this.sid.blend_options === 0x0) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-    //             // if(params===null) alert('Blend Mode MUST be enabled for shader: MESH_ENABLE.GFX.FN_GLOW_SPHERE')
-    //             this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE; break;
-    //         }
-    //         case MESH_ENABLE.GFX.FN_NOISE_WORLEY: {
-    //             // Exception: Use the 'params' to distinguish different worley noises 
-    //             if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; break; }
-    //             else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; break; }
-    //             else if (params === 3) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; break; }
-    //         }
-    //         case MESH_ENABLE.GFX.FN_NOISE_VORONOI: {
-    //             // Exception: Use the 'params' to distinguish different worley noises 
-    //             if (!params || params === 1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; break; }
-    //             else if (params === 2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; break; }
-    //         }
-
-    //         case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
-
-
-
-    //         case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-    //         case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-    //         case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
-    //         case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-    //         // case MESH_ENABLE.GFX.FLARE: {
-    //         //     // this.sid.shad |= SID.SHADER_OPERATIONS.FLARE; 
-    //         //     // if(params === null) alert('665518665518 params should not be null');
-    //         //     if (params !== null) this.shader_ops_idxs.Add(Program_store_shader_operations(params.function_operation, params.blend_mode));
-    //         //     break;
-    //         // }
-
-    //     }
-
-    // }
 
 
     /**
@@ -898,6 +628,7 @@ export class Mesh {
         }
 
     }
+    /** */
     GfxEnableAttr(flags, params) {
 
         if (flags & SID.ATTR.DIM2) { this.sid.attr |= SID.ATTR.DIM2; }
@@ -917,6 +648,7 @@ export class Mesh {
         }
 
     }
+    /** */
     GfxPassAttr(flags) {
 
         if (flags & SID.ATTR.VPOS2) this.sid.pass |= SID.ATTR.VPOS2;
@@ -939,6 +671,7 @@ export class Mesh {
     GfxEnableBlend(blend_flags) {
         this.sid.blend_options |= blend_flags;
     }
+    /** */
     GfxEnableFn(flags, params) {
 
         // Enable shader function calls (from shader main())
@@ -1007,6 +740,7 @@ export class Mesh {
         // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
         // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
     }
+    /** */
     EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
@@ -1049,6 +783,7 @@ export class Mesh {
         }
 
     }
+    /** */
     SetClbkGfxUniforms(unif_name, Clbk, clbk_params) {
 
         // Find uniform
@@ -1090,6 +825,7 @@ export class Mesh {
 
 
     }
+    /** */
     GfxUniformSetAndUpdate(unif_name, value, value_idx = null) {
 
         /**ERROR */ if (this.gfx === null) alert('Try to update uniform before mesh has gfx.')
@@ -1116,7 +852,7 @@ export class Mesh {
         }
     }
 
-
+    /** */
     AddChildScrollerIdx(scroller_comp_idx) {
         /**
          * In order for a root widget to have access to all scrollers of any of it's children meshes,
@@ -1128,6 +864,13 @@ export class Mesh {
     }
 
 
+    /** */
+    SetName(name = null) {
+        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
+        /**DEBUG*/this.name = name
+    }
+    /** */
+    GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
 
 }
 

@@ -49,7 +49,7 @@ export class Text_Mesh extends Mesh {
       this.last_charidx = properties.text.length;
       
       this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;
-      this.properties.font_size = properties.font_size;
+      this.font_size = properties.font_size;
 
       this.text_width = 0;
       this.text_height = 0;
@@ -203,9 +203,8 @@ export class Text_Mesh extends Mesh {
 
    }
 
-   SetPosX(x) {
-
-      this.geom.SetPosX(this.gfx, x, this.geom.num_faces);
+   SetWposXFromAddWPos(x) {
+      this.geom.SetWposXFromAddWPos(this.gfx, x, this.geom.num_faces);
 
    }
    AddWposX(x) {

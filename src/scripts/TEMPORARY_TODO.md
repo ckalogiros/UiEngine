@@ -1,7 +1,8 @@
 TODO
 
-* For the comet we need to tell the shader builder not to assign any src_color at the end of the fragment shader:
-   Use flags???
+* Re-implement 'current_event_callback_idx' and 'event_clbks_resolve_fn' for many callbacks in a Mesh
+
+* Align_NEW rename to align or layout and remove Align() if it is unused(check to see)
 
 * IMMIDIATELY: Separate font-symbols and texture rendering shaders
 
@@ -19,22 +20,8 @@ TODO
    2. Then on the shader side we already have a counter to pass through different functions, so we are OK in the shaders
 
 
-* Remove any anecessary vpos pass in Arkanoid
-* Add 'u_scale' to Widget_gfx_enable
-* Add 'attr_time' to Widget_gfx_enable
-* Add 'ATTR_GENERIC_VEC2' to Widget_gfx_enable
-* Implement 'blend color' to Widget_gfx_enable
 
-* Demo comet:
-   Use the new generic uniform collector to automaticaly set the slider controls
-   Resolve the controls for glow particles. Implement a way to choose which controls to enable, from the comet function call
-* Particles are not ROUND!!!
-
-* Implement slider controls also for vb attributes (not only uniforms)
-
-* DROPDOWN WIDGET
-   * Create Style btn for the dp btn in the construction via Style_dropdown...
-   * Render dp with scrolller
+* Render dp with scrolller
 
 * Currently we render a 4 color vertex buffers support.
    So it is free to create color gradiants for all meshes.
@@ -52,7 +39,7 @@ Example
    const infomesh = Create_widget_multi_text({
       align:ALIGN.HORIZONTAL, // DOES NOT STORE THE ALIGN IN THE CONSTRUCTOR
    });
-   infomesh.align.flags = ALIGN_2.HORIZONTAL;
+   infomesh.align.flags = LAYOUT.HORIZONTAL;
 
 * Create_widget_multi_text,
    remove OLD Align:ALIGN.HORIZONTAL OR rename it to corespond a specific alignment for multi-text,

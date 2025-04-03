@@ -17,257 +17,7 @@ import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive,
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 
 
-// export class Rect extends Mesh {
-
-//    constructor(pos = POSITION_CENTER, dim = [10, 10], col, num_faces, is_debug_mesh = 0x0) {
-
-//       // num_faces = 1
-//       const geom = new Geometry2D(pos, dim, _, num_faces);
-//       const mat = new Material(col);
-
-//       super(geom, mat);
-
-//       this.type |= MESH_TYPE.RECT_MESH | is_debug_mesh;
-
-//    }
-
-
-
-
-
-//    /****************************************************************************************************************************************************/
-//    /****************************************************************************************************************************************************/
-//    // OVERIDEN METHODS
-//    /****************************************************************************************************************************************************/
-//    Activate() {
-
-//       this.state.mask |= MESH_STATE.ACTIVE;
-//    }
-
-
-//    Deactivate() {
-
-//       this.state.mask &= ~MESH_STATE.ACTIVE;
-//    }
-
-
-//    StateEnable(MASK = 0x0) {
-
-//       this.state.mask |= MASK;
-//    }
-
-
-//    StateDisable(MASK = 0x0) {
-
-//       this.state.mask &= ~MASK;
-//    }
-
-
-//    SetTypeDebug() {
-//       this.type |= MESH_TYPE.DEBUG_MESH;
-//    }
-
-
-//    AddToWidgetRootBuffer(root_bufferidx) {
-
-//       this.root_bufferidx = root_bufferidx;
-//       Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
-
-//    }
-
-
-//    AddChild(mesh) {
-
-//       mesh.idx = this.children.Add(mesh);
-
-//       mesh.parent = this;
-
-//       return mesh.idx;
-//    }
-
-
-
-//    // RemoveFromMeshPerVbBuffer() {
-//    //    Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-//    // }
-
-
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Graphics
-//    /*******************************************************************************************************************************************************/
-
-//    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
-
-//       if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
-
-//       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
-
-//       return this.gfx;
-//    }
-
-
-//    AddToGfx() {
-
-//       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
-//       this.is_gfx_inserted = true;
-
-//       // Add entry to Gfx Buffer
-//       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
-//       // return this.gfx.vb.starts;
-//    }
-
-
-//    AddToGfxFromReset() {
-
-//       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-//       Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
-
-//       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-//       this.is_gfx_inserted = true;
-
-//       // Add entry to Gfx Buffer
-//       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
-//    }
-
-
-//    // TODO: Use it
-//    UpdateGfx() {
-
-//       if (this.is_gfx_inserted)
-//          Vertex_buffer_update_vertices(this.gfx, this.geom, this.mat, this.GetName())
-//       else {
-//          Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
-//          this.is_gfx_inserted = true;
-//       }
-
-//       return this.gfx.vb.start;
-//    }
-
-
-
-
-
-//    /*******************************************************************************************************************************************************/
-//    // Setters-Getters
-//    /*******************************************************************************************************************************************************/
-
-//    GetMaxWidth() { return this.geom.dim[0]; }
-
-
-//    GetMaxHeight() { return this.geom.dim[1]; }
-
-
-//    SetIsGfxInserted(flag) {
-//       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
-//    }
-
-
-//    SetPosX(x) {
-//       super.SetPosX(x);
-//    }
-
-
-//    SetFrameBufferIdx(fbidx) {
-//       this.isFramebufferRendered = fbidx;
-//    }
-
-
-//    SetPosXNoGfxUpdate(x) {
-//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-//          Mesh_unif_set_vb_root_wposx(this.root_posidx, x);
-//       }
-//       else this.geom.pos[0] = x;
-//    }
-
-
-//    SetPosYNoGfxUpdate(y) {
-//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-//          Mesh_unif_set_vb_root_wposy(this.root_posidx, y);
-//       }
-//       else this.geom.pos[1] = y;
-//    }
-
-
-//    SetPosZNoGfxUpdate(val) {
-//       this.geom.pos[2] = val;
-//    }
-
-
-//    SetPosXYNoGfxUpdate(x, y) {
-//       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
-//          Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
-//       }
-//       else {
-//          this.geom.pos[0] = x;
-//          this.geom.pos[1] = y;
-//       }
-//    }
-
-
-//    MoveNoGfxUpdate(x, y) {
-
-//       this.geom.pos[0] += x;
-//       this.geom.pos[1] += y;
-//    }
-
-
-//    MoveYNoGfxUpdate(y) {
-
-//       this.geom.pos[1] += y;
-//    }
-
-
-//    MoveXNoGfxUpdate(x) {
-
-//       this.geom.pos[0] += x;
-//    }
-
-
-//    SetDimNoGfxUpdate(x, y) {
-
-//       this.geom.dim[0] = x;
-//       this.geom.pos[1] = y;
-//    }
-
-
-//    SetDimYNoGfxUpdate(y) {
-
-//       this.geom.dim[1] = y;
-//    }
-
-
-//    SetDimXNoGfxUpdate(x) {
-
-//       this.geom.dim[0] = x;
-//    }
-
-
-//    TEMP_recalc(x, y) {
-//       this.geom.pos[0] = x;
-//       this.geom.pos[1] = y;
-//    }
-
-
-//    // SetMargin() {
-//    //    this.geom.dim[0] += this.StylesGetMargin(STYLES.AXIS.X);
-//    //    this.geom.dim[1] += this.StylesGetMargin(STYLES.AXIS.Y);
-//    // }
-
-
-
-// }
-
-
-
-
-
-// TODOS: 
-/**
+/*
  * Remove class Rect
  * Deal with the AddItem() and AddChild methods
  * What about the variable 'options'?
@@ -307,14 +57,17 @@ export class Rect_Mesh extends Mesh {
 
       this.SetLayout(properties.layout)
    }
+   /** */
    SetLayout(align_flags) {
 
       this.align.flags = align_flags;
    }
+   /** */
    AddLayout(align_flags) {
 
       this.align.flags |= align_flags;
    }
+   /** */
    AddItem(mesh, options = 0x0) {
 
       this.options |= options;
@@ -332,6 +85,7 @@ export class Rect_Mesh extends Mesh {
 
       return idx;
    }
+   /** */
    AddChild(mesh) {
 
       mesh.idx = this.children.Add(mesh);
@@ -345,6 +99,7 @@ export class Rect_Mesh extends Mesh {
 
    /****************************************************************************************************************************************************/
    // OVERIDEN METHODS
+   /** */
    Destroy() {
 
       for (let i = 0; i <= this.children.boundary; i++) {
@@ -352,6 +107,7 @@ export class Rect_Mesh extends Mesh {
       }
       return super.Destroy();
    }
+   /** */
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -359,6 +115,7 @@ export class Rect_Mesh extends Mesh {
          if (this.children.buffer[i]) this.children.buffer[i].Activate();
       }
    }
+   /** */
    Deactivate() {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
@@ -366,9 +123,13 @@ export class Rect_Mesh extends Mesh {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
    }
+   /** */
    StateEnable(MASK = 0x0) { this.state.mask |= MASK; }
+   /** */
    StateDisable(MASK = 0x0) { this.state.mask &= ~MASK; }
+   /** */
    SetTypeDebug() { this.type |= MESH_TYPE.DEBUG_MESH; }
+   /** */
    AddToWidgetRootBuffer(root_bufferidx) {
 
       this.root_bufferidx = root_bufferidx;
@@ -382,6 +143,7 @@ export class Rect_Mesh extends Mesh {
 
    }
    
+   /** */
    GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
       if(this.gfx_ctx_parent === INT_NULL) {
@@ -396,6 +158,7 @@ export class Rect_Mesh extends Mesh {
          }
       }
    }
+   /** */
    GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
       
       if(this.gfx_ctx_parent === INT_NULL) {
@@ -410,6 +173,7 @@ export class Rect_Mesh extends Mesh {
          }
       }
    }
+   /** */
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
@@ -419,6 +183,7 @@ export class Rect_Mesh extends Mesh {
          if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
       }
    }
+   /** */
    SetIsGfxInserted(flag) {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
    }

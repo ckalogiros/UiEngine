@@ -803,9 +803,6 @@ export class Section extends Mesh {
    }
 
 
-   SetPosXY(x, y) { Section_set_posxy_children_recursive(x, y, this); }
-
-
    SetPosX(x) { super.SetPosX(x); }
 
 

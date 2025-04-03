@@ -772,7 +772,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
 export function Create_smoke_particles_controls(emitter, color = GREY[2], parameters = null, shader_parameters = null, generic_contols_parameters, uniform_name) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
-      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:ALIGN_2.VERTICAL, texture_id:texture_id}));
+      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:LAYOUT.VERTICAL, texture_id:texture_id}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
       return slider;
    }
@@ -972,7 +972,7 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
 export function Create_particles_controls(emitter, scale_down, color = GREY[2], parameters = null, u_scale_create = false, generic_contols_parameters = null, uniform_name=null, enable_transform_controls=true) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
-      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:ALIGN_2.VERTICAL, texture_id:texture_id}));
+      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:LAYOUT.VERTICAL, texture_id:texture_id}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
       return slider;
    }
@@ -1355,12 +1355,12 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    const zpos = -1
 
    { // Create color picker panel
-      const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, zpos + 1], col:YELLOWL[4], name:'color_picker_panel', layout:ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF}));
+      const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, zpos + 1], col:YELLOWL[4], name:'color_picker_panel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
       Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:16,})
       controls_section.AddItem(panel);
 
       // Create label
-      const label = Create_widget_label(Style_label_default_properties({text:'Colorpicker', pos:[0, 0, zpos + 2], col:GREY[1], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.VERTICAL}));
+      const label = Create_widget_label(Style_label_default_properties({text:'Colorpicker', pos:[0, 0, zpos + 2], col:GREY[1], text_pad:text_pad, texture_id:default_font , layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:16,})
       panel.AddItem(label);
 
@@ -1537,7 +1537,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
 export function Create_comet_noise_contols(noise_particles_buffer, color = GREY[2], parameters = null, generic_contols_parameters, uniform_name) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
-      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:ALIGN_2.VERTICAL, texture_id:texture_id}));
+      const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:LAYOUT.VERTICAL, texture_id:texture_id}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
       return slider;
    }
@@ -2375,18 +2375,18 @@ export function Test_noise_shader() {
 function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuous_emitt:true, button_pres_emitt:false}, }) {
    
    // Create emitt panel
-   const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, z + 1], col:YELLOWL[4], name:`${emitter.name}_emitt_panel`, layout:ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, z + 1], col:YELLOWL[4], name:`${emitter.name}_emitt_panel`, layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:16,})
 
    
    // Create a one time emmit switch or 
    if(emitt_options.continuous_emitt) {
       // Create label
-      const label = Create_widget_label(Style_label_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.HORIZONTAL}));
+      const label = Create_widget_label(Style_label_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:LAYOUT.HORIZONTAL}));
       Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:12,})
       panel.AddItem(label);
 
-      const emitt_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, z + 2], size:18, col:YELLOWR[8], layout:ALIGN_2.HORIZONTAL, name:`${emitter.name}_emitt_switch`}));
+      const emitt_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, z + 2], size:18, col:YELLOWR[8], layout:LAYOUT.HORIZONTAL, name:`${emitter.name}_emitt_switch`}));
       Widget_gfx_ready_enable({mesh:emitt_switch, enable_sdf_rect:emitt_switch.geom.dim[1],})
       emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       panel.AddItem(emitt_switch);
@@ -2396,7 +2396,7 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
    }
    if(emitt_options.button_pres_emitt) {
 
-      const emitt_btn = Create_widget_button(Style_button_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.VERTICAL, name:`${emitter.name}_emitt_button`}));
+      const emitt_btn = Create_widget_button(Style_button_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:LAYOUT.VERTICAL, name:`${emitter.name}_emitt_button`}));
       Widget_gfx_ready_enable({mesh:emitt_btn, enable_sdf_rect:emitt_btn.geom.dim[1],})
       emitt_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
       panel.AddItem(emitt_btn);
@@ -2411,11 +2411,11 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
 function Create_color_picker_switch_panel(z, emitter) {
    
    // Create color picker panel
-   const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, z + 1], col:YELLOWL[4], name:'color_picker_panel', layout:ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, z + 1], col:YELLOWL[4], name:'color_picker_panel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:16,})
 
    // Create label
-   const label = Create_widget_label(Style_label_default_properties({text:'Colorpicker', pos:[0, 0, z + 2], col:GREY[1], text_pad:text_pad, texture_id:default_font , layout:ALIGN_2.VERTICAL}));
+   const label = Create_widget_label(Style_label_default_properties({text:'Colorpicker', pos:[0, 0, z + 2], col:GREY[1], text_pad:text_pad, texture_id:default_font , layout:LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:16,})
    panel.AddItem(label);
 

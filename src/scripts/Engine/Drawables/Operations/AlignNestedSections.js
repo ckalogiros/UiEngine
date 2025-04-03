@@ -30,7 +30,7 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
 
-      if (cur_mesh.align.flags & ALIGN_2.RESIZE_SELF) {
+      if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
 
          cur_mesh.geom.pos[0] = cur_pos_x;
          cur_mesh.geom.pos[1] = cur_pos_y;
@@ -38,13 +38,13 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
          const ret = Align_pre_simple(cur_mesh, cur_pos_x, cur_pos_y, pad);
 
 
-         if (cur_mesh.align.flags & ALIGN_2.VERTICAL) {
+         if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
 
             // if (total_size_x < ret.dim_x + cur_pad_x) total_size_x = ret.dim_x + cur_pad_x; // Set in x-axis
             total_size_y += ret.dim_y + cur_pad_y;
             if (i !== 0) accum_row_size_x = 0; row++;
          }
-         else if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+         else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
 
             // total_size_x += ret.dim_x + cur_pad_x; // Set in x-axis
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
@@ -68,7 +68,7 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
 
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
-            if (next_mesh.align.flags & ALIGN_2.VERTICAL) {
+            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
                cur_pos_x = mesh.geom.pos[0] + pad_x;
                if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) {
                   cur_pos_y += row_max_size_y;
@@ -76,7 +76,7 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
                else cur_pos_y += cur_mesh.geom.dim[1] * 2;
                row_max_size_y = 0;
             }
-            else if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
                cur_pos_x += cur_mesh.geom.dim[0] * 2;
             }
          }
@@ -85,13 +85,13 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
 
          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
 
-         if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+         if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
 
             total_size_x += ret.dim_x;
             total_size_y = (total_size_y < ret.dim_y) ? ret.dim_y : total_size_y; // Set in y-axis
             if (i !== 0) accum_row_size_x = 0;
          }
-         else if (cur_mesh.align.flags & ALIGN_2.VERTICAL) {
+         else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
             total_size_y += ret.dim_y; // Accumulate in y-dimention
             // if (total_size_x < ret.dim_x) 
             total_size_x = ret.dim_x; // Set in x-axis
@@ -99,10 +99,10 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
 
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
-            if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+            if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
                cur_pos_x += ret.dim_x * 2;
             }
-            else if (next_mesh.align.flags & ALIGN_2.VERTICAL) {
+            else if (next_mesh.align.flags & LAYOUT.VERTICAL) {
                cur_pos_y += ret.dim_y * 2;
                cur_pos_x = mesh.geom.pos[0] + pad_x;
             }
@@ -154,7 +154,7 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
 
-      if (cur_mesh.align.flags & ALIGN_2.RESIZE_SELF) {
+      if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
 
          cur_mesh.geom.pos[0] = cur_pos_x;
          cur_mesh.geom.pos[1] = cur_pos_y;
@@ -162,13 +162,13 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
          const ret = Align_pre_simple(cur_mesh, cur_pos_x, cur_pos_y, pad);
 
 
-         if (cur_mesh.align.flags & ALIGN_2.VERTICAL) {
+         if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
 
             // if (total_size_x < ret.dim_x + cur_pad_x) total_size_x = ret.dim_x + cur_pad_x; // Set in x-axis
             total_size_y += ret.dim_y + cur_pad_y;
             if (i !== 0) accum_row_size_x = 0; row++;
          }
-         else if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+         else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
 
             // total_size_x += ret.dim_x + cur_pad_x; // Set in x-axis
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
@@ -192,7 +192,7 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
 
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
-            if (next_mesh.align.flags & ALIGN_2.VERTICAL) {
+            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
                cur_pos_x = mesh.geom.pos[0] + pad_x;
                if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) {
                   cur_pos_y += row_max_size_y;
@@ -200,7 +200,7 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
                else cur_pos_y += cur_mesh.geom.dim[1] * 2;
                row_max_size_y = 0;
             }
-            else if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
                cur_pos_x += cur_mesh.geom.dim[0] * 2;
             }
          }
@@ -209,13 +209,13 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
 
          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
 
-         if (cur_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+         if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
 
             total_size_x += ret.dim_x;
             total_size_y = (total_size_y < ret.dim_y) ? ret.dim_y : total_size_y; // Set in y-axis
             if (i !== 0) accum_row_size_x = 0;
          }
-         else if (cur_mesh.align.flags & ALIGN_2.VERTICAL) {
+         else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
             total_size_y += ret.dim_y; // Accumulate in y-dimention
             // if (total_size_x < ret.dim_x) 
             total_size_x = ret.dim_x; // Set in x-axis
@@ -223,10 +223,10 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
 
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
-            if (next_mesh.align.flags & ALIGN_2.HORIZONTAL) {
+            if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
                cur_pos_x += ret.dim_x * 2;
             }
-            else if (next_mesh.align.flags & ALIGN_2.VERTICAL) {
+            else if (next_mesh.align.flags & LAYOUT.VERTICAL) {
                cur_pos_y += ret.dim_y * 2;
                cur_pos_x = mesh.geom.pos[0] + pad_x;
             }

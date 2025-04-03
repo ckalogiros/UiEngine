@@ -370,23 +370,24 @@ export class Widget_Label extends Rect_Mesh {
 
     SetWposXY(x, y) {
         super.SetWposXY(x, y);
-        this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
-        this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
-        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
+        // this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
+        // this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
+        // this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
+        this.text_mesh.geom.SetWposXYFromAddWPos(this.text_mesh.gfx, x, y);
     }
 
 
     SetWposX(x) {
         super.SetWposX(x);
-        this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
-        this.text_mesh.geom.AddWposX(this.text_mesh.gfx, x);
+        // this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
+        this.text_mesh.geom.SetWposXFromAddWPos(this.text_mesh.gfx, x);
     }
 
 
     SetWposY(y) {
         super.SetWposY(y);
-        this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
-        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y);
+        // this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
+        this.text_mesh.geom.SetWposYFromAddWPos(this.text_mesh.gfx, y);
     }
 
 

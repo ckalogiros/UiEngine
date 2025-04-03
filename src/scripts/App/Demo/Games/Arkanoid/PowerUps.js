@@ -20,10 +20,6 @@ import { Player_create_animation_scale } from "./Player.js";
 
 /** */
 const POWUP_COLORS_ARRAY = [
-   // GREEN[9],
-   // BLUEL[9],
-   // PURPLEB[9],
-   // YELLOW[9],
    ARKANOID_COLORS.green,
    ARKANOID_COLORS.blue,
    ARKANOID_COLORS.purple,
@@ -60,7 +56,7 @@ class Powup {
 
       // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [POWUP_INIT_SIZE, POWUP_INIT_SIZE], color, 'PowupMesh', _, _, _,);
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[POWUP_INIT_SIZE, POWUP_INIT_SIZE], col:color, name:'PowupMesh', }));
-      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, enable_src_color_in_main:false,});
+      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:false,});
 
 
       // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);

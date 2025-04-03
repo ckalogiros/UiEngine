@@ -82,7 +82,10 @@ function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
 function Choose_update_callback(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return Gl_batch_set_RGBA;
     if(anim_type_flag & ANIMATIONS.TYPE.WPOS) return Gl_batch_set_pos_xy;
-
+}
+function Update_test(num_values){
+    if(num_values === 2) return Update_values_color_balanced_vec2;
+    alert('77777777777 MISSING CALLBACK');
 }
 
 
@@ -156,6 +159,7 @@ class Mesh_Animation{
         this.vb_data = []; 
         this.anim_data = [];
         this.UpdateClbk = null;
+        this.TestRenameMe = null;
         this.is_active = false;
         this.in_animation = false;
         this.anim_type_flag = anim_type_flag;
@@ -177,9 +181,6 @@ class Mesh_Animation{
 
 
 
-
-
-const _mesh_animations_mesh_refs_buffer = New_generic_buffer(_, 'Animations Mesh References Buffer');
 
 
 const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
@@ -337,7 +338,8 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     anim.anim_data[vb_data_idx].SetData(t, t_step, min, max)
     
     // Set apropriate callback
-    anim.UpdateClbk = Choose_update_callback(anim_type_flag)
+    anim.UpdateClbk = Choose_update_callback(anim_type_flag);
+    anim.TestRenameMe = Update_test(vals_len)
     
     anim.is_active = true;
     anim.in_animation = true;
@@ -383,6 +385,30 @@ function Min_max(values, anim_data, flags, values_len){
         switcher *= -1;
     }
 }
+/** Update color based on the rgb balances of the initial color */
+function Update_values_color_balanced_vec2(values, anim_data, flags, values_len){
+
+    const min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
+    
+
+    // Color increase cycle
+    if(anim_data[ANIM_DATA.STEP] > 0){
+
+        if(values[0] > max || values[1] > max){
+            anim_data[ANIM_DATA.STEP] *= -1;
+        }
+    }
+    else {
+        if(values[0] < min || values[1] < min){
+            anim_data[ANIM_DATA.STEP] *= -1;
+        }
+    }
+
+    values[0] += anim_data[ANIM_DATA.STEP];
+    values[1] += anim_data[ANIM_DATA.STEP];
+    // if(flags & ANIMATIONS.TYPE.CYCLICAL){
+    
+}
 
 
 export function Mesh_animations_run(){
@@ -390,18 +416,21 @@ export function Mesh_animations_run(){
     if(_mesh_animations_buffer.active_count===0) return;
 
     for(let i=0; i <= _mesh_animations_buffer.boundary; i++){
+
+        const anim = _mesh_animations_buffer.buffer[i];
         
-        if(_mesh_animations_buffer.buffer[i].is_active){
-            if(_mesh_animations_buffer.buffer[i].in_animation){
+        if(anim.is_active){
+            if(anim.in_animation){
                 
-                const len = _mesh_animations_buffer.buffer[i].vb_data.length;
+                const len = anim.vb_data.length;
                 for(let j=0; j < len; j++){
                     
-                    const vb_data = _mesh_animations_buffer.buffer[i].vb_data[j];
-                    const anim_data = _mesh_animations_buffer.buffer[i].anim_data[j].data;
-                    Min_max(vb_data.data.values, anim_data, _mesh_animations_buffer.buffer[i].anim_type_flag, vb_data.values_len)
-                    
-                    _mesh_animations_buffer.buffer[i].UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
+                    const vb_data = anim.vb_data[j];
+                    const anim_data = anim.anim_data[j].data;
+                    // Min_max(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+                    anim.TestRenameMe(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+
+                    anim.UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
                                                      vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 
                                                      vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts);
                                                     //  vb_data.data.num_faces, vb_data.data.offsets, vb_data.data.which_vb, vb_data.data.counts, vb_data.data.num_faces[0]);
@@ -415,8 +444,8 @@ export function Mesh_animations_run(){
 
             }
             else{ // Here do stuf if animation stops
-                // _mesh_animations_buffer.buffer[i].is_active = false;
-                // _mesh_animations_buffer.buffer[i].stopAnimationClbk(_mesh_animations_buffer.buffer[i].params);
+                // anim.is_active = false;
+                // anim.stopAnimationClbk(anim.params);
                 console.log("ANIMATIONS STOP")
             }
         }

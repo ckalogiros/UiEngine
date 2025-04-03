@@ -76,11 +76,8 @@ class Coin {
 
 
       // Coin textured mesh
-      // const mesh = Create_widget_section(_, _, [0, 0], [0, 0, 3], [COIN_SIZE, COIN_SIZE], TRANSPARENCY(WHITE, 1.), 'CoinMesh', _, _, texture_file_id,);
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[COIN_SIZE, COIN_SIZE], col:WHITE, name:'CoinMesh', texture_id:texture_file_id}));
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:COIN_SIZE, });
-      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false});
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 

@@ -75,13 +75,6 @@ class Score_Mod {
          // mesh.text_mesh.SetColorRGB(REDL);
          // mesh.text_mesh.RenderTextFromString('REDL');
          // if(temp_flag) mesh.text_mesh.RenderTextFromString('AA AS');
-
-         // mesh.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
-         // mesh.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
-         // mesh.Align(ALIGN.HOR_CENTER | ALIGN.RIGHT, [0, 0]);
-         // mesh.Align(ALIGN.TOP | ALIGN.LEFT, [10, 10]);
-         // mesh.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
-         // mesh.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
       }
 
 

@@ -90,7 +90,7 @@ export function Style_rect_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id,
       variant_idx: user_properties.variant_idx,
 
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
 
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
@@ -158,7 +158,7 @@ export function Style_slider_simple_default_properties(user_properties) {
       rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       handle: {
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : BLUEL[7],
@@ -204,7 +204,7 @@ export function Style_slider_default_properties(user_properties) {
       // font_size: user_properties.font_size,
       variant_idx: user_properties.variant_idx,
       
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       bar: {
          // col:BLUEL[7],
@@ -291,7 +291,7 @@ export function Style_label_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id !== undefined ? user_properties.sub_texture_id : _,
       variant_idx: user_properties.variant_idx !== undefined ? user_properties.variant_idx : _,
       
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
       
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
@@ -316,7 +316,7 @@ export function Style_button_default_properties(user_properties) {
 
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
       
       text:user_properties.text, 
       text_pad:user_properties.text_pad, 
@@ -381,7 +381,7 @@ export function Style_switch_default_properties(user_properties) {
       pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
       style:user_properties.style !== undefined ? user_properties.style : style,
             
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       handle: {
          
@@ -434,7 +434,7 @@ export function Style_section_default_properties(user_properties) {
       sub_texture_id:user_properties.sub_texture_id,
       variant_idx:user_properties.variant_idx,
             
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
@@ -482,7 +482,7 @@ export function Style_dropdown_default_properties(user_properties) {
          sub_texture_id:_,
          variant_idx:_,
                
-         layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.RESIZE_PARENT|ALIGN_2.HORIZONTAL,
+         layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.RESIZE_PARENT|LAYOUT.HORIZONTAL,
 
          is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
       },
@@ -553,7 +553,7 @@ export function Style_color_picker_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id,
       variant_idx: user_properties.variant_idx,
 
-      layout:user_properties.layout !== undefined ? user_properties.layout : ALIGN_2.HORIZONTAL|ALIGN_2.RESIZE_SELF,
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
 
       rcorners:{
          color_picker:  user_properties.rcorners!==undefined && user_properties.rcorners.color_picker !== undefined ? user_properties.rcorners.color_picker : 10, 

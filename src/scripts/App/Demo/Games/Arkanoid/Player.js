@@ -41,7 +41,6 @@ export class Player {
       const posy = y;
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, _);

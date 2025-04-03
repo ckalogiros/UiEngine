@@ -102,7 +102,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    rootidx; // Store the root's dropdown index (of the '_root_dropdown');
    dp_symbols; // Text symbols for denoting a dropdown's Expanded/contracted menu. // TODO: Add textured symbols OR create a font texture with symbols for dropdown expansion/contraction.
 
-
+   /** */
    constructor(mesh_bufferidx, properties) {
 
       super(mesh_bufferidx, properties.dp)
@@ -115,7 +115,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
-      this.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
+      this.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
 
       properties.dp.pos[2] += 1;
       this.menu = Create_rect_mesh(properties.menu);
@@ -124,13 +124,13 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE.ACTIVE;
-      this.menu.align.flags = ALIGN_2.VERTICAL|ALIGN_2.RESIZE_SELF;
+      this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
       
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
       const btn = Create_widget_button(properties.btn);
       Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10,})
-      btn.align.flags = ALIGN_2.VERTICAL
+      btn.align.flags = LAYOUT.VERTICAL
 
 
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
@@ -147,21 +147,17 @@ export class Widget_Dropdown extends Rect_Mesh {
 
 
    }
-
+   /** */
    SetLayout(align_flags) {
 
       this.align.flags = align_flags;
    }
-
+   /** */
    AddLayout(align_flags) {
 
       this.align.flags |= align_flags;
    }
-
-
-
-   
-
+   /** */
    Activate() {
 
       this.state.mask |= MESH_STATE.ACTIVE;
@@ -170,8 +166,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          this.menu.Activate(); // Button
       }
    }
-
-
+   /** */
    Deactivate() {
 
       this.state.mask &= ~MESH_STATE.ACTIVE;
@@ -180,8 +175,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          this.menu.Deactivate(); // Button
       }
    }
-
-
+   /** */
    StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
@@ -190,8 +184,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          this.menu.StateEnable(MASK); // Active Menu
       }
    }
-
-
+   /** */
    StateDisable(MASK = 0x0) {
 
       this.state.mask &= ~MASK;
@@ -200,8 +193,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          this.menu.StateDisable(MASK); // Active Menu
       }
    }
-
-
+   /** */
    SetTypeDebug() {
 
       this.type |= MESH_TYPE.DEBUG_MESH;
@@ -221,7 +213,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    // INHERITED METHODS
    /****************************************************************************************************************************************************/
 
-
+   /** */
    Destroy() {
 
       const btn = this.children.buffer[0];
@@ -234,8 +226,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       return super.Destroy();
 
    }
-   
-   
+   /** */
    AddToWidgetRootBuffer(root_bufferidx) {
       
       this.root_bufferidx = root_bufferidx;
@@ -246,13 +237,11 @@ export class Widget_Dropdown extends Rect_Mesh {
       
       this.menu.AddToWidgetRootBuffer(root_bufferidx);
    }
-   
-
+   /** */
    SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetDropdown')
    }
-
-
+   /** */
    AddToMenu(mesh) {
 
       // NOTE: If the dp is Root, it has been set to widget root buffer from super. If not, there is no purpose of doing anything to the dp.
@@ -292,9 +281,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       mesh.idx = this.menu.AddItem(mesh);
 
    }
-
-
-
+   /** */
    OptionsEnable(MASK=0x0){
 
       this.options |= MASK;
@@ -305,8 +292,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          if(child && child.options) child.OptionsEnable(MASK);
       }
    }
-
-
+   /** */
    EnableGfx(which, params=null, menu_params=null, button_params=null){
       
       super.EnableGfx(which, params);
@@ -317,7 +303,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       btn.EnableGfx(which, button_params);
       
    }
-   
+   /** */
    EnableGfxUniforms(flags, name, type, shader_flags){
       
       super.EnableGfxUniforms(flags, name, type, shader_flags);
@@ -331,8 +317,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       } 
       
    }
-   
-
+   /** */
    GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
       if (this.gfx_ctx_parent === INT_NULL) {
@@ -348,8 +333,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          btn.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
       }
    }
-   
-
+   /** */
    GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
       if (this.gfx_ctx_parent === INT_NULL) {
@@ -365,7 +349,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          btn.GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
       }
    }
-
+   /** */
    EnableGfxOperations(function_operation, blend_mode) {
 
       super.EnableGfxOperations(function_operation, blend_mode);
@@ -375,6 +359,26 @@ export class Widget_Dropdown extends Rect_Mesh {
          const btn = this.children.buffer[0];
          if(btn) btn.EnableGfxOperations(function_operation, blend_mode);
       }
+   }
+   /** */
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
+
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+
+      if(unif_name === 'u_wposxy'){
+
+         // Call for each root mesh in every vertex buffer
+         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
+         const len = root_meshes.length;
+         for(let i=1; i < len; i++){
+      
+            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
+      
+         }
+      }
+
    }
 
    
@@ -399,8 +403,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       return this.gfx;
    }
-
-
+   /** */
    Render() {
 
       // super.AddToGfx();
@@ -418,8 +421,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       }
 
    }
-
-
+   /** */
    Rerender() {
 
       super.AddToGfxFromReset();
@@ -441,7 +443,6 @@ export class Widget_Dropdown extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Listeners
    /*******************************************************************************************************************************************************/
-
 
    /**
     * Constructs all listen events enabled for this classs widget.
@@ -490,6 +491,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
    
    // SEE: ## OnClick()
+   /** */
    OnClick(params) {
 
       const dp = params.evt_params.target_mesh;
@@ -539,59 +541,8 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       return true;
    }
-   /**SAVE */
-   // OnClick(params) {
-
-   //    const dp = params.evt_params.target_mesh;
-
-   //    /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
-   //    /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
-
-   //    const btn = dp.children.buffer[0];
-   //    // Dropdown_roots_get_root_by_idx(dp.rootidx);
-
-   //    // Check if the button is clicked
-   //    if(params.meshidx === btn.mesh_bufferidx){
-
-   
-   //       if (dp.isOn & DP_MENU_STATE.OFF) { // Case: Activate Menu 
-   
-   //          dp.DpActivateMenu();
-   
-   //          btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[1], 0); // Update the symbol text.
-   //          dp.isOn = DP_MENU_STATE.ON;
-   
-   //       }
-   //       else {  // Case: Deactivete Menu 
-   
-   //          btn.text_mesh.UpdateTextCharacter(dp.dp_symbols[0], 0);
-   
-   //          /* Need to update the symbol of the text(not only the gfx buffers), 
-   //             because when the btn will be activated it will be re-inserted in the gfx buffers 
-   //             and it will use the text_mesh's  string (wich is currently the '-' synmbol). */
-   //          btn.text_mesh.SliceText(0, 1);
-   //          btn.text_mesh.SetTextAtIndex(dp.dp_symbols[1], 0);
-   
-   //          dp.DpDeactivateMenu();
-   
-   //          dp.isOn |= DP_MENU_STATE.OFF;
-   //       }
-
-   //       STATE.mesh.SetClicked(btn);
-   //       STATE.mesh.SetFocused(dp);
-   //    }
-
-   //    // Else the click happened anywhere in dropdown except the button area
-   //    else if(dp.state.mask & MESH_STATE.IS_MOVABLE) { // Create move timeInterval if the dp has the move flag
-
-   //       dp.OnMove({params:dp});
-   //    }
-
-   //    return true;
-   // }
-
-
    // SEE ### OnMove Events Implementation Logic
+   /** */
    OnMove(params) {
 
       const dp = params.params;
@@ -625,9 +576,8 @@ export class Widget_Dropdown extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Setters_Getters
    /*******************************************************************************************************************************************************/
-
-
    
+   /** */
    SetPosXYNoGfxUpdate(x, y) {
 
       if(Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)){ // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -641,79 +591,74 @@ export class Widget_Dropdown extends Rect_Mesh {
          btn.SetPosXYNoGfxUpdate(x, y);
       }
    }
+   // TEMP_recalc(x, y) {
+
+   //    const btn = this.children.buffer[0];
+
+   //    const dx = btn.geom.pos[0] - this.geom.pos[0];
+   //    const dy = btn.geom.pos[1] - this.geom.pos[1];
+
+   //    this.geom.pos[0] = x;
+   //    this.geom.pos[1] = y;
+
+   //    const pad = this.StylesGetPad();
+   //    btn.TEMP_recalc(x + dx + pad[0], y + dy + pad[1]);
 
 
-   TEMP_recalc(x, y) {
+   //    if(this.isOn & DP_MENU_STATE.ON){
 
-      const btn = this.children.buffer[0];
-
-      const dx = btn.geom.pos[0] - this.geom.pos[0];
-      const dy = btn.geom.pos[1] - this.geom.pos[1];
-
-      this.geom.pos[0] = x;
-      this.geom.pos[1] = y;
-
-      const pad = this.StylesGetPad();
-      btn.TEMP_recalc(x + dx + pad[0], y + dy + pad[1]);
-
-
-      if(this.isOn & DP_MENU_STATE.ON){
-
-         // this.menu.SetPosXYNoGfxUpdate(x, y)
-         // this.menu.TEMP_recalc(x, y);
+   //       // this.menu.SetPosXYNoGfxUpdate(x, y)
+   //       // this.menu.TEMP_recalc(x, y);
          
-         const widget_root = Dropdown_roots_get_root_by_idx(this.rootidx)
-         Calculate_sizes_recursive(widget_root, widget_root.options, );
+   //       const widget_root = Dropdown_roots_get_root_by_idx(this.rootidx)
+   //       Calculate_sizes_recursive(widget_root, widget_root.options, );
       
       
-         if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-            CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-            CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-         }
-         else {
-            if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-            else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-            else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-         }
+   //       if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
+   //          CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
+   //          CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
+   //       }
+   //       else {
+   //          if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
+   //          else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
+   //          else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
+   //       }
          
-         widget_root.SectionSetPad();
+   //       widget_root.SectionSetPad();
          
-         // Calculate positions for dropdown
-         const cur_pos = [0,0];
-         cur_pos[0] = this.geom.pos[0]; 
-         cur_pos[1] = this.geom.pos[1]; 
+   //       // Calculate positions for dropdown
+   //       const cur_pos = [0,0];
+   //       cur_pos[0] = this.geom.pos[0]; 
+   //       cur_pos[1] = this.geom.pos[1]; 
          
-         Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-      }
-   }
+   //       Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
+   //    }
+   // }
+   // TEMP_recalc_x(x) {
 
+   //    const btn = this.children.buffer[0];
+   //    this.geom.pos[0] = x;
 
-   TEMP_recalc_x(x) {
+   //    // TODO: Conceptualize how to implement the code below that will reflect a broader context.
 
-      const btn = this.children.buffer[0];
-      this.geom.pos[0] = x;
+   //    const pad = this.StylesGetPad();
+   //    const xp = x + pad[0];
+   //    const yp = this.geom.pos[1] + pad[1]*2;
+   //    const dx = btn.text_mesh.geom.pos[0]-btn.geom.pos[0];
+   //    const dy = btn.text_mesh.geom.pos[1]-btn.geom.pos[1];
+   //    btn.geom.pos[0] = xp;
+   //    btn.geom.pos[1] = yp;
+   //    btn.text_mesh.geom.pos[0] = xp+dx;
+   //    btn.text_mesh.geom.pos[1] = yp+dy;
 
-      // TODO: Conceptualize how to implement the code below that will reflect a broader context.
-
-      const pad = this.StylesGetPad();
-      const xp = x + pad[0];
-      const yp = this.geom.pos[1] + pad[1]*2;
-      const dx = btn.text_mesh.geom.pos[0]-btn.geom.pos[0];
-      const dy = btn.text_mesh.geom.pos[1]-btn.geom.pos[1];
-      btn.geom.pos[0] = xp;
-      btn.geom.pos[1] = yp;
-      btn.text_mesh.geom.pos[0] = xp+dx;
-      btn.text_mesh.geom.pos[1] = yp+dy;
-
-      if(this.isOn & DP_MENU_STATE.ON){
-         // HACK
-         this.menu.geom.pos[0] = this.geom.pos[0] + pad[0];
-         this.menu.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1]*2
-         this.menu.Recalc_no_gfx_update();
-      }
-   }
-
-
+   //    if(this.isOn & DP_MENU_STATE.ON){
+   //       // HACK
+   //       this.menu.geom.pos[0] = this.geom.pos[0] + pad[0];
+   //       this.menu.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1]*2
+   //       this.menu.Recalc_no_gfx_update();
+   //    }
+   // }
+   /** */
    SetType(type_flag) {
 
       this.type |= type_flag;
@@ -722,52 +667,16 @@ export class Widget_Dropdown extends Rect_Mesh {
       btn.text_mesh.type |= type_flag;
 
    }
-
-
+   /** */
    SetText(text) {
       const btn = this.children.buffer[0];
       btn.text_mesh.RenderTextFromString(text);
    }
-
-
+   /** */
    SetIsGfxInserted(flag) {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
       const btn = this.children.buffer[0];
       btn.SetIsGfxInserted(flag);
-   }
-
-
-   // /** Must run for every mesh */
-   // GfxUniformsEnable(flags, name, type, shader_flags) {
-
-   //    super.EnableGfxUniforms(flags, name, type, shader_flags);
-
-   //    const btn = this.children.buffer[0];
-   //    btn.GfxUniformsEnable(flags, name, type, shader_flags);
-      
-   //    this.menu.GfxUniformsEnable(flags, name, type, shader_flags);
-      
-   // }
-
-  
-   GfxUniformsSetClbk(unif_name, Clbk, clbk_params){
-
-      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
-      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-
-      if(unif_name === 'u_wposxy'){
-
-         // Call for each root mesh in every vertex buffer
-         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
-         const len = root_meshes.length;
-         for(let i=1; i < len; i++){
-      
-            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
-      
-         }
-      }
-
    }
 
 
@@ -776,6 +685,8 @@ export class Widget_Dropdown extends Rect_Mesh {
    /*******************************************************************************************************************************************************/
    // Align
    /*******************************************************************************************************************************************************/
+   
+   /** */
    AlignNEW(pos_x, pos_y) {
 
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
@@ -804,12 +715,8 @@ export class Widget_Dropdown extends Rect_Mesh {
    /****************************************************************************************************************************************************/
    // UNIQUE METHODS
    /****************************************************************************************************************************************************/
-   
 
-
-
-
-   // Reset and rebuild vertex buffers x
+   /** */
    #DeactivateMenu(dp = null) {
 
       if (!dp) dp = this;
@@ -870,6 +777,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    }
 
 
+   /** */
    DpDeactivateMenu() {
 
       const menu = this.menu;
@@ -883,7 +791,6 @@ export class Widget_Dropdown extends Rect_Mesh {
          View_remove_from_group(menu);
       }
 
-      // this.DpDestroyListeners(menu);
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
@@ -891,33 +798,13 @@ export class Widget_Dropdown extends Rect_Mesh {
       btn.text_mesh.SliceText(0, 1);
       btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
 
-
-      
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-      // const widget_root = root.parent;
-      // const widget_root = root;
 
       /********************************************************************************************************************/
       // Calculate all meshes sizes from the root widget dropdown
       if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
       if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-      
-      
-      // Calculate_sizes_recursive(widget_root, widget_root.options, );
-      
-      
-      // if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-      //    CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-      //    CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      // }
-      // else {
-      //    if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-      //    else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-      //    else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      // }
-      
-      // widget_root.SectionSetPad();
       
       // Calculate positions for dropdown
       const cur_pos = [0,0];
@@ -941,6 +828,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    }
 
 
+   /** */
    #ActivateMenu() {
       // TODO: SEE ### Dropdown Remove
       // Must remove listener
@@ -979,6 +867,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    }
 
 
+   /** */
    DpActivateMenu() {
 
       const menu = this.menu;
@@ -997,12 +886,8 @@ export class Widget_Dropdown extends Rect_Mesh {
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
          View_add_to_group(menu, this.group_bufferidxs[0])
       }
-
-
       
       this.#ActivateMenu(); // Add dropdown to gfx buffers.
-      // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
-      
       
       const btn = this.children.buffer[0];
       btn.text_mesh.SliceText(0, 1);
@@ -1017,30 +902,11 @@ export class Widget_Dropdown extends Rect_Mesh {
       if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
       
       
-      // widget_root.Recalc_no_gfx_update(widget_root );
-      
-      
-      // Calculate_sizes_recursive(widget_root, widget_root.options, this);
-      
-      
-      // if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-      //    CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-      //    CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-      // }
-      // else {
-      //    if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-      //    else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-      //    else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-      // }
-      
-      // widget_root.SectionSetPad();
-      
       // Calculate positions for dropdown
       const cur_pos = [0,0];
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
       Align_pre_simple(widget_root)
 
@@ -1054,676 +920,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       // Re-render   
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
       View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-
-   }
-
-   /**SAVES */
-   // // Reset and rebuild vertex buffers x
-   // #DeactivateMenu(dp = null) {
-
-   //    if (!dp) dp = this;
-   //    this.menu_active = false; // Set state to active.
-
-   //    const menu = dp.menu;
-
-   //    if (dp.isOn & DP_MENU_STATE.ON) {
-   //       for (let j = 0; j <= menu.children.boundary; j++) {
-
-   //          const item = menu.children.buffer[j]; 
-
-   //          if(item){
-
-   //             // If the menu's item mesh is of type dropdown, run recursively to deactivate mesh's menu.
-   //             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN && item.is_gfx_inserted) {
-
-   //                const btn = item.children.buffer[0];
-   //                btn.text_mesh.SliceText(0, 1);
-   //                btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
-   
-   //                // item.RemoveFromMeshPerVbBuffer();
-   //                item.Deactivate();
-   //                item.SetIsGfxInserted(false);
-   
-   //                // console.log(item.GetName())
-   //                item.RemoveAllListenEvents();
-                  
-                  
-   //                if (item.isOn & DP_MENU_STATE.ON) this.#DeactivateMenu(item); // Run recursive for every dropdown in every menu
-   //             }
-   //             else {
-   //                if (item.gfx && item.is_gfx_inserted) {
-                     
-   //                   // item.RemoveFromMeshPerVbBuffer();
-   //                   item.Deactivate();
-   //                   item.SetIsGfxInserted(false);
-                     
-   //                   // console.log(item.GetName())
-   //                   item.RemoveAllListenEvents();
-   //                }
-   //             }
-   //          }
-   //       }
-
-   //       if (menu.gfx && menu.is_gfx_inserted) {
-
-   //          menu.state.mask &= ~MESH_STATE.ACTIVE;
-
-   //          // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
-   //          menu.is_gfx_inserted = false;
-   //       }
-   //    }
-
-   //    dp.isOn |= DP_MENU_STATE.OFF;
-   //    dp.isOn &= ~DP_MENU_STATE.ON;
-
-   // }
-
-
-   // DpDeactivateMenu() {
-
-   //    const menu = this.menu;
-   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
-
-   //    // Reset vertex buffers from group
-   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-
-   //    // Remove menu and all its items from the group view
-   //    if (menu.group_bufferidxs[0] !== INT_NULL) {
-   //       View_remove_from_group(menu);
-   //    }
-
-   //    // this.DpDestroyListeners(menu);
-   //    this.#DeactivateMenu();
-   //    this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
-
-   //    const btn = this.children.buffer[0];
-   //    btn.text_mesh.SliceText(0, 1);
-   //    btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
-
-
-      
-   //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
-   //    const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-   //    // const widget_root = root.parent;
-   //    // const widget_root = root;
-
-   //    /********************************************************************************************************************/
-   //    // Calculate all meshes sizes from the root widget dropdown
-   //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-   //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-      
-      
-   //    // Calculate_sizes_recursive(widget_root, widget_root.options, );
-      
-      
-   //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-   //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-   //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-   //    }
-   //    else {
-   //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-   //       else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-   //       else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-   //    }
-      
-   //    widget_root.SectionSetPad();
-      
-   //    // Calculate positions for dropdown
-   //    const cur_pos = [0,0];
-   //    cur_pos[0] = this.geom.pos[0]; 
-   //    cur_pos[1] = this.geom.pos[1]; 
-      
-   //    // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-
-
-
-
-
-   //    /********************************************************************************************************************/
-   //    // Set any scroller components
-   //    if(this.scroller_comp){
-   //       Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
-   //    }
-   //    // And for all scrollers up the mesh tree
-   //    let parent = this.parent;
-   //    while(parent!==null){
-   //       if(parent.scroller_comp){
-   //          Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
-   //       }
-   //       parent = parent.parent;
-   //    }
-      
-
-   //    /********************************************************************************************************************/
-   //    // Clip unnecessary meshes
-   //    { 
-
-   //       // // Get the group root mesh to Recalc position/dimentions 
-   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-   //       // let clip_top = null, clip_bottom = null;
-   //       // if (group_root_mesh.parent) {
-   
-   //       //    clip_top = group_root_mesh.parent.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-   //       // }
-   //       // else {
-   //       //    clip_top = group_root_mesh.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-   //       // }
-   
-   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-   
-   
-   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-   //    }
-
-
-   //    /********************************************************************************************************************/
-   //    // Re-create listen events 
-   //    /**
-   //     * ISSUE 
-   //     * Normaly we would construct the listeners only for the dp menu.
-   //     * Though in case of another dp in the widget_root, it's meshes 
-   //     * are active from the scroller cliping, but the listeners havn't
-   //     * been activated.
-   //     * So we activate the listeners of all meshes of the widget_root,
-   //     * eventhough this is very inefficient.
-   //     * 
-   //     * Solution:
-   //     * Find a way to create the listeners.
-   //     * In 'Clip()' would be the best place but unfortunately the
-   //     * activation of the listeners must be called once, from the mesh 
-   //     * that is the parent, so that the listeners tree view will 
-   //     * be build correctly(in the EventListeners.js)
-   //     */
-   //    // Construct_listen_events_from_mesh_tree(this.menu)
-   //    // Construct_listen_events_relations_from_mesh_tree(this.menu);
-   //    Construct_listen_events_from_mesh_tree(widget_root)
-   //    Construct_listen_events_relations_from_mesh_tree(widget_root);
-      
-      
-
-   //    /********************************************************************************************************************/
-   //    // Re-render   
-   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
-   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-   // }
-
-
-   // #ActivateMenu() {
-   //    // TODO: SEE ### Dropdown Remove
-   //    // Must remove listener
-
-   //    const menu = this.menu;
-   //    this.menu_active = true; // Set state to active.
-
-   //    menu.state.mask |= MESH_STATE.ACTIVE;
-
-   //    // Activate menu's items, recursively
-   //    for (let i = 0; i <= menu.children.boundary; i++) {
-
-   //       const item = menu.children.buffer[i];
-
-   //       if(item){
-
-   //          item.Activate();
-   //          if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-   
-   //             // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-   //             if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-   
-   //                // If the menu was deactivated while open, then on activation keep its '-' symbol
-   //                const btn = item.children.buffer[0];
-   //                btn.text_mesh.SliceText(0, 1);
-   //                btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-   //                item.#ActivateMenu();
-   //             }
-   //          }
-   //       }
-   //    }
-
-   //    this.isOn |= DP_MENU_STATE.ON;
-   //    this.isOn &= ~DP_MENU_STATE.OFF;
-
-   // }
-
-
-   // DpActivateMenu() {
-
-   //    const menu = this.menu;
-   //    const root = Dropdown_roots_get_root_by_idx(this.rootidx);
-
-
-   //    this.isOn |= DP_MENU_STATE.ON;
-   //    this.isOn &= ~DP_MENU_STATE.OFF;
-
-   //    View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
-
-   //    this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
-
-
-   //    // Case its the first time this menu will be rendered
-   //    if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
-   //       // View_add_to_group(menu, this.group_bufferidxs[0])
-   //       View_add_to_group(menu, this.group_bufferidxs[0])
-   //    }
-
-
-      
-   //    this.#ActivateMenu(); // Add dropdown to gfx buffers.
-   //    // menu.SetFrameBufferIdx(this.isFramebufferRendered); // To update any framebuffer (if exists)
-      
-      
-   //    const btn = this.children.buffer[0];
-   //    btn.text_mesh.SliceText(0, 1);
-   //    btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-
-   //    const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
-   //    const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-
-   //    /********************************************************************************************************************/
-   //    // Calculate all meshes sizes from the root widget dropdown
-   //    if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-   //    if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-      
-      
-   //    // widget_root.Recalc_no_gfx_update(widget_root );
-      
-      
-   //    // Calculate_sizes_recursive(widget_root, widget_root.options, this);
-      
-      
-   //    if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-   //       CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-   //       CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-   //    }
-   //    else {
-   //       if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-   //       else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-   //       else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-   //    }
-      
-   //    widget_root.SectionSetPad();
-      
-   //    // Calculate positions for dropdown
-   //    const cur_pos = [0,0];
-   //    cur_pos[0] = this.geom.pos[0]; 
-   //    cur_pos[1] = this.geom.pos[1]; 
-      
-   //    // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-
-
-
-   //    /********************************************************************************************************************/
-   //    // Set any scissor box
-   //    if(Vertex_buffer_group_has_scissorbox(this.gfx.vb.groupidx)){
-   //       Vertex_buffer_group_update_scissorbox_all_vb(this.gfx.vb.groupidx);
-   //    }
-
-
-
-
-   //    /********************************************************************************************************************/
-   //    // Set any scroller component
-   //    if(this.scroller_comp){
-   //       Scroller_component_calculate_handle_pos_dim(this, this.scroller_comp);
-   //    }
-   //    // And for all scrollers up the mesh tree
-   //    let parent = this.parent;
-   //    while(parent!==null){
-   //       if(parent.scroller_comp){
-   //          Scroller_component_calculate_handle_pos_dim(parent, parent.scroller_comp);
-   //       }
-   //       parent = parent.parent;
-   //    }
-      
-
-   //    /********************************************************************************************************************/
-   //    // Clip unnecessary meshes
-   //    { 
-
-   //       // Get the group root mesh to Recalc position/dimentions 
-   //       // const group_rootidx = View_get_view_vb_root_meshidx(this.group_bufferidxs);
-   //       // const group_root_mesh = Mesh_buffer_get_mesh_byidx(group_rootidx)
-   //       // let clip_top = null, clip_bottom = null;
-   //       // if (group_root_mesh.parent) {
-   
-   //       //    clip_top = group_root_mesh.parent.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.parent.geom.dim[1]*2;
-   //       //    // clip_right = group_root_mesh.parent.geom.pos[0] + group_root_mesh.parent.geom.dim[0] - 20;
-   //       // }
-   //       // else {
-   //       //    clip_top = group_root_mesh.GetPosY();
-   //       //    clip_bottom = clip_top + group_root_mesh.geom.dim[1]*2;
-   //       // }
-   
-   //       // // If we do not use the clip from group, which runs for all meshes in the group(SLOW), then we do not un-clip any meshes after this dp
-   //       // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-   //       // // Clipy_from_tree_recursive(group_root_mesh, clip_top, clip_bottom);
-   //       // // Clampx_from_group(root.group_bufferidxs[0], 0, clip_right);
-   
-   
-   //       // // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-   //    }
-
-
-   //    /********************************************************************************************************************/
-   //    // Re-create listen events 
-   //    Construct_listen_events_from_mesh_tree(this.menu)
-   //    Construct_listen_events_relations_from_mesh_tree(this.menu);
-
-   //    // Set menu in focus
-   //    // // Mesh_set_root_in_focus(widget_root.root_bufferidx, widget_root.scroller_comp_idx);
-   //    // // Mesh_set_root_in_focus(widget_root.root_bufferidx);
-   //    // Mesh_set_root_in_focus(root.root_bufferidx);
-      
-      
-
-   //    /********************************************************************************************************************/
-   //    // Re-render   
-   //    // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-   //    // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-   //    // View_render_from_view_all_buffers(widget_root.group_bufferidxs[0], false);
-   //    View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-   //    // View_rerender_from_view_all_buffers(root.group_bufferidxs[0], false);
-
-   // }
-}
-
-
-
-function temp_dp_calc_sizes(dp, target_child_idx=0, is_independed=0x0){
-
-
-   // Calculate sizes bottom-up the tree with this 'dp' being the root...  
-   const dif = Calculate_sizes_recursive(dp, dp.options, target_child_idx);
-
-   const max = dp.max_size;
-   let prev_max = [max[0], max[1]];
-   const pad = [0,0];
-   
-
-   // ... And then go up the tree, from this 'dp' to the actual root, to add the dimention difference that was calculated erlier.
-   // NOTE: This is done so that we skip calculating all children from the root. Instead we calculate from this dp and all its children , and we propagate the size difference up to any 'Section' parents.   
-   let p = dp.parent;
-   while(p){
-
-      const meshpad = p.StylesGetPad();
-      pad[0] += meshpad[0];
-      pad[1] += meshpad[1];
-
-      
-      if(p){
-         if(p.type & MESH_TYPE.SECTION_MESH){
-
-            if(p.type & MESH_TYPE.WIDGET_SCROLLER || p.type & MESH_TYPE.WIDGET_MENU_BAR || p.type & MESH_TYPE.WIDGET_WINDOW) {
-               console.log('BREAK', p.GetName())
-               break;
-            }
-   
-            if(p.options & SECTION.VERTICAL){
-   
-               if(dif[0] > POSSITIVE && p.geom.dim[0] <= prev_max[0]){
-                  // console.log(p.GetName(), 'max_size', p.max_size[0], 'dimx', p.geom.dim[0])
-                  p.geom.dim[0] += dif[0];
-                  p.max_size[0] = p.geom.dim[0];
-   
-               }
-               else if(dif[0] < POSSITIVE){
-
-                  if(p.type & MESH_TYPE.WIDGET_DROP_DOWN){
-
-                     const ms = Dp_menu_get_max_size_from_siblings(p)
-                     if(p.geom.dim[0] > ms[0]){
-      
-                        p.geom.dim[0] += dif[0];
-                        p.max_size[0] = p.geom.dim[0];
-      
-                        // p.geom.dim[1] -= pad[1];
-                     }
-                  }
-   
-               }
-               else{
-                  console.log('{{{{{}}}}}', p.geom.dim[0], 'clicked max', dp.max_size[0])
-               }
-               
-   
-               p.geom.dim[1] += dif[1];
-               p.max_size[1] = p.geom.dim[1];
-            }
-            else if(p.options & SECTION.HORIZONTAL){
-   
-               p.geom.dim[1] += dif[1] + pad[1];
-               p.max_size[1] = p.geom.dim[1];
-               if(p.geom.dim[1] < p.min_size[1]){
-                  
-                  p.geom.dim[1] = p.min_size[1] + pad[1];
-                  p.max_size[1] = p.geom.dim[1];
-               }
-   
-               p.geom.dim[1] += dif[1] + pad[1];
-               p.max_size[1] = p.geom.dim[1];
-            }
-   
-            prev_max[0] = p.max_size[0];
-            prev_max[1] = p.max_size[1];
-         }
-         
-         
-         p = p.parent
-      }
-   }
-
-   
-   dp.geom.dim[0] -= dif[0]
-   dp.max_size[0] -= dif[0]
-
-}
-
-
-
-function Dp_menu_get_max_size_from_siblings(parent){
-
-   console.log('- parent', parent.geom.dim[0], 'max', parent.max_size[0], parent.GetName())
-   let max_size = [0, 0];
-   for (let i=0; i <= parent.children.boundary; i++){
-      const sib = parent.children.buffer[i];
-      console.log('---- sibling', sib.geom.dim[0], 'max', max_size[0], sib.GetName())
-      const pad = sib.StylesGetPad()
-      if(max_size[0] <= sib.geom.dim[0]+pad[0]*2){
-         max_size[0] = sib.geom.dim[0] + pad[0]*2;
-      // if(max_size[0] <= sib.geom.dim[0]+pad[0]){
-      //    max_size[0] = sib.geom.dim[0] + pad[0];
-         console.log('SET MAX SIZE', max_size[0])
-      }
-      else if(sib.max_size===_){console.log('Has no max_size', sib.GetName())}
-      // if(sib.max_size && max_size[0] < sib.geom.dim[0]){
-      //    max_size[0] = sib.geom.dim[0];
-      // }
-   }
-
-   return max_size;
-}
-
-
-
-export function TEMP_DP_STEAL_THE_DP_RECALC(dp){
-   
-   Expand(dp, dp.options)
-   temp_dp_calc_sizes(dp, _, dp.options & SECTION.INDEPENDENT);
-
-      
-   dp.geom.dim[0] = dp.max_size[0] + dp.StylesGetPad(STYLES.AXIS.X);
-   dp.geom.dim[1] = dp.max_size[1] + dp.StylesGetPad(STYLES.AXIS.Y);
-   
-
-   const cur_pos = [0,0];
-   cur_pos[0] = dp.geom.pos[0]; 
-   cur_pos[1] = dp.geom.pos[1]; 
-   Dp_calc_pos_tree_up_recursive(dp, dp.options, cur_pos, _, _, dp.options & SECTION.INDEPENDENT);
-}
-
-
-
-function Dp_calc_pos_tree_up_recursive(dp, options, curr, target_child_idx, is_for_build, is_independed=0x0){
-
-   Temp_dp_calculate_positions(dp, options, curr, target_child_idx, is_for_build);
-   
-   const parent = dp.parent;
-
-   if(parent){
-      
-      const continue_recur = (is_independed & (parent.options & SECTION.INDEPENDENT)) ? true 
-      : ((is_independed===0x0 && (parent.options & SECTION.INDEPENDENT)===0) ? true : false);
-
-      if(parent.options & SECTION.VERTICAL) {
-         curr[0] = parent.geom.pos[0];
-         curr[1] = dp.geom.pos[1] + dp.geom.dim[1]*2;
-      }
-      else if(parent.options & SECTION.HORIZONTAL) {
-         curr[0] = dp.geom.pos[0] + dp.geom.dim[0]*2;
-         curr[1] = dp.geom.pos[1];
-      }
-
-      if(continue_recur)
-         Dp_calc_pos_tree_up_recursive(parent, options, curr, dp.idx+1, true, (parent.options & SECTION.INDEPENDENT));
-   }
-
-}
-
-
-
-function Temp_dp_calculate_positions(parent, options, curr, target_child_idx, is_for_build=false) {
-
-   
-   const cur_pos = [
-      curr[0] + parent.StylesGetPad(STYLES.AXIS.X), 
-      is_for_build ? curr[1] : curr[1] + parent.StylesGetPad(STYLES.AXIS.Y), // 'is_for_build=true' don't add the pad on repositioning alredy buld dropdowns  
-   ];
-
-   
-   const pad = [0, 0]
-   
-   const target_idx = (target_child_idx != undefined) ? (target_child_idx >= 0) ? target_child_idx : 0 : 0;
-
-   if(target_idx > parent.children.boundary) return
-
-   for (let i = target_idx; i <= parent.children.boundary; i++) {
-      
-      const mesh = parent.children.buffer[i];
-
-      if(mesh){
-
-         let continue_recur = true;
-         let opt = options
-   
-         // console.log('  RecalcPos', mesh.GetName())
-   
-         if (options & SECTION.INHERIT) opt = parent.options
-         
-         // const padd = mesh.StylesGetPad();
-         const padd = [0,0,];
-         if(padd){
-            pad[0] += padd[0];
-            pad[1] += padd[1];
-         }
-   
-         const rel_pos = [cur_pos[0], cur_pos[1]];
-         
-         if(mesh.type & MESH_TYPE.WIDGET_TEXT_DYNAMIC){
-            
-            mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
-            continue_recur = false;
-         }
-         else if(mesh.scroller_comp !== null){
-
-            console.log(mesh.GetName())
-            
-            const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
-            const widget_root = mesh;
-            Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0]-mesh.geom.pos[0], cur_pos[1]-mesh.geom.pos[1]);
-            
-            mesh.geom.pos[0] = rel_pos[0]; 
-            mesh.geom.pos[1] = rel_pos[1];
-         }
-         else if(mesh.type & MESH_TYPE.WIDGET_SLIDER){
-   
-            // mesh.MoveNoGfxUpdate(rel_pos[0], rel_pos[1]);
-            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-            continue_recur = false;
-         }
-         else if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) 
-         { // For meshes with a parent of type Section
-   
-            mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-            // continue_recur = false;
-         }
-         else if (mesh.type & MESH_TYPE.SECTION_MESH) 
-         { // For meshes with a parent of type Section
-   
-            mesh.geom.pos[0] = rel_pos[0]; 
-            mesh.geom.pos[1] = rel_pos[1];
-            
-            // Case of menu bar, that has text directly as a child
-            if(mesh.text_mesh){
-               mesh.text_mesh.geom.pos[0] = rel_pos[0] + pad[0];
-               mesh.text_mesh.geom.pos[1] = rel_pos[1] + pad[1];
-            }
-         }
-         else{
-   
-            // mesh.TEMP_recalc(rel_pos[0] + pad[0], rel_pos[1] + pad[1]);
-            // mesh.TEMP_recalc(rel_pos[0], rel_pos[1]);
-   
-            if(mesh.type & MESH_TYPE.WIDGET_SWITCH) continue_recur = false;
-            if(mesh.text_mesh) continue_recur = false;
-         }
-
-         if(mesh.scroller_comp !== null){
-            console.log(mesh.GetName(), mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY())
-            console.log(mesh.GetName(), cur_pos[0], cur_pos[1])
-            
-            const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
-            // const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-            const widget_root = mesh;
-            // const dx = mesh.geom.pos[0] - cur_pos[0];
-            // const dy = mesh.geom.pos[1] - cur_pos[1];
-            // Scroller_component_set_pos(mesh.scroller_comp, widget_root, dx, dy);
-            Scroller_component_set_pos(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
-            // Scroller_component_set_pos(mesh.scroller_comp, widget_root, mesh.GetPosX()+mesh.geom.dim[0]*2, mesh.GetPosY());
-            // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root);
-            // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp, widget_root, cur_pos[0], cur_pos[1]);
-            // console.log(mesh.GetName())
-         }
-   
-   
-         if(parent.rel_comp){
-            Relative_pos_comp_recalc_all(parent);
-            continue_recur = false;
-         }
-   
-         if (continue_recur) { // Continue recursively, if the mesh does not handle any its children.
-            Temp_dp_calculate_positions(mesh, opt, cur_pos, _, _);
-            // console.log('   RecalcPos', mesh.GetName())
-         }
-   
-   
-         // Increment current position tracker
-         if (parent.options & SECTION.VERTICAL) {
-            cur_pos[1] += mesh.geom.dim[1] * 2;
-            parent.last_pos[1] = cur_pos[1];
-         }
-         else if (parent.options & SECTION.HORIZONTAL) {
-            cur_pos[0] += mesh.geom.dim[0] * 2;
-            parent.last_pos[0] = cur_pos[0];
-         }
-      }
 
    }
 

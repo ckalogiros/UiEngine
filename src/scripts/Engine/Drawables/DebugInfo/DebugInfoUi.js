@@ -1,6 +1,6 @@
 "use strict";
 
-import { Dropdown_roots_set_root, TEMP_DP_STEAL_THE_DP_RECALC } from "../Widgets/Widget_Dropdown.js";
+import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_text } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
@@ -66,7 +66,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.SetName('InfoUi-static');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -217,7 +217,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.SetName('MorePerformanceTimers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -281,7 +281,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.SetName('ApplicationBuffers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -354,7 +354,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
 
    section.SetName('ApplicationBuffers');
@@ -427,7 +427,7 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int16_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int16_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
 
    section.SetName('ApplicationBuffers');
@@ -503,7 +503,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    const zpos = 0;
    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [x, y, zpos], [0, 0], TRANSPARENCY(GREY[2], transp), 'ui performance:int16_buffers panel', _, _, _);
    // const section = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui performance:int8_buffers panel', options:SECTION.VERTICAL, pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), }));
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int8_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int8_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.SetName('ApplicationBuffers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -791,7 +791,7 @@ function Debug_info_create_ui_stats() {
 
 
    // const section = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui stats timers panel', options:SECTION.VERTICAL, pad:[10, 14], pos:DEBUG_INFO.UI_STATS.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], 1.8), is_debug_mesh:true}));
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui stats timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui stats timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1112,7 +1112,7 @@ function Debug_info_create_ui_performance_timers() {
    const zpos = DEBUG_INFO.UI_TIMERS.POS[2];
    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, zpos], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui performance timers panel', [18, 14, 2]);
    // const section = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui performance timers panel', options:SECTION.VERTICAL, pad:[10, 10], pos:[0, 0, zpos], dim:[0,0], col:TRANSPARENCY(GREY[1], 1.8), is_debug_mesh:true}));
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1643,11 +1643,11 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
 
    // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.HORIZONTAL, [10, 10], [x, y, DEBUG_INFO.UI_MOUSE.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
    // const section = Create_widget_section(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui mouse info panel', options:SECTION.HORIZONTAL, pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_MOUSE.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[2], .8), }));
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_MOUSE.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.HORIZONTAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_MOUSE.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
    // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   section.align.flags = ALIGN_2.RESIZE_SELF;
+   section.align.flags = LAYOUT.RESIZE_SELF;
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('InfoUi-Mouse section');
    
@@ -1665,25 +1665,25 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
       texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
       is_debug_mesh:false,
    });
-   infomesh.align.flags = ALIGN_2.HORIZONTAL;
+   infomesh.align.flags = LAYOUT.HORIZONTAL;
    section.AddItem(infomesh);
-   // dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=ALIGN_2.HORIZONTAL
-   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.VERTICAL,);
-   infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('222',        fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
-   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
-   // // infomesh.CreateNewText('555000000000000000000',       fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('3333',      fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.VERTICAL);
-   // infomesh.CreateNewText('00',        fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('555',       fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('6',         fontsize, GREEN[7], [10, 0], .9, _, ALIGN_2.HORIZONTAL);
-   // infomesh.CreateNewText('5', fontsize, GREEN[7], [8, 0], .9, _, ALIGN_2.VERTICAL);
+   // dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL
+   infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, LAYOUT.VERTICAL,);
+   infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('222',        fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.VERTICAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.VERTICAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.VERTICAL);
+   // infomesh.CreateNewText('0',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.VERTICAL);
+   // // infomesh.CreateNewText('555000000000000000000',       fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('3333',      fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.VERTICAL);
+   // infomesh.CreateNewText('00',        fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('555',       fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('6',         fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
+   // infomesh.CreateNewText('5', fontsize, GREEN[7], [8, 0], .9, _, LAYOUT.VERTICAL);
 
 
    section.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
@@ -1777,7 +1777,7 @@ export function Debug_info_create_ui_focused() {
    const fontsize = _font_size;
 
    // const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 8], [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2]], [0, 0], TRANSPARENCY(GREY[1], .8), 'ui mouse info panel');
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_FOCUSED.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_FOCUSED.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -1854,7 +1854,6 @@ let u = 0;
 //    const zpos = focused.geom.pos[2];
 
 //    /**
-//          this.temp_align = 0x0;
 
 //          this.geom = {
 //             this.pos = [0, 0, 0];
@@ -1905,12 +1904,10 @@ let u = 0;
 //         this.idx = INT_NULL;
 //         this.sceneidx = STATE.scene.active_idx;
 //         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
-//         this.batch_fnidx = INT_NULL;
 //         this.mesh_bufferidx = INT_NULL;
 //         this.root_bufferidx = INT_NULL;
 //         this.per_vb_bufferidx = INT_NULL;
 //         this.batch_buffer_vbidx = INT_NULL;
-//         this.batchidx = INT_NULL;
 //         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
 //         this.nameidx = INT_NULL;
 
@@ -1928,7 +1925,6 @@ let u = 0;
 
 
 //         this.hover_margin = [0, 0];
-//         this.styles = Styles_create();
 //         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]];
 
 
@@ -2280,7 +2276,7 @@ function Debug_info_create_mesh_info(params) {
    const tr = 1.45;
 
    // const section = Create_widget_section(_, SECTION.VERTICAL, _, DEBUG_INFO.UI_MESH.POS, [0, 0], TRANSPARENCY(REDL[7], .7), 'MeshInfo DebugUi');
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'MeshInfo DebugUi', pad:[10, 10], pos:DEBUG_INFO.UI_MESH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'MeshInfo DebugUi', pad:[10, 10], pos:DEBUG_INFO.UI_MESH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -2510,7 +2506,7 @@ function Debug_info_create_batch_info(params) {
    }
 
    // const section = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], DEBUG_INFO.UI_BATCH.POS, [0, 0], TRANSPARENCY(GREY[1], .5), 'ui batch info panel');
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -2840,7 +2836,7 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    // Create the scolled section where a dropdown is going to exist 
    const scrolled = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], [0, 0, pos[2] + 1], [0, 0], TRANSPARENCY(GREY[0], .4), 'DBG UI Scrolled section', _, _, _, MESH_TYPE.DEBUG_MESH);
-   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:ALIGN_2.RESIZE_SELF|ALIGN_2.VERTICAL}));
+   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    // Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -3277,7 +3273,6 @@ function Helper_mesh_tree_info_create_more_info(parent, info_data, zindex, col_m
       { const info = Create_widget_text(_, `batch:${info_data.batch_buffer_vbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `group:${info_data.group_bufferidxs}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `fbidx:${info_data.fbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
-      { const info = Create_widget_text(_, `batch_fnidx:${info_data.batch_fnidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
    }
 
    { // Geometry info
@@ -3516,7 +3511,6 @@ function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col
       { const info = Create_widget_text(_, `batch:${info_data.batch_buffer_vbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `group:${info_data.group_bufferidxs}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `fbidx:${info_data.fbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
-      { const info = Create_widget_text(_, `batch_fnidx:${info_data.batch_fnidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
    }
 
    { // Geometry info
@@ -3737,7 +3731,6 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
       { const info = Create_widget_text(_, `batch:${info_data.batch_buffer_vbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `group:${info_data.group_bufferidxs}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
       { const info = Create_widget_text(_, `fbidx:${info_data.fbidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
-      { const info = Create_widget_text(_, `batch_fnidx:${info_data.batch_fnidx}`, _, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); view.AddToMenu(info); }
    }
 
    { // Geometry info
@@ -4338,7 +4331,6 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
          entry_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, root_dp.mesh_bufferidx, true);
          entry_mesh.GenGfxCtx();
 
-         // TEMP_DP_STEAL_THE_DP_RECALC(root_dp)
          if (root_dp.menu.is_gfx_inserted) {
 
             entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;

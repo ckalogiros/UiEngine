@@ -309,10 +309,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   SetPosX(x) {
+   SetWposX(x) {
 
-      super.SetPosX(x);
-      this.children.buffer[0].SetPosX(x);
+      super.SetWposX(x);
+      this.children.buffer[0].SetWposX(x);
    }
 
 
