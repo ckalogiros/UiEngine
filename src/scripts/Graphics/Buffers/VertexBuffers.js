@@ -947,7 +947,6 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
     const vb_groupidx = gfx.vb.groupidx;
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-    // const attribs_info = Shader_attributes_get_attribs(prog.attribsidx);
 
     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
 
@@ -961,15 +960,15 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
 
         // Reallocate vertex buffer if it has no more space
         let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-        let meshSize = 0;
+        let total_attribs = 0;
         if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
             verts_per_rect = 2;
-            meshSize = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
+            total_attribs = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
         }
-        else meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
+        else total_attribs = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
         
         
-        if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
+        if (vb_info.count + total_attribs >= vb_info.size) vb_info.Realloc(total_attribs);
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
 
@@ -979,11 +978,11 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
         const attribs_count = vb_info.attribs_info.count;
 
-        vb_info.vCount = meshSize / vb_info.attribs_info.count;
+        vb_info.vCount = total_attribs / vb_info.attribs_info.count;
 
         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset, vb_info.vCount);
 
-        vb_info.count += meshSize;
+        vb_info.count += total_attribs;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
 
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
@@ -994,8 +993,6 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         // Store the texture index in the vertex
         vb_info.texidx = mat.texidx;
         gfx.vb.counts.buffer[i] = verts_per_rect * vb_info.attribs_info.count;
-
-        // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 
     }
 
@@ -1043,15 +1040,15 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
         // Reallocate vertex buffer if it has no more space
         let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-        let meshSize = 0;
+        let total_attribs = 0;
         if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
             verts_per_rect = 2;
-            meshSize = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
+            total_attribs = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
         }
-        else meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
+        else total_attribs = vb_info.attribs_info.count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
         // const verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
-        // const meshSize = vb_info.attribs_info.count * verts_per_rect * num_faces;
-        if (vb_info.count + meshSize >= vb_info.size) vb_info.Realloc(meshSize);
+        // const total_attribs = vb_info.attribs_info.count * verts_per_rect * num_faces;
+        if (vb_info.count + total_attribs >= vb_info.size) vb_info.Realloc(total_attribs);
         
 
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);

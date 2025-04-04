@@ -1,5 +1,4 @@
 import { Mesh_buffer_get } from "./MeshBuffer.js";
-import { Section } from "../Drawables/Meshes/Section.js";
 import { Widget_Label } from "../Drawables/Widgets/WidgetLabel.js";
 import { Widget_Button, Widget_Switch } from "../Drawables/Widgets/WidgetButton.js";
 import { Widget_Multi_Text, Widget_Text } from "../Drawables/Widgets/WidgetText.js";
@@ -81,23 +80,6 @@ export function Create_text_mesh(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-/** (is_root, options, pad, pos, dim, col, name, style, num_faces, texture_id, sub_texture_id, is_debug_mesh) { */
-export function Create_widget_section(properties) {
-
-   const _mesh_buffer = Mesh_buffer_get();
-   const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx,
-      new Section(mesh_bufferidx, properties)
-   );
-
-   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
-      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
-
-   return _mesh_buffer.buffer[mesh_bufferidx];
-}
-
 
 
 export function Create_widget_text(properties) {

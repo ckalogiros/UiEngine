@@ -39,12 +39,8 @@ export function Shaders_load(gl, sid, uniforms_info, shader_ops) {
 	const vShader = Shaders_build_vertex_shader(sid, uniforms_info);
 	const fShader = Shaders_build_fragment_shader(sid, uniforms_info, shader_ops);
 
-	// _vertex_shader_buffer.push({vShader:vShader});
-	// _fragment_shader_buffer.push({fShader:fShader});
 	_vertex_shader_buffer.push(vShader.vs);
 	_fragment_shader_buffer.push(fShader.fs);
-	// _vertex_shader_buffer.push(vShader.code);
-	// _fragment_shader_buffer.push(fShader.code);
 
 	const shader_program = Load_shaders(gl, vShader.vs, fShader.fs, sid);
 	if (shader_program) {
@@ -76,10 +72,10 @@ function Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, 
 		gl.bindAttribLocation(shader_program, loc, 'a_wpos_time');
 		loc++;
 	}
-	if(sid.attr & SID.ATTR.STYLE){
-		gl.bindAttribLocation(shader_program, loc, 'a_generic_1');
-		loc++;
-	}
+	// if(sid.attr & SID.ATTR.STYLE){
+	// 	gl.bindAttribLocation(shader_program, loc, 'a_generic_1');
+	// 	loc++;
+	// }
 	if(sid.attr & SID.ATTR.VPOS2){
 		gl.bindAttribLocation(shader_program, loc, 'a_pos');
 		loc++;
@@ -111,10 +107,6 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	const msg = (success === undefined) ? 'Success!' : success;
 	if(DEBUG.SHADERS) console.log('Validate program', msg);
 	
-	// Bind attribute locations before linking the program
-	// Bind_attributes_at_specific_locations_based_on_sid(gl, shader_program, sid);
-	// console.error('881766293 Bind_attributes_at_specific_locations_based_on_sid() has been deactivated \nThe new implementation of predetermine attribute locations are in the ShaderBitFlags.js file')
-
 	gl.linkProgram(shader_program);
 
 	const status = gl.getProgramParameter(shader_program, gl.LINK_STATUS);
@@ -173,8 +165,4 @@ export function Shaders_print_loop() {
 		);
 
 	}
-	// console.log( '----- Shader Code -----',
-	// 	'\nVertex shader', _vertex_shader_buffer,
-	// 	'\nFragment shader', _fragment_shader_buffer,
-	// );
 }

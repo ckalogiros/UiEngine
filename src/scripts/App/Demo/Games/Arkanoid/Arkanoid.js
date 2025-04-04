@@ -20,7 +20,7 @@ import { Arkanoid_powerup_reset, Arkanoid_powup_destroy, Powup_init_buffer, Powu
 import { Arkanoid_scoremod_destroy, Arkanoid_scoremod_reset, Score_mod_init_buffer } from "./ScoreMod.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_activate_all_vbs } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Check_intersection_point_rect } from "../../../../Engine/Drawables/Operations/Collisions.js";
-import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Align_pre_simple } from "../../../Tests/TestAlignNestedSections.js";
 import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";

@@ -7,7 +7,7 @@ import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Debug_info_create_ui_focused, Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { GetRandomColor, GetRandomInt, GetRandomPos, GetSequencedColor } from '../Helpers/Helpers.js';
-import { Create_rect_mesh, Create_text_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_section, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_text_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_minimize_btn, Create_widget_multi_text, Create_widget_scroller, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { Clipy_from_group } from '../Engine/Drawables/Operations/Clip.js';
 import { BLACK, BLUE, BLUEL, BLUER, BLUE_10_120_220, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREENL, GREENR, GREY, Get_fasma_color, Interpolate_rgb_to_01, MAGENTA, ORANGE, ORANGEL, ORANGER, ORANGE_240_160_10, PURPLE, PURPLEB, PURPLER, RED, REDL, RGB, TRANSPARENT, WHITE, YELLOW, YELLOWL, YELLOWR } from '../Engine/Drawables/Material/Base/Colors.js';
 import { View_build_group_from_root_mesh, View_set_view_vb_start } from '../Engine/Core/Views/MeshBufferViews.js';
@@ -47,11 +47,10 @@ import { Arkanoid_initialize, Arkanoid_test_game_options } from './Demo/Games/Ar
 import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_slider_simple, Widget_ready_switch, Widget_ready_switch_button } from './Widgets/WidgetReadyWidgets.js';
 import { Effects_create_explosion_circle, Effect_explosion_circle_get_mesh_byidx } from '../Engine/Drawables/Effects/Effects.js';
 import { Widget_gfx_ready_enable, Widget_gfx_ready_enable_default } from './Widgets/WidgetGfxReady.js';
-import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
-import { Align_expand, Align_pre_simple, Test_alignment, Test_alignment_nested_2 } from './Tests/TestAlignNestedSections.js';
+import { CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
+import { Align_expand, Align_pre_simple, Test_alignment } from './Tests/TestAlignNestedSections.js';
 import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFps, PerformanceTimersGetMilisec } from '../Engine/Timers/PerformanceTimers.js';
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
-import { Expand } from '../Engine/Drawables/Meshes/Section.js';
 import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer, Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from './Widgets/WidgetGenericControlsReady.js';
 
@@ -200,7 +199,7 @@ export function TestWidgetsGeneric() {
     }
 
     { // Resize section
-        // SectionResizable([50, 0, 0])
+        SectionResizable([50, 0, 0])
     }
 
     { // Widget: Dropdown
@@ -370,8 +369,8 @@ export function TestWidgetsGeneric() {
 
         { // Demos Widgets
 
-            let y = 0;
-            const pad = 50;
+            // let y = 0;
+            // const pad = 50;
 
             // const sections = Demo_widgets_sections(_, [0, 100]);
             // y += sections.geom.dim[1]*2 + pad;
@@ -379,7 +378,7 @@ export function TestWidgetsGeneric() {
             // const info = Demo_widgets_explainer_info([100,100])
             // y += info.geom.dim[1]*2 + pad;
 
-            const btn = Demo_widgets(_, [0, y]);
+            // const btn = Demo_widgets(_, [0, y]);
             // y += btn.geom.dim[1]*2 + pad;
 
             // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
@@ -1263,14 +1262,11 @@ function SectionResizable(pos) {
 
     const tr = 1.;
     const marg = [10, 10];
-    // const dim = [200, 200];
-    const dim = [400, VIEWPORT.HEIGHT / 2];
+    const dim = [200, 200];
+    // const dim = [400, VIEWPORT.HEIGHT / 2];
 
-    // const grey = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, marg, pos, dim, TRANSPARENCY(BLUEL[5], tr), _, [, dim[1], 2]);
-    // const grey = Create_widget_section(Style_section_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: _, pad: marg, pos: pos, dim: dim, col: TRANSPARENCY(BLUEL[5], tr), }));
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: _, pad: marg, pos: pos, dim: dim, col: TRANSPARENCY(BLUEL[5], tr), }));
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, })
-    // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.StateEnable(MESH_STATE.IS_RESIZEABLE);
     section.SetName(`section${grey_cnt++}`);

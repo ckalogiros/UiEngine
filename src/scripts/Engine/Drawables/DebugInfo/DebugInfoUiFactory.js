@@ -1,6 +1,6 @@
 "use strict";
 
-import { Create_widget_label, Create_widget_section, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
+import { Create_widget_label, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
 import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Style_label_default_properties, Style_section_default_properties, Style_switch_default_properties } from "../Widgets/WidgetReadyStyles.js";
 

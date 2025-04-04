@@ -13,6 +13,8 @@ src/scripts/Graphics/Shaders/ignore/*
 
 src/scripts/Helpers/ignore/*
 
+src/scripts/unused/*
+
 
 build
 node_modules

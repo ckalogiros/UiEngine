@@ -3,22 +3,15 @@
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
-import { AddArr2, CopyArr2 } from "../../../Helpers/Math/MathOperations.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_section } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { Calculate_sizes_recursive, Expand, Section, Section_on_move_clbk } from "../Meshes/Section.js";
-import { GREY, PURPLER, WHITE } from "../Material/Base/Colors.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
-import { Relative_pos_comp_recalc_all } from "../Operations/RelativePosComponent.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos } from "./ScrollerComponent.js";
-import { Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
-import { Style_rect_default_properties, Style_section_default_properties } from "./WidgetReadyStyles.js";
 import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
-import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 
 
@@ -551,7 +544,7 @@ export class Widget_Dropdown extends Rect_Mesh {
        * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
        * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
        */
-      const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, dp);
+      const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
       if (dp.StateCheck(MESH_STATE.IS_GRABABLE)) {

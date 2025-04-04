@@ -350,12 +350,6 @@ const SID = {
         if (sid.inst & SID.INST.TIME) str[k] += 'time, '
         if (sid.inst & SID.INST.SDF) str[k] += 'sdf, '
         if (sid.inst & SID.INST.MSDF) str[k] += 'msdf, '
-        if (sid.inst & SID.INST.STYLE) {
-            str[k] += 'generir_attribs1, ';
-            if (sid.attr & (SID.ATTR.STYLE)) str[k] += 'style, ';
-            if (sid.attr & (SID.ATTR.BORDER & SID.ATTR.FEATHER & SID.ATTR.R_CORNERS)) str[k] += '[round corners, border width, border feather], ';
-            if (sid.attr & (SID.ATTR.EMPTY)) str[k] += 'empty, ';
-        }
         if (sid.inst & SID.INST.POS3) str[k] += 'pos3, '
         if (sid.inst & SID.INST.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
         if (sid.inst & SID.INST.EMPTY) str[k] += 'empty, '

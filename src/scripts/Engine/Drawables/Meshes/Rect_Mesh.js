@@ -5,24 +5,17 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_update_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
-import { Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy, Mesh_unif_is_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { Calculate_positions_no_gfx_update_recursive, Calculate_sizes_recursive, Section_on_move_clbk } from "./Section.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
+import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
 
-/*
- * Remove class Rect
- * Deal with the AddItem() and AddChild methods
- * What about the variable 'options'?
- */
-// export class Rect_Mesh extends Rect {
 export class Rect_Mesh extends Mesh {
 
    /**
@@ -363,7 +356,7 @@ export class Rect_Mesh extends Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Section_on_move_clbk, section);
+         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, section);
          section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
@@ -460,5 +453,34 @@ export class Rect_Mesh extends Mesh {
          if (child) Section_rotatez_children_recursive(child, angle);
       }
    }
+
+}
+
+
+export function Rect_mesh_on_move_clbk(params) {
+
+   const section = params.params;
+
+   // Destroy the time interval calling this function if the mesh is not grabed.
+   if (section.StateCheck(MESH_STATE.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+
+      const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+      Time_intervals_destroy_byidx(intervalIdx);
+      section.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
+
+      return;
+   }
+
+   const mouse_dif = Mouse_get_pos_dif();
+   if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
+
+   Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y);
+
+
+   /********************************************************************************************************************/
+   // Set any scrollbar
+   // TODO: We need to make the scroller visible to the root parent 'section' mesh.
+   if (section.scroller_comp !== null || section.has_children_scrollers)
+      Scroller_component_movexy(section.children_scrollers_buffer, mouse_dif.x, -mouse_dif.y);
 
 }
