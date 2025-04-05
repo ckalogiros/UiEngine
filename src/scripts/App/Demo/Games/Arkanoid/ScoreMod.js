@@ -4,9 +4,10 @@ import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buf
 import { Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { GREY, TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Set_color_rgba, Set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_alpha, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Arkanoid_score_calc } from "./Arkanoid.js";
 
@@ -50,7 +51,8 @@ class Score_Mod {
 
    constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL) {
 
-      const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENT, text_col:text_color, texture_id:font,}));
+      // const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENT, text_col:text_color, texture_id:font,}));
+      const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENCY(GREY[4], .4), text_col:text_color, texture_id:font,}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidxs.label, vb_groupidxs.text_mesh);
 
@@ -163,10 +165,20 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
       const score_mod = _text_mesh_buffer.buffer[idx];
 
 
-      score_mod.mesh.SetWposXY(x, y);
+      Set_wpos_xy(score_mod.mesh, x, y)
+      // Set_wpos_xy(score_mod.mesh.text_mesh, x, y)
+      // Gl_set_wpos_xy(score_mod.mesh.gfx, x, y);
+      // score_mod.mesh = x;
+      // score_mod.mesh.geom.pos[0] = x;
+      // score_mod.mesh.geom.pos[1] = y;
+      score_mod.mesh.text_mesh.geom.pos[0] = x;
+      score_mod.mesh.text_mesh.geom.pos[1] = y;
+      // score_mod.mesh.text_mesh.geom.pos[0] = score_mod.mesh.geom.pos[0];
+      // score_mod.mesh.text_mesh.geom.pos[1] = score_mod.mesh.geom.pos[1];
       score_mod.mesh.text_mesh.RenderTextFromString(text);
 
-      score_mod.mesh.text_mesh.SetColorRGBA(text_color)
+      Set_color_rgba(score_mod.mesh.text_mesh, text_color)
+      // score_mod.mesh.text_mesh.SetColorRGBA(text_color)
       score_mod.is_active = true;
 
       // Remove from the free idxs buffer

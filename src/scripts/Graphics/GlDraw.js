@@ -95,8 +95,6 @@ export function Gl_draw(gl) {
                     
                     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                    // TODO: Set bufferData instead
-                    // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW);
                     gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
                     GL_STATE.BOUND_VBO = vb_info.vbo;

@@ -301,7 +301,45 @@ export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, st
 }
 
 
+export function FILL_VERTEX_BUFFER_TEST(vb_data, attribs, start, num_faces, stride, num_vertices, a_vpos_offset) {
 
+   let attribs_count = 0;
+   let index = start;
+
+   // for (let i = 0; i < num_faces; i++) {
+      
+   //    for (let j = 0; j < num_vertices; j++) {
+
+   //       for (let k = 0; k < attribs.length; k++) {
+            
+   //          for (let l = 0; l < attribs[k].length; l++) {
+
+   //             vb_data[index++] = attribs[k][l];
+   //          }
+   //       }
+   //    }
+
+   //    attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
+
+   // }
+   for (let i = 0; i < num_faces; i++) {
+      
+      for (let j = 0; j < num_vertices; j++) {
+
+         for (let k = 0; k < attribs.length; k++) {
+            
+            vb_data[index++] = attribs[k];
+         }
+      }
+
+      attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
+
+   }
+
+   // Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
+   return attribs_count;
+
+}
 
 
 
@@ -321,38 +359,7 @@ export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, st
  * 
  **************************************************************************************************************************************/
 
-// function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, num_faces) {
 
-//    let index = start;
-
-//    stride -= 2;
-
-//    let posx = dimx;
-//    const posy = dimy;
-
-//    for(let i=0; i<num_faces; i++){
-
-//       // VERTEX POSITION
-//       vb_data[index++] = -posx;
-//       vb_data[index++] = -posy;
-//       index += stride;
-
-//       vb_data[index++] = -posx;
-//       vb_data[index++] =  posy;
-//       index += stride;
-
-//       vb_data[index++] =  posx;
-//       vb_data[index++] = -posy;
-//       index += stride;
-
-//       vb_data[index++] = posx;
-//       vb_data[index++] = posy;
-//       index += stride;
-
-//       posx += dimx*4
-//    }
-
-// }
 export function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, num_faces, len) {
 
    let index = start;
@@ -361,7 +368,6 @@ export function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, nu
 
    let width = (dimx * 2) / (num_faces);
    let l = -dimx;
-   // let r= l+width;
    let t = -dimy;
    let b = dimy;
 
@@ -381,32 +387,6 @@ export function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, nu
       l += width;
 
    }
-   // for(let i=0; i<num_faces; i++){
-   // // for(let i=0; i<(len/num_faces)+1; i++){
-   // // for(let i=0; i<len+(len-(num_faces*2)); i++){
-
-   //    // VERTEX POSITION
-   //    vb_data[index++] = l;
-   //    vb_data[index++] = t;
-   //    index += stride;
-
-   //    vb_data[index++] = l;
-   //    vb_data[index++] = b;
-   //    index += stride;
-
-   //    vb_data[index++] = r;
-   //    vb_data[index++] = t;
-   //    index += stride;
-
-   //    vb_data[index++] = r;
-   //    vb_data[index++] = b;
-   //    index += stride;
-
-   //    l = r+width;
-   //    r = l+width;
-   //    // t -= 20;
-   //    // b += 20;
-   // }
 
 }
 function Set_vertex_uv_coordinates_TEX2(vb_data, start, stride, uv) {
@@ -1034,50 +1014,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME_GENERIC2(vb_data
    return attribs_count;
 
 }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_GENERIC2(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset) {
-
-//    let attribs_count = 0;
-//    let index = start;
-//    const len = num_faces * verts_per_rect;
-
-//    for (let i = 0; i < len; i++) {
-
-//       // COLOR
-//       vb_data[index++] = mat.col[0];
-//       vb_data[index++] = mat.col[1];
-//       vb_data[index++] = mat.col[2];
-//       vb_data[index++] = mat.col[3];
-
-//       // WORLD POSITION
-//       vb_data[index++] = geom.pos[0] + geom.dim[0];
-//       vb_data[index++] = geom.pos[1] + geom.dim[1];
-//       vb_data[index++] = geom.pos[2];
-
-//       // VERTEX POSITION
-//       index += V_POS_COUNT;
-
-//       // DIMENTION
-//       vb_data[index++] = geom.dim[0];
-//       vb_data[index++] = geom.dim[1];
-
-//       // STYLE
-//       vb_data[index++] = mat.style.rcorners;
-
-//       // GENERIC
-//       // index += V_GENERIC2_COUNT;
-//       vb_data[index++] = geom.generic.a;
-//       vb_data[index++] = geom.generic.b;
-
-//       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
-
-//    }
-
-//    Set_vertex_position_VPOS2(vb_data, start+a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-//    // const a_dim_offset = a_vpos_offset+2
-//    // Set_dimention_DIM2(vb_data, start+a_dim_offset, stride, geom.dim[0], geom.dim[1], num_faces);
-//    return attribs_count;
-
-// }
 function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME_GENERIC2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
 
    let attribs_count = 0;
@@ -1155,122 +1091,6 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
    return attribs_count;
 
 }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
-
-//    let attribs_count = 0;
-//    let index = start;
-//    const len = num_faces * verts_per_rect;
-
-//    for (let i = 0; i < len; i++) {
-
-//       // COLOR
-//       vb_data[index++] = mat.col[0];
-//       vb_data[index++] = mat.col[1];
-//       vb_data[index++] = mat.col[2];
-//       vb_data[index++] = mat.col[3];
-
-//       // WORLD POSITION
-//       vb_data[index++] = geom.pos[0] + geom.dim[0];
-//       vb_data[index++] = geom.pos[1] + geom.dim[1];
-//       vb_data[index++] = geom.pos[2];
-
-//       // VERTEX POSITION
-//       index += V_POS_COUNT;
-
-//       // STYLE
-//       vb_data[index++] = mat.style.rcorners;
-//       vb_data[index++] = mat.style.feather;
-//       vb_data[index++] = mat.style.border;
-
-//       // GLOW_INTENSITY
-//       vb_data[index++] = .0;
-
-//       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
-
-//    }
-
-//    Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-//    return attribs_count;
-
-// }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
-
-//    let attribs_count = 0;
-//    let index = start;
-//    const len = num_faces * verts_per_rect;
-
-//    for (let i = 0; i < len; i++) {
-
-//       // COLOR
-//       vb_data[index++] = mat.col[0];
-//       vb_data[index++] = mat.col[1];
-//       vb_data[index++] = mat.col[2];
-//       vb_data[index++] = mat.col[3];
-
-//       // WORLD POSITION
-//       vb_data[index++] = geom.pos[0] + geom.dim[0];
-//       vb_data[index++] = geom.pos[1] + geom.dim[1];
-//       vb_data[index++] = geom.pos[2];
-
-//       // VERTEX POSITION
-//       index += V_POS_COUNT;
-
-//       // DIMENTION
-//       vb_data[index++] = geom.dim[0];
-//       vb_data[index++] = geom.dim[1];
-
-//       // STYLE
-//       vb_data[index++] = mat.style.rcorners;
-//       vb_data[index++] = mat.style.feather;
-
-//       // GLOW_INTENSITY
-//       vb_data[index++] = .0;
-
-//       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
-
-//    }
-
-//    Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-//    return attribs_count;
-
-// }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
-
-//    let attribs_count = 0;
-//    let index = start;
-//    const len = num_faces * verts_per_rect;
-
-//    for (let i = 0; i < len; i++) {
-
-//       // COLOR
-//       vb_data[index++] = mat.col[0];
-//       vb_data[index++] = mat.col[1];
-//       vb_data[index++] = mat.col[2];
-//       vb_data[index++] = mat.col[3];
-
-//       // WORLD POSITION
-//       vb_data[index++] = geom.pos[0] + geom.dim[0];
-//       vb_data[index++] = geom.pos[1] + geom.dim[1];
-//       vb_data[index++] = geom.pos[2];
-
-//       // VERTEX POSITION
-//       index += V_POS_COUNT;
-
-//       // STYLE
-//       vb_data[index++] = mat.style.rcorners;
-//       vb_data[index++] = mat.style.feather;
-
-//       // GLOW_INTENSITY
-//       vb_data[index++] = mat.style.border; // HACK: this attribute must have its own field variable in the mesh class
-
-//       attribs_count += stride; // TODO: Store Vertices_per_rect in shder_attribs?????
-
-//    }
-
-//    Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-//    return attribs_count;
-
-// }
 function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
 
    let attribs_count = 0;

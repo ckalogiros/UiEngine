@@ -7,9 +7,9 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREEN, GREY, PURPLE, TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Add_wpos_y, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min, Mult_arr3_scalar } from "../../../../Helpers/Math/MathOperations.js";
@@ -708,7 +708,7 @@ function Animation_push_up_run(params) {
    }
    else if (dirx !== 0) {
 
-      mesh.geom.AddWposX(mesh.gfx, movex);
+      mesh.AddWposX(mesh.gfx, movex);
       params.target_dist -= params.move_dist;
 
       // Create brick squash
@@ -725,12 +725,13 @@ function Animation_push_up_run(params) {
          mesh.geom.dim[1] -= size;
          if (mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = false;
       }
-      mesh.geom.SetDimXY(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+      Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
       Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
    }
    else if (diry !== 0) {
 
-      mesh.geom.AddWposY(mesh.gfx, movey);
+      // mesh.geom.AddWposY(mesh.gfx, movey);
+      Gl_add_wpos_y(mesh.gfx, movey);
       params.target_dist -= params.move_dist;
 
 
@@ -748,7 +749,7 @@ function Animation_push_up_run(params) {
          mesh.geom.dim[1] += size;
          if (mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = false;
       }
-      mesh.geom.SetDimXY(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+      Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
       Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
 
    }
@@ -756,15 +757,17 @@ function Animation_push_up_run(params) {
    { // Score modifier
       const sizex = score_mod.geom.dim[0] * (slope * scale);
       const sizey = score_mod.geom.dim[1] * (slope * scale);
-      score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
+      Gl_set_vpos_xy(score_mod.gfx, sizex, sizey);
       Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
+      Add_wpos_y(score_mod, -params.move_amt);
 
       if (score_mod.sid.attr & SID.ATTR.R_CORNERS) {
          Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
       }
 
       score_mod.text_mesh.ScaleText(slope * scale)
-      score_mod.AddWposY(-params.move_amt);
+      // Gl_add_wpos_y(score_mod.text_mesh.gfx, -params.move_amt, score_mod.text_mesh.geom.num_faces);
+      // Add_wpos_y(score_mod.text_mesh, -params.move_amt);
    }
 
    if (params.target_dist > 0) return true;
@@ -808,7 +811,7 @@ function Animation_pull_run(params) {
       }
       else if (dirx !== 0) {
 
-         mesh.geom.AddWposX(mesh.gfx, -movex);
+         mesh.AddWposX(mesh.gfx, -movex);
          params.target_dist -= params.move_dist;
 
          // Create brick squash
@@ -824,12 +827,13 @@ function Animation_pull_run(params) {
             mesh.geom.dim[1] -= size;
             if (mesh.geom.dim[0] >= params.brick_dim_x_initial + lim) brick.lock_squash_anim = false;
          }
-         mesh.geom.SetDimXY(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+         Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
          Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
       }
       else if (diry !== 0) {
 
-         mesh.geom.AddWposY(mesh.gfx, -movey);
+         // mesh.geom.AddWposY(mesh.gfx, -movey);
+         Gl_add_wpos_y(mesh.gfx, -movey);
          params.target_dist -= params.move_dist;
 
          // Create brick squash
@@ -845,7 +849,7 @@ function Animation_pull_run(params) {
             mesh.geom.dim[1] += size;
             if (mesh.geom.dim[0] <= params.brick_dim_x_initial - lim) brick.lock_squash_anim = false;
          }
-         mesh.geom.SetDimXY(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
+         Gl_set_vpos_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
          Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
       }
    }
@@ -860,11 +864,11 @@ function Animation_pull_stop(params) {
    // Brick set back initial dimentions
    params.brick.mesh.geom.dim[0] = params.brick_dim_x_initial;
    params.brick.mesh.geom.dim[1] = params.brick_dim_y_initial;
-   params.brick.mesh.geom.SetDimXY(params.brick.mesh.gfx, params.brick.mesh.geom.dim[0], params.brick.mesh.geom.dim[1]);
+   Gl_set_vpos_xy(params.brick.mesh.gfx, params.brick.mesh.geom.dim[0], params.brick.mesh.geom.dim[1]);
    Gl_set_dim_xy(params.brick.mesh.gfx, params.brick.mesh.geom.dim[0], params.brick.mesh.geom.dim[1]);
 
    // Set to initial position
-   params.brick.mesh.geom.SetWposXY(params.brick.mesh.gfx, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0], params.brick.mesh.geom.pos[1] + params.brick.mesh.geom.dim[1]);
+   Gl_set_wpos_xy(params.brick.mesh.gfx, params.brick.mesh.geom.pos[0] + params.brick.mesh.geom.dim[0], params.brick.mesh.geom.pos[1] + params.brick.mesh.geom.dim[1]);
 
    params.brick.mesh.SetColorRGBA(TRANSPARENCY(GREY[2], .3));
    params.brick.is_active = false;
@@ -977,13 +981,17 @@ function Animation_explosion_circle_run(params) {
       const slope = Logarithmic_interpolation(timer, slope_constant);
       const sizex = score_mod.geom.dim[0] * (slope * scale);
       const sizey = score_mod.geom.dim[1] * (slope * scale);
-      score_mod.geom.SetDimXY(score_mod.gfx, sizex, sizey);
+      // score_mod.SetDimXY(score_mod.gfx, sizex, sizey);
+      Gl_set_vpos_xy(score_mod.gfx, sizex, sizey);
       Gl_set_dim_xy(score_mod.gfx, sizex, sizey);
 
       // Update text
       Set_color_a(score_mod.text_mesh, 1 - params.timer, score_mod.text_mesh.geom.num_faces);
       score_mod.text_mesh.ScaleText(slope * scale)
-      score_mod.AddWposY(-params.move_amt * 1.2);
+
+      Gl_add_wpos_y(score_mod.text_mesh.gfx, -params.move_amt * 10.2, score_mod.text_mesh.geom.num_faces);
+      // Add_wpos_y(score_mod.text_mesh, -params.move_amt * 1.2);
+      Add_wpos_y(score_mod, -params.move_amt * 1.2);
 
    }
 
@@ -1123,7 +1131,8 @@ function Animation_powup_hit_run(params) {
 
       const slope = Logarithmic_interpolation(timer, slope_constant);
       score_mod.text_mesh.ScaleText(slope * scale)
-      score_mod.AddWposY(-params.move_amt * 10 * (1 - slope));
+      // Add_wpos_y(score_mod.text_mesh, -params.move_amt * 10 * (1 - slope));
+      Add_wpos_y(score_mod, -params.move_amt * 10 * (1 - slope));
 
    }
    else if (params.alpha_timer < 1) {
@@ -1198,10 +1207,12 @@ function Animation_run(params) {
                if (brick.geom.dim[1] > 13 && _bricks_buffer.buffer[row.buffer[i]].is_active === false) {
 
                   const size = 2.
-                  brick.geom.AddWposY(brick.gfx, size);
+                  // brick.geom.AddWposY(brick.gfx, size);
+                  Gl_add_wpos_y(brick.gfx, size);
                   brick.geom.dim[0] += size;
                   brick.geom.dim[1] -= size;
-                  brick.geom.SetDimXY(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
+                  // brick.SetDimXY(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
+                  Gl_set_vpos_xy(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
                   Gl_set_dim_xy(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
 
                }
@@ -1209,7 +1220,7 @@ function Animation_run(params) {
 
                   brick.geom.dim[0] = brick.geom.defDim[0];
                   brick.geom.dim[1] = brick.geom.defDim[1];
-                  brick.geom.SetDimXY(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
+                  Gl_set_vpos_xy(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
                   Gl_set_dim_xy(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);
 
                   brick.geom.pos[1] = brick.geom.defPos[1];

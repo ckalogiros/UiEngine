@@ -9,7 +9,7 @@ import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Mat
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
-import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Min } from "../../../../Helpers/Math/MathOperations.js";
@@ -426,7 +426,7 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
 
       ball.mesh.geom.pos[0] += ph.velx * (ph.speed + ph.accelx);
       ball.mesh.geom.pos[1] += ph.vely * (ph.speed + ph.accely);
-      ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0] + ball_size, ball.mesh.geom.pos[1] + ball_size);
+      Gl_set_wpos_xy(ball.mesh.gfx, ball.mesh.geom.pos[0] + ball_size, ball.mesh.geom.pos[1] + ball_size);
 
       if (ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point values
       else if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')
@@ -516,7 +516,7 @@ function Ball_animation_scale_up_run(params) {
    ball.geom.dim[0] = ball_size;
    ball.geom.dim[1] = ball_size;
 
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Gl_set_vpos_xy(ball.gfx, ball_size, ball_size);
    Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
    Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
 
@@ -568,7 +568,7 @@ function Ball_animation_scale_down_run(params) {
    ball.geom.dim[0] = ball_size;
    ball.geom.dim[1] = ball_size;
 
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Gl_set_vpos_xy(ball.gfx, ball_size, ball_size);
    Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
    Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
 
@@ -590,7 +590,7 @@ function Ball_animation_scale_down_stop(params) {
    params.ball.mesh.geom.dim[0] = ball_initial_dimx;
    params.ball.mesh.geom.dim[1] = ball_initial_dimx;
 
-   params.ball.mesh.geom.SetDimXY(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
+   Gl_set_vpos_xy(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
    Gl_set_dim_xy(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
    Gl_set_attr_round_corners(params.ball.mesh.gfx, ball_initial_dimx);
 
@@ -667,7 +667,7 @@ function Ball_animation_squash_run(params) {
       ball.geom.dim[1] = params.ball_initial_size;
       ball.geom.dim[0] = params.ball_initial_size;
       // ball.geom.AddWposY(ball.gfx, size);
-      ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+      Gl_set_vpos_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
       Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
       Gl_set_attr_round_corners(ball.gfx, params.ball_initial_size);
 
@@ -678,7 +678,7 @@ function Ball_animation_squash_run(params) {
 
       return false;
    }
-   ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+   Gl_set_vpos_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
    Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
    Gl_set_attr_round_corners(ball.gfx, Min(ball.geom.dim[0], ball.geom.dim[1]));
 

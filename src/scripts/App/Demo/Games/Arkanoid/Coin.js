@@ -9,7 +9,7 @@ import { BLUEL, GREY, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawable
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_add_wpos_xy, Gl_set_alpha, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_alpha, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
@@ -416,7 +416,7 @@ function Coin_update_state_2(coin) {
 
          const slope = Logarithmic_interpolation(timer, slope_constant);
          score_mod.text_mesh.ScaleText(slope * scale)
-         score_mod.AddWposY(-coin.dependencies.move_amt * 10 * (1 - slope));
+         Gl_add_wpos_y(score_mod.gfx, -coin.dependencies.move_amt * 10 * (1 - slope));
       }
       else if (coin.dependencies.alpha_timer < 1) {
 

@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_add_vertices_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -14,6 +14,8 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Shader_attributes_get_attribs } from "../../../Graphics/ShaderAttributes.js";
+import * as glBufferOps from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -31,7 +33,10 @@ export class Rect_Mesh extends Mesh {
 
       
       super(geom, mat);
-      // console.log(properties.name, properties.col)
+
+
+
+
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
 
@@ -88,6 +93,49 @@ export class Rect_Mesh extends Mesh {
       return mesh.idx;
    }
 
+   /****************************************************************************************************************************************************/
+   AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps. Gl_add_vpos_xy(gfx, x, y, num_faces); }
+   AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
+   AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
+   SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
+   SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
+   SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }
+
+   UpdateAddDimXY  (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+   UpdateAddDimX   (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_x( gfx, this.dim[0], num_faces); }
+   UpdateAddDimY   (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_y( gfx, this.dim[1], num_faces); }
+   UpdateSetDimXY  (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+   UpdateSetDimX   (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
+   UpdateSetDimY   (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
+   UpdateAddWposXY (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
+   UpdateAddWposX  (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
+   UpdateAddWposY  (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
+   UpdateSetWposXY (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
+   UpdateSetWposX  (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
+   UpdateSetWposY  (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
+
+   AddWposXY   (gfx, x, y, num_faces=1) { glBufferOps.Gl_add_wpos_xy(gfx, x, y, num_faces); }
+   AddWposX    (gfx, x   , num_faces=1) { glBufferOps.Gl_add_wpos_x( gfx, x, num_faces); }
+   AddWposY    (gfx, y   , num_faces=1) { glBufferOps.Gl_add_wpos_y( gfx, y, num_faces); }
+   SetWposXY   (gfx, x, y, num_faces=1) { glBufferOps.Gl_set_wpos_xy(gfx, x, y, num_faces); }
+   SetWposX    (gfx, x   , num_faces=1) { glBufferOps.Gl_set_wpos_x( gfx, x, num_faces); }
+   SetWposY    (gfx, y   , num_faces=1) { glBufferOps.Gl_set_wpos_y( gfx, y, num_faces); }
+
+   /** */
+   SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+   /** */
+   SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
+   /** */
+   SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
+   /** */
+   SetWposXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y,); }
+   /** */
+   SetWposX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
+   /** */
+   SetWposY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
+   /** */
+   SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
+   /****************************************************************************************************************************************************/
 
 
    /****************************************************************************************************************************************************/
@@ -191,6 +239,7 @@ export class Rect_Mesh extends Mesh {
 
       // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      // this.TEMP_add_atttribs();
 
       for (let i = 0; i <= this.children.boundary; i++) {
 
@@ -198,6 +247,9 @@ export class Rect_Mesh extends Mesh {
          if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
+
+      
+      
 
    }
    Render(run_for_children = true) {
@@ -215,6 +267,52 @@ export class Rect_Mesh extends Mesh {
       }
 
    }
+   TEMP_add_atttribs() {
+
+      // (attr & SID.ATTR.COL4) ? (attr & SID.ATTR.COL4_PER_VERTEX) ? XXX : XXX;
+      // if (attr & SID.ATTR.WPOS3) clean_attr |= SID.ATTR.WPOS3;
+      // if (attr & SID.ATTR.VPOS2) clean_attr |= SID.ATTR.VPOS2;
+      // if (attr & SID.ATTR.DIM2) clean_attr |= SID.ATTR.DIM2;
+      // if (attr & SID.ATTR.R_CORNERS) clean_attr |= SID.ATTR.R_CORNERS;
+      // if (attr & SID.ATTR.FEATHER) clean_attr |= SID.ATTR.FEATHER;
+      // if (attr & SID.ATTR.TIME) clean_attr |= SID.ATTR.TIME;
+      // if (attr & SID.ATTR.ANGLE) clean_attr |= SID.ATTR.ANGLE;
+      // if (attr & SID.ATTR.BORDER) clean_attr |= SID.ATTR.BORDER;
+      // if (attr & SID.ATTR.TEX2) clean_attr |= SID.ATTR.TEX2;
+      // if (attr & SID.ATTR.GENERIC2) clean_attr |= SID.ATTR.GENERIC2;
+
+      const attribs_info = Shader_attributes_get_attribs(this.gfx.prog.attribsidx);
+
+      
+
+      this.attributes = [
+         this.mat.col[0],this.mat.col[1],this.mat.col[2],this.mat.col[3],
+         this.geom.pos[0]+this.geom.dim[0], this.geom.pos[1]+this.geom.dim[1],this. geom.pos[2],
+         -this.geom.dim[0], -this.geom.dim[1],
+         this.geom.dim[0], this.geom.dim[1],
+         10,
+         0,
+         this.mat.col[0],this.mat.col[1],this.mat.col[2],this.mat.col[3],
+         this.geom.pos[0]+this.geom.dim[0], this.geom.pos[1]+this.geom.dim[1],this. geom.pos[2],
+         -this.geom.dim[0], this.geom.dim[1],
+         this.geom.dim[0], this.geom.dim[1],
+         10,
+         0,
+         this.mat.col[0],this.mat.col[1],this.mat.col[2],this.mat.col[3],
+         this.geom.pos[0]+this.geom.dim[0], this.geom.pos[1]+this.geom.dim[1],this. geom.pos[2],
+         this.geom.dim[0], -this.geom.dim[1],
+         this.geom.dim[0], this.geom.dim[1],
+         10,
+         .0,
+         this.mat.col[0],this.mat.col[1],this.mat.col[2],this.mat.col[3],
+         this.geom.pos[0]+this.geom.dim[0], this.geom.pos[1]+this.geom.dim[1],this. geom.pos[2],
+         this.geom.dim[0], this.geom.dim[1],
+         this.geom.dim[0], this.geom.dim[1],
+         10,
+         .0,
+      ];
+
+   }
    AddToGfx() {
 
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
@@ -225,6 +323,18 @@ export class Rect_Mesh extends Mesh {
 
       return this.gfx.vb.start;
    }
+   // AddToGfx() {
+
+
+
+   //    Vertex_buffer_add_vertices_NEW(this.gfx, this.attributes);
+   //    this.is_gfx_inserted = true;
+
+   //    // Add entry to Gfx Buffer
+   //    this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+
+   //    return this.gfx.vb.start;
+   // }
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)

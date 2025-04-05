@@ -471,9 +471,6 @@ export function Gl_set_vpos_xy(gfxInfo, x, y, num_faces = 1) {
    const xx = x;
    const yy = y;
 
-   // const len = (num_faces * gfxInfo.verts_per_rect)+2;
-   // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
-
 
    /**Contol point of resize left-top */
    vb_data[index++] = -xx;
@@ -1638,6 +1635,16 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 
 
 
+/**
+ * // TODO: 
+ * // EFFICIENCY
+ * Use AoS array of structs to pass all attribs for particles, so that we populate vb linearly
+ * struct{
+ *    col[r,g,b,a]
+ *    pos[x,y]
+ *    generic[a,b]
+ * }
+ */
 /**************************************************************************************************************/
 // Particle System: Batch Update Particles
 

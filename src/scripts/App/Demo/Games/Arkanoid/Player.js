@@ -7,7 +7,7 @@ import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_vpos_x, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 
@@ -177,7 +177,7 @@ function Player_animation_scale_up_run(params) {
    const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
    player.geom.dim[0] = sizex;
 
-   player.geom.SetDimX(player.gfx, sizex,);
+   Gl_set_vpos_x(player.gfx, sizex,);
    Gl_set_dim_x(player.gfx, sizex,);
    Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
 
@@ -188,7 +188,7 @@ function Player_animation_scale_up_run(params) {
       const glow_sizex = glow_current_dimx + (glow_current_dimx * slope * params.glow_scalex);
       glow_fx.geom.dim[0] = glow_sizex;
 
-      glow_fx.geom.SetDimX(glow_fx.gfx, glow_sizex,);
+      Gl_set_vpos_x(glow_fx.gfx, glow_sizex,);
       Gl_set_dim_x(glow_fx.gfx, glow_sizex,);
 
       glow_fx.geom.pos[0] = player.geom.pos[0] + player.geom.dim[0];
@@ -240,7 +240,7 @@ function Player_animation_scale_down_run(params) {
    const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
    player.geom.dim[0] = sizex;
 
-   player.geom.SetDimX(player.gfx, sizex,);
+   Gl_set_vpos_x(player.gfx, sizex,);
    Gl_set_dim_x(player.gfx, sizex,);
    Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
 

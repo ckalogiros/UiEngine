@@ -110,6 +110,7 @@ export class Mesh {
 
         this.geom = geom;
         this.mat = mat;
+        this.attributes = [];
 
 
         this.sid = {
@@ -483,20 +484,20 @@ export class Mesh {
     // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
-    /** */
-    SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
-    /** */
-    SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
-    /** */
-    SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
-    /** */
-    SetWposXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y,); }
-    /** */
-    SetWposX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
-    /** */
-    SetWposY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
-
-    SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
+    // /** */
+    // SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetWposXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y,); }
+    // /** */
+    // SetWposX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
+    // /** */
+    // SetWposY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
+    // /** */
+    // SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
 
     /** */
     GetPosXY() {

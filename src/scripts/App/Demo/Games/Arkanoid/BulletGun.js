@@ -8,7 +8,7 @@ import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_vpos_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
@@ -384,7 +384,7 @@ function Gun_create_animation_run(params) {
 
    const dify = gun.geom.dim[1] - sizey;
    gun.geom.dim[1] = sizey;
-   gun.geom.SetDimY(gun.gfx, sizey,);
+   Gl_set_vpos_y(gun.gfx, sizey,);
    Gl_set_dim_y(gun.gfx, sizey,);
    gun.geom.pos[1] += dify;
    Gl_add_wpos_y(gun.gfx, dify,)
@@ -404,7 +404,7 @@ function Gun_create_animation_stop(params) {
    params.gun.mesh2.geom.pos[1] += params.gun.mesh2.geom.dim[1];
    Gl_add_wpos_y(params.gun.mesh2.gfx, params.gun.mesh2.geom.dim[1],)
    params.gun.mesh2.geom.dim[1] = 0;
-   params.gun.mesh2.geom.SetDimY(params.gun.mesh2.gfx, 0,);
+   Gl_set_vpos_y(params.gun.mesh2.gfx, 0,);
    Gl_set_dim_y(params.gun.mesh2.gfx, 0,);
    Gl_set_alpha(params.gun.mesh2.gfx, 1);
 
@@ -428,7 +428,7 @@ function Gun_create_animation_gun_scale_mesh2_run(params) {
 
    const dify = gun.geom.dim[1] - sizey;
    gun.geom.dim[1] = sizey;
-   gun.geom.SetDimY(gun.gfx, sizey,);
+   Gl_set_vpos_y(gun.gfx, sizey,);
    Gl_set_dim_y(gun.gfx, sizey,);
    gun.geom.pos[1] += dify;
    Gl_add_wpos_y(gun.gfx, dify,)
@@ -483,7 +483,6 @@ function Gun_create_animation_push_back_run(params) {
    if (params.reset_anim) { // Case there is a fire bullet event, we just reset the animation
       params.function_slope.SetTimer(0);
       Gl_set_wpos_y(part1.gfx, part1.geom.pos[1] + part1.geom.dim[1],);
-      Gl_set_wpos_y(part2.gfx, part2.geom.pos[1] + part2.geom.dim[1],);
       params.reset_anim = false;
    }
 

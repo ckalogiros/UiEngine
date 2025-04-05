@@ -24,7 +24,7 @@ import { Style_label_default_properties, Style_rect_default_properties, Style_sl
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Align_pre_simple } from "../../../Tests/TestAlignNestedSections.js";
 import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_set_rgb } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_rgb, Gl_set_wpos_x } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Slider_connect } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from "../../../Widgets/WidgetGenericControlsReady.js";
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
@@ -490,7 +490,7 @@ function Arkanoid_run(params) {
    // Set player's new position
    const new_posx = posx;
    player.mesh.geom.pos[0] = new_posx;
-   player.mesh.SetWposX(new_posx + player_half_dimx);
+   Gl_set_wpos_x(player.mesh.gfx, new_posx + player_half_dimx);
 
 
    const pl_left = player.mesh.geom.pos[0];
@@ -507,12 +507,12 @@ function Arkanoid_run(params) {
          // Make the ball not leave the players's width area
          if (ball.mesh.geom.pos[0] < pl_left) {
             ball.mesh.geom.pos[0] = pl_left;
-            ball.mesh.geom.SetWposX(ball.mesh.gfx, pl_left);
+            Gl_set_wpos_x(ball.mesh.gfx, pl_left);
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
          }
          else if (ball.mesh.geom.pos[0] > pl_right) {
             ball.mesh.geom.pos[0] = pl_right;
-            ball.mesh.geom.SetWposX(ball.mesh.gfx, pl_right);
+            Gl_set_wpos_x(ball.mesh.gfx, pl_right);
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
          }
       }

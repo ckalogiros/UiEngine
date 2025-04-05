@@ -1,5 +1,8 @@
 TODO
 
+* SEE iq's antialias filtering for using instead of sdf rect to all ather shapes
+https://www.shadertoy.com/view/4ssSRl
+
 * Re-implement 'current_event_callback_idx' and 'event_clbks_resolve_fn' for many callbacks in a Mesh
 
 * Align_NEW rename to align or layout and remove Align() if it is unused(check to see)

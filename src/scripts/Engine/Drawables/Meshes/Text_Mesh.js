@@ -483,7 +483,8 @@ export class Text_Mesh extends Mesh {
       let posx = this.geom.pos[0] - text_width;
       // let posy = this.geom.pos[1] - text_height;
       // let posy = center ? this.geom.pos[1]+this.text_height : this.geom.pos[1];
-      let posy = this.geom.pos[1];
+      // let posy = this.geom.pos[1];
+      let posy = this.geom.pos[1] - text_height;
 
 
       // const gfx_copy = { vb: this.gfx.CopyVb() } 
@@ -522,9 +523,10 @@ export class Text_Mesh extends Mesh {
             // posy += (yoffset-texture.base_line ) * size * 2;
 
             Gl_set_wpos_xy(this.gfx, posx + width, posy + height);
+            // Gl_set_wpos_xy(this.gfx, posx + width, posy);
             posx += width * 2;
 
-            posy = this.geom.pos[1] - text_height; // Reset yh position
+            posy = this.geom.pos[1] - text_height; // Reset y position
 
             this.gfx.vb.starts.buffer[0] += attribs_count;
          }
