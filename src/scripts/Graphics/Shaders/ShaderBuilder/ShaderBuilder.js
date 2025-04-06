@@ -1324,7 +1324,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
       // '  if(u_blend_mode) bool a = false;',
-      '  if(u_blend_mode == 0) final_color *= 1.0;',
+      '  if(u_blend_mode == 0) final_color *= 1.0;', // SID.UNIF.BLEND_MODE
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
       // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
