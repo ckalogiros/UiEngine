@@ -646,7 +646,8 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
    const x = brick.mesh.geom.pos[0];
    const y = brick.mesh.geom.pos[1];
 
-   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x + w, y + h, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9]);
+   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x , y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9]);
+   // const score_mod_idx = Score_mod_create(1.2, 'x1.2', x + w, y + h, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9]);
    const score_mod = Score_mod_get_text_mesh_byidx(score_mod_idx);
 
    // Resolve the hit direction to move the brick
@@ -657,7 +658,8 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
       brick: brick,
       direction: { x: dirx, y: diry },
       target_dist: 30, // in pixels
-      move_dist: 2.5, // in pixels
+      // move_dist: 2.5, // in pixels
+      move_dist: .5, // in pixels
       brick_dim_ratio: w / h,
       brick_squash_lim: 7,
       brick_dim_x_initial: w,
@@ -765,8 +767,12 @@ function Animation_push_up_run(params) {
          Gl_set_attr_round_corners(score_mod.gfx, score_mod.mat.style.rcorners * (slope + 1));
       }
 
+      // score_mod.text_mesh.geom.pos[1] = score_mod.geom.pos[1]
+      console.log(score_mod.geom.pos[1])
       score_mod.text_mesh.ScaleText(slope * scale)
-      // Gl_add_wpos_y(score_mod.text_mesh.gfx, -params.move_amt, score_mod.text_mesh.geom.num_faces);
+      Gl_add_wpos_y( score_mod.text_mesh.gfx, -params.move_amt, score_mod.text_mesh.geom.num_faces);
+      console.log(params.move_amt)
+      // Gl_add_wpos_y(score_mod.text_mesh.gfx, -params.move_amt*10, score_mod.text_mesh.geom.num_faces);
       // Add_wpos_y(score_mod.text_mesh, -params.move_amt);
    }
 
@@ -1101,7 +1107,8 @@ function Animation_powup_hit(x, y) {
    const time_step = 0.03, slope_const = 0.5, scale = 3;
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
-
+   // const x = this.glow_mesh.mesh.geom.pos[0] + this.glow_mesh.mesh.geom.dim[0];
+   // const y = this.glow_mesh.mesh.geom.pos[1] + this.glow_mesh.mesh.geom.dim[1];
    const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, PURPLE[9]);
    const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 

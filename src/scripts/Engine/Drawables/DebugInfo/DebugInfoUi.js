@@ -2825,78 +2825,78 @@ export function Dbg_ui_reset_buffer_entries() {
 
 
 
-function Dbg_info_ui_create_ui(pos, name) {
+// function Dbg_info_ui_create_ui(pos, name) {
 
-   const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
-   const pad = [6, 6], style = { rcorners: 6, feather: 1.8, border: 0 }, fontsize = 9.8;
-   // const pad = [6, 6], style = [0, 1, 0], fontsize = 9.8;
+//    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GREY[5], 1.);
+//    const pad = [6, 6], style = { rcorners: 6, feather: 1.8, border: 0 }, fontsize = 9.8;
+//    // const pad = [6, 6], style = [0, 1, 0], fontsize = 9.8;
 
-   pos[0] = 0;
-   pos[1] = 0;
+//    pos[0] = 0;
+//    pos[1] = 0;
 
-   // Create the scolled section where a dropdown is going to exist 
-   const scrolled = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], [0, 0, pos[2] + 1], [0, 0], TRANSPARENCY(GREY[0], .4), 'DBG UI Scrolled section', _, _, _, MESH_TYPE.DEBUG_MESH);
-   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   // Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   // scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
-   // scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
-   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   // scrolled.SetTypeDebug();
+//    // Create the scolled section where a dropdown is going to exist 
+//    const scrolled = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [6, 6], [0, 0, pos[2] + 1], [0, 0], TRANSPARENCY(GREY[0], .4), 'DBG UI Scrolled section', _, _, _, MESH_TYPE.DEBUG_MESH);
+//    // const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+//    // Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+//    scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+//    scrolled.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+//    // scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
+//    // scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+//    scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+//    scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+//    // scrolled.SetTypeDebug();
 
-   // Create the dropdown where all entries for the info will be stored
-   const dp = Create_widget_dropdown(_, name, [0, 0, pos[2] + 2], col_dp, col_menu, _, [4, 4], _, _, _, style, pad, MESH_TYPE.DEBUG_MESH);
-   // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-   // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-   dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
-   dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   Dropdown_roots_set_root(dp, dp);
-   dp.SetTypeDebug();
-   scrolled.AddItem(dp)
+//    // Create the dropdown where all entries for the info will be stored
+//    const dp = Create_widget_dropdown(_, name, [0, 0, pos[2] + 2], col_dp, col_menu, _, [4, 4], _, _, _, style, pad, MESH_TYPE.DEBUG_MESH);
+//    // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
+//    // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+//    dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+//    dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+//    // dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+//    Dropdown_roots_set_root(dp, dp);
+//    dp.SetTypeDebug();
+//    scrolled.AddItem(dp)
 
-   // Create a text widget for count and size info of a buffer
-   const info = Create_widget_text(_, `count:000 size:000`, [0, 0, pos[2] + 2], fontsize, WHITE, _, _, _, MESH_TYPE.DEBUG_MESH);
-   info.SetTypeDebug();
-   dp.AddToMenu(info);
-
-
-
-   scrolled.SetTypeDebug();
-
-   // scrolled.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   scrolled.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, scrolled.mesh_bufferidx, true);
-   scrolled.GenGfxCtx();
+//    // Create a text widget for count and size info of a buffer
+//    const info = Create_widget_text(_, `count:000 size:000`, [0, 0, pos[2] + 2], fontsize, WHITE, _, _, _, MESH_TYPE.DEBUG_MESH);
+//    info.SetTypeDebug();
+//    dp.AddToMenu(info);
 
 
-   // scrolled.ScrollerAlignWithItemsRecalc();
-   scrolled.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   scrolled.Calc_no_gfx_update();
 
-   scrolled.Render();
-   Root_group_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
+//    scrolled.SetTypeDebug();
 
-   scrolled.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled.gfx.vb.groupidx)
+//    // scrolled.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   Construct_listen_events_from_mesh_tree(scrolled)
-   Construct_listen_events_relations_from_mesh_tree(scrolled);
-
-   View_build_group_from_root_mesh(scrolled);
-
-   const scroller_component = Components_create_scroller_component(_, 200, scrolled, 100);
-   Scoller_component_gengfx_and_render(scroller_component, scrolled, _);
-   Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled.root_posidx, scroller_component.root_posidx);
-   Listeners_set_priority(E.C, scroller_component.listeners);
-   scrolled.AddChildScrollerIdx(scrolled.scroller_comp_idx);
-
-   Scroller_component_calculate_handle_pos_dim(scrolled, scroller_component);
+//    scrolled.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, scrolled.mesh_bufferidx, true);
+//    scrolled.GenGfxCtx();
 
 
-   return scrolled;
-}
+//    // scrolled.ScrollerAlignWithItemsRecalc();
+//    scrolled.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+//    scrolled.Calc_no_gfx_update();
+
+//    scrolled.Render();
+//    Root_group_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
+
+//    scrolled.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled.gfx.vb.groupidx)
+
+//    Construct_listen_events_from_mesh_tree(scrolled)
+//    Construct_listen_events_relations_from_mesh_tree(scrolled);
+
+//    View_build_group_from_root_mesh(scrolled);
+
+//    const scroller_component = Components_create_scroller_component(_, 200, scrolled, 100);
+//    Scoller_component_gengfx_and_render(scroller_component, scrolled, _);
+//    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled.root_posidx, scroller_component.root_posidx);
+//    Listeners_set_priority(E.C, scroller_component.listeners);
+//    scrolled.AddChildScrollerIdx(scrolled.scroller_comp_idx);
+
+//    Scroller_component_calculate_handle_pos_dim(scrolled, scroller_component);
+
+
+//    return scrolled;
+// }
 
 
 
@@ -3938,79 +3938,79 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
 
 
-function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zindex, col_menu, col_dp, margin, style) {
+// function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zindex, col_menu, col_dp, margin, style) {
 
-   {
-      const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex], _, GREEN[4], 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
-      info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-      info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-      info_mesh.SetTypeDebug();
-      info_mesh.Deactivate();
-      parent.AddToMenu(info_mesh);
+//    {
+//       const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex], _, GREEN[4], 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
+//       info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+//       info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+//       info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+//       info_mesh.SetTypeDebug();
+//       info_mesh.Deactivate();
+//       parent.AddToMenu(info_mesh);
 
-      const pos = [0, 0, info_mesh.geom.pos[2] + 1]
-      { const info = Create_widget_text(_, `count:${info_data.active_count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-      { const info = Create_widget_text(_, `size:${info_data.size}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-      { const info = Create_widget_text(_, `boundary:${info_data.boundary}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-      { const info = Create_widget_text(_, `freeidx:${info_data.freeidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-      { const info = Create_widget_text(_, `reserveidx:${info_data.reserveidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+//       const pos = [0, 0, info_mesh.geom.pos[2] + 1]
+//       { const info = Create_widget_text(_, `count:${info_data.active_count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+//       { const info = Create_widget_text(_, `size:${info_data.size}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+//       { const info = Create_widget_text(_, `boundary:${info_data.boundary}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+//       { const info = Create_widget_text(_, `freeidx:${info_data.freeidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+//       { const info = Create_widget_text(_, `reserveidx:${info_data.reserveidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
 
-      {
+//       {
 
-         const all_meshes_buffer = Create_widget_dropdown(_, `meshes`, [100, 100, zindex + 1], GREY[1], GREY[2], _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-         all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-         all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         all_meshes_buffer.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-         all_meshes_buffer.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-         all_meshes_buffer.SetTypeDebug();
-         all_meshes_buffer.Deactivate();
-         Dropdown_roots_set_root(all_meshes_buffer, all_meshes_buffer)
-         info_mesh.AddItem(all_meshes_buffer);
+//          const all_meshes_buffer = Create_widget_dropdown(_, `meshes`, [100, 100, zindex + 1], GREY[1], GREY[2], _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+//          all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+//          all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+//          all_meshes_buffer.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+//          all_meshes_buffer.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+//          all_meshes_buffer.SetTypeDebug();
+//          all_meshes_buffer.Deactivate();
+//          Dropdown_roots_set_root(all_meshes_buffer, all_meshes_buffer)
+//          info_mesh.AddItem(all_meshes_buffer);
 
-         // pos[2] += 1;
+//          // pos[2] += 1;
 
-         for (let i = 0; i <= info_data.boundary; i++) {
+//          for (let i = 0; i <= info_data.boundary; i++) {
 
-            const meshidx = info_data.buffer[i];
-            const mesh = Mesh_buffer_get_mesh_byidx(meshidx)
-            if (mesh) {
+//             const meshidx = info_data.buffer[i];
+//             const mesh = Mesh_buffer_get_mesh_byidx(meshidx)
+//             if (mesh) {
 
-               const info = Create_widget_text(_, `idx:[${meshidx}] ${mesh.GetName()}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
-               info.SetTypeDebug();
-               all_meshes_buffer.AddToMenu(info);
-            }
-         }
+//                const info = Create_widget_text(_, `idx:[${meshidx}] ${mesh.GetName()}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
+//                info.SetTypeDebug();
+//                all_meshes_buffer.AddToMenu(info);
+//             }
+//          }
 
-      }
-   }
+//       }
+//    }
 
 
-   // { // Gfx info
-   //    const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-   //    gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   //    gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   //    gfx.SetTypeDebug();
-   //    parent.AddToMenu(gfx)
-   //    if (info_data.gfx) {
-   //       // Program
-   //       { const info = Create_widget_text(_, `prog: {idx:${info_data.gfx.prog.idx} attribsidx:${info_data.gfx.prog.attribsidx} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
-   //       // Vertex buffer
-   //       { const info = Create_widget_text(_, `vb: { idx:${info_data.gfx.vb.idx} start:${info_data.gfx.vb.start} count:${info_data.gfx.vb.count} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
-   //       // Index buffer
-   //       { const info = Create_widget_text(_, `ib: { idx:${info_data.gfx.ib.idx} count:${info_data.gfx.ib.count} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
-   //       // Texture
-   //       { const info = Create_widget_text(_, `tb: { idx:${info_data.gfx.tb.idx} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
-   //    }
-   //    else {
-   //       { // Vertex buffer
-   //          const info = Create_widget_text(_, `NULL`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
-   //          info.SetTypeDebug();
-   //          gfx.AddToMenu(info);
-   //       }
-   //    }
-   // }
-}
+//    // { // Gfx info
+//    //    const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+//    //    gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+//    //    gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+//    //    gfx.SetTypeDebug();
+//    //    parent.AddToMenu(gfx)
+//    //    if (info_data.gfx) {
+//    //       // Program
+//    //       { const info = Create_widget_text(_, `prog: {idx:${info_data.gfx.prog.idx} attribsidx:${info_data.gfx.prog.attribsidx} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
+//    //       // Vertex buffer
+//    //       { const info = Create_widget_text(_, `vb: { idx:${info_data.gfx.vb.idx} start:${info_data.gfx.vb.start} count:${info_data.gfx.vb.count} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
+//    //       // Index buffer
+//    //       { const info = Create_widget_text(_, `ib: { idx:${info_data.gfx.ib.idx} count:${info_data.gfx.ib.count} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
+//    //       // Texture
+//    //       { const info = Create_widget_text(_, `tb: { idx:${info_data.gfx.tb.idx} }`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); gfx.AddToMenu(info); }
+//    //    }
+//    //    else {
+//    //       { // Vertex buffer
+//    //          const info = Create_widget_text(_, `NULL`, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
+//    //          info.SetTypeDebug();
+//    //          gfx.AddToMenu(info);
+//    //       }
+//    //    }
+//    // }
+// }
 
 
 
@@ -4173,43 +4173,43 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
 
 
-function Helper_vertex_buffer_info_create_more_info(parent, vb_group, zindex, col_menu, margin, style) {
+// function Helper_vertex_buffer_info_create_more_info(parent, vb_group, zindex, col_menu, margin, style) {
 
-   const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
-   info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
-   info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   info_mesh.SetTypeDebug();
-   parent.AddToMenu(info_mesh);
+//    const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
+//    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+//    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
+//    info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+//    info_mesh.SetTypeDebug();
+//    parent.AddToMenu(info_mesh);
 
 
-   const pos = [0, 0, zindex + 2]
-   for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+//    const pos = [0, 0, zindex + 2]
+//    for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
 
-      const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
+//       const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
 
-      const vb_info_info = Create_widget_dropdown(_, `VB-[${vb_group.vb_idxs.buffer[i]}]`, [0, 0, zindex], _, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-      vb_info_info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-      vb_info_info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
-      parent.AddToMenu(vb_info_info);
+//       const vb_info_info = Create_widget_dropdown(_, `VB-[${vb_group.vb_idxs.buffer[i]}]`, [0, 0, zindex], _, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
+//       vb_info_info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+//       vb_info_info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
+//       parent.AddToMenu(vb_info_info);
 
-      /* vb_info struct:
-         add_to_fn, count, vCount, sid:, size, state, texidx, type, vbo:webGlObject, 
-         attribs_info:{ attrib_divisor:int, count:int, locs:[], offsets:[], sizes:[], }
-      */
+//       /* vb_info struct:
+//          add_to_fn, count, vCount, sid:, size, state, texidx, type, vbo:webGlObject, 
+//          attribs_info:{ attrib_divisor:int, count:int, locs:[], offsets:[], sizes:[], }
+//       */
 
-      { const info = Create_widget_text(_, `count:${vb_info.count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
-      { const info = Create_widget_text(_, `size:${vb_info.size}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
-      { const info = Create_widget_text(_, `vCount:${vb_info.vCount}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
-   }
-   { const info = Create_widget_text(_, `draw count:${vb_group.draw_count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `render_queueidx:${vb_group.render_queueidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `progidx:${vb_group.progidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `ibidx:${vb_group.ibidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `texidx:${vb_group.texture_file_id}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `vaoidx:${vb_group.vaoidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//       { const info = Create_widget_text(_, `count:${vb_info.count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
+//       { const info = Create_widget_text(_, `size:${vb_info.size}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
+//       { const info = Create_widget_text(_, `vCount:${vb_info.vCount}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.SetTypeDebug(); vb_info_info.AddToMenu(info); }
+//    }
+//    { const info = Create_widget_text(_, `draw count:${vb_group.draw_count}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//    { const info = Create_widget_text(_, `render_queueidx:${vb_group.render_queueidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//    { const info = Create_widget_text(_, `progidx:${vb_group.progidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//    { const info = Create_widget_text(_, `ibidx:${vb_group.ibidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//    { const info = Create_widget_text(_, `texidx:${vb_group.texture_file_id}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
+//    { const info = Create_widget_text(_, `vaoidx:${vb_group.vaoidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info.state.mask &= ~MESH_STATE.ACTIVE; info_mesh.AddItem(info); }
 
-}
+// }
 
 
 
@@ -4370,21 +4370,21 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
 
 function Helper_render_queue_buffer_info_create_more_info(parent, info_data, zindex, col_menu, margin, style) {
 
-   const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'rq_info', style, _, _, MESH_TYPE.DEBUG_MESH);
-   info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
-   info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
-   info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
-   info_mesh.SetTypeDebug();
-   info_mesh.Deactivate();
-   parent.AddToMenu(info_mesh);
+   // const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'rq_info', style, _, _, MESH_TYPE.DEBUG_MESH);
+   // info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
+   // info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
+   // info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
+   // info_mesh.SetTypeDebug();
+   // info_mesh.Deactivate();
+   // parent.AddToMenu(info_mesh);
 
 
-   const pos = [0, 0, zindex + 2]
-   { const info = Create_widget_text(_, `is active:${info_data.isActive}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `isactiveflag:${info_data.flags & 0x1}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `progidx:${info_data.progidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `vbidx:${info_data.vbidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
-   { const info = Create_widget_text(_, `ibidx:${info_data.ibidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   // const pos = [0, 0, zindex + 2]
+   // { const info = Create_widget_text(_, `is active:${info_data.isActive}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   // { const info = Create_widget_text(_, `isactiveflag:${info_data.flags & 0x1}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   // { const info = Create_widget_text(_, `progidx:${info_data.progidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   // { const info = Create_widget_text(_, `vbidx:${info_data.vbidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
+   // { const info = Create_widget_text(_, `ibidx:${info_data.ibidx}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH); info.Deactivate(); info.SetTypeDebug(); info_mesh.AddItem(info); }
 
 }
 

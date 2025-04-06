@@ -2,20 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Edge",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost:6001",
+            "webRoot": "${workspaceFolder}/src"
+        },
+        
+        {
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "sourceMaps": true,
             "url": "http://localhost:6001",
+            "runtimeExecutable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
             "webRoot": "${workspaceFolder}/src"
         },
-        {
-            "type": "cmake",
-            "request": "launch",
-            "name": "Debug portfile(s)",
-            "cmakeDebugType": "external",
-            "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
-            "preLaunchTask": "Debug vcpkg commands"
-        }
     ],
 }

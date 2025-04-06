@@ -409,7 +409,7 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       pass: SID.ATTR.WPOS3,
    }
 
-   const panel = Create_widget_section(Style_rect_default_properties({is_rrot:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1]}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_rrot:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1]}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:true,});
    // panel.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);

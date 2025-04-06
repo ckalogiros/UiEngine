@@ -1,15 +1,15 @@
 "use strict";
 
-import { Create_widget_label, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
 import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
-import { Style_label_default_properties, Style_section_default_properties, Style_switch_default_properties } from "../Widgets/WidgetReadyStyles.js";
+import { Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_switch_default_properties } from "../Widgets/WidgetReadyStyles.js";
 
 
 export function Ui_create_label_switch(name, font_size, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){
 
    const rcorners = 4;
 
-   const section = Create_widget_section(Style_section_default_properties({is_root:_, name:`DBG_UI ${name}`, options:SECTION.HORIZONTAL, pad:section_pad, pos:[0, 0, zindex + 1], dim:[0,0], col:section_col, style:label_style}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:_, name:`DBG_UI ${name}`, pad:section_pad, pos:[0, 0, zindex + 1], dim:[0,0], col:section_col, style:label_style}));
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    section.SetName(`DBG_UI ${name}`);

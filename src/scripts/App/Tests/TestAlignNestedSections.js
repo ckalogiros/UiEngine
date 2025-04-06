@@ -1300,7 +1300,6 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
 
    /********************************************************************************************************************************************************/
    // Create
-   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, 0, 0], dim:[0, 0], col:TRANSPARENCY(GREY[1], .8), name:'Test_alignment'}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1655,540 +1654,539 @@ function Create_triangle_structure(x = 50, y = 50) {
 
 function Test_slider_control_pad(x, y) {
 
-   const pos = [x, y, 0];
-   const slider_size = 100;
-   const pad = [10, 10];
-
-   /********************************************************************************************************************************************************/
-   // Create
-   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-   section.StylesSetPad([10, 10]);
-   section.align.flags = LAYOUT.RESIZE_SELF;
-
-   const info_text = `# ADD TITLE HERE #`;
-   const info_label = Widget_ready_label(_, info_text, _, 0, 0, 14, TRANSPARENT, _, _, _,);
-   info_label.align.flags = LAYOUT.FLOAT_RIGHT | LAYOUT.VERTICAL;
-   section.AddItem(info_label);
-
-
-   let grey_cnt = 1;
-   let purple_cnt = 1;
-   let yellow_cnt = 1;
-   let cyan_cnt = 1;
-   /********************************************************************************************************************************************************/
-   // Create slider
-   const s0 = Create_rect_t1(section, GREY[1], `GREY[1]`, LAYOUT.VERTICAL, pad);
-   const s = Create_rect_t1(s0, GREY[5], `G5`, LAYOUT.HORIZONTAL | LAYOUT.EXPAND, pad, false);
-
-
-   const ss1 = Create_rect_t1(s, YELLOWR[3], `Y3`, LAYOUT.HORIZONTAL | LAYOUT.EXPAND, pad, false);
-   { const label = Widget_ready_label(_, 'Change Yellow meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.HORIZONTAL; ss1.AddItem(label); }
-   const slider_1 = Widget_ready_slider(_, 0, 0, .0, 'Yellow', slider_size); slider_1.StylesSetPad([0, 0]); slider_1.AlignAddFlags(LAYOUT.VERTICAL); ss1.AddItem(slider_1);
-   const slider_1_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_1_lr.StylesSetPad([0, 0]); slider_1_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss1.AddItem(slider_1_lr);
-   const slider_1_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_1_tb.StylesSetPad([0, 0]); slider_1_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss1.AddItem(slider_1_tb);
-
-   const ss2 = Create_rect_t1(s, PURPLEB[3], `P3`, LAYOUT.VERTICAL | LAYOUT.EXPAND, pad, false);
-   { const label = Widget_ready_label(_, 'Change Purple meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.VERTICAL; ss2.AddItem(label); }
-   const slider_2 = Widget_ready_slider(_, 0, 0, .0, 'Purple', slider_size); slider_2.StylesSetPad([0, 0]); slider_2.AlignAddFlags(LAYOUT.VERTICAL); ss2.AddItem(slider_2);
-   const slider_2_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_2_lr.StylesSetPad([0, 0]); slider_2_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss2.AddItem(slider_2_lr);
-   const slider_2_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_2_tb.StylesSetPad([0, 0]); slider_2_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss2.AddItem(slider_2_tb);
-
-   const ss3 = Create_rect_t1(s, GREY[1], `G1`, LAYOUT.VERTICAL | LAYOUT.EXPAND, pad, false);
-   { const label = Widget_ready_label(_, 'Change Grey meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.VERTICAL; ss3.AddItem(label); }
-   const slider_3 = Widget_ready_slider(_, 0, 0, .0, 'Grey', slider_size); slider_3.StylesSetPad([0, 0]); slider_3.AlignAddFlags(LAYOUT.VERTICAL); ss3.AddItem(slider_3);
-   const slider_3_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_3_lr.StylesSetPad([0, 0]); slider_3_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss3.AddItem(slider_3_lr);
-   const slider_3_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_3_tb.StylesSetPad([0, 0]); slider_3_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss3.AddItem(slider_3_tb);
-
-
-   /********************************************************************************************************************************************************/
-   // Align
-   const ret = Align_pre_simple(section);
-   const pad_x = section.StylesGetPad(STYLES.AXIS.X);
-   const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
-   section.geom.dim[0] = ret.dim_x + pad_x;
-   section.geom.dim[1] = ret.dim_y + pad_y;
-   Align_expand(section, section.align.flags,)
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
-
-
-
-
-
-
-   /********************************************************************************************************************************************************/
-   // Create items
-
-   const ss = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8), 'Test_alignment');
-   ss.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   ss.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   ss.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   ss.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   ss.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-   ss.StylesSetPad([10, 10]);
-   ss.align.flags = LAYOUT.RESIZE_SELF;
-
-   const group1_meshes = [];
-   const group2_meshes = [];
-   const group3_meshes = [];
-
-   { /** With Widgets */
-      {
-         const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.VERTICAL, pad);
-         group3_meshes.push(s2);
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
-            group2_meshes.push(s1);
-            {
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-               {
-                  const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
-                  { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
-               }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               // { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.HORIZONTAL; s.AddItem(label); }
-            }
-         }
-      }
-      {
-         const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.HORIZONTAL, pad);
-         group3_meshes.push(s2);
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-         }
-      }
-      {
-         const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.VERTICAL, pad);
-         group3_meshes.push(s2);
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-            }
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-            }
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
-            }
-
-         }
-         {
-            const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
-            group2_meshes.push(s1);
-            {
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-               { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
-            }
-         }
-      }
-
-      const ret = Align_pre_simple(ss);
-      const pad_x = ss.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = ss.StylesGetPad(STYLES.AXIS.Y);
-      ss.geom.dim[0] = ret.dim_x + pad_x;
-      ss.geom.dim[1] = ret.dim_y + pad_y;
-      // Align_expand(ss, ss.align.flags,)
-
-
-
-      ss.geom.pos[0] = x;
-      ss.geom.pos[1] = section.geom.pos[1] + section.geom.dim[1] * 2 + 20;
-
-
-      /********************************************************************************************************************************************************/
-      // Render
-      ss.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
-
-      ss.Render();
-      Root_group_activate_all_vbs_in_renderqueue(ss.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(ss)
-      Construct_listen_events_relations_from_mesh_tree(ss);
-      ss.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, ss.gfx.vb.groupidx);
-   }
-
-
-
-
-
-   /********************************************************************************************************************************************************/
-   // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
-
-   section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-
-
-
-   /********************************************************************************************************************************************************/
-   // Connect sliders to gfx program uniforms 
-
-   /** Inner nested sections */
-   const params1 = {
-      target_meshes: group1_meshes,
-      root_mesh: ss,
-   };
-   // Change left-right-top-bottom pad
-   Slider_connect(slider_1, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPad([val, val]);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params1,
-   );
-   // Change left-right pad
-   Slider_connect(slider_1_lr, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadX(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params1,
-   );
-   // Change top-bottom pad
-   Slider_connect(slider_1_tb, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadY(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params1,
-   );
-
-   /** Middle nested sections */
-   const params2 = {
-      target_meshes: group2_meshes,
-      root_mesh: ss,
-   };
-   // Change left-right-top-bottom pad
-   Slider_connect(slider_2, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPad([val, val]);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-      // target_mesh.geom.dim[0] = ret.dim_x + val;
-      // target_mesh.geom.dim[1] = ret.dim_y + val;
-
-      // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0]+target_mesh.geom.dim[0], target_mesh.geom.pos[1]+target_mesh.geom.dim[1])
-      // // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0], target_mesh.geom.pos[1]);
-      // target_mesh.geom.SetDim(target_mesh.geom.dim, target_mesh.gfx);
-      // Gl_set_dim_xy(target_mesh.gfx, target_mesh.geom.dim[0], target_mesh.geom.dim[1]);
-
-   }, params2,
-   );
-   // Change left-right pad
-   Slider_connect(slider_2_lr, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadX(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params2,
-   );
-   // Change top-bottom pad
-   Slider_connect(slider_2_tb, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadY(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params2,
-   );
-
-   /** Outer nested sections */
-   const params3 = {
-      target_meshes: group3_meshes,
-      root_mesh: ss,
-   };
-   // Change left-right-top-bottom pad
-   Slider_connect(slider_3, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPad([val, val]);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params3,
-   );
-   // Change left-right-top-bottom pad
-   Slider_connect(slider_3_lr, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadX(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params3,
-   );
-   // Change left-right-top-bottom pad
-   Slider_connect(slider_3_tb, (params, slider_val) => {
-
-      const root_mesh = params.clbk_params.root_mesh;
-      const target_meshes = params.clbk_params.target_meshes;
-      const val = slider_val * 20 + 10
-
-      const len = target_meshes.length;
-      for (let i = 0; i < len; i++) {
-
-         const mesh = target_meshes[i];
-         mesh.StylesSetPadY(val);
-      }
-      const ret = Align_pre_simple(root_mesh, _, _,);
-
-
-      const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
-      root_mesh.geom.dim[0] = ret.dim_x + pad_x;
-      root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-
-   }, params3,
-   );
-
-
-
-   return section;
+   // const pos = [x, y, 0];
+   // const slider_size = 100;
+   // const pad = [10, 10];
+
+   // /********************************************************************************************************************************************************/
+   // // Create
+   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
+   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+   // section.StylesSetPad([10, 10]);
+   // section.align.flags = LAYOUT.RESIZE_SELF;
+
+   // const info_text = `# ADD TITLE HERE #`;
+   // const info_label = Widget_ready_label(_, info_text, _, 0, 0, 14, TRANSPARENT, _, _, _,);
+   // info_label.align.flags = LAYOUT.FLOAT_RIGHT | LAYOUT.VERTICAL;
+   // section.AddItem(info_label);
+
+
+   // let grey_cnt = 1;
+   // let purple_cnt = 1;
+   // let yellow_cnt = 1;
+   // let cyan_cnt = 1;
+   // /********************************************************************************************************************************************************/
+   // // Create slider
+   // const s0 = Create_rect_t1(section, GREY[1], `GREY[1]`, LAYOUT.VERTICAL, pad);
+   // const s = Create_rect_t1(s0, GREY[5], `G5`, LAYOUT.HORIZONTAL | LAYOUT.EXPAND, pad, false);
+
+
+   // const ss1 = Create_rect_t1(s, YELLOWR[3], `Y3`, LAYOUT.HORIZONTAL | LAYOUT.EXPAND, pad, false);
+   // { const label = Widget_ready_label(_, 'Change Yellow meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.HORIZONTAL; ss1.AddItem(label); }
+   // const slider_1 = Widget_ready_slider(_, 0, 0, .0, 'Yellow', slider_size); slider_1.StylesSetPad([0, 0]); slider_1.AlignAddFlags(LAYOUT.VERTICAL); ss1.AddItem(slider_1);
+   // const slider_1_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_1_lr.StylesSetPad([0, 0]); slider_1_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss1.AddItem(slider_1_lr);
+   // const slider_1_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_1_tb.StylesSetPad([0, 0]); slider_1_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss1.AddItem(slider_1_tb);
+
+   // const ss2 = Create_rect_t1(s, PURPLEB[3], `P3`, LAYOUT.VERTICAL | LAYOUT.EXPAND, pad, false);
+   // { const label = Widget_ready_label(_, 'Change Purple meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.VERTICAL; ss2.AddItem(label); }
+   // const slider_2 = Widget_ready_slider(_, 0, 0, .0, 'Purple', slider_size); slider_2.StylesSetPad([0, 0]); slider_2.AlignAddFlags(LAYOUT.VERTICAL); ss2.AddItem(slider_2);
+   // const slider_2_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_2_lr.StylesSetPad([0, 0]); slider_2_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss2.AddItem(slider_2_lr);
+   // const slider_2_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_2_tb.StylesSetPad([0, 0]); slider_2_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss2.AddItem(slider_2_tb);
+
+   // const ss3 = Create_rect_t1(s, GREY[1], `G1`, LAYOUT.VERTICAL | LAYOUT.EXPAND, pad, false);
+   // { const label = Widget_ready_label(_, 'Change Grey meshes padding', _, 0, 0, 14, TRANSPARENT, _, _, [20, 16]); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.VERTICAL; ss3.AddItem(label); }
+   // const slider_3 = Widget_ready_slider(_, 0, 0, .0, 'Grey', slider_size); slider_3.StylesSetPad([0, 0]); slider_3.AlignAddFlags(LAYOUT.VERTICAL); ss3.AddItem(slider_3);
+   // const slider_3_lr = Widget_ready_slider(_, 0, 0, .0, 'Left-right', slider_size); slider_3_lr.StylesSetPad([0, 0]); slider_3_lr.AlignAddFlags(LAYOUT.HORIZONTAL); ss3.AddItem(slider_3_lr);
+   // const slider_3_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_3_tb.StylesSetPad([0, 0]); slider_3_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss3.AddItem(slider_3_tb);
+
+
+   // /********************************************************************************************************************************************************/
+   // // Align
+   // const ret = Align_pre_simple(section);
+   // const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+   // const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+   // section.geom.dim[0] = ret.dim_x + pad_x;
+   // section.geom.dim[1] = ret.dim_y + pad_y;
+   // Align_expand(section, section.align.flags,)
+
+   // // Calculate from pos=[0,0], and then add the user's pos
+   // section.geom.pos[0] = pos[0];
+   // section.geom.pos[1] = pos[1];
+
+
+
+
+
+
+   // /********************************************************************************************************************************************************/
+   // // Create items
+
+   // const ss = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8), 'Test_alignment');
+   // ss.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // ss.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // ss.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // ss.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   // ss.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+   // ss.StylesSetPad([10, 10]);
+   // ss.align.flags = LAYOUT.RESIZE_SELF;
+
+   // const group1_meshes = [];
+   // const group2_meshes = [];
+   // const group3_meshes = [];
+
+   // { /** With Widgets */
+   //    {
+   //       const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.VERTICAL, pad);
+   //       group3_meshes.push(s2);
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //             {
+   //                const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s);
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.VERTICAL, pad); /*group1_meshes.push(s_);*/ }
+   //                { const s_ = Create_rect_t1(s, TRANSPARENCY(CYAN[3], .9), `Y${cyan_cnt++}`, LAYOUT.HORIZONTAL, pad); /*group1_meshes.push(s_);*/ }
+   //             }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             // { const label = Widget_ready_label(_, `1`, _, 0, 0, 14, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags = LAYOUT.HORIZONTAL; s.AddItem(label); }
+   //          }
+   //       }
+   //    }
+   //    {
+   //       const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //       group3_meshes.push(s2);
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+   //       }
+   //    }
+   //    {
+   //       const s2 = Create_rect_t1(ss, GREY[1], `G2${grey_cnt++}`, LAYOUT.VERTICAL, pad);
+   //       group3_meshes.push(s2);
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //          }
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.VERTICAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //          }
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.VERTICAL, pad); group1_meshes.push(s); }
+   //          }
+
+   //       }
+   //       {
+   //          const s1 = Create_rect_t1(s2, TRANSPARENCY(PURPLEB[3], .5), `Y${purple_cnt++}`, LAYOUT.HORIZONTAL, pad);
+   //          group2_meshes.push(s1);
+   //          {
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //             { const s = Create_rect_t1(s1, TRANSPARENCY(YELLOWR[3], .9), `Y${yellow_cnt++}`, LAYOUT.HORIZONTAL, pad); group1_meshes.push(s); }
+   //          }
+   //       }
+   //    }
+
+   //    const ret = Align_pre_simple(ss);
+   //    const pad_x = ss.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = ss.StylesGetPad(STYLES.AXIS.Y);
+   //    ss.geom.dim[0] = ret.dim_x + pad_x;
+   //    ss.geom.dim[1] = ret.dim_y + pad_y;
+   //    // Align_expand(ss, ss.align.flags,)
+
+
+
+   //    ss.geom.pos[0] = x;
+   //    ss.geom.pos[1] = section.geom.pos[1] + section.geom.dim[1] * 2 + 20;
+
+
+   //    /********************************************************************************************************************************************************/
+   //    // Render
+   //    ss.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+
+   //    ss.Render();
+   //    Root_group_activate_all_vbs_in_renderqueue(ss.root_bufferidx);
+   //    Construct_listen_events_from_mesh_tree(ss)
+   //    Construct_listen_events_relations_from_mesh_tree(ss);
+   //    ss.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, ss.gfx.vb.groupidx);
+   // }
+
+
+
+
+
+   // /********************************************************************************************************************************************************/
+   // // Render
+   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+
+   // section.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   // Construct_listen_events_from_mesh_tree(section)
+   // Construct_listen_events_relations_from_mesh_tree(section);
+   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+
+
+
+
+   // /********************************************************************************************************************************************************/
+   // // Connect sliders to gfx program uniforms 
+
+   // /** Inner nested sections */
+   // const params1 = {
+   //    target_meshes: group1_meshes,
+   //    root_mesh: ss,
+   // };
+   // // Change left-right-top-bottom pad
+   // Slider_connect(slider_1, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPad([val, val]);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params1,
+   // );
+   // // Change left-right pad
+   // Slider_connect(slider_1_lr, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadX(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params1,
+   // );
+   // // Change top-bottom pad
+   // Slider_connect(slider_1_tb, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadY(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params1,
+   // );
+
+   // /** Middle nested sections */
+   // const params2 = {
+   //    target_meshes: group2_meshes,
+   //    root_mesh: ss,
+   // };
+   // // Change left-right-top-bottom pad
+   // Slider_connect(slider_2, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPad([val, val]);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+   //    // target_mesh.geom.dim[0] = ret.dim_x + val;
+   //    // target_mesh.geom.dim[1] = ret.dim_y + val;
+
+   //    // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0]+target_mesh.geom.dim[0], target_mesh.geom.pos[1]+target_mesh.geom.dim[1])
+   //    // // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0], target_mesh.geom.pos[1]);
+   //    // target_mesh.geom.SetDim(target_mesh.geom.dim, target_mesh.gfx);
+   //    // Gl_set_dim_xy(target_mesh.gfx, target_mesh.geom.dim[0], target_mesh.geom.dim[1]);
+
+   // }, params2,
+   // );
+   // // Change left-right pad
+   // Slider_connect(slider_2_lr, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadX(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params2,
+   // );
+   // // Change top-bottom pad
+   // Slider_connect(slider_2_tb, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadY(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params2,
+   // );
+
+   // /** Outer nested sections */
+   // const params3 = {
+   //    target_meshes: group3_meshes,
+   //    root_mesh: ss,
+   // };
+   // // Change left-right-top-bottom pad
+   // Slider_connect(slider_3, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPad([val, val]);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params3,
+   // );
+   // // Change left-right-top-bottom pad
+   // Slider_connect(slider_3_lr, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadX(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params3,
+   // );
+   // // Change left-right-top-bottom pad
+   // Slider_connect(slider_3_tb, (params, slider_val) => {
+
+   //    const root_mesh = params.clbk_params.root_mesh;
+   //    const target_meshes = params.clbk_params.target_meshes;
+   //    const val = slider_val * 20 + 10
+
+   //    const len = target_meshes.length;
+   //    for (let i = 0; i < len; i++) {
+
+   //       const mesh = target_meshes[i];
+   //       mesh.StylesSetPadY(val);
+   //    }
+   //    const ret = Align_pre_simple(root_mesh, _, _,);
+
+
+   //    const pad_x = root_mesh.StylesGetPad(STYLES.AXIS.X);
+   //    const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
+   //    root_mesh.geom.dim[0] = ret.dim_x + pad_x;
+   //    root_mesh.geom.dim[1] = ret.dim_y + pad_y;
+
+   // }, params3,
+   // );
+
+
+
+   // return section;
 
 }
 

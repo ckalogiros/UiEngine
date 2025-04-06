@@ -1973,38 +1973,38 @@ function Animate_comet_perimetric(params) {
 
 export function Test_noise_shader() {
 
-   const emitters = [];
-   const emitter_idxs = [];
-   const speed = 10;
-   let cnt = 0;
-   const size = 40
-   const dim = [size * DEVICE.device_scale, size * DEVICE.device_scale]
+   // const emitters = [];
+   // const emitter_idxs = [];
+   // const speed = 10;
+   // let cnt = 0;
+   // const size = 40
+   // const dim = [size * DEVICE.device_scale, size * DEVICE.device_scale]
 
-   // Create Particle emitters
-   {
+   // // Create Particle emitters
+   // {
 
-      const emitter_idx = Particle_system_create_emitter('TestParticles', TRANSPARENCY(WHITE, .1), [0, 300, 0], dim, .003, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, );
+   //    const emitter_idx = Particle_system_create_emitter('TestParticles', TRANSPARENCY(WHITE, .1), [0, 300, 0], dim, .003, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, );
 
-      const emitter = Particles_get_particle_system(emitter_idx);
-      emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-      emitter.speed = speed;
+   //    const emitter = Particles_get_particle_system(emitter_idx);
+   //    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   //    emitter.speed = speed;
 
 
-      emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-      emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TEX2);
+   //    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
+   //    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+   //    emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TEX2);
 
 
-      Particles_gen_gfx_ctx(emitter);
+   //    Particles_gen_gfx_ctx(emitter);
 
 
 
-      emitter.SetConeOfDirection(1, 1, -.9, .4);
+   //    emitter.SetConeOfDirection(1, 1, -.9, .4);
 
-      emitters[cnt] = emitter;
-      emitter_idxs[cnt] = emitter_idx;
-      cnt++
-   }
+   //    emitters[cnt] = emitter;
+   //    emitter_idxs[cnt] = emitter_idx;
+   //    cnt++
+   // }
 
 
 
@@ -2013,301 +2013,300 @@ export function Test_noise_shader() {
 
 
 
-   /****************************************************************************************************************/
-   // Emitter controls
+   // /****************************************************************************************************************/
+   // // Emitter controls
 
-   const header_font_size = 9 * DEVICE.device_scale;
-   const regular_font_size = 8 * DEVICE.device_scale;
+   // const header_font_size = 9 * DEVICE.device_scale;
+   // const regular_font_size = 8 * DEVICE.device_scale;
 
-   // Style for the Section widgets.
-   const section_pad = [0, 0];
-   const clp_fontsize = regular_font_size;
-   const trans = .2, trans2 = .2;
+   // // Style for the Section widgets.
+   // const section_pad = [0, 0];
+   // const clp_fontsize = regular_font_size;
+   // const trans = .2, trans2 = .2;
 
-   // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
-   const label_style = [6, 0, 2];
-   const label_pad = [6, 6];
-   const label_col = TRANSPARENCY(BLUEL[1], 0);
-   const label_text_col = WHITE;
+   // // Style for the label widgets: [BORDER, ROUND_CORNERS, FEATHER]
+   // const label_style = [6, 0, 2];
+   // const label_pad = [6, 6];
+   // const label_col = TRANSPARENCY(BLUEL[1], 0);
+   // const label_text_col = WHITE;
 
 
-   const slider_col = TRANSPARENCY(GREY[5], .1);
-   const slider_text_col = WHITE;
+   // const slider_col = TRANSPARENCY(GREY[5], .1);
+   // const slider_text_col = WHITE;
 
-   // Style for the switch widgets
-   const C1 = TRANSPARENCY(BLACK, trans2);
-   const CGREY = TRANSPARENCY(GREY[0], trans2);
-   const switch_size = 19 * DEVICE.device_scale;
-   const switch_pad = 4;
-   const switch_col = TRANSPARENCY(GREY[8], .1);
-   const section_col = C1;
-   const switch_col2 = TRANSPARENCY(GREY[1], trans2);
-   let zpos = 0;
+   // // Style for the switch widgets
+   // const C1 = TRANSPARENCY(BLACK, trans2);
+   // const CGREY = TRANSPARENCY(GREY[0], trans2);
+   // const switch_size = 19 * DEVICE.device_scale;
+   // const switch_pad = 4;
+   // const switch_col = TRANSPARENCY(GREY[8], .1);
+   // const section_col = C1;
+   // const switch_col2 = TRANSPARENCY(GREY[1], trans2);
+   // let zpos = 0;
 
-   const u_wpos_flags = {
-      unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.ATTR.WPOS3,
-   }
+   // const u_wpos_flags = {
+   //    unif: SID.UNIF.ROOT_WPOS2,
+   //    pass: SID.ATTR.WPOS3,
+   // }
 
-   const controls_dp = Create_widget_dropdown(_, 'Emitter Test', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
-   controls_dp.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   Dropdown_roots_set_root(controls_dp, controls_dp);
-   // controls_dp.AddToMenu(controls_dp);
+   // const controls_dp = Create_widget_dropdown(_, 'Emitter Test', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
+   // controls_dp.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // Dropdown_roots_set_root(controls_dp, controls_dp);
+   // // controls_dp.AddToMenu(controls_dp);
 
 
 
 
-   { // Emitter switch and label
+   // { // Emitter switch and label
 
-      const emitter_section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Emitter Test', label_style);
-      emitter_section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
+   //    const emitter_section = Create_rect_mesh(Style_rect_default_properties({pad:section_pad, pos:[0, 0, zpos + 1], dim:[0, 0], col:section_col, name:'Emitter Test'}));
+   //    emitter_section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
-      const label = Create_widget_label(_, 'Emitter Test', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
-      emitter_section.AddItem(label);
+   //    const label = Create_widget_label(_, 'Emitter Test', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
+   //    emitter_section.AddItem(label);
 
-      const emitter_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
-      emitter_switch.SetName('emitter_switch switch Test');
-      emitter_section.AddItem(emitter_switch);
+   //    const emitter_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
+   //    emitter_switch.SetName('emitter_switch switch Test');
+   //    emitter_section.AddItem(emitter_switch);
 
-      emitter_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    emitter_section.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-      const evt_params = { target_params: [emitter_idxs[0]] };
-      emitter_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
-      emitter_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    const evt_params = { target_params: [emitter_idxs[0]] };
+   //    emitter_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
+   //    emitter_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
-      controls_dp.AddToMenu(emitter_section);
-   }
+   //    controls_dp.AddToMenu(emitter_section);
+   // }
 
-   { // Color picker switch  label
+   // { // Color picker switch  label
 
-      zpos = -1
-      const color_picker = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Color Picker', label_style);
-      color_picker.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
+   //    zpos = -1
+   //    const color_picker = Create_rect_mesh(Style_rect_default_properties({pad:section_pad, pos:[0, 0, zpos + 1], dim:[0, 0], col:section_col, name:'Color Picker'}));
+   //    color_picker.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
-      // Create label
-      const label = Create_widget_label(_, 'Color Picker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
-      color_picker.AddItem(label);
-      color_picker.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    // Create label
+   //    const label = Create_widget_label(_, 'Color Picker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
+   //    color_picker.AddItem(label);
+   //    color_picker.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
-      // Create switch
-      const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
-      colorpicker_switch.SetName('color_picker switch');
-      color_picker.AddItem(colorpicker_switch);
+   //    // Create switch
+   //    const colorpicker_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
+   //    colorpicker_switch.SetName('color_picker switch');
+   //    color_picker.AddItem(colorpicker_switch);
 
-      colorpicker_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      colorpicker_switch.Bind(
-         (params) => {
+   //    colorpicker_switch.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    colorpicker_switch.Bind(
+   //       (params) => {
 
-            /**
-             * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'event_clbks' of the switch widget??????
-             * Explanation:
-             * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
-             * 
-            */
-            const switch_mesh = params.target_mesh;
-            const isOn = switch_mesh.isOn;
+   //          /**
+   //           * // TODO: Why we use the 'evt_params.EventClbk' in the .Bind() function instead of the 'event_clbks' of the switch widget??????
+   //           * Explanation:
+   //           * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+   //           * 
+   //          */
+   //          const switch_mesh = params.target_mesh;
+   //          const isOn = switch_mesh.isOn;
 
 
-            if (isOn) {
+   //          if (isOn) {
 
-               const colorpicker = Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 0, _, _, _, _, _, _, 0x0,);
+   //             const colorpicker = Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 0, _, _, _, _, _, _, 0x0,);
 
-               // TODO: The slider from colorpicker updates correctly but the glow particles hue and transparency do not update    
-               colorpicker.SetTransparencySliderSetInitialValue(1.0)
-               // colorpicker.SetHueSliderSetInitialValue(.80)
+   //             // TODO: The slider from colorpicker updates correctly but the glow particles hue and transparency do not update    
+   //             colorpicker.SetTransparencySliderSetInitialValue(1.0)
+   //             // colorpicker.SetHueSliderSetInitialValue(.80)
 
-               // Root_group_set_render_queue_priority(colorpicker.root_bufferidx);
+   //             // Root_group_set_render_queue_priority(colorpicker.root_bufferidx);
 
 
-               colorpicker.AssignTargetMeshClbk((params) => {
-                  const color = params;
+   //             colorpicker.AssignTargetMeshClbk((params) => {
+   //                const color = params;
 
-                  // Add color to controls dropdown
-                  // CopyArr4(controls_dp.mat.col, color);
-                  // CopyArr4(controls_dp.mat.defCol, color);
-                  // Gl_set_rgba(controls_dp.gfx, color, controls_dp.geom.num_faces);
-                  CopyArr4(emitters[0].mat.col, color);
-               });
-               switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker'section index somewhere so that this callback can destroy it
-            }
-            else {
-
-               const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
-               colorpicker.Destroy();
-            }
-         },
-         null, null,
-      );
-
-      controls_dp.AddToMenu(color_picker);
-   }
-
-
-   { // Contol Params for tarnsform and physics
-
-      const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
-      const glow_controls_dp2 = Create_widget_dropdown(_, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
-      glow_controls_dp2.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      controls_dp.AddToMenu(glow_controls_dp2)
-
-      { // Gravity
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Gravity');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.50);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-         Slider_connect(slider, (params, slider_val) => {
-
-            const max = 1, start = -.5;
-            const y = (slider_val * max) + start;
-            emitters[0].gravity = y;
-         }, _);
-      }
-      { // Acceleration
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Acceleration');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.29);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-         Slider_connect(slider, (params, slider_val) => {
-
-            // const slider_val = Slider_get_slider_val({slider:slider});
-            emitters[0].accel = slider_val;
-
-            // Linear Interpolation
-            const max = 15, start = 0;
-            const y = (slider_val * max) + start;
-            emitters[0].accel = y;
-            emitters[0].max_speed = 4;
-         }, _);
-      }
-      { // Deccelerarion
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Deccelerarion');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.58);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-         Slider_connect(slider, (params, slider_val) => {
-
-            /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
-            const h = 1, k = -2.8, r = 3.8 * 3.8;
-            const x = slider_val;
-            let y = 0;
-            y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
-            emitters[0].deccel = y;
-
-         }, _);
-      }
-      { // Set Emitter X Position
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position X');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.05);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         Slider_connect(slider, (params, slider_val) => {
-            const y = slider_val * VIEWPORT.WIDTH - emitters[0].dim[0];
-            emitters[0].pos[0] = y;
-         }, _);
-      }
-      { // Set Emitter Y Position
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position Y');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.29);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         Slider_connect(slider, (params, slider_val) => {
+   //                // Add color to controls dropdown
+   //                // CopyArr4(controls_dp.mat.col, color);
+   //                // CopyArr4(controls_dp.mat.defCol, color);
+   //                // Gl_set_rgba(controls_dp.gfx, color, controls_dp.geom.num_faces);
+   //                CopyArr4(emitters[0].mat.col, color);
+   //             });
+   //             switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker'section index somewhere so that this callback can destroy it
+   //          }
+   //          else {
+
+   //             const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
+   //             colorpicker.Destroy();
+   //          }
+   //       },
+   //       null, null,
+   //    );
+
+   //    controls_dp.AddToMenu(color_picker);
+   // }
+
+
+   // { // Contol Params for tarnsform and physics
+
+   //    const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
+   //    const glow_controls_dp2 = Create_widget_dropdown(_, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
+   //    glow_controls_dp2.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //    controls_dp.AddToMenu(glow_controls_dp2)
+
+   //    { // Gravity
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Gravity');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.50);
+
+
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //       Slider_connect(slider, (params, slider_val) => {
+
+   //          const max = 1, start = -.5;
+   //          const y = (slider_val * max) + start;
+   //          emitters[0].gravity = y;
+   //       }, _);
+   //    }
+   //    { // Acceleration
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Acceleration');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.29);
+
+
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //       Slider_connect(slider, (params, slider_val) => {
+
+   //          // const slider_val = Slider_get_slider_val({slider:slider});
+   //          emitters[0].accel = slider_val;
+
+   //          // Linear Interpolation
+   //          const max = 15, start = 0;
+   //          const y = (slider_val * max) + start;
+   //          emitters[0].accel = y;
+   //          emitters[0].max_speed = 4;
+   //       }, _);
+   //    }
+   //    { // Deccelerarion
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Deccelerarion');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.58);
+
+
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+
+   //       Slider_connect(slider, (params, slider_val) => {
+
+   //          /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
+   //          const h = 1, k = -2.8, r = 3.8 * 3.8;
+   //          const x = slider_val;
+   //          let y = 0;
+   //          y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
+   //          emitters[0].deccel = y;
+
+   //       }, _);
+   //    }
+   //    { // Set Emitter X Position
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position X');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.05);
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       Slider_connect(slider, (params, slider_val) => {
+   //          const y = slider_val * VIEWPORT.WIDTH - emitters[0].dim[0];
+   //          emitters[0].pos[0] = y;
+   //       }, _);
+   //    }
+   //    { // Set Emitter Y Position
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position Y');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.29);
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       Slider_connect(slider, (params, slider_val) => {
 
-            const y = slider_val * VIEWPORT.HEIGHT - emitters[0].dim[1];
-            emitters[0].pos[1] = y;
-         }, _);
-      }
-      { // Set Emitter Y Direction Up
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Up ');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.02);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         Slider_connect(slider, (params, slider_val) => {
+   //          const y = slider_val * VIEWPORT.HEIGHT - emitters[0].dim[1];
+   //          emitters[0].pos[1] = y;
+   //       }, _);
+   //    }
+   //    { // Set Emitter Y Direction Up
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Up ');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.02);
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       Slider_connect(slider, (params, slider_val) => {
 
-            // const slider_val = Slider_get_slider_val({slider:slider});
-            const max = -1, start = 0;
-            const y = (slider_val * max) + start;
-            emitters[0].variation_emission.ydir_neg = y;
-         }, _);
-      }
-      { // Set Emitter Y Direction Down
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Down');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.02);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         Slider_connect(slider, (params, slider_val) => {
+   //          // const slider_val = Slider_get_slider_val({slider:slider});
+   //          const max = -1, start = 0;
+   //          const y = (slider_val * max) + start;
+   //          emitters[0].variation_emission.ydir_neg = y;
+   //       }, _);
+   //    }
+   //    { // Set Emitter Y Direction Down
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Down');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.02);
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       Slider_connect(slider, (params, slider_val) => {
 
-            // const slider_val = Slider_get_slider_val({slider:slider});
-            const max = 1, start = 0;
-            const y = (slider_val * max) + start;
-            emitters[0].variation_emission.ydir_pos = y;
-         }, _);
-      }
-      { // Set Emitter Direction X Left
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction X Left');
-         glow_controls_dp2.AddToMenu(slider);
-         slider.SetInitialValue(.60);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         Slider_connect(slider, (params, slider_val) => {
+   //          // const slider_val = Slider_get_slider_val({slider:slider});
+   //          const max = 1, start = 0;
+   //          const y = (slider_val * max) + start;
+   //          emitters[0].variation_emission.ydir_pos = y;
+   //       }, _);
+   //    }
+   //    { // Set Emitter Direction X Left
+   //       const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction X Left');
+   //       glow_controls_dp2.AddToMenu(slider);
+   //       slider.SetInitialValue(.60);
+   //       slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   //       Slider_connect(slider, (params, slider_val) => {
 
-            // const slider_val = Slider_get_slider_val({slider:slider});
-            let max = 2, start = -1;
-            const y = (slider_val * max) + start;
-            emitters[0].variation_emission.xdir_pos = y;
-            emitters[0].variation_emission.xdir_neg = y;
-         }, _);
+   //          // const slider_val = Slider_get_slider_val({slider:slider});
+   //          let max = 2, start = -1;
+   //          const y = (slider_val * max) + start;
+   //          emitters[0].variation_emission.xdir_pos = y;
+   //          emitters[0].variation_emission.xdir_neg = y;
+   //       }, _);
 
-      }
+   //    }
 
-   }
+   // }
 
 
 
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [4, 4], [VIEWPORT.RIGHT - 280, 50, 0], [100, 100], CGREY, 'SidePanel', [0, 10, 1.8]);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
+   // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
-   section.AddItem(controls_dp);
+   // section.AddItem(controls_dp);
 
 
 
-   // HACK: Set all text meshes of the scrolled_section to be rendered to a new VB
-   const text_mesh = controls_dp.children.buffer[0].text_mesh;
-   text_mesh.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
+   // // HACK: Set all text meshes of the scrolled_section to be rendered to a new VB
+   // const text_mesh = controls_dp.children.buffer[0].text_mesh;
+   // text_mesh.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
 
 
-   // Render properties panel
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // // Render properties panel
+   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
-   section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-   section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx);
-   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, section.mesh_bufferidx, true);
-   section.GenGfxCtx();
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-   section.Calc_no_gfx_update();
-   section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   // section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
+   // section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   // section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx);
+   // // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, section.mesh_bufferidx, true);
+   // section.GenGfxCtx();
+   // // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+   // section.Calc_no_gfx_update();
+   // section.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
 
-   Construct_listen_events_from_mesh_tree(section);
-   Construct_listen_events_relations_from_mesh_tree(section);
+   // Construct_listen_events_from_mesh_tree(section);
+   // Construct_listen_events_relations_from_mesh_tree(section);
 
-   View_build_group_from_root_mesh(section);
+   // View_build_group_from_root_mesh(section);
 
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
 
 
@@ -2316,33 +2315,32 @@ export function Test_noise_shader() {
 
 
 
-   /****************************************************************************************************************/
-   const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [10, 60, 0], _, GREY[1],);
-   s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // /****************************************************************************************************************/
+   // s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   // s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
-   const btn = Create_widget_button(_, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
-   s.AddItem(btn);
-   btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // const btn = Create_widget_button(_, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
+   // s.AddItem(btn);
+   // btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   // btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   // btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idxs] },)
+   // btn.Bind(Particle_system_emitt, _, { target_params: [emitter_idxs] },)
 
 
-   s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // s.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
-   s.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT
-   s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-   s.Calc_no_gfx_update();
-   s.Render();
-   Root_group_activate_all_vbs_in_renderqueue(s.root_bufferidx);
+   // s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+   // // s.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
+   // s.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT
+   // s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+   // s.Calc_no_gfx_update();
+   // s.Render();
+   // Root_group_activate_all_vbs_in_renderqueue(s.root_bufferidx);
 
-   s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, s.gfx.vb.groupidx);
+   // s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, s.gfx.vb.groupidx);
 
-   Construct_listen_events_from_mesh_tree(s);
-   Construct_listen_events_relations_from_mesh_tree(s);
+   // Construct_listen_events_from_mesh_tree(s);
+   // Construct_listen_events_relations_from_mesh_tree(s);
 
 }
 

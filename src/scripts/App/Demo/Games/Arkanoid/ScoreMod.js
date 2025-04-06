@@ -52,7 +52,7 @@ class Score_Mod {
    constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL) {
 
       // const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENT, text_col:text_color, texture_id:font,}));
-      const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENCY(GREY[4], .4), text_col:text_color, texture_id:font,}));
+      const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENCY(GREY[4], .7), text_col:text_color, texture_id:font,}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidxs.label, vb_groupidxs.text_mesh);
 
@@ -173,8 +173,9 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
       // score_mod.mesh.geom.pos[1] = y;
       score_mod.mesh.text_mesh.geom.pos[0] = x;
       score_mod.mesh.text_mesh.geom.pos[1] = y;
+      // score_mod.mesh.text_mesh.geom.pos[1] = y+score_mod.mesh.text_mesh.geom.dim[1];
       // score_mod.mesh.text_mesh.geom.pos[0] = score_mod.mesh.geom.pos[0];
-      // score_mod.mesh.text_mesh.geom.pos[1] = score_mod.mesh.geom.pos[1];
+      // score_mod.mesh.text_mesh.geom.pos[1] = y-score_mod.mesh.geom.dim[1]*2;
       score_mod.mesh.text_mesh.RenderTextFromString(text);
 
       Set_color_rgba(score_mod.mesh.text_mesh, text_color)

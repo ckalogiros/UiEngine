@@ -23,7 +23,7 @@ import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotat
 import { Demo_widgets, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
 import { Game_snake } from "./Demo/Games/Tetris/Snake.js";
 import { Board_rotations } from "./Demo/DemoBoardRotations.js";
-import { Tetris, Tetris_reset } from "./Demo/Games/Snake/Tetris.js";
+// import { Tetris, Tetris_reset } from "./Demo/Games/Snake/Tetris.js";
 import { Arkanoid_free_buffers, Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
 import { CALLBACK_ANIMATION_TYPE_FLAGS } from "../Engine/Animations/CallbackAnimationsReadyAnimations.js";
 import { Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/WidgetReadyStyles.js";

@@ -203,7 +203,7 @@ export function Ball_remove_mesh_byidx(idx = INT_NULL) {
    _balls_buffer.buffer[idx].Reset();
    _free_balls_buffer_idxs.Add(idx);
 
-   Ball_print_loop();
+   // Ball_print_loop();
 
 }
 /** */
