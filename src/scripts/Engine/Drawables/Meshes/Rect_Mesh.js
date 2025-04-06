@@ -15,13 +15,8 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Shader_attributes_get_attribs } from "../../../Graphics/ShaderAttributes.js";
-import * as glBufferOps from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
 
-function Create_attributes() {
-
-
-}
 
 export class Rect_Mesh extends Mesh {
 
@@ -98,49 +93,6 @@ export class Rect_Mesh extends Mesh {
       return mesh.idx;
    }
 
-   /****************************************************************************************************************************************************/
-   AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps. Gl_add_vpos_xy(gfx, x, y, num_faces); }
-   AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
-   AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
-   SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
-   SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
-   SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }
-
-   UpdateAddDimXY  (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-   UpdateAddDimX   (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_x( gfx, this.dim[0], num_faces); }
-   UpdateAddDimY   (gfx, num_faces=1) { glBufferOps.Gl_add_vpos_y( gfx, this.dim[1], num_faces); }
-   UpdateSetDimXY  (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-   UpdateSetDimX   (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
-   UpdateSetDimY   (gfx, num_faces=1) { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
-   UpdateAddWposXY (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
-   UpdateAddWposX  (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
-   UpdateAddWposY  (gfx, num_faces=1) { glBufferOps.Gl_add_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
-   UpdateSetWposXY (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
-   UpdateSetWposX  (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
-   UpdateSetWposY  (gfx, num_faces=1) { glBufferOps.Gl_set_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
-
-   AddWposXY   (gfx, x, y, num_faces=1) { glBufferOps.Gl_add_wpos_xy(gfx, x, y, num_faces); }
-   AddWposX    (gfx, x   , num_faces=1) { glBufferOps.Gl_add_wpos_x( gfx, x, num_faces); }
-   AddWposY    (gfx, y   , num_faces=1) { glBufferOps.Gl_add_wpos_y( gfx, y, num_faces); }
-   SetWposXY   (gfx, x, y, num_faces=1) { glBufferOps.Gl_set_wpos_xy(gfx, x, y, num_faces); }
-   SetWposX    (gfx, x   , num_faces=1) { glBufferOps.Gl_set_wpos_x( gfx, x, num_faces); }
-   SetWposY    (gfx, y   , num_faces=1) { glBufferOps.Gl_set_wpos_y( gfx, y, num_faces); }
-
-   /** */
-   SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
-   /** */
-   SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
-   /** */
-   SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
-   /** */
-   SetWposXY(x, y) { this.SetUpdateFrameBuffer(); this.geom.SetWposXY(this.gfx, x, y,); }
-   /** */
-   SetWposX(x) { this.SetUpdateFrameBuffer(); this.geom.SetWposX(this.gfx, x, this.geom.num_faces); }
-   /** */
-   SetWposY(y) { this.SetUpdateFrameBuffer(); this.geom.SetWposY(this.gfx, y,); }
-   /** */
-   SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
-   /****************************************************************************************************************************************************/
 
 
    /****************************************************************************************************************************************************/
@@ -328,18 +280,7 @@ export class Rect_Mesh extends Mesh {
 
       return this.gfx.vb.start;
    }
-   // AddToGfx() {
 
-
-
-   //    Vertex_buffer_add_vertices_NEW(this.gfx, this.attributes);
-   //    this.is_gfx_inserted = true;
-
-   //    // Add entry to Gfx Buffer
-   //    this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
-   //    return this.gfx.vb.start;
-   // }
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
