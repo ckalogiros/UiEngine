@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Base/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_add_vertices_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -17,6 +17,11 @@ import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Shader_attributes_get_attribs } from "../../../Graphics/ShaderAttributes.js";
 import * as glBufferOps from "../../../Graphics/Buffers/VertexBuffersOps.js";
 
+
+function Create_attributes() {
+
+
+}
 
 export class Rect_Mesh extends Mesh {
 
@@ -35,7 +40,7 @@ export class Rect_Mesh extends Mesh {
       super(geom, mat);
 
 
-
+      // this.attributes = Create_attributes
 
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;

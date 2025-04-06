@@ -301,45 +301,45 @@ export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, st
 }
 
 
-export function FILL_VERTEX_BUFFER_TEST(vb_data, attribs, start, num_faces, stride, num_vertices, a_vpos_offset) {
+// export function FILL_VERTEX_BUFFER_TEST(vb_data, attribs, start, num_faces, stride, num_vertices, a_vpos_offset) {
 
-   let attribs_count = 0;
-   let index = start;
+//    let attribs_count = 0;
+//    let index = start;
 
-   // for (let i = 0; i < num_faces; i++) {
+//    // for (let i = 0; i < num_faces; i++) {
       
-   //    for (let j = 0; j < num_vertices; j++) {
+//    //    for (let j = 0; j < num_vertices; j++) {
 
-   //       for (let k = 0; k < attribs.length; k++) {
+//    //       for (let k = 0; k < attribs.length; k++) {
             
-   //          for (let l = 0; l < attribs[k].length; l++) {
+//    //          for (let l = 0; l < attribs[k].length; l++) {
 
-   //             vb_data[index++] = attribs[k][l];
-   //          }
-   //       }
-   //    }
+//    //             vb_data[index++] = attribs[k][l];
+//    //          }
+//    //       }
+//    //    }
 
-   //    attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
+//    //    attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
 
-   // }
-   for (let i = 0; i < num_faces; i++) {
+//    // }
+//    for (let i = 0; i < num_faces; i++) {
       
-      for (let j = 0; j < num_vertices; j++) {
+//       for (let j = 0; j < num_vertices; j++) {
 
-         for (let k = 0; k < attribs.length; k++) {
+//          for (let k = 0; k < attribs.length; k++) {
             
-            vb_data[index++] = attribs[k];
-         }
-      }
+//             vb_data[index++] = attribs[k];
+//          }
+//       }
 
-      attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
+//       attribs_count += stride; // TODO: Store Vertices_per_rect in shader_attribs?????
 
-   }
+//    }
 
-   // Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
-   return attribs_count;
+//    // Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
+//    return attribs_count;
 
-}
+// }
 
 
 
@@ -419,18 +419,7 @@ function Set_vertex_uv_coordinates_TEX2(vb_data, start, stride, uv) {
    index += stride;
 
 }
-function Set_dimention_DIM2(vb_data, start, stride, dimx, dimy) {
 
-   let index = start;
-
-   const _dimx = dimx * 2;
-   const _dimy = dimy * 2;
-
-   // VERTEX POSITION
-   vb_data[index++] = _dimx;
-   vb_data[index++] = _dimy;
-
-}
 
 
 
