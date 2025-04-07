@@ -177,7 +177,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
    if(event_move) label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    if(event_hover) label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-   // label.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+   // label.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
    // label.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
 
@@ -316,7 +316,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-   // msdf_text.StateEnable(MESH_STATE.IS_HOVER_COLORABLE | MESH_STATE.IS_RESIZEABLE);
+   // msdf_text.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
    // msdf_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
    // msdf_text.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
 

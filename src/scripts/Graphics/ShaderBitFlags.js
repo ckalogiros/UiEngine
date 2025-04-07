@@ -1,6 +1,29 @@
 "use strict"
 
 
+const GL_TYPES = {
+
+   FLOAT: 5126,
+   FLOAT_VEC2: 35664,
+   FLOAT_VEC3: 35665,
+   FLOAT_VEC4: 35666,
+   FLOAT_32_UNSIGNED_INT_24_8_REV: 36269,
+   FLOAT_MAT2: 35674,
+   FLOAT_MAT2x3: 35685,
+   FLOAT_MAT2x4: 35686,
+   FLOAT_MAT3: 35675,
+   FLOAT_MAT3x2: 35687,
+   FLOAT_MAT3x4: 35688,
+   FLOAT_MAT4: 35676,
+   FLOAT_MAT4x2: 35689,
+   FLOAT_MAT4x3: 35690,
+}
+
+function GL_GET_ERROR(line){
+   console.error('line:', line, ' Error code:', gfxCtx.gl.getError())
+}
+
+
 // Generic Bit Flags array. 
 let BIT = 0x1;
 const BIT_FLAGS = new Int32Array([
@@ -134,7 +157,7 @@ const ATTRIBUTES = [
    {FLAG:SID_ATTR.FEATHER,            IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'FEATHER',         ATTR_NAME:'feather'},
    {FLAG:SID_ATTR.TIME,               IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'TIME',            ATTR_NAME:'time'},
    {FLAG:SID_ATTR.ANGLE,              IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'ANGLE',           ATTR_NAME:'angle'},
-   {FLAG:SID_ATTR.U_SCALE_VEC2,             IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'U_SCALE_VEC2',          ATTR_NAME:'scale2'},
+   {FLAG:SID_ATTR.U_SCALE_VEC2,       IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'U_SCALE_VEC2',    ATTR_NAME:'scale2'},
    {FLAG:SID_ATTR.BORDER,             IDX:_counter++,    TYPE:GL_TYPES.FLOAT,        TYPE_SIZE:1,    KEY_NAME:'BORDER',          ATTR_NAME:'border'},
    {FLAG:SID_ATTR.SDF,                IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'SDF',             ATTR_NAME:'sdf'},
    {FLAG:SID_ATTR.MSDF,               IDX:_counter++,    TYPE:GL_TYPES.FLOAT_VEC2,   TYPE_SIZE:2,    KEY_NAME:'MSDF',            ATTR_NAME:'msdf'},

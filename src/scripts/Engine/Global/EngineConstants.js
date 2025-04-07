@@ -61,51 +61,6 @@ const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget..
 
 
 
-const APP = {
-	ENABLE_SHADER_PROJECTION_MATRIX: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
-	ENABLE_SHADER_WPOS_UNIFORM: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
-}
-
-
-
-
-//
-const TYPES = {
-
-	ID: 'TYPES',
-
-	BOOL: _CNT,
-	INT8: _CNT <<= 0x1,
-	INT16: _CNT <<= 0x1,
-	INT32: _CNT <<= 0x1,
-	UINT8: _CNT <<= 0x1,
-	UINT16: _CNT <<= 0x1,
-	UINT32: _CNT <<= 0x1,
-	FLOAT32: _CNT <<= 0x1,
-	VEC2: _CNT <<= 0x1,
-	VEC3: _CNT <<= 0x1,
-	VEC4: _CNT <<= 0x1,
-	MAT2X2: _CNT <<= 0x1,
-	MAT4X4: _CNT <<= 0x1,
-
-	GetSizeInBytes(type, id) {
-
-		if (id === undefined || id !== this.ID) alert('type not match');
-
-		let size = 0;
-		if (type & this.FLOAT32) size += FLOAT32_BYTE_SIZE;
-		else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
-		else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
-		else if (type & this.INT32 || type & this.UINT32) size += INT32_BYTE_SIZE;
-		else if (type & this.VEC2) size += VEC2_BYTE_SIZE;
-		else if (type & this.VEC3) size += VEC3_BYTE_SIZE;
-		else if (type & this.VEC4) size += VEC4_BYTE_SIZE;
-		else if (type & this.MAT2X2) size += MAT2X2_BYTE_SIZE;
-		else if (type & this.MAT4X4) size += MAT4X4_BYTE_SIZE;
-
-		return size;
-	}
-}
 
 
 
@@ -238,72 +193,6 @@ const STATE = {
 		click_hold: null,
 		click_holdidx: INT_NULL,
 
-		SetHovered(mesh) {
-			this.hovered = mesh;
-			if (!mesh) {
-				this.hoveredIdx = INT_NULL;
-			}
-			else {
-				this.hoveredIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetGrabed(mesh) {
-			this.grabed = mesh;
-			if (!mesh) {
-				this.grabedIdx = INT_NULL;
-			}
-			else {
-				this.grabedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetClicked(mesh) {
-			this.clicked = mesh;
-			if (!mesh) {
-				this.clickedIdx = INT_NULL;
-			}
-			else {
-				this.clickedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetFocused(mesh) {
-
-			this.focused = mesh;
-			if (!mesh) {
-				this.focusedIdx = INT_NULL;
-			}
-			else {
-				this.focusedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetClickHold(mesh) {
-
-			this.click_hold = mesh;
-			if (!mesh) {
-				this.click_holdidx = INT_NULL;
-			}
-			else {
-				this.click_holdidx = mesh.mesh_bufferidx;
-			}
-		},
-		CheckAllAndRemove(mesh) {
-			if (mesh === this.hovered) {
-				this.hovered = null;
-				this.hoveredIdx = INT_NULL;
-			}
-			if (mesh === this.clicked) {
-				this.clicked = null;
-				this.grabedIdx = INT_NULL;
-			}
-			if (mesh === this.grabed) {
-				this.grabed = null;
-				this.clickedIdx = INT_NULL;
-			}
-			if (mesh === this.focused) {
-				this.focused = null;
-				this.focusedIdx = INT_NULL;
-			}
-		}
-
 	},
 
 	mouse: {
@@ -311,32 +200,51 @@ const STATE = {
 		activeClickedButtonId: INT_NULL,
 	},
 
-	Reset(){
 
-		// this.scene.active = null;
-		// this.scene.active_idx = null;
-	
-		this.loop.paused = false;
-	
-		this.mesh.hovered = null;
-		this.mesh.hoveredIdx = INT_NULL;
-		
-		this.mesh.clicked = null;
-		this.mesh.clickedIdx = INT_NULL;
-		
-		this.mesh.grabed = null;
-		this.mesh.grabedIdx = INT_NULL;
-		
-		this.mesh.focused = null;
-		this.mesh.focusedIdx = INT_NULL;
-		
-		this.mesh.click_hold = null;
-		this.mesh.click_holdidx = INT_NULL;
-
-		this.mouse.activeClickedButtonId
-	}
 };
 
+
+
+
+
+
+
+
+_CNT = 0x1;
+const MESH_STATE_FLAGS = {
+
+	ACTIVE: _CNT,
+	CLIPED_Y: _CNT <<= 1,
+	CLIPED_X: _CNT <<= 1,
+
+	IN_FOCUS: _CNT <<= 1,
+	IN_HOVER: _CNT <<= 1,
+	IN_MOVE: _CNT <<= 1,
+	IN_RESIZE: _CNT <<= 1,
+	IN_GRAB: _CNT <<= 1,
+	IN_HOVER_COLOR: _CNT <<= 1,
+	IN_HOLD_CLICK: _CNT <<= 1,
+	
+	IS_HOVERABLE: _CNT <<= 1,
+	IS_CLICKABLE: _CNT <<= 1,
+	IS_RESIZEABLE: _CNT <<= 1,
+	IS_MOVABLE: _CNT <<= 1,
+	IS_GRABABLE: _CNT <<= 1,
+	IS_FAKE_EVENT: _CNT <<= 1,
+	IS_FAKE_HOVERABLE: _CNT <<= 1,
+	IS_FAKE_CLICKABLE: _CNT <<= 1,
+	IS_HOVER_COLORABLE: _CNT <<= 1,
+	IS_HOLD_CLICK: _CNT <<= 1,
+
+	IN_SCALE: _CNT <<= 1,
+	HAS_POPUP: _CNT <<= 1,
+	HAS_CLIP: _CNT <<= 1,
+
+	// Masks for denoting a vertex buffer's uniform wpos as 'sticky, so it will be uupdated accordingly on canvas resize and scroll 
+	STICKY_POSX: _CNT <<= 0x1, 
+	STICKY_POSY: _CNT <<= 0x1,
+
+};
 
 
 
@@ -374,79 +282,6 @@ const SECTION = {
 
 };
 
-
-
-
-
-
-
-
-_CNT = 0x1;
-const MESH_STATE = {
-
-	ACTIVE: _CNT,
-	CLIPED_Y: _CNT <<= 1,
-	CLIPED_X: _CNT <<= 1,
-
-	IN_FOCUS: _CNT <<= 1,
-	IN_HOVER: _CNT <<= 1,
-	IN_MOVE: _CNT <<= 1,
-	IN_RESIZE: _CNT <<= 1,
-	IN_GRAB: _CNT <<= 1,
-	IN_HOVER_COLOR: _CNT <<= 1,
-	IN_HOLD_CLICK: _CNT <<= 1,
-	
-	IS_HOVERABLE: _CNT <<= 1,
-	IS_CLICKABLE: _CNT <<= 1,
-	IS_RESIZEABLE: _CNT <<= 1,
-	IS_MOVABLE: _CNT <<= 1,
-	IS_GRABABLE: _CNT <<= 1,
-	IS_FAKE_EVENT: _CNT <<= 1,
-	IS_FAKE_HOVERABLE: _CNT <<= 1,
-	IS_FAKE_CLICKABLE: _CNT <<= 1,
-	IS_HOVER_COLORABLE: _CNT <<= 1,
-	IS_HOLD_CLICK: _CNT <<= 1,
-
-	IN_SCALE: _CNT <<= 1,
-	HAS_POPUP: _CNT <<= 1,
-	HAS_CLIP: _CNT <<= 1,
-
-	// Masks for denoting a vertex buffer's uniform wpos as 'sticky, so it will be uupdated accordingly on canvas resize and scroll 
-	STICKY_POSX: _CNT <<= 0x1, 
-	STICKY_POSY: _CNT <<= 0x1,
-
-	
-	ToString(mask) {
-
-		let str = '';
-		if (mask & this.IN_FOCUS) str += 'IN_FOCUS,'
-		if (mask & this.IN_HOVER) str += 'IN_HOVER,'
-		if (mask & this.IN_SCALE) str += 'IN_SCALE,'
-		if (mask & this.IN_MOVE) str += 'IN_MOVE,'
-		if (mask & this.IN_GRAB) str += 'IN_GRAB,'
-		if (mask & this.IN_HOVER_COLOR) str += 'IN_HOVER_COLOR,'
-
-		if (mask & this.IS_MOVABLE) str += 'IS_MOVABLE,'
-		if (mask & this.IS_GRABABLE) str += 'IS_GRABABLE,'
-
-		if (mask & this.CLICKED_MOUSE_L) str += 'CLICKED_MOUSE_L,'
-		if (mask & this.CLICKED_MOUSE_M) str += 'CLICKED_MOUSE_M,'
-		if (mask & this.CLICKED_MOUSE_R) str += 'CLICKED_MOUSE_R,'
-
-		if (mask & this.IS_HOVERABLE) str += 'IS_HOVERABLE,'
-		if (mask & this.HAS_POPUP) str += 'HAS_POPUP,'
-		if (mask & this.IS_HOVER_COLORABLE) str += 'IS_HOVER_COLORABLE,'
-
-		return str;
-		// console.info(str)
-	},
-
-
-	Print(mask) {
-		console.info(this.ToString(mask))
-	}
-
-};
 
 
 

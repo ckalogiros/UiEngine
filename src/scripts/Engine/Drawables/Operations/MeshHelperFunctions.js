@@ -1,5 +1,6 @@
 "use strict";
 
+import { State_mesh_set_focused } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_group_update_scissorbox_all_vb, Vertex_buffer_set_and_update_uniform } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_find_uniform_ubidx_from_name } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
@@ -175,7 +176,7 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
 
 
     // Set the global state
-    STATE.mesh.SetFocused(root);
+    State_mesh_set_focused(root);
 }
 
 

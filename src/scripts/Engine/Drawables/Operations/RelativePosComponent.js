@@ -175,7 +175,7 @@ function _Relative_pos_comp_recalc_left(whereidx, parent){
 
       console.log('1111111111111111111111', elem.GetName())
 
-      if(elem.state.mask & MESH_STATE.ACTIVE){
+      if(elem.state.mask & MESH_STATE_FLAGS.ACTIVE){
          x += elem.geom.dim[0]*2;
          elem.TEMP_recalc_x(x);
          x += elem.geom.dim[0];

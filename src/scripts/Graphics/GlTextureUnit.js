@@ -151,6 +151,6 @@ export function Gl_texture_unit_bind(gl, texture_unit) {
     gl.bindTexture(gl.TEXTURE_2D, texture_unit.tbo);
 
     GL_STATE.BOUND_TEXTURE_IDX = texture_unit.texidx;
-    Bound_texture.texidx = texture_unit.texidx; // Update the global Texture constant object
+    BOUND_TEXTURE.texidx = texture_unit.texidx; // Update the global Texture constant object
 }
 

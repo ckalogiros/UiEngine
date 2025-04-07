@@ -2,13 +2,12 @@
 
 
 
-import { Callback_animations_create } from '../../Engine/Animations/CallbackAnimations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
-import { Mesh_unif_add_vb_root_wposx, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx } from '../../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
-import { BLACK, BLUEL, GREEN, GREENL, GREY, Interpolate_rgb_to_01, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { BLACK, BLUEL, GREEN, GREENL, GREY, ORANGER, PURPLE, PURPLEB, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
@@ -20,9 +19,7 @@ import { Timer_get_global_timer, Timer_get_global_timer_cycle } from '../../Engi
 import { Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
-import { Linear_interpolation } from '../../Helpers/Math/MathFunctions.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from '../Widgets/WidgetGenericControlsReady.js';
-import { Widget_ready_slider } from '../Widgets/WidgetReadyWidgets.js';
 import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
 import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
@@ -820,45 +817,45 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
 
       }, { mnemonics: { shader_parameters: shader_parameters }, },);
    }
-   if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
-      const slider = Create_slider_control(slider_dim, slider_col, 'Noise UV Coord', slider_rcorners, default_font, );
-      controls_buffer.push(slider);
-      slider.SetInitialValue(shader_parameters ? shader_parameters[1] : .71);
-      Slider_connect(slider, (params, slider_val) => {
+   // if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
+   //    const slider = Create_slider_control(slider_dim, slider_col, 'Noise UV Coord', slider_rcorners, default_font, );
+   //    controls_buffer.push(slider);
+   //    slider.SetInitialValue(shader_parameters ? shader_parameters[1] : .71);
+   //    Slider_connect(slider, (params, slider_val) => {
 
-         const val_idx = 0;
-         // Find the ubidx
-         const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
-         Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
+   //       const val_idx = 0;
+   //       // Find the ubidx
+   //       const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
+   //       Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
 
-      }, { mnemonics: { shader_parameters: shader_parameters }, },);
-   }
-   if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
-      const slider = Create_slider_control(slider_dim, slider_col, 'Cone Wideness', slider_rcorners, default_font, );
-      controls_buffer.push(slider);
-      slider.SetInitialValue(shader_parameters ? shader_parameters[2] : .78);
-      Slider_connect(slider, (params, slider_val) => {
+   //    }, { mnemonics: { shader_parameters: shader_parameters }, },);
+   // }
+   // if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
+   //    const slider = Create_slider_control(slider_dim, slider_col, 'Cone Wideness', slider_rcorners, default_font, );
+   //    controls_buffer.push(slider);
+   //    slider.SetInitialValue(shader_parameters ? shader_parameters[2] : .78);
+   //    Slider_connect(slider, (params, slider_val) => {
 
-         const val_idx = 1;
-         // Find the ubidx
-         const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
-         Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
+   //       const val_idx = 1;
+   //       // Find the ubidx
+   //       const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
+   //       Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
 
-      }, { mnemonics: { shader_parameters: shader_parameters }, },);
-   }
-   if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
-      const slider = Create_slider_control(slider_dim, slider_col, 'Complexity', slider_rcorners, default_font, );
-      controls_buffer.push(slider);
-      slider.SetInitialValue(shader_parameters ? shader_parameters[4] : .50);
-      Slider_connect(slider, (params, slider_val) => {
+   //    }, { mnemonics: { shader_parameters: shader_parameters }, },);
+   // }
+   // if (emitter.sid.fx & SID.FX.FS_SMOKE_VEC3) {
+   //    const slider = Create_slider_control(slider_dim, slider_col, 'Complexity', slider_rcorners, default_font, );
+   //    controls_buffer.push(slider);
+   //    slider.SetInitialValue(shader_parameters ? shader_parameters[4] : .50);
+   //    Slider_connect(slider, (params, slider_val) => {
 
-         const val_idx = 2;
-         // Find the ubidx
-         const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
-         Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
+   //       const val_idx = 2;
+   //       // Find the ubidx
+   //       const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_smoke_params');
+   //       Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
 
-      }, { mnemonics: { shader_parameters: shader_parameters }, },);
-   }
+   //    }, { mnemonics: { shader_parameters: shader_parameters }, },);
+   // }
    // Contols for tarnsform and physics
    { // Gravity
       const slider = Create_slider_control(slider_dim, slider_col, 'Gravity', slider_rcorners, default_font, );
@@ -2059,7 +2056,7 @@ export function Test_noise_shader() {
 
    { // Emitter switch and label
 
-      const emitter_section = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Emitter Test', label_style);
+      const emitter_section = Create_rect_mesh(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Emitter Test', label_style);
       emitter_section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
       const label = Create_widget_label(_, 'Emitter Test', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
@@ -2082,7 +2079,7 @@ export function Test_noise_shader() {
    { // Color picker switch  label
 
       zpos = -1
-      const color_picker = Create_widget_section(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Color Picker', label_style);
+      const color_picker = Create_rect_mesh(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Color Picker', label_style);
       color_picker.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
       // Create label
@@ -2274,7 +2271,7 @@ export function Test_noise_shader() {
 
 
 
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [4, 4], [VIEWPORT.RIGHT - 280, 50, 0], [100, 100], CGREY, 'SidePanel', [0, 10, 1.8]);
+   const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [4, 4], [VIEWPORT.RIGHT - 280, 50, 0], [100, 100], CGREY, 'SidePanel', [0, 10, 1.8]);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
@@ -2317,7 +2314,7 @@ export function Test_noise_shader() {
 
 
    /****************************************************************************************************************/
-   const s = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [10, 60, 0], _, GREY[1],);
+   const s = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [10, 60, 0], _, GREY[1],);
    s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 

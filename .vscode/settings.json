@@ -1,4 +1,14 @@
 {
     "liveServer.settings.port": 6001,
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "debug.javascript.terminalOptions": {
+        "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**",
+        "**/node_modules/.vite-temp/**"
+        ]
+    },
+    "vscode-edge-devtools.port": 6001,
+    "vscode-edge-devtools.sourceMaps": false,
+    "vscode-edge-devtools.webRoot": "${workspaceFolder}/src"
 }

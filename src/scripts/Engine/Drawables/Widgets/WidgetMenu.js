@@ -12,6 +12,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Co
 import { Style_label_default_properties, Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 
 
 
@@ -270,7 +271,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
@@ -599,7 +600,7 @@ export class Widget_Minimize extends Widget_Button {
       const minim_mesh = params.source_params;
       const root = params.evt_params;
 
-      STATE.mesh.SetClicked(minim_mesh);
+      State_mesh_set_clicked(minim_mesh);
 
 
       if (minim_mesh.group_bufferidxs[0] === INT_NULL) {
@@ -658,7 +659,7 @@ export class Widget_Minimize extends Widget_Button {
             // Set Graphics
             root.Rerender(); // We need to re-render the whole vb. Many meshes have been excluded from the minimize action
 
-            root.StateDisable(MESH_STATE.IS_RESIZEABLE);
+            root.StateDisable(MESH_STATE_FLAGS.IS_RESIZEABLE);
             minim_mesh.toggle = true;
 
          }
@@ -713,7 +714,7 @@ export class Widget_Minimize extends Widget_Button {
 
             root.Rerender();
 
-            root.StateEnable(MESH_STATE.IS_RESIZEABLE);
+            root.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
             minim_mesh.toggle = false;
          }
       }

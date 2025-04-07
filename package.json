@@ -12,10 +12,9 @@
         "directory": "/"
     },
     "scripts": {
-        "start": "snowpack dev",
-        "build": "snowpack build"
+
     },
-    "dependencies": {
-        "snowpack": "^3.8.8"
+    "devDependencies": {
+        "vite": "^6.2.5"
     }
 }

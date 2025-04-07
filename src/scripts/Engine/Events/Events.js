@@ -1,5 +1,6 @@
 "use strict";
 
+import { State_mesh_set_clickhold, State_mesh_set_grabed, State_mesh_set_hovered } from "../../GlobalFunctions.js";
 import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Listener_dispatch_check_hover_event, Listener_dispatch_event } from "./EventListeners.js";
 
@@ -48,23 +49,23 @@ export function HandleEvents() {
 
             // Disable mesh's hover state
             if (STATE.mesh.hovered) {
-                if (mesh.StateCheck(MESH_STATE.IN_MOVE)) {
-                    mesh.state.mask &= ~MESH_STATE.IN_MOVE; // Set false
+                if (mesh.StateCheck(MESH_STATE_FLAGS.IN_MOVE)) {
+                    mesh.state.mask &= ~MESH_STATE_FLAGS.IN_MOVE; // Set false
                 }
             }
             // Disable mesh's grab state
             if (STATE.mesh.grabed) {
-                if (STATE.mesh.grabed.StateCheck(MESH_STATE.IN_GRAB)) {
-                    STATE.mesh.grabed.state.mask &= ~MESH_STATE.IN_GRAB; // Set false
-                    STATE.mesh.SetGrabed(null)
+                if (STATE.mesh.grabed.StateCheck(MESH_STATE_FLAGS.IN_GRAB)) {
+                    STATE.mesh.grabed.state.mask &= ~MESH_STATE_FLAGS.IN_GRAB; // Set false
+                    State_mesh_set_grabed(null)
                 }
             }
             // Resolve click n hold
             if (STATE.mesh.click_hold && e.params.mouseButton === MOUSE.BTN_ID.LEFT) {
-                if (STATE.mesh.click_hold.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+                if (STATE.mesh.click_hold.StateCheck(MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
                     STATE.mouse.activeClickedButtonId = e.params.mouseButton;
-                    STATE.mesh.click_hold.state.mask &= ~MESH_STATE.IN_HOLD_CLICK; // Set false
+                    STATE.mesh.click_hold.state.mask &= ~MESH_STATE_FLAGS.IN_HOLD_CLICK; // Set false
 
                     /**
                      * // HACK:  Remove time interval of a click n hold button.
@@ -79,7 +80,7 @@ export function HandleEvents() {
                     // if (LISTENERS_FLAGS[E.C] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
                     //     Listener_dispatch_event(E.C, e.params.mouseButton);
                     
-                    STATE.mesh.SetClickHold(null)
+                    State_mesh_set_clickhold(null)
                 }
             }
 
@@ -111,7 +112,7 @@ export function Events_handle_immidiate(e) {
 
         // Apply Hover Color, if the hovered mesh is not already in hover.
         // TODO: isn't it unecessary to check if colorable????? The purpose of hover is to color????
-        if (e.params.mesh.StateCheck(MESH_STATE.IS_HOVER_COLORABLE) && e.params.mesh.mesh_bufferidx !== STATE.mesh.hoveredIdx) {
+        if (e.params.mesh.StateCheck(MESH_STATE_FLAGS.IS_HOVER_COLORABLE) && e.params.mesh.mesh_bufferidx !== STATE.mesh.hoveredIdx) {
 
             // Unhover any hovered mesh.
             if (STATE.mesh.hovered) {
@@ -131,14 +132,14 @@ export function Events_handle_immidiate(e) {
                 }
 
                 Set_default_color_rgba(STATE.mesh.hovered);
-                STATE.mesh.hovered.state.mask &= ~MESH_STATE.IN_HOVER_COLOR;
+                STATE.mesh.hovered.state.mask &= ~MESH_STATE_FLAGS.IN_HOVER_COLOR;
             }
 
             Set_hover_color_rgba(e.params.mesh);
 
-            e.params.mesh.state.mask |= (MESH_STATE.IN_HOVER_COLOR | MESH_STATE.IN_HOVER); 
+            e.params.mesh.state.mask |= (MESH_STATE_FLAGS.IN_HOVER_COLOR | MESH_STATE_FLAGS.IN_HOVER); 
             
-            STATE.mesh.SetHovered(e.params.mesh);
+            State_mesh_set_hovered(e.params.mesh);
             TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT++;
 
             // If there is a resolve function, call it.
@@ -166,9 +167,9 @@ export function Events_handle_immidiate(e) {
     // else if (e.type === 'unhover') {
     else if (e.type & EVENT_HANDLER_TYPE.MOUSE_UNHOVER) {
 
-        if (e.params.mesh.StateCheck(MESH_STATE.IN_HOVER_COLOR)) {
+        if (e.params.mesh.StateCheck(MESH_STATE_FLAGS.IN_HOVER_COLOR)) {
             Set_default_color_rgba(e.params.mesh);
-            e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER_COLOR; // Set false
+            e.params.mesh.state.mask &= ~MESH_STATE_FLAGS.IN_HOVER_COLOR; // Set false
         }
 
             // If there is a resolve function, call it.
@@ -193,8 +194,8 @@ export function Events_handle_immidiate(e) {
             }
         // }
         
-        e.params.mesh.state.mask &= ~MESH_STATE.IN_HOVER; // Set false
-        STATE.mesh.SetHovered(null);
+        e.params.mesh.state.mask &= ~MESH_STATE_FLAGS.IN_HOVER; // Set false
+        State_mesh_set_hovered(null);
     }
 
 }

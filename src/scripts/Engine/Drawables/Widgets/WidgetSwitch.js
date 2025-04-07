@@ -1,6 +1,7 @@
 "use strict";
 
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
@@ -69,10 +70,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       switch_handle.SetName('switch');
 
       switch_handle.mat.style.rcorners = properties.size - pad;
-      switch_handle.state.mask &= ~MESH_STATE.ACTIVE;
+      switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
       this.AddChild(switch_handle);
-      this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
+      this.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
 
       this.SetLayout(properties.layout);
 
@@ -97,15 +98,15 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
    Activate() {
 
-      this.state.mask |= MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask |= MESH_STATE.ACTIVE;
+      this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      this.children.buffer[0].state.mask |= MESH_STATE_FLAGS.ACTIVE;
    }
 
 
    Deactivate() {
 
-      this.state.mask &= ~MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask &= ~MESH_STATE.ACTIVE;
+      this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      this.children.buffer[0].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
    }
 
    StateEnable(MASK = 0x0) {
@@ -229,7 +230,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
    Render() {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) {
+      if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          super.AddToGfx();
          this.children.buffer[0].AddToGfx();
       }
@@ -394,7 +395,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
@@ -419,7 +420,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       mesh.isOn ^= 0x1;
       mesh.SetUpdateFrameBuffer();
-      STATE.mesh.SetClicked(mesh);
+      State_mesh_set_clicked(mesh);
 
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);

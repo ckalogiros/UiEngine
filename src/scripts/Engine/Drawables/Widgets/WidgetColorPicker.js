@@ -1,6 +1,7 @@
 "use strict"
 
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
@@ -115,7 +116,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: color_pick, enable_sdf_rect: properties.rcorners.color_pick, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
-      color_pick.state.mask &= ~MESH_STATE.ACTIVE;
+      color_pick.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
 
 
@@ -417,7 +418,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
    Render() {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) {
+      if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          // super.AddToGfx();
          super.AddToGfx();
          for (let i = 0; i <= this.children.boundary; i++) {
@@ -537,7 +538,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       // TODO: Implement Resize functionality
 
-      STATE.mesh.SetClicked(widget);
+      State_mesh_set_clicked(widget);
 
       if (widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
@@ -548,12 +549,12 @@ export class Widget_Color_Picker extends Rect_Mesh {
          const idx = Time_intervals_create(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (widget.StateCheck(MESH_STATE.IS_GRABABLE)) {
+         if (widget.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-            STATE.mesh.SetGrabed(widget);
-            STATE.mesh.SetFocused(widget);
+            State_mesh_set_grabed(widget);
+            State_mesh_set_focused(widget);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            widget.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+            widget.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
             // Mesh_set_root_in_focus(widget.root_bufferidx);
          }
 
@@ -983,7 +984,7 @@ function On_move_clbk(params) {
    const widget = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (widget.StateCheck(MESH_STATE.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (widget.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);

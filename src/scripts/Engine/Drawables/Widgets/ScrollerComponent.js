@@ -1,6 +1,7 @@
 "use strict";
 
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { State_mesh_set_clicked, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../../Core/Buffers.js";
@@ -244,7 +245,7 @@ function Scroller_component_listen_event_construct() {
 
 
    /****************************************************************************/
-   if (bar.state.mask & MESH_STATE.ACTIVE) {
+   if (bar.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
       // Construct for bar
       if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
@@ -280,14 +281,14 @@ function Scroller_component_on_update_handle(_params) {
    const bar = _params.params;
    const handle = bar.children.buffer[0];
 
-   if (bar.StateCheck(MESH_STATE.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+   if (bar.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
       bar.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
 
-      handle.state.mask &= ~MESH_STATE.IN_GRAB;
+      handle.state.mask &= ~MESH_STATE_FLAGS.IN_GRAB;
 
       return;
    }
@@ -386,7 +387,7 @@ function Scroller_component_onClick(params) {
    //       console.log('Y RESIZE');
    //    }
    
-   //    mesh.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
+   //    mesh.state.mask |= MESH_STATE_FLAGS.IN_RESIZE | MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS;
    //    STATE.mesh.SetGrabed(mesh);
    //    STATE.mesh.SetFocused(mesh);
    
@@ -403,17 +404,17 @@ function Scroller_component_onClick(params) {
       if (point[1] < bar_pos[1] || point[1] > bar_pos[1] + bar.geom.dim[1] * 2) return
       
 
-      STATE.mesh.SetClicked(bar);
+      State_mesh_set_clicked(bar);
 
       if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
          const idx = Time_intervals_create(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
          bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
-         STATE.mesh.SetGrabed(bar);
+         State_mesh_set_grabed(bar);
          // STATE.mesh.SetFocused(mesh);
-         // mesh.state.mask |= MESH_STATE.IN_FOCUS;
-         bar.StateEnable(MESH_STATE.IN_GRAB);
+         // mesh.state.mask |= MESH_STATE_FLAGS.IN_FOCUS;
+         bar.StateEnable(MESH_STATE_FLAGS.IN_GRAB);
       }
 
       return true;

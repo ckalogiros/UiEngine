@@ -601,7 +601,7 @@ export function Root_group_rerender_from_root_reconstruct_listeners(root_bufferi
    for (let i = 0; i <= root.boundary; i++) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // mesh.AddToGfxFromReset();
          mesh.AddToGfx();
@@ -639,7 +639,7 @@ export function Root_group_rerender(root_bufferidx) {
    for (let i = 1; i <= root.boundary; i++) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Rerender
          mesh.AddToGfxFromReset();
@@ -672,7 +672,7 @@ export function Root_group_resize_and_rerender(root_bufferidx, x, y, do_reconstr
    for (let i = 1; i <= root.boundary; i++) {
 
       const mesh = Mesh_buffer_get_mesh_byidx(root.buffer[i]);
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Resize: Only to Menu_Bar meshes that have the option:EXPAND
          if (mesh.type & MESH_TYPE.WIDGET_MENU_BAR && mesh.options & SECTION.EXPAND) {
@@ -887,7 +887,7 @@ export function Root_group_buffer_print_w1() {
                      'gfxidx', mesh.per_vb_bufferidx,
                      'msbidx', mesh.mesh_bufferidx,
                      'state', mesh.state.mask,
-                     'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                     'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE_FLAGS.ACTIVE,
                      'root_pos', mesh.root_posidx,
                      'name', mesh.geom.pos, mesh.GetName());
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
@@ -898,7 +898,7 @@ export function Root_group_buffer_print_w1() {
                      'ridx:', mesh.root_bufferidx,
                      // 'is_gfx_inserted:', mesh.is_gfx_inserted,
                      // 'gfxidx', mesh.per_vb_bufferidx,
-                     'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE.ACTIVE,
+                     'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE_FLAGS.ACTIVE,
                      'root_pos', mesh.root_posidx,
                      // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                      // 'state', mesh.state.mask,

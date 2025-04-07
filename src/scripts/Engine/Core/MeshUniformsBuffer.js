@@ -493,10 +493,10 @@ export function Mesh_unif_update_sticky_pos(xdif, ydif){
    for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
       
       const unif_pos = _per_vb_mesh_unif_wpos.buffer[i];
-      if(unif_pos.sticky_pos & MESH_STATE.STICKY_POSX){
+      if(unif_pos.sticky_pos & MESH_STATE_FLAGS.STICKY_POSX){
          _per_vb_mesh_unif_wpos.buffer[i].wpos[0] += xdif;
       }
-      if(unif_pos.sticky_pos & MESH_STATE.STICKY_POSY){
+      if(unif_pos.sticky_pos & MESH_STATE_FLAGS.STICKY_POSY){
          _per_vb_mesh_unif_wpos.buffer[i].wpos[1] += ydif;
       }
    }
@@ -687,7 +687,7 @@ export function Root_uniforms_for_wpos() {
          'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
          'draw_count:', vb_groups.buffer[i].draw_count,
          // 'ABS:', (unif_obj.has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
-         // '| STICK:', (unif_obj.sticky_pos & MESH_STATE.STICKY_POSX) ? true : false,
+         // '| STICK:', (unif_obj.sticky_pos & MESH_STATE_FLAGS.STICKY_POSX) ? true : false,
          // '| scroll:', unif_obj.scroll_bar,
          'par_posidx:', unif_obj.parent_posidx,
          '| unifpos:', unif_obj.wpos,

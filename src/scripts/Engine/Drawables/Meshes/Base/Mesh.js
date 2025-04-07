@@ -15,6 +15,7 @@ import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
+import { State_mesh_reset } from "../../../../GlobalFunctions.js";
 
 
 
@@ -121,7 +122,6 @@ export class Mesh {
             shad_ops: 0x0,
             fx: 0x0,
             blend_options: 0x0,
-            gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
         };
 
 
@@ -131,12 +131,11 @@ export class Mesh {
 
         this.shader_ops_idxs = New_int8_buffer(8, 'Mesh.shader_ops_idxs');
         this.uniforms = [];
-        if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-            this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+        
 
 
         this.type = MESH_TYPE.MESH;
-        this.state = { mask: MESH_STATE.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
+        this.state = { mask: MESH_STATE_FLAGS.ACTIVE }; // Unfortunately js cannot create a pointer for integers, so we have to wrap the mask to a class;
         this.gfx_pool_request = GFX_POOL_REQUESTS.ANY;
 
 
@@ -185,6 +184,9 @@ export class Mesh {
 
         this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too
+
+        this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
+        this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
         
 
 
@@ -288,7 +290,7 @@ export class Mesh {
         // Remove from gfx buffers.
 
         // A mesh maybe active buut not inserted in vertex buffer
-        if (this.is_gfx_inserted && this.state.mask & MESH_STATE.ACTIVE) {
+        if (this.is_gfx_inserted && this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
 
             /* DO NOT DELETE: dealing with text meshes */
@@ -343,7 +345,7 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove mesh from STATE.
-        STATE.mesh.CheckAllAndRemove(this)
+        State_mesh_reset(this);
 
 
         return shift_children;
@@ -393,30 +395,30 @@ export class Mesh {
 
             this.listeners.AddAtIndex(E.H, INT_NULL);
 
-            this.state.mask |= (MESH_STATE.IS_HOVERABLE | MESH_STATE.IS_HOVER_COLORABLE);
+            this.state.mask |= (MESH_STATE_FLAGS.IS_HOVERABLE | MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
 
-            if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_HOVERABLE);
+            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_HOVERABLE);
 
         }
         if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
             this.listeners.AddAtIndex(E.C, INT_NULL)
 
-            this.state.mask |= (MESH_STATE.IS_CLICKABLE);
+            this.state.mask |= (MESH_STATE_FLAGS.IS_CLICKABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
 
-            if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
+            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
 
         }
         if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
             this.listeners.AddAtIndex(E.C, INT_NULL);
 
-            this.state.mask |= (MESH_STATE.IS_GRABABLE | MESH_STATE.IS_MOVABLE | MESH_STATE.IS_CLICKABLE);
+            this.state.mask |= (MESH_STATE_FLAGS.IS_GRABABLE | MESH_STATE_FLAGS.IS_MOVABLE | MESH_STATE_FLAGS.IS_CLICKABLE);
             this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
 
-            if (is_fake_event) this.state.mask |= (MESH_STATE.IS_FAKE_EVENT | MESH_STATE.IS_FAKE_CLICKABLE);
+            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
 
         }
 
@@ -426,20 +428,20 @@ export class Mesh {
     AddListenEvent(etypeidx, Clbk = null, params = null) {
 
         if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
-        if ((this.state.mask & MESH_STATE.ACTIVE) === 0x0) {
+        if ((this.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0x0) {
             // console.error('0198815 \nMesh is INACTIVE to add a listen event \n', this.GetName());
             return;
         }
 
 
-        const is_fake = (this.state.mask & MESH_STATE.IS_FAKE_EVENT) ? true : false;
+        const is_fake = (this.state.mask & MESH_STATE_FLAGS.IS_FAKE_EVENT) ? true : false;
         this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
     }
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     /** */
     ChangeListenEvent(etypeidx, Clbk = null, params = null) {
 
-        if (this.state.mask & MESH_STATE.ACTIVE) { // HERE: see if can remove check
+        if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) { // HERE: see if can remove check
 
             Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
         }
@@ -761,7 +763,7 @@ export class Mesh {
 
             if (flags.unif) this.sid.unif |= flags.unif;
             if (flags.pass) this.sid.pass |= flags.pass;
-            if (flags.fx) this.sid.fx |= flags.fx;
+            // if (flags.fx) this.sid.fx |= flags.fx;
         }
 
         // Avoid duplicates

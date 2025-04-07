@@ -77,14 +77,15 @@ export function Inspect_and_correct_slider_properties(user_properties) {
 export function Style_rect_default_properties(user_properties) {
    const properties = {
       is_root: user_properties.is_root,
+      
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
-
-      dim: user_properties.dim,
+      dim: user_properties.dim !== undefined ? user_properties.dim : [0,0],
       col: user_properties.col,
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
+      
       num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
       name: user_properties.name !== undefined ? user_properties.name : 'Rect Mesh UNAMED',
       // rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
-      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
 
       texture_id:user_properties.texture_id, 
       sub_texture_id: user_properties.sub_texture_id,

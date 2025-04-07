@@ -14,6 +14,8 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
+import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -74,7 +76,7 @@ export class Rect_Mesh extends Mesh {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx)
       }
 
-      mesh.StateEnable(this.state.mask & MESH_STATE.ACTIVE);
+      mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
 
       return idx;
    }
@@ -103,7 +105,7 @@ export class Rect_Mesh extends Mesh {
    /** */
    Activate() {
 
-      this.state.mask |= MESH_STATE.ACTIVE;
+      this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Activate();
       }
@@ -111,7 +113,7 @@ export class Rect_Mesh extends Mesh {
    /** */
    Deactivate() {
 
-      this.state.mask &= ~MESH_STATE.ACTIVE;
+      this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
@@ -202,7 +204,7 @@ export class Rect_Mesh extends Mesh {
    }
    Render(run_for_children = true) {
 
-      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) {
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
          this.AddToGfx();
       }
 
@@ -277,7 +279,7 @@ export class Rect_Mesh extends Mesh {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
@@ -296,20 +298,20 @@ export class Rect_Mesh extends Mesh {
 
       const section = params.evt_params.target_mesh;
 
-      STATE.mesh.SetClicked(section);
+      State_mesh_set_clicked(section);
 
       // This is to bind a click event to a section.
       if (section.evt_params && section.evt_params.EventClbk) {
 
          // Create time interval to continuosly press the button
-         if (section.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+         if (section.StateCheck(MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
             const EventClbk = section.evt_params.EventClbk;
             const target_params = section.evt_params.params.target_params
             const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
-            STATE.mesh.SetClickHold(section);
+            State_mesh_set_clickhold(section);
          }
          else {
 
@@ -325,7 +327,7 @@ export class Rect_Mesh extends Mesh {
          const bottom = pos[1] + section.geom.dim[1] * 2;
 
          const point = Mouse_get_pos();
-         if (section.state.mask & MESH_STATE.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
+         if (section.state.mask & MESH_STATE_FLAGS.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
 
             // We have Resize
             if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
@@ -342,9 +344,9 @@ export class Rect_Mesh extends Mesh {
                // console.log('Y RESIZE');
             }
 
-            section.state.mask |= MESH_STATE.IN_RESIZE | MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS;
-            STATE.mesh.SetGrabed(section);
-            // STATE.mesh.SetFocused(section);
+            section.state.mask |= MESH_STATE_FLAGS.IN_RESIZE | MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS;
+            State_mesh_set_grabed(section);
+            // State_mesh_set_focused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             Mesh_set_root_in_focus(section.root_bufferidx);
 
@@ -359,12 +361,12 @@ export class Rect_Mesh extends Mesh {
          const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, section);
          section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (section.StateCheck(MESH_STATE.IS_GRABABLE)) {
+         if (section.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-            STATE.mesh.SetGrabed(section);
-            STATE.mesh.SetFocused(section);
+            State_mesh_set_grabed(section);
+            State_mesh_set_focused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            section.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+            section.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
             // Root_group_set_in_focus(section.root_bufferidx);
             // Mesh_set_root_in_focus(section.root_bufferidx);
 
@@ -381,7 +383,7 @@ export class Rect_Mesh extends Mesh {
       const root = params.params;
 
       // NOTE: We use the same element of the mesh's interval buffer for the resize event as the move event, they cannot both exist at the same time. 
-      if (root.StateCheck(MESH_STATE.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+      if (root.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
          const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);
@@ -462,7 +464,7 @@ export function Rect_mesh_on_move_clbk(params) {
    const section = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (section.StateCheck(MESH_STATE.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (section.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);

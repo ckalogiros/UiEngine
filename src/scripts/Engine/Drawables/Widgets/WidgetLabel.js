@@ -13,6 +13,7 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 
 
 
@@ -108,15 +109,15 @@ export class Widget_Label extends Rect_Mesh {
 
     Activate() {
 
-        this.state.mask |= MESH_STATE.ACTIVE;
-        this.text_mesh.state.mask |= MESH_STATE.ACTIVE;
+        this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+        this.text_mesh.state.mask |= MESH_STATE_FLAGS.ACTIVE;
     }
 
 
     Deactivate() {
 
-        this.state.mask &= ~MESH_STATE.ACTIVE;
-        this.text_mesh.state.mask &= ~MESH_STATE.ACTIVE;
+        this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+        this.text_mesh.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
     }
 
 
@@ -247,8 +248,8 @@ export class Widget_Label extends Rect_Mesh {
 
     Render() {
         if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
-        if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) { this.AddToGfx(); }
-        if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE.ACTIVE)) { this.text_mesh.AddToGfx(); }
+        if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
+        if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
     }
 
 
@@ -358,11 +359,11 @@ export class Widget_Label extends Rect_Mesh {
         this.geom.AddWposY(this.gfx, y,);
         this.text_mesh.geom.pos[1] += y;
         this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y,);
-        // if(this.state.mask & MESH_STATE.ACTIVE) {
+        // if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
         //     this.geom.AddWposY(this.gfx, y, );
         // }
         // this.text_mesh.geom.pos[1] += y;
-        // if(this.text_mesh.state.mask & MESH_STATE.ACTIVE) {
+        // if(this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
         //     this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
         // }
     }
@@ -553,7 +554,7 @@ export class Widget_Label extends Rect_Mesh {
 
         const mesh = this;
 
-        if (mesh.state.mask & MESH_STATE.ACTIVE) {
+        if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
             // Construct HOVER event
             if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
@@ -574,8 +575,8 @@ export class Widget_Label extends Rect_Mesh {
 
 
 
-        STATE.mesh.SetClicked(mesh);
-        STATE.mesh.SetFocused(mesh);
+        State_mesh_set_clicked(mesh);
+        State_mesh_set_focused(mesh);
 
         // IMPORTANT: We use the 'INTERVALS.MOVE' index for the 'timeIntervalsIdxBuffer' element, to store the interval for the move OR the resize event, since resize and move (intervals) cannot co-exist.
         if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
@@ -589,7 +590,7 @@ export class Widget_Label extends Rect_Mesh {
             let is_resizesed = false;
 
             // Check for Resize
-            if (mesh.StateCheck(MESH_STATE.IS_RESIZEABLE)) {
+            if (mesh.StateCheck(MESH_STATE_FLAGS.IS_RESIZEABLE)) {
 
                 const point = Mouse_get_pos();
 
@@ -613,7 +614,7 @@ export class Widget_Label extends Rect_Mesh {
                         // console.log('Y RESIZE');
                     }
 
-                    mesh.StateEnable(MESH_STATE.IN_RESIZE);
+                    mesh.StateEnable(MESH_STATE_FLAGS.IN_RESIZE);
                     is_resizesed = true;
                 }
             }
@@ -627,10 +628,10 @@ export class Widget_Label extends Rect_Mesh {
             }
 
 
-            if (mesh.StateCheck(MESH_STATE.IS_GRABABLE)) {
+            if (mesh.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-                STATE.mesh.SetGrabed(mesh);
-                mesh.StateEnable(MESH_STATE.IN_GRAB);
+                State_mesh_set_grabed(mesh);
+                mesh.StateEnable(MESH_STATE_FLAGS.IN_GRAB);
             }
 
         }
@@ -642,7 +643,7 @@ export class Widget_Label extends Rect_Mesh {
 
         const mesh = params.params;
 
-        if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+        if (mesh.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
             Time_intervals_destroy_byidx(intervalIdx);
@@ -697,7 +698,7 @@ function Label_on_move_clbk(params) {
      */
     const mesh = params.params;
 
-    if (mesh.StateCheck(MESH_STATE.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+    if (mesh.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
         Time_intervals_destroy_byidx(intervalIdx);

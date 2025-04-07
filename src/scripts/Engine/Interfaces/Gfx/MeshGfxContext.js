@@ -7,7 +7,7 @@ import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
-import { Scene_set_projection_matrix } from "../../Scenes.js";
+import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
@@ -248,11 +248,12 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       progidx = Program_create_program(sid, uniforms, shader_ops_idxs);
 
-      Scene_set_projection_matrix(sceneidx)
+      Scene_set_projection_matrix(sceneidx);
+      Scene_set_screen_res_uniform();
 
-      // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
-      const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
-      Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
+      // // HACK: the uniform block should not be implemented HERE, Also weather or not the 'u_screen_res' should be enabled is responsibility of 'WHO'???????????????????
+      // const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
+      // Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 
    }
 
@@ -398,7 +399,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
                   const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
                   // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
-                  const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+                  const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY;
                   // Choose to assign the mesh as the root uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
                   const COPY_MESH_POS = (flags) ? true : false;
                   // Create the uniform position that will update the vertexbuffer's uniform
@@ -420,7 +421,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       else {
 
          const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY;
          const IS_VB_ROOT = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
          const IS_VB_USED = is_vertex_buffer_from_pool_used;
 
@@ -620,7 +621,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
       else {
 
          const HAS_ABSOLUTE_POS = FLAGS & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE.STICKY_POSX) | mesh.state.mask & MESH_STATE.STICKY_POSY;
+         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY;
          const COPY_MESH_POS = (FLAGS) ? true : false;
 
          // Get the unif wpos that is already created for this vb

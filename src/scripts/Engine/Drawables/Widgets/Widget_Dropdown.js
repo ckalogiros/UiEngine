@@ -13,6 +13,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshid
 import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 
 
 
@@ -116,7 +117,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
-      this.menu.state.mask &= ~MESH_STATE.ACTIVE;
+      this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
       
       this.dp_symbols = ['+', '-'];
@@ -153,7 +154,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    /** */
    Activate() {
 
-      this.state.mask |= MESH_STATE.ACTIVE;
+      this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
       this.children.buffer[0].Activate(); // Button
       if(this.isOn & DP_MENU_STATE.ON){
          this.menu.Activate(); // Button
@@ -162,7 +163,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    /** */
    Deactivate() {
 
-      this.state.mask &= ~MESH_STATE.ACTIVE;
+      this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.children.buffer[0].Deactivate(); // Button
       if(this.isOn & DP_MENU_STATE.ON){
          this.menu.Deactivate(); // Button
@@ -241,7 +242,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       // NOTE: The dp's button is inserted to the widget root buffer by the constructor:  'this.AddItem(btn)'
 
       if ((this.isOn & DP_MENU_STATE.ON) === 0) {
-         mesh.StateDisable(MESH_STATE.ACTIVE)
+         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE)
       }
 
 
@@ -400,7 +401,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    Render() {
 
       // super.AddToGfx();
-      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE.ACTIVE)) {
+      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
          super.AddToGfx()
       }
 
@@ -455,7 +456,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
 
       /****************************************************************************/
-      if (dp.state.mask & MESH_STATE.ACTIVE) {
+      if (dp.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          
          // Construct HOVER event
          if (dp.listeners && dp.listeners.buffer[E.H] === INT_NULL) {
@@ -522,12 +523,12 @@ export class Widget_Dropdown extends Rect_Mesh {
             dp.isOn |= DP_MENU_STATE.OFF;
          }
 
-         STATE.mesh.SetClicked(btn);
-         STATE.mesh.SetFocused(dp);
+         State_mesh_set_clicked(btn);
+         State_mesh_set_focused(dp);
       }
 
       // Else the click happened anywhere in dropdown except the button area
-      else if(dp.state.mask & MESH_STATE.IS_MOVABLE) { // Create move timeInterval if the dp has the move flag
+      else if(dp.state.mask & MESH_STATE_FLAGS.IS_MOVABLE) { // Create move timeInterval if the dp has the move flag
 
          dp.OnMove({params:dp});
       }
@@ -547,12 +548,12 @@ export class Widget_Dropdown extends Rect_Mesh {
       const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-      if (dp.StateCheck(MESH_STATE.IS_GRABABLE)) {
+      if (dp.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-         STATE.mesh.SetGrabed(dp);
-         STATE.mesh.SetFocused(dp);
+         State_mesh_set_grabed(dp);
+         State_mesh_set_focused(dp);
          Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: dp })
-         dp.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
+         dp.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
          // Mesh_set_root_in_focus(dp.root_bufferidx);
       }
 
@@ -757,7 +758,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
          if (menu.gfx && menu.is_gfx_inserted) {
 
-            menu.state.mask &= ~MESH_STATE.ACTIVE;
+            menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
             // Widget_group_update_decrement(root.group_bufferidxs, menu.geom.num_faces, menu);
             menu.is_gfx_inserted = false;
@@ -829,7 +830,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       const menu = this.menu;
       this.menu_active = true; // Set state to active.
 
-      menu.state.mask |= MESH_STATE.ACTIVE;
+      menu.state.mask |= MESH_STATE_FLAGS.ACTIVE;
 
       // Activate menu's items, recursively
       for (let i = 0; i <= menu.children.boundary; i++) {

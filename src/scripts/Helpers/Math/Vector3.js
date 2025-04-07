@@ -1,5 +1,5 @@
-import * as MathUtils from './MathUtils.js';
-import { Quaternion } from './Quaternion.js';
+import * as MathUtils from './../THREE_math/MathUtils.js';
+import { Quaternion } from './../THREE_math/Quaternion.js';
 
 class Vector3 {
 

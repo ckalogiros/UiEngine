@@ -17,7 +17,7 @@ import { Widget_ready_label, Widget_ready_slider } from "../Widgets/WidgetReadyW
 export function Test_alignment() {
 
    let mesh = null;
-   let x = 100, y = 600;
+   let x = 10, y = 60;
 
    mesh = Test_alignment_nested_2(50, y); y += mesh.geom.dim[1] * 2 + 20;
 
@@ -1300,7 +1300,7 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
 
    /********************************************************************************************************************************************************/
    // Create
-   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
+   // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, 0, 0], dim:[0, 0], col:TRANSPARENCY(GREY[1], .8), name:'Test_alignment'}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -1661,8 +1661,8 @@ function Test_slider_control_pad(x, y) {
 
    /********************************************************************************************************************************************************/
    // Create
-   // const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
+   // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
+   const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    // section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -1728,7 +1728,7 @@ function Test_slider_control_pad(x, y) {
    /********************************************************************************************************************************************************/
    // Create items
 
-   const ss = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8), 'Test_alignment');
+   const ss = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[2], .8), 'Test_alignment');
    ss.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    ss.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    ss.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);

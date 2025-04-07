@@ -473,7 +473,7 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
          if (meshidx !== INT_NULL) {
 
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-            if (mesh.state.mask & MESH_STATE.ACTIVE)
+            if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)
                Mesh_per_vb_remove_mesh(vb_groupidx, mesh.per_vb_bufferidx)
          }
       }
@@ -498,7 +498,7 @@ export function View_render_from_view_all_buffers(view_bufferidx, do_reconstruct
          if (meshidx !== INT_NULL) {
 
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-            if (mesh.state.mask & MESH_STATE.ACTIVE) {
+            if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
                mesh.AddToGfx();
             }
@@ -532,7 +532,7 @@ export function View_rerender_from_view_all_buffers(view_bufferidx, do_reconstru
          if (meshidx !== INT_NULL) {
 
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
-            if (mesh.state.mask & MESH_STATE.ACTIVE) {
+            if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
                mesh.AddToGfxFromReset();
             }

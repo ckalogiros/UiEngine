@@ -122,7 +122,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, rcorners);
    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.StateEnable(MESH_STATE.IS_RESIZEABLE);
+   section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
    section.SetName('Sattelite_rotation->panel');
 
 
@@ -555,7 +555,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[4, 4], pos:[x + pad, y + total_height * 2, 0], dim:elastic_collisions_panel_dim, col:GREY[1]}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:rcorners,})
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.StateEnable(MESH_STATE.IS_RESIZEABLE);
+   section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
    section.SetName('Elastic_collisions');
 
 

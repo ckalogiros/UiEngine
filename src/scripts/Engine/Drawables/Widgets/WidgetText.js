@@ -57,13 +57,13 @@ export class Widget_Text extends Text_Mesh {
 
 	Activate() {
 
-		this.state.mask |= MESH_STATE.ACTIVE;
+		this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
 	}
 
 
 	Deactivate() {
 
-		this.state.mask &= ~MESH_STATE.ACTIVE;
+		this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 	}
 
 
@@ -370,18 +370,18 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	Activate() {
 
-		this.state.mask |= MESH_STATE.ACTIVE;
+		this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MESH_STATE_FLAGS.ACTIVE;
 		}
 	}
 
 
 	Deactivate() {
 
-		this.state.mask &= ~MESH_STATE.ACTIVE;
+		this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 		}
 	}
 

@@ -455,8 +455,12 @@ class UniformsBlock {
 }
 
 
-
-export function Uniforms_block_buffer_create(sid, program, uniforms) {
+/** 
+ * Searches uniform names from @uniforms and puts it to the uniform block if it is a shared type uniform (shared across all programs) 
+ * 
+ * @param {[string name, ]} uniforms 
+ */
+export function Uniforms_block_create_shared_uniform(sid, program, uniforms) {
 
    const gl = gfxCtx.gl;
 

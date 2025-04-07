@@ -96,7 +96,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners })
    section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.StateEnable(MESH_STATE.IS_RESIZEABLE);
+   section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
    section.SetName('BoardRotationsPanel');
 
 

@@ -8,7 +8,6 @@ import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js"
 import { Uniforms_block_update_uniform } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Notifications_update } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Performance_timer_start, Performance_timer_stop, Performance_timers_update_tick } from "../Timers/PerformanceTimers.js";
-import { Command_buffer_run } from "../Core/Commandbuffer.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../Scenes.js";
 import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
@@ -88,102 +87,52 @@ export class Renderer {
 
       if (STATE.loop.paused === false) {
 
-         TimeUpdate();
+         // TimeUpdate();
 
-         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
+         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
-         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
-         Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
-         Timers_update_global_timer(); // This is a globbal timer, going only forward
-         Timers_update();
-         // Step_timers_update();
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
+         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
+         // Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
+         // Timers_update_global_timer(); // This is a globbal timer, going only forward
+         // Timers_update();
+         // // Step_timers_update();
+         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
 
-         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
-         Mesh_animations_run();
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
+         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
+         // Mesh_animations_run();
+         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
 
-         Callback_animations_run();
+         // Callback_animations_run();
 
-         Framebuffer_update_draw();
+         // Framebuffer_update_draw();
          this.scene.OnUpdate();
 
-         Notifications_update();
-
-         // Command_buffer_run()
+         // Notifications_update();
 
          Uniforms_block_update_uniform();
 
-         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles)
-         Particle_system_update()
-         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles)
+         // Particle_system_update()
 
-
-         // Uniforms_buffer_update_uniforms_all();
-
-         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
+         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
+         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
 
-         Input_reset();
+         // Input_reset();
 
-
-         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
-
+         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
          
-         // Test_log2_performance();
+         // Performance_timers_update_tick();
 
+         // TimeSample();
 
-         Performance_timers_update_tick();
-
-         TimeSample();
-
-         // PerformanceTimersTick();
       }
-
-      // if(!STATE.loop.paused) STATE.loop.paused = true;
-
 
    }
 
 
 }
 
-// function log2(val){
-//    return Math.log2(val);
-// }
-// function sqrt(val){
-//    return Math.sqrt(val);
-// }
 
-// function Test_log2_performance(){
-
-//    const len = BIT_FLAGS_SIZE;
-//    let moc = 0;
-//    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1);
-
-
-//    for(let i=0; i<len; i++){
-
-//       const res = log2(BIT_FLAGS[i]);
-//       moc += res;
-//       // const res2 = sqrt(BIT_FLAGS[i]);
-//       // moc += res2;
-//       // const res3 = Hash(i);
-//       // moc += res3;
-//       // console.log(res)
-//    }
-
-
-//    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1);
-
-
-//    // const fps = PerformanceTimersGetFps([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
-//    // const fps = PerformanceTimersGetMilisec([PERFORMANCE_TIMERS_IDXS.MiscTest1, 0])
-
-//    return moc
-
-// }
 
 
 
@@ -312,29 +261,29 @@ function Renderer_create_webgl_context(canvas) {
 
 
 
-   // Measure GPU time. Not working in all browsers
-   const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query');
-   let gl_timer_query_obj = null;
-   // const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query_webgl2');
-   if (!ext_gpu_timer_query) {
+   // // Measure GPU time. Not working in all browsers
+   // const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query');
+   // let gl_timer_query_obj = null;
+   // // const ext_gpu_timer_query = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+   // if (!ext_gpu_timer_query) {
       
-      // const ext_gpu_timer_query2 = gl.getExtension('disjoint_timer_query_webgl2');
-      // if (!ext_gpu_timer_query2) {
-      //    console.error('EXT_disjoint_timer_query 2 is not supported');
-      //    return
-      // }
-      console.error('EXT_disjoint_timer_query is not supported');
+   //    // const ext_gpu_timer_query2 = gl.getExtension('disjoint_timer_query_webgl2');
+   //    // if (!ext_gpu_timer_query2) {
+   //    //    console.error('EXT_disjoint_timer_query 2 is not supported');
+   //    //    return
+   //    // }
+   //    console.error('EXT_disjoint_timer_query is not supported');
       
-   }
-   else {
+   // }
+   // else {
 
-      console.error('ext_gpu_timer_query', ext_gpu_timer_query);
+   //    console.error('ext_gpu_timer_query', ext_gpu_timer_query);
       
-      if(WEB_GL_PERFORMANCE_MEASURE_ENABLED){
+   //    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED){
    
-         gl_timer_query_obj = ext_gpu_timer_query.createQueryEXT();
-      }
-   }
+   //       gl_timer_query_obj = ext_gpu_timer_query.createQueryEXT();
+   //    }
+   // }
 
 
 
@@ -358,13 +307,13 @@ function Renderer_create_webgl_context(canvas) {
 
    gfxCtx.gl = gl;
    gfxCtx.extentions_string = extensions;
-   gfxCtx.ext = {
-      ext_gpu_timer_query: ext_gpu_timer_query,
-      timer_query_obj:gl_timer_query_obj, 
-      elapsed:0,
-      accum_timer:0,
-      counter:0,
-   };
+   // gfxCtx.ext = {
+   //    ext_gpu_timer_query: ext_gpu_timer_query,
+   //    timer_query_obj:gl_timer_query_obj, 
+   //    elapsed:0,
+   //    accum_timer:0,
+   //    counter:0,
+   // };
 
    
    // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_get_performance_timer_query_avaraged(gfxCtx);}, 100)
@@ -389,68 +338,68 @@ function Renderer_create_webgl_context(canvas) {
 }
 
 
-export function Renderer_webgl_check_query_results() {
+// export function Renderer_webgl_check_query_results() {
 
-   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) {
+//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) {
       
-      const ext_gpu_timer_query = gfxCtx.ext.ext_gpu_timer_query;
-      const timer_query = gfxCtx.ext.timer_query_obj;
-      const gl = gfxCtx.gl;
+//       const ext_gpu_timer_query = gfxCtx.ext.ext_gpu_timer_query;
+//       const timer_query = gfxCtx.ext.timer_query_obj;
+//       const gl = gfxCtx.gl;
 
-      const available = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_AVAILABLE_EXT);
-      const disjoint = gl.getParameter(ext_gpu_timer_query.GPU_DISJOINT_EXT);
+//       const available = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_AVAILABLE_EXT);
+//       const disjoint = gl.getParameter(ext_gpu_timer_query.GPU_DISJOINT_EXT);
    
-      if (available && !disjoint) 
-      {
-         // Retrieve the result (in nanoseconds)
-         const timeElapsed = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_EXT);
-         gfxCtx.ext.elapsed = timeElapsed;
-         gfxCtx.ext.accum_timer += timeElapsed;
-         gfxCtx.ext.counter++;
-         // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms");
-         // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms", 'avarage', (avarage / 1000000.0) + " ms", 'accum_timer', gfxctx.ext.accum_timer/ 1000000.0, 'counter', gfxctx.ext.counter);
-      } 
+//       if (available && !disjoint) 
+//       {
+//          // Retrieve the result (in nanoseconds)
+//          const timeElapsed = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_EXT);
+//          gfxCtx.ext.elapsed = timeElapsed;
+//          gfxCtx.ext.accum_timer += timeElapsed;
+//          gfxCtx.ext.counter++;
+//          // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms");
+//          // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms", 'avarage', (avarage / 1000000.0) + " ms", 'accum_timer', gfxctx.ext.accum_timer/ 1000000.0, 'counter', gfxctx.ext.counter);
+//       } 
 
-   }
+//    }
 
-}
+// }
 
-export function Renderer_get_performance_timer_query_avaraged(gfxctx) {
+// export function Renderer_get_performance_timer_query_avaraged(gfxctx) {
 
-   const avarage_time = gfxctx.ext.accum_timer / gfxctx.ext.counter;
-   gfxctx.ext.accum_timer = 0; 
-   gfxctx.ext.counter = 0;
-   return avarage_time * NANOSEC;
+//    const avarage_time = gfxctx.ext.accum_timer / gfxctx.ext.counter;
+//    gfxctx.ext.accum_timer = 0; 
+//    gfxctx.ext.counter = 0;
+//    return avarage_time * NANOSEC;
 
-}
+// }
 
-export function Renderer_get_performance_timer_query(gfxctx) {
+// export function Renderer_get_performance_timer_query(gfxctx) {
 
-   return gfxctx.ext.elapsed;
-}
+//    return gfxctx.ext.elapsed;
+// }
 
 
-export function Renderer_webgl_begin_timer_query(gfxctx) {
+// export function Renderer_webgl_begin_timer_query(gfxctx) {
 
-   const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
-   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
-      const timer_query = gfxctx.ext.timer_query_obj;
-      ext_gpu_timer_query.beginQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT, timer_query);
-   }
+//    const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
+//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
+//       const timer_query = gfxctx.ext.timer_query_obj;
+//       ext_gpu_timer_query.beginQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT, timer_query);
+//    }
    
-}
+// }
 
 
-export function Renderer_webgl_end_timer_query(gfxctx) {
+// export function Renderer_webgl_end_timer_query(gfxctx) {
    
-   const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
-   if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
-      ext_gpu_timer_query.endQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT);
-      // gfxctx.ext.counter++;
-   }
+//    const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
+//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
+//       ext_gpu_timer_query.endQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT);
+//       // gfxctx.ext.counter++;
+//    }
 
 
-}
+// }
 
 
 

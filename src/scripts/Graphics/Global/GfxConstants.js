@@ -48,47 +48,6 @@ const u = '_';
 
 
 
-_CNT = 0x1;
-const TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN = {
-	rect_123_234: _CNT,
-};
-
-
-
-
-
-
-
-
-_CNT = 0x1;
-/** Grouping shader programs. Example: group for debug user interface meshes, default group meshes */
-const GFX_GROUPS = {
-
-    DEBUG: {
-        IDX: INT_NULL, // The index of the group of programs dedicated for displaing debug info. 
-        MASK: _CNT,
-    },
-
-    DEFAULT: {
-        IDX: INT_NULL, // The default group stores shader programs for 
-        MASK: _CNT <<= 0x1,
-    },
-
-    // SIZE: 2,
-
-    GetIdxByMask(mask) {
-        if (mask & this.DEFAULT.MASK) return this.DEFAULT.IDX;
-        else if (mask & this.DEBUG.MASK) return this.DEBUG.IDX;
-    },
-
-    /**DEBUG */ GetName(idx) {
-        if (this.DEBUG.IDX === idx) return 'DEBUG progs group'
-        else if (this.DEFAULT.IDX === idx) return 'DEFAULT progs group'
-        else return `UNKOWN progs group index. index:${idx}`
-    },
-}
-
-
 
 
 
@@ -203,16 +162,6 @@ const SID = {
 
     },
 
-    // FX
-    FX: {
-        // FS_GLOW_VEC3: BIT6,
-        // FS_GLOW_VEC2: BIT6<<=0x1,
-        // FN_NOISE: BIT6<<=0x1,
-        // FS_NOISE_2: BIT6<<=0x1,
-        FS_SMOKE_VEC3: BIT6<<=0x1,
-        FS_SMOKE_VEC2: BIT6<<=0x1,
-    },
-
     BLEND_OPTIONS: {
         // BLEND_MODE_ACTIVE: BIT7 <<= 0x1, 
         BLEND_MODE_ADD: BIT7 <<= 0x1, 
@@ -263,11 +212,6 @@ const SID = {
         const  shader_ops2 = sid2.shad_ops;
         // const  shad1 = sid1.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
         // const  shad2 = sid2.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
-        /**
-         * // TODO:
-         * I have deactivated the 'gfx_group' check.
-         * Also for the uniforms i exclude the projection matrix and resolution uniforms
-         */
         if (
             shad1 === shad2 &&
             attr1 === attr2 &&
@@ -288,10 +232,8 @@ const SID = {
         dst.unif = 0x0;        dst.unif |= src.unif;
         dst.pass = 0x0;        dst.pass |= src.pass;
         dst.inst = 0x0;        dst.inst |= src.inst;
-        dst.fx   = 0x0;        dst.fx   |= src.fx;
-        shad_ops = 0x0;        shad_ops |= src.shad_ops,
+        dst.shad_ops = 0x0;    dst.shad_ops |= src.shad_ops,
         dst.blend_options = 0x0;  dst.blend_options   |= src.blend_options;
-        dst.gfx_group = 0x0;
     },
 
     CreateCopy(src){
@@ -304,7 +246,6 @@ const SID = {
             shad_ops: src.shad_ops,
             fx:   src.fx,
             blend_options:   src.blend_options,
-            gfx_group: 0x0,
         };
         return sid;
     },
@@ -390,23 +331,6 @@ const SID = {
         return false;
     },
 };
-
-
-
-// if(SID.ATTR > MAX_BIT_MASK) alert('SID ATTR exceeding javascript\'s max number value');
-// if(SID.UNIF > MAX_BIT_MASK) alert('SID UNIF exceeding javascript\'s max number value');
-// if(SID.ATTR > MAX_BIT_MASK) alert('SID PASS exceeding javascript\'s max number value');
-
-
-
-
-
-
-// Create a copy of the SID.ATTR, so we can compare with 'sid'
-// const SID.ATTR = SID.ATTR;
-
-
-
 
 
 
@@ -506,7 +430,8 @@ const MESH_ENABLE = {
 
 
 
-// TODO: Rename. This is a global storage of vertex buffer indexes concerning specific types of meshes been drawn together(like scrollers)
+// This is a global storage of vertex buffer indexes concerning specific types of meshes been drawn together(like scrollers)
+// TODO: Remove and render scrollers ordinarely
 const GFX_VBIDX_RENAME_ME = {
     SCROLLER_VB_IDX: INT_NULL,
 
@@ -661,14 +586,7 @@ const UNIFORM = {
 
 // Store key-value pairs of texture name - texture index(for the global texture array. See GlTextures.js)
 // TODO: Create buffers of fonts and farmebuffers
-const Bound_texture = {
-    // atlas: INT_NULL,
-    // font: INT_NULL,
-    // frameBufferTexture0: INT_NULL,
-
-    // Current Bound Texture's index(in the texture array. See GlTextures.js). 
-    // Only one bound texture is allowed at any time by webGl, so this is a global access
-    // to which texture is bound.
+const BOUND_TEXTURE = {
     texidx: -1,
 };
 
@@ -772,24 +690,6 @@ const UNIF_TYPE = {
 
 
 
-
-
-/*************************************************************************************************/
-// Graphics Constants
-
-const TRIG = {
-    COS: 0,
-    SIN: 0,
-
-};
-
-
-
-
-
-
-
-
 /*************************************************************************************************/
 // Framebuffer
 _CNT = 0x1;
@@ -809,102 +709,4 @@ const FB = {
 
 
 
-
-
-
-/** Rotation Matrices */
-class ROTATION3D {
-    RX = [
-        1, 0, 0,
-        0, TRIG.COS, -TRIG.SIN,
-        0, TRIG.SIN, TRIG.COS,
-    ];
-    RY = [
-        TRIG.COS, 0, TRIG.SIN,
-        0, 1, 0,
-        -TRIG.SIN, 0, TRIG.COS,
-    ];
-    RZ = [
-        TRIG.COS, -TRIG.SIN, 0,
-        TRIG.SIN, TRIG.COS, 0,
-        0, 0, 1,
-    ];
-
-    Set(cos, sin) {
-
-        this.RX[4] = cos;
-        this.RX[5] = -sin;
-        this.RX[7] = sin;
-        this.RX[8] = cos;
-
-        this.RY[0] = cos;
-        this.RY[2] = -sin;
-        this.RY[6] = sin;
-        this.RY[8] = cos;
-
-        this.RZ[0] = cos;
-        this.RZ[1] = -sin;
-        this.RZ[3] = sin;
-        this.RZ[4] = cos;
-    }
-
-    SetRX(cos, sin) {
-        this.RX[4] = cos;
-        this.RX[5] = -sin;
-        this.RX[7] = sin;
-        this.RX[8] = cos;
-    }
-    SetRY(cos, sin) {
-        this.RY[0] = cos;
-        this.RY[2] = -sin;
-        this.RY[6] = sin;
-        this.RY[8] = cos;
-    }
-    SetRZ(cos, sin) {
-        this.RZ[0] = cos;
-        this.RZ[1] = -sin;
-        this.RZ[3] = sin;
-        this.RZ[4] = cos;
-    }
-}
-
-
-
-
-
-
-
-
-const ROT3D = new ROTATION3D();
-
-const RX3D = [
-    1, 0, 0,
-    0, TRIG.COS, -TRIG.SIN,
-    0, TRIG.SIN, TRIG.COS,
-];
-
-
-
-
-
-
-
-const RY3D = [
-    TRIG.COS, 0, TRIG.SIN,
-    0, 1, 0,
-    -TRIG.SIN, 0, TRIG.COS,
-];
-
-
-
-
-
-
-
-
-const RZ3D = [
-    TRIG.COS, -TRIG.SIN, 0,
-    TRIG.SIN, TRIG.COS, 0,
-    0, 0, 1,
-];
 

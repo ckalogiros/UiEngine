@@ -229,7 +229,7 @@ class Emitter {
       this.sid.unif |= mat.sid.unif;
       this.sid.shad |= mat.sid.shad;
       this.sid.pass |= mat.sid.pass;
-      this.sid.fx |= mat.sid.fx;
+      // this.sid.fx |= mat.sid.fx;
 
       // this.pos = [pos[0], pos[1], pos[2]];
       // this.prev_pos = [pos[0], pos[1]];
@@ -258,14 +258,11 @@ class Emitter {
       //    shad_ops: 0x0,
       //    fx: 0x0,
       //    blend_options: 0x0,
-      //    gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
       // ;
 
 
       this.uniforms = [];
-      if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-         this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-
+      this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       // this.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // this.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
@@ -590,7 +587,7 @@ class Emitter {
 
          if (flags.unif) this.sid.unif |= flags.unif;
          if (flags.pass) this.sid.pass |= flags.pass;
-         if (flags.fx) this.sid.fx |= flags.fx;
+         // if (flags.fx) this.sid.fx |= flags.fx;
       }
 
       // Avoid duplicates

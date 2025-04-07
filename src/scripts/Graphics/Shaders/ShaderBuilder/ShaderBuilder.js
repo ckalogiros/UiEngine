@@ -931,10 +931,11 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
        * for vertex pos and another 2 for dimention
        */
 
-
-      (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-         : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+      
+      '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+      //    ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+      //    : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
       '   gl_Position = position;',
 
@@ -1012,8 +1013,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '#include <precision_high>',
 
       // TODO: REMOVE  U_SMOKE_PARAMS_VEC3 U_NOISE_PARAMS and replace with generic buffer
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
+      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
+      // (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.ANGLE) ? '#define A_ANGLE 1' : '',
@@ -1135,7 +1136,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise : '',
       // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2 : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
+      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
       
       
       /********************************************************************************************************/
@@ -1223,7 +1224,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
       // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
       // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2_call : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
+      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
 
       

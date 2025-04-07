@@ -390,65 +390,6 @@ export function Mesh_per_vb_get_mesh_count(vb_groupidx) { return _mesh_per_verte
 /****************************************************************************************************************************************************/
 
 
-export function Widget_root_create_text_info() {
-
-   const col_menu = GREY[3], col_dp = GREY[1];
-
-   const s = Create_widget_section(_, SECTION.VERTICAL, [6, 6], [400, 400, 0], [0, 0], TRANSPARENCY(BLUEL[9], .3), 'Wigdet Root Buffers Info');
-
-   const destroy = Create_widget_button(_, 'Destroy', _, _, _, TRANSPARENCY(GREEN[7], .3), _, _, _, _, _);
-   // destroy.Bind(TEMP, _, s);
-   s.AddItem(destroy);
-
-   // s.Calc()
-
-   const margin = [4, 4];
-   const style = {rcorners:3, feather:1, border:0};
-   const gr = _widget_groups_buffer;
-
-   const grw = Create_widget_dropdown(_, 'Widget Groups', [100, 100, 0], col_dp, col_menu, _, _, _, _, _, margin);
-   grw.CreateClickEvent();
-   Dropdown_roots_set_root(grw, grw)
-   s.AddItem(grw)
-
-   const group_info = Create_widget_text(_, `count:${gr.active_count} size:${gr.size}`);
-   grw.AddToMenu(group_info);
-
-   for (let i = 0; i <= gr.boundary; i++) {
-
-
-      const group = gr.buffer[i];
-
-
-      const groupw = Create_widget_dropdown(_, 'Group', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-      groupw.CreateClickEvent();
-      grw.AddToMenu(groupw)
-
-      const group_info = Create_widget_text(_, `count:${group.active_count} size:${group.size}`);
-      groupw.AddToMenu(group_info);
-
-      const len = group.group_data.length;
-      for (let i2 = 0; i2 < len; i2++) {
-
-         const group_data = group.group_data[i2];
-
-         const group_dataw = Create_widget_dropdown(_, 'group data', [100, 100, 0], col_dp, col_menu, _, [2, 2], _, _, style, margin);
-         group_dataw.CreateClickEvent();
-         groupw.AddToMenu(group_dataw)
-
-
-         { const info = Create_widget_text(_, `meshidx:${group_data.meshidx} num_faces:${group_data.num_faces}`); group_dataw.AddToMenu(info); }
-         { const info = Create_widget_text(_, `start:${group_data.start} ib_start:${group_data.ib_start}`); group_dataw.AddToMenu(info); }
-         // { const info = Create_widget_text(_, `ib_start:${group_data.ib_start}`); group_dataw.AddToMenu(info); }
-
-         /****************************************************************************************************************************/
-      }
-   }
-
-
-   s.Calc()
-   return s;
-}
 
 
 
@@ -502,7 +443,7 @@ export function Mesh_buffer_print_loop() {
             'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
             'child idx:', _mesh_buffer.buffer[i].idx,
-            'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE.ACTIVE,
+            'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE_FLAGS.ACTIVE,
             'nameidx:', _mesh_buffer.buffer[i].nameidx,
             'pos:', _mesh_buffer.buffer[i].geom.pos,
             'name:', _mesh_buffer.buffer[i].GetName(),

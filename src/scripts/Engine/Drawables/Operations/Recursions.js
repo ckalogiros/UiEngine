@@ -95,7 +95,7 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
 
     // console.log(mesh.GetName())
 
-    if (mesh.listeners !== null && (mesh.state.mask & MESH_STATE.ACTIVE)) {
+    if (mesh.listeners !== null && (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
 
         for (let etype = 0; etype <= mesh.listeners.boundary; etype++) {
             

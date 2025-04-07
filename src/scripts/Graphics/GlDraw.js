@@ -4,7 +4,6 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { Renderer_webgl_begin_timer_query, Renderer_webgl_end_timer_query } from '../Engine/Renderers/Renderer.js';
 
 
 
@@ -12,9 +11,9 @@ import { Renderer_webgl_begin_timer_query, Renderer_webgl_end_timer_query } from
 
 
 // rgb(38, 27, 37)
-const R = .1;
-const G = .1;
-const B = .1;
+const R = .05;
+const G = .05;
+const B = .05;
 // const R = (1/255) * 32;
 // const G = (1/255) * 32;
 // const B = (1/255) * 32;
@@ -24,7 +23,7 @@ const B = .1;
 
 export function Gl_draw(gl) {
 
-    Renderer_webgl_begin_timer_query(gfxCtx);
+    // Renderer_webgl_begin_timer_query(gfxCtx);
 
 
     const drawQueue = Renderqueue_get_active();
@@ -139,7 +138,7 @@ export function Gl_draw(gl) {
         if(vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
     }
 
-    Renderer_webgl_end_timer_query(gfxCtx);
+    // Renderer_webgl_end_timer_query(gfxCtx);
     
 }
 

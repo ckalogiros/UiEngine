@@ -1,5 +1,6 @@
 "use strict";
 
+import { State_mesh_set_clicked, State_mesh_set_clickhold } from '../../../GlobalFunctions.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
 import { Widget_Label } from './WidgetLabel.js';
@@ -60,7 +61,7 @@ export class Widget_Button extends Widget_Label {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
@@ -85,14 +86,14 @@ export class Widget_Button extends Widget_Label {
       if (mesh.evt_params && mesh.evt_params.EventClbk) {
 
          // Create time interval to continuosly press the button
-         if (mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+         if (mesh.StateCheck(MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params
             const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
-            STATE.mesh.SetClickHold(mesh);
+            State_mesh_set_clickhold(mesh);
          }
          else  {
 
@@ -214,7 +215,7 @@ export class Widget_Switch extends Widget_Button {
       mesh.isOn ^= 0x1;
       text_mesh.RenderTextFromString(mesh.state_text[mesh.isOn]);
       mesh.SetUpdateFrameBuffer();
-      STATE.mesh.SetClicked(mesh);
+      State_mesh_set_clicked(mesh);
 
       /**
        * For popup menu options and slider connections.

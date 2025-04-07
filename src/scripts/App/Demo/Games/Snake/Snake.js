@@ -10,6 +10,7 @@ import { BLACK, BLUEL, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLE
 import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/ScrollerComponent.js";
+import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Switch_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSwitch.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
@@ -20,6 +21,7 @@ import { Gl_set_attr_round_corners, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_
 import { GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
 import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
+import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
 
 
@@ -53,6 +55,7 @@ const SCALE_UP_FACTOR = 1.7;
 const score_font = TEXTURES.CONSOLAS_28px;
 const score_size = 12;
 
+const def_tex_id = TEXTURES.CONSOLA_VARIANT_FONT, def_sub_tex_id = ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0;
 
 
 
@@ -189,10 +192,8 @@ export function Game_snake(y = 0, controls_create = true) {
 
    // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(26, 70, 30), 1.);
    const board_color = TRANSPARENCY(Interpolate_rgb_to_01(40, 50, 46), 1.);
-   const section = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [VIEWPORT.WIDTH / 2 - board_width, vertical_space, 0], [board_width - board_pad, board_height], board_color, 'section', style);
-   section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-   section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[VIEWPORT.WIDTH / 2 - board_width, vertical_space, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', }));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, });
 
 
 
@@ -205,17 +206,9 @@ export function Game_snake(y = 0, controls_create = true) {
 
    const collectable_size = 20;
 
-   const collectable = Create_widget_section(_, _, [0, 0], [300, 300, 0], collectable_dim, REDL[3], 'section', [collectable_size, 6, 3]);
-
-   collectable.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   collectable.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // collectable.EnableGfxUniforms({ fx: SID.FX.FS_GLOW_VEC3, }, 'u_glow_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-   // collectable.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
-   collectable.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 6);
-   collectable.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, collectable_dim[0]);
-   collectable.EnableGfx(MESH_ENABLE.GFX.ATTR_GLOW_INTENSITY);
+   const collectable = Create_rect_mesh(Style_rect_default_properties({pos:[300, 300, 0], dim:collectable_dim, col:REDL[3], name:'collectable', }));
+   Widget_gfx_ready_enable({mesh:collectable, enable_sdf_rect:collectable_dim[0], enable_unif_scale:true});
    collectable.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
-   collectable.SetName('collectable');
    section.AddItem(collectable);
 
    const center_applpe_pos = [
@@ -223,9 +216,8 @@ export function Game_snake(y = 0, controls_create = true) {
       (collectable.geom.pos[1] + collectable.geom.dim[1]) - (collectable_apple_dim[1] + 6),
       1
    ];
-   const collectable_apple = Create_widget_section(_, _, [0, 0], center_applpe_pos, collectable_apple_dim, WHITE, _, _, _, TEXTURES.TEST_APPLE);
-   collectable_apple.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   collectable_apple.SetName('collectable_apple');
+   const collectable_apple = Create_rect_mesh(Style_rect_default_properties({pos:center_applpe_pos, dim:collectable_apple_dim, col:WHITE, texture_id:TEXTURES.TEST_APPLE, name:'collectable_apple'}));
+   Widget_gfx_ready_enable({mesh:collectable_apple, });
    section.AddItem(collectable_apple);
 
 
@@ -236,11 +228,8 @@ export function Game_snake(y = 0, controls_create = true) {
 
    /*************************************************************************************************/
    // Create the snake head's nose mesh (Shows the direction of the snke)
-   const nose = Create_rect_mesh(_, [0, 0, 1], [4, 8], TRANSPARENCY(BLUEL[9], 1.));
-   nose.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   nose.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-   nose.EnableGfx(MESH_ENABLE.GFX.ATTR_ANGLE, 10);
-   nose.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+   const nose = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[4, 8], col:TRANSPARENCY(BLUEL[9], 1.), }));
+   Widget_gfx_ready_enable({mesh:nose, enable_sdf_rect:10, enable_attr_angle:0, });
    nose.SetName('Nose');
    section.AddItem(nose);
 
@@ -270,11 +259,8 @@ export function Game_snake(y = 0, controls_create = true) {
       style.rcorners = calc_size;
       style.feather = snake.style.feather;
       const col = GetSequencedColor(9);
-      const body_mesh = Create_widget_section(_, _, [0, 0], [next_posx, next_posy, 1], [calc_size, calc_size], col, 'body_mesh', style);
-      body_mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-      body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.rcorners);
+      const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[next_posx, next_posy, 1], dim:[calc_size, calc_size], col:col, name:'body_mesh', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+      Widget_gfx_ready_enable({mesh:body_mesh, enable_sdf_rect:style.rcorners, enable_unif_scale:true});
       section.AddItem(body_mesh);
 
       const bodyidx = snake.body.Add(new Body_Mesh_Properties(body_mesh, snake.glow_intensity));
@@ -352,7 +338,7 @@ export function Game_snake(y = 0, controls_create = true) {
       },
       _,
       { target_params: { snake: snake, nose: nose } },
-      MESH_STATE.IS_HOLD_CLICK
+      MESH_STATE_FLAGS.IS_HOLD_CLICK
    );
 
 
@@ -366,7 +352,7 @@ export function Game_snake(y = 0, controls_create = true) {
 
    const text_pad_x = 7, text_pad_y = 3;
    const digit_meshes_arr = [];
-   const digit1_label = Create_widget_label(_, '0', _, [0, 0, 0], score_size, TRANSPARENCY(YELLOWR[9], 1.), WHITE, [text_pad_x, text_pad_y], _, _, score_font);
+   const digit1_label = Create_widget_label(Style_label_default_properties({text:'0', pos:[0, 0, 0], col:TRANSPARENCY(YELLOWR[9], 1.), text_pad:[text_pad_x, text_pad_y], font_size:score_font}));
    {
       digit1_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       digit1_label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
@@ -379,7 +365,7 @@ export function Game_snake(y = 0, controls_create = true) {
    }
 
    // Calculate score label width before creation. Works only if the font is already in use (loaded)
-   const score_label = Create_widget_label(_, 'score', _, [0, 0, 0], score_size, TRANSPARENCY(GREEN[7], 1.), WHITE, [text_pad_x, text_pad_y], _, _, score_font);
+   const score_label = Create_widget_label(Style_label_default_properties({text:'score', col:GREEN[7], text_pad:[text_pad_x, text_pad_y], font_size:score_font}));
    {
       score_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       score_label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 12);
@@ -574,12 +560,9 @@ function Snake_start_menu(params) {
 
    const tr = .75;
 
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, 100, 10], [0, 0], TRANSPARENCY(GREY[3], tr), 'section',);
-   menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-   menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[VIEWPORT.WIDTH / 2, 100, 10], col:TRANSPARENCY(GREY[3], tr), name:'StartMenuPanel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:r_corners});
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   menu_panel.SetName('StartMenuPanel');
 
    menu_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
 
@@ -614,87 +597,67 @@ click mouse button.`;
    const left_pad = 10;
    let start_btn = null;
 
+   const play_contols_info = Create_rect_mesh(Style_rect_default_properties({pad:[left_pad, 10], pos:[0, 0, 4], dim:[0, 0], col:TRANSPARENCY(GREY[5], tr), name:'play_contols_info', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   Widget_gfx_ready_enable({mesh:play_contols_info, enable_sdf_rect:r_corners});
+   menu_panel.AddItem(play_contols_info);
    {
-
-      // const play_contols_info = Create_widget_section(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
-      const play_contols_info = Create_widget_section(_, _, [left_pad, 10], [0, 0, 4], [0, 0], TRANSPARENCY(GREY[5], tr), 'play_contols_info',);
-      play_contols_info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      play_contols_info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      play_contols_info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
-      // play_contols_info.options = SECTION.RESIZE_PARENT|SECTION.VERTICAL|SECTION.EXPAND;
-      play_contols_info.options = SECTION.RESIZE_PARENT | SECTION.VERTICAL;
-      menu_panel.AddItem(play_contols_info);
+      const text_pad = [11, 6];
 
       {
-         const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[1], .0), 'Controls section',);
-         info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[1], .0), name:'Controls section', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10});
          play_contols_info.AddItem(info);
 
          // const col = BLUEL[9];
          const col = BLACK;
-         const ctrl = Create_widget_label(_, info_text_use_options, _, _, _, TRANSPARENCY(WHITE, .5), col, [11, 6], _, _, TEXTURES.CONSOLAS_2);
-         ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
+         const ctrl = Create_widget_label(Style_label_default_properties({text:info_text_use_options, col:col, text_col:TRANSPARENCY(WHITE, .5), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S3_0}));
+         Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
       }
       {
-         const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[0], 1.0), 'Controls section',);
-         info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
-         info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[0], .0), name:'Controls section', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:menu_panel.geom.dim[0] / 10});
          play_contols_info.AddItem(info);
 
          const col = BLUEL[9];
          // const col = BLACK;
-         const ctrl = Create_widget_label(_, 'CONTROLS', _, _, _, TRANSPARENT, col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-         // const ctrl = Create_widget_label(_, 'Controls', _, _, _, TRANSPARENCY(WHITE, .5), col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+         const ctrl = Create_widget_label(Style_label_default_properties({text:'CONTROLS', col:TRANSPARENT, text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
          ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
          info.AddItem(ctrl);
       }
       {
-         const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[0], 1.0), 'Rotate Left section',);
-         info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
-         info.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[0], .0), name:'Rotate Left section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:menu_panel.geom.dim[0] / 10});
          play_contols_info.AddItem(info);
 
          const col = PURPLER[9];
-         const ctrl = Create_widget_label(_, 'Rotate Left', _, _, _, GREY[3], col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+         const ctrl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
          ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
          info.AddItem(ctrl);
 
-         const expl = Create_widget_label(_, info_text_rot_left, _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_20px);
+         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_left, col:TRANSPARENCY(GREY[4], 0), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
          expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          expl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          info.AddItem(expl);
       }
       {
-         const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[1], .0), 'Rotate Right section',);
-         info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
-         info.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[1], .0), name:'Rotate Right section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:menu_panel.geom.dim[0] / 10});
          play_contols_info.AddItem(info);
 
          const col = PURPLEB[9];
-         const ctrl = Create_widget_label(_, 'Rotate Right', _, _, _, GREY[3], col, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
+         const ctrl = Create_widget_label(Style_label_default_properties({text:'Rotate Right', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
          ctrl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          ctrl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, ctrl.geom.dim[1]);
          info.AddItem(ctrl);
 
-         const expl = Create_widget_label(_, info_text_rot_right, _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_20px);
+         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_right, col:TRANSPARENCY(GREY[4], 0), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
          expl.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          expl.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
          expl.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
@@ -702,28 +665,16 @@ click mouse button.`;
       }
    }
    {
-      const play_contols_info = Create_widget_section(_, _, [left_pad, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[5], 0), 'Start section',);
-      play_contols_info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      play_contols_info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      play_contols_info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, r_corners);
-      play_contols_info.options = SECTION.RESIZE_PARENT | SECTION.VERTICAL | SECTION.EXPAND;
-      menu_panel.AddItem(play_contols_info);
       {
-         const info = Create_widget_section(_, _, [10, 10], [0, 0, 10], [0, 0], TRANSPARENCY(GREY[1], .0), 'Start sub section',);
-         info.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         info.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
-         info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT;
-         play_contols_info.AddItem(info);
+         // const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[1], .0), name:'Start sub section', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+         // Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:menu_panel.geom.dim[0] / 10});
+         // play_contols_info.AddItem(info);
 
          /*******************************************************************************************/
          // Start Game button
-         start_btn = Create_widget_close_btn(_, menu_panel, 'START', [0, 0, zpos], 30, btn_col, WHITE, [dim[0] / 2 - pad * 2, 10], _, _, TEXTURES.CONSOLAS_32px);
-         start_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-         start_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-         start_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, start_btn.geom.dim[1]);
-         start_btn.SetName('start_btn');
-         play_contols_info.AddItem(start_btn);
+         start_btn = Create_widget_close_btn(Style_button_default_properties({ menu_panel, text:'start_btn', pos:[0, 0, zpos], col:btn_col, text_pad:[dim[0] / 2 - pad * 2, 10], texture_id:def_tex_id, sub_texture_id:def_sub_tex_id}));
+         Widget_gfx_ready_enable({mesh:start_btn, enable_sdf_rect:start_btn.geom.dim[1]});
+         menu_panel.AddItem(start_btn);
       }
    }
 
@@ -1249,17 +1200,10 @@ function Animation_scale_down_stop(params) {
 
 
       const zpos = 2;
-      const style = { rcorners: calc_size, feather: snake.style.feather, border: snake.style.border };
       const col = GetSequencedColor(9);
-      const body_mesh = Create_widget_section(_, _, [0, 0], [posx, posy, zpos], [calc_size, calc_size], col, 'body_mesh', style);
+      const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[posx, posy, zpos], dim:[calc_size, calc_size], col:col, name:'body_mesh',}));
+      Widget_gfx_ready_enable({mesh:body_mesh, enable_sdf_rect:body_mesh.geom.dim[1], enable_unif_scale:true, });
       section.AddItem(body_mesh);
-
-
-      body_mesh.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, snake.style.feather);
-      body_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS,);
-
       body_mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, last_mesh.gfx.vb.groupidx);
       body_mesh.Render();
 
@@ -1374,12 +1318,9 @@ function Snake_options_callback(params) {
       (VIEWPORT.HEIGHT / 2 >= 250) ? 250 : VIEWPORT.HEIGHT / 2 - 10,
    ];
    let zpos = 10;
-   const menu_panel = Create_widget_section(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim, TRANSPARENCY(GREY[1], .5), 'section', style);
-   menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 4);
-   menu_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, menu_panel.geom.dim[0] / 10);
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim:dim, col:TRANSPARENCY(GREY[1], .5), name:'MenuOptionsPanel',}));
+   Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:menu_panel.geom.dim[0] / 10, });
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   menu_panel.SetName('MenuOptionsPanel');
 
    params.params.menu_panel = menu_panel;
 
@@ -1389,13 +1330,10 @@ function Snake_options_callback(params) {
 
 
 
-   const controls_section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0, 0, 1], [0, 0], TRANSPARENCY(GREY[0], .6), 'controls_section',);
-   controls_section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-   controls_section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+   const controls_section = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[0], .6), name:'controls_section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:10, });
    menu_panel.AddItem(controls_section);
 
-   controls_section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
    controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
 
 
@@ -1478,12 +1416,10 @@ function Snake_options_callback(params) {
 
    /*****************************************************************************************************************************************/
    // Sliders for color change
-   const enable_panel = Create_widget_section(_, SECTION.HORIZONTAL, [10, 10], _, _, TRANSPARENCY(GREY[0], tr), 'SwitchEnable');
+   const enable_panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:TRANSPARENCY(GREY[0], tr), name:'SwitchEnable', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   Widget_gfx_ready_enable({mesh:enable_panel, enable_sdf_rect:6, });
+   controls_section.AddItem(enable_panel);
    {
-      enable_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      enable_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-      enable_panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 6);
-      controls_section.AddItem(enable_panel);
 
       const label = Create_widget_label(_, 'Color Options', _, _, _, TRANSPARENCY(CYAN[6], .7), WHITE, [6, 5], _, _, TEXTURES.CONSOLAS_16px);
       label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
