@@ -1,6 +1,6 @@
 "use strict";
 
-import { Mult_arr3_scalar, Mult_arr4_scalar } from "../../../../Helpers/Math/MathOperations";
+import { Mult_arr3_scalar, Mult_arr4_scalar } from "../../../../Helpers/Math/MathOperations.js";
 
 
 

@@ -1,29 +1,30 @@
 // Snowpack Configuration File
 // See all supported options: https://www.snowpack.dev/reference/configuration
+// https://www.snowpack.dev/reference/configuration#mount
+// https://www.snowpack.dev/reference/configuration#buildoptionssourcemap
 
-/** @type {import("snowpack").SnowpackUserConfig } */
+
 module.exports = {
   mount: {
-    /* ... */
-    // src: '/',
-    public: {url: '/', static: true, resolve: true},
+    public: {url: '/', static: true, resolve: false},
     src: '/',
     resources: '/resources',
-    // style: '/src/style/style.css'
   },
-  plugins: [
-    /* ... */
-
-  ],
+  plugins: [  ],
   packageOptions: {
-    /* ... */
-    source:"remote",
+    source:"local",
+    cache:"/.snowpack/cache",
   },
   devOptions: {
-    /* ... */
     port: 6001,
   },
   buildOptions: {
-    /* ... */
-  },
+    // sourceMaps: true,
+    sourcemap: false,
+    // Try these variations:
+    sourceMap: "inline", // or "external"
+    minify: false, // Ensure false during dev
+    clean:"true",
+    cacheDirPath:"/node_modules/.cache/snowpack",
+  }
 };
