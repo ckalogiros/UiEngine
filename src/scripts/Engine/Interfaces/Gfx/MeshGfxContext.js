@@ -15,6 +15,7 @@ import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
+import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 
 
 
@@ -212,7 +213,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    // Cash
-   const sid = SID.CreateCopy(mesh.sid)
+   const sid = Sid_make_copy(mesh.sid)
    const sceneidx = mesh.sceneidx;
    const mesh_count = mesh.geom.num_faces;
    const root_bufferidx = mesh.root_bufferidx;
@@ -269,7 +270,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    /** Check for any vbidx match, from already created vbs, in the mesh tree structure */
-   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   if (specific_vb_groupidx !== INT_NULL && Sid_check_match(sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
 
       // Check if mesh has texture, and if it isn't tha same texture as is the 'specific_vb_groupidx', must create new vertex buffer
       if (mesh.mat.texidx !== INT_NULL) {
@@ -530,7 +531,7 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
    let vbidxs = null;
    let vb_groupidx = INT_NULL;
 
-   if (specific_vb_groupidx !== INT_NULL && SID.CheckSidMatch(emitter.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
+   if (specific_vb_groupidx !== INT_NULL && Sid_check_match(emitter.sid, Vertex_buffer_group_get_sid(specific_vb_groupidx))) { // Get the vbidxs if an apropriate vb group is found
       vbidxs = Vertex_buffer_group_get_vbidxs(specific_vb_groupidx);
       progidx = Vertex_buffer_group_get_progidx(specific_vb_groupidx);
       vb_groupidx = specific_vb_groupidx

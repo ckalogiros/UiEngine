@@ -119,7 +119,6 @@ const SID = {
     },
 
     ATTR: {},
-    // PASS: {},
 
     INST:{
         COL4: BIT3,
@@ -182,154 +181,7 @@ const SID = {
     },
 
 
-    Init() {
-      
-        // Set prerequisites for shader operations that need sdf_rect operation 
-        SID.SHADER_OPERATIONS.GROUP_SDF_RECT = (
-            SID.SHADER_OPERATIONS |
-            SID.SHADER_OPERATIONS.OUTER_GLOW_RECT |
-            SID.SHADER_OPERATIONS.INNER_SHADOW_RECT |
-            SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT |
-            SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2
-        );
-    },
 
-    CheckSidMatch(sid1, sid2) {
-
-        // Remove all Block Uniforms flags. Better to reuse a program than to create a duplicate only because some meshes dont use Blocked Uniforms. 
-        // For individual uniforms we must include for the match, since a Program's shaders may be compiled before the creation of other meshes with the same sid except an extra uniform
-        const  unif1 = sid1.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
-        const  unif2 = sid2.unif & ~(this.UNIF.PROJECTION_MATRIX|this.UNIF.SCREEN_RESOLUTION);
-        
-        // const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        // const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX|this.ATTR.COL4_PER_VERTEX)
-        const  attr1 = sid1.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
-        const  attr2 = sid2.attr & ~(this.ATTR.TEST_MULTI_VERTEX);
-
-        const  shad1 = sid1.shad;
-        const  shad2 = sid2.shad;
-        const  shader_ops1 = sid1.shad_ops;
-        const  shader_ops2 = sid2.shad_ops;
-        // const  shad1 = sid1.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
-        // const  shad2 = sid2.shad & ~(this.SHAD.INDEXED_PATT_CONNECTED_FACES_X);
-        if (
-            shad1 === shad2 &&
-            attr1 === attr2 &&
-            unif1 === unif2 && 
-            shader_ops1 === shader_ops2 && 
-            sid1.pass === sid2.pass
-            // sid1.fx === sid2.fx
-        ) {
-            return true;
-        }
-
-        return false;
-    },
-
-    Copy(dst, src){
-        dst.shad = 0x0;        dst.shad |= src.shad;
-        dst.attr = 0x0;        dst.attr |= src.attr;
-        dst.unif = 0x0;        dst.unif |= src.unif;
-        dst.pass = 0x0;        dst.pass |= src.pass;
-        dst.inst = 0x0;        dst.inst |= src.inst;
-        dst.shad_ops = 0x0;    dst.shad_ops |= src.shad_ops,
-        dst.blend_options = 0x0;  dst.blend_options   |= src.blend_options;
-    },
-
-    CreateCopy(src){
-        const sid =  {
-            shad: src.shad,
-            attr: src.attr,
-            unif: src.unif,
-            pass: src.pass,
-            inst: src.inst,
-            shad_ops: src.shad_ops,
-            fx:   src.fx,
-            blend_options:   src.blend_options,
-        };
-        return sid;
-    },
-
-    ToString(sid){
-        return `shad:${sid.shad} attr:${sid.attr} unif:${sid.unif} pass:${sid.pass}`
-    },
-
-    GetTypeToString(sid){
-
-        let str = ['','','',''];
-        let k = 0;
-
-        if (sid.shad) str[k] += 'ShaderProperties:'
-        if (sid.shad & SID.SHAD.INDEXED) str[k] += 'IndexedGeometry, '
-        if (sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) str[k] += 'ConectedFaces, '
-        if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_4) str[k] += 'VertexBreak-4, '
-        if (sid.shad & SID.SHAD.INDEXED_PATT_DISCONTINUE_6) str[k] += 'VertexBreak-, '
-        if (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) str[k] += 'Premultiplied Alpha, '
-        // if (sid.shad) str[k] += '\n'
-    
-        k++;
-        if (sid.attr) str[k] += 'Attribs:'
-        if (sid.attr & SID.ATTR.COL4) str[k] += 'col4, '
-        if (sid.attr & SID.ATTR.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
-        if (sid.attr & SID.ATTR.VPOS2) str[k] += 'pos2, '
-        if (sid.attr & SID.ATTR.DIM2) str[k] += 'dim2, '
-        if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
-        if (sid.attr & SID.ATTR.ANGLE) str[k] += 'angle, '
-        if (sid.attr & SID.ATTR.U_SCALE_VEC2) str[k] += 'scale2, '
-        if (sid.attr & SID.ATTR.TEX2) str[k] += 'tex2, '
-        if (sid.attr & SID.ATTR.WPOS3) str[k] += 'wpos4, '
-        if (sid.attr & SID.ATTR.TIME) str[k] += 'time, '
-        if (sid.attr & SID.ATTR.SDF) str[k] += 'Sdf, '
-        if (sid.attr & SID.ATTR.MSDF) str[k] += 'Msdf, '
-    
-        k++;
-        if (sid.inst) str[k] += 'InstancedGeometry:'
-        if (sid.inst & SID.INST.COL4) str[k] += 'cal4, '
-        if (sid.inst & SID.INST.VPOS2) str[k] += 'pos2, '
-        if (sid.inst & SID.INST.TEX2) str[k] += 'tex2, '
-        if (sid.inst & SID.INST.WPOS3) str[k] += 'wpos4, '
-        if (sid.inst & SID.INST.TIME) str[k] += 'time, '
-        if (sid.inst & SID.INST.SDF) str[k] += 'sdf, '
-        if (sid.inst & SID.INST.MSDF) str[k] += 'msdf, '
-        if (sid.inst & SID.INST.POS3) str[k] += 'pos3, '
-        if (sid.inst & SID.INST.COL4_PER_VERTEX) str[k] += 'col4_per_vertex, '
-        if (sid.inst & SID.INST.EMPTY) str[k] += 'empty, '
-        // if (sid.inst) str[k] += '\n'
-
-        k++;
-        if (sid.unif) str[k] += 'Uniforms:'
-        if (sid.unif & SID.UNIF.PROJECTION) str[k] += 'projection_matrix, '
-        if (sid.unif & SID.UNIF.SCREEN_RESOLUTION) str[k] += 'screen_resolution, '
-        if (sid.unif & SID.UNIF.ROOT_WPOS2) str[k] += 'ROOT_WPOS2, '
-        if (sid.unif & SID.UNIF.TIME) str[k] += 'time, '
-        if (sid.unif & SID.UNIF.COL4) str[k] += 'col4, '
-        // if (sid.unif) str[k] += '\n'
-    
-        k++;
-        if (sid.pass) str[k] += 'Passes:'
-        if (sid.pass & SID.ATTR.COL4) str[k] += 'col4, '
-        if (sid.pass & SID.ATTR.VPOS2) str[k] += 'pos2, '
-        if (sid.pass & SID.ATTR.DIM2) str[k] += 'dim2, '
-        if (sid.pass & SID.ATTR.WPOS2) str[k] += 'wpos2, '
-        if (sid.pass & SID.ATTR.TEX2) str[k] += 'tex2, '
-        if (sid.pass & SID.ATTR.TIME) str[k] += 'time1, '
-        if (sid.pass & SID.ATTR.SDF2) str[k] += 'sdf2'
-        if (sid.pass & SID.ATTR.STYLE3) str[k] += 'generir_attribs1'
-        // if (sid.pass) str[k] += '\n'
-    
-        return str;
-    },
-
-    CheckSidUnifByName(sid_unif, unif_name) {unif: SID.UNIF.FS_RCORNERS_FLOAT
-
-        if(unif_name === 'u_col4') return (sid_unif & this.UNIF.COL4) ? true : false;
-        else if(unif_name === 'u_dim2') return (sid_unif & this.UNIF.DIM2) ? true : false;
-        else if(unif_name === 'u_scale2') return (sid_unif & this.UNIF.U_SCALE_VEC2) ? true : false;
-        else if(unif_name === 'u_wposxy') return (sid_unif & this.UNIF.ROOT_WPOS2) ? true : false;
-        else if(unif_name === 'u_time') return (sid_unif & this.UNIF.TIME) ? true : false;
-
-        return false;
-    },
 };
 
 
@@ -369,62 +221,60 @@ const V_BORDER_FEATHER_STRIDE = 2;
 
 
 
-
+// TODO: Deprecated
 _CNT = 1;
 const MESH_ENABLE = {
 
     GFX: {
 
-        // ATTR_VPOS2: _CNT++,
-        ATTR_DIM2: _CNT++,
-        ATTR_TEX2: _CNT++,
-        ATTR_TIME: _CNT++,
-        ATTR_ANGLE: _CNT++,
-        ATTR_R_CORNERS: _CNT++,
-        ATTR_FEATHER: _CNT++,
-        ATTR_BORDER: _CNT++,
-        ATTR_GLOW_INTENSITY: _CNT++,
-        ATTR_COL4_PER_VERTEX: _CNT++,
-        ATTR_GENERIC_VEC2: _CNT++,
+    //     // ATTR_VPOS2: _CNT++,
+    //     ATTR_DIM2: _CNT++,
+    //     ATTR_TEX2: _CNT++,
+    //     ATTR_TIME: _CNT++,
+    //     ATTR_ANGLE: _CNT++,
+    //     ATTR_R_CORNERS: _CNT++,
+    //     ATTR_FEATHER: _CNT++,
+    //     ATTR_BORDER: _CNT++,
+    //     ATTR_GLOW_INTENSITY: _CNT++,
+    //     ATTR_COL4_PER_VERTEX: _CNT++,
+    //     ATTR_GENERIC_VEC2: _CNT++,
         
-        UNIF_RESOLUTION: _CNT++,
-        UNIFORM: _CNT++, // TODO: NOT NEEDED????
-        UNIF_TIME: _CNT++,
+    //     UNIF_RESOLUTION: _CNT++,
+    //     UNIFORM: _CNT++, // TODO: NOT NEEDED????
+    //     UNIF_TIME: _CNT++,
         
-        // FX_GLOW: _CNT++,
-        FN_NOISE: _CNT++,
-        FX_SMOKE: _CNT++,
+    //     // FX_GLOW: _CNT++,
+    //     FN_NOISE: _CNT++,
+    //     FX_SMOKE: _CNT++,
         
-        // Pass from vertex to fragment shader
-        PASS_COL4: _CNT++,
-        PASS_WPOS3: _CNT++,
-        PASS_WPOS2: _CNT++,
-        PASS_VPOS2: _CNT++,
-        PASS_DIM2: _CNT++,
-        PASS_TIME1: _CNT++,
-        PASS_RES2: _CNT++,
+    //     // Pass from vertex to fragment shader
+    //     PASS_COL4: _CNT++,
+    //     PASS_WPOS3: _CNT++,
+    //     PASS_WPOS2: _CNT++,
+    //     PASS_VPOS2: _CNT++,
+    //     PASS_DIM2: _CNT++,
+    //     PASS_TIME1: _CNT++,
+    //     PASS_RES2: _CNT++,
 
-        // Enable blending function for blending colors in fragment shader 
-        BLEND_OPTIONS: _CNT++, 
+    //     // Enable blending function for blending colors in fragment shader 
+    //     BLEND_OPTIONS: _CNT++, 
 
-        // Shader Color Functions
-        FN_GLOW: _CNT++,
-        FN_EXPLOSION_CIRCLE: _CNT++,
-        FN_EXPLOSION_GLOW: _CNT++,
-        FN_INNER_SHADOW: _CNT++,
-        FN_GLOW_SPHERE: _CNT++,
-        FN_NOISE_WORLEY: _CNT++,
-        FN_NOISE_VORONOI: _CNT++,
+    //     // Shader Color Functions
+    //     FN_GLOW: _CNT++,
+    //     FN_EXPLOSION_CIRCLE: _CNT++,
+    //     FN_EXPLOSION_GLOW: _CNT++,
+    //     FN_INNER_SHADOW: _CNT++,
+    //     FN_GLOW_SPHERE: _CNT++,
+    //     FN_NOISE_WORLEY: _CNT++,
+    //     FN_NOISE_VORONOI: _CNT++,
 
-        TEST_SHADERS_1: _CNT++,
-        TEST_SHADERS_2: _CNT++,
-        TEST_SHADERS_3: _CNT++,
-        TEST_SHADERS_4: _CNT++,
-        TEST_SHADERS_5: _CNT++,
-        // FLARE: _CNT++,
+    //     TEST_SHADERS_1: _CNT++,
+    //     TEST_SHADERS_2: _CNT++,
+    //     TEST_SHADERS_3: _CNT++,
+    //     TEST_SHADERS_4: _CNT++,
+    //     TEST_SHADERS_5: _CNT++,
 
-
-        NONE: 0,
+    //     NONE: 0,
     },
 }
 

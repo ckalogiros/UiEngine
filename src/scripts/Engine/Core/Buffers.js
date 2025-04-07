@@ -9,7 +9,37 @@
 // TODO: IMPLEMENT FREEIDX OR FREE_BUFFER (Also impl at MeshBufferViews.js: at // IMPORTANT: After consolidation, the buffer's freeidx is not valid)
 
 
+export const DEBUG_INFO_STRUCTS = {
 
+	BUFFER: {
+		GENERIC: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		CHARACTER: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT8: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT16: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT32: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+
+	},
+};
 
 
 

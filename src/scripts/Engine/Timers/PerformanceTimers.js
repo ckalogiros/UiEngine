@@ -167,7 +167,7 @@ export function Performance_timers_get_avg_1sec_reset(timer_idxs) {
    // { // Debug
    //    const called = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].called;
    //    const cnt = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].cnt;
-   //    console.log(timer_idxs, 'called', called, 'cnt', cnt, 'name', PERFORMANCE_TIMERS_IDXS.GetStrName(timer_idxs[0]))
+   //    console.log(timer_idxs, 'called', called, 'cnt', cnt, 'name', Performance_timer_get_name_byid(timer_idxs[0]))
    // }
    timer.cnt = 0;
    timer.accum = 0; // Get the accumulated time from the timer.
@@ -292,3 +292,30 @@ export function Performance_timers_init_all() {
    }
 }
 
+
+/**
+ * @param {const} id of type: PERFORMANCE_TIMERS_IDXS
+ */
+function Performance_timer_get_name_byid(id){
+   switch(id){
+      case PERFORMANCE_TIMERS_IDXS.GameLoop: return 'GameLoop';
+      case PERFORMANCE_TIMERS_IDXS.GlDraw: return 'GlDraw';
+      case PERFORMANCE_TIMERS_IDXS.AllTimersUpdate: return 'AllTimersUpdate';
+      case PERFORMANCE_TIMERS_IDXS.Batch: return 'Batch';
+      case PERFORMANCE_TIMERS_IDXS.Batch2: return 'Batch2';
+      case PERFORMANCE_TIMERS_IDXS.SceneUpdate: return 'SceneUpdate';
+      case PERFORMANCE_TIMERS_IDXS.EventListener: return 'EventListener';
+      case PERFORMANCE_TIMERS_IDXS.HoverListener: return 'HoverListener';
+      case PERFORMANCE_TIMERS_IDXS.MeshInfoTip: return 'MeshInfoTip';
+      case PERFORMANCE_TIMERS_IDXS.FramebufferRendering: return 'FramebufferRendering';
+      case PERFORMANCE_TIMERS_IDXS.AddToGfxRect: return 'AddToGfxRect';
+      case PERFORMANCE_TIMERS_IDXS.AddToGfxText: return 'AddToGfxText';
+      case PERFORMANCE_TIMERS_IDXS.Animations: return 'Animations';
+      case PERFORMANCE_TIMERS_IDXS.Particles: return 'Particles';
+      case PERFORMANCE_TIMERS_IDXS.Particles: return 'Particles2';
+      case PERFORMANCE_TIMERS_IDXS.MiscTest1: return 'MiscTest1';
+      case PERFORMANCE_TIMERS_IDXS.MiscTest2: return 'MiscTest2';
+      case PERFORMANCE_TIMERS_IDXS.MiscTest3: return 'MiscTest3';
+      case PERFORMANCE_TIMERS_IDXS.MiscTest4: return 'MiscTest4';
+   }
+}

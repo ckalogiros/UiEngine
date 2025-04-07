@@ -4,7 +4,7 @@ import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_wid
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREY, WHITE, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -205,12 +205,12 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
       // label.text_mesh.RenderTextFromString('REDL');
       // if(temp_flag) label.text_mesh.RenderTextFromString('AA AS');
 
-      // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
-      // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
-      // label.Align(ALIGN.HOR_CENTER | ALIGN.RIGHT, [0, 0]);
-      // label.Align(ALIGN.TOP | ALIGN.LEFT, [10, 10]);
-      // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
-      // label.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
+      // label.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.LEFT, [0, 0]);
+      // label.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.RIGHT, [0, 0]);
+      // label.Align(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.RIGHT, [0, 0]);
+      // label.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.LEFT, [10, 10]);
+      // label.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.RIGHT, [0, 0]);
+      // label.Align(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0]);
    }
 
 
@@ -344,12 +344,12 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
          // msdf_text.text_mesh.RenderTextFromString('REDL');
          // if(temp_flag) msdf_text.text_mesh.RenderTextFromString('AA AS');
 
-         // msdf_text.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
-         // msdf_text.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
-         // msdf_text.Align(ALIGN.HOR_CENTER | ALIGN.RIGHT, [0, 0]);
-         // msdf_text.Align(ALIGN.TOP | ALIGN.LEFT, [10, 10]);
-         // msdf_text.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
-         // msdf_text.Align(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0]);
+         // msdf_text.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.LEFT, [0, 0]);
+         // msdf_text.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.RIGHT, [0, 0]);
+         // msdf_text.Align(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.RIGHT, [0, 0]);
+         // msdf_text.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.LEFT, [10, 10]);
+         // msdf_text.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.RIGHT, [0, 0]);
+         // msdf_text.Align(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0]);
       }
    }
 

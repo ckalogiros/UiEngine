@@ -121,7 +121,7 @@ export class Widget_Text extends Text_Mesh {
 		const pos = [0, 0];
 		CopyArr2(pos, this.geom.pos);
 
-		if (flags & ALIGN.LEFT) {
+		if (flags & TEXT_ALIGN.LEFT) {
 
 			const pos = [0, 0];
 			CopyArr2(pos, this.geom.pos);
@@ -135,7 +135,7 @@ export class Widget_Text extends Text_Mesh {
 			CopyArr2(this.geom.pos, pos);
 
 		}
-		else if (flags & ALIGN.RIGHT) {
+		else if (flags & TEXT_ALIGN.RIGHT) {
 
 			const pos = [0, 0];
 			CopyArr2(pos, this.geom.pos);
@@ -523,7 +523,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	// 	let max_width = super.GetMaxWidth();
 
-	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
+	// 	if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 	// 		for (let i = 0; i <= this.children.boundary; i++) {
 	// 			// if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 	// 			if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
@@ -547,7 +547,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		let max_width = super.GetMaxWidth();
 
-		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
+		if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
 				if (this.children.buffer[i]) max_width += this.children.buffer[i].text_width + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
@@ -572,8 +572,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	// 	let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
-	// 	// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
-	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
+	// 	// HACK: TODO: Set only one of both(SECTION or TEXT_ALIGN) as global align bit field
+	// 	if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
 	// 		return max_height;
 	// 	}
 	// 	else { // Else calculate all the lines of the text meshes
@@ -588,8 +588,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
-		// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
-		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
+		// HACK: TODO: Set only one of both(SECTION or TEXT_ALIGN) as global align bit field
+		if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
 			return max_height;
 		}
 		else { // Else calculate all the lines of the text meshes
@@ -633,7 +633,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL) {
+	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = TEXT_ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -691,7 +691,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		// const second_pad = new_text.StylesGetPad();
 
 
-		if (this.alignment & ALIGN.VERTICAL) {
+		if (this.alignment & TEXT_ALIGN.VERTICAL) {
 			// new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
 			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
 			// new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
@@ -699,7 +699,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// New align fix
 			new_text.align.flags = LAYOUT.VERTICAL;
 		}
-		else if (this.alignment & ALIGN.HORIZONTAL) {
+		else if (this.alignment & TEXT_ALIGN.HORIZONTAL) {
 			// new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
 			// new_text.geom.pos[0] += prev_text_mesh.text_width * 2 + second_pad[0];
 			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
@@ -984,7 +984,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		const dim = this.geom.dim;
 		CopyArr2(pos, this.geom.pos);
 		let ypos = pos[1] + dim[1] * 2;
-		if (flags & ALIGN.VERTICAL) {
+		if (flags & TEXT_ALIGN.VERTICAL) {
 
 			for (let i = 0; i <= this.children.boundary; i++) {
 

@@ -106,7 +106,7 @@ export function Style_text_default_properties(user_properties) {
    const properties = {
       is_root:user_properties.is_root,
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
-      align:user_properties.align !== undefined ? user_properties.align : ALIGN.HORIZONTAL, 
+      align:user_properties.align !== undefined ? user_properties.align : TEXT_ALIGN.HORIZONTAL, 
       
       text:user_properties.text !== undefined ? user_properties.text : 'UUnamed Multi Text', 
       font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 
@@ -128,7 +128,7 @@ export function Style_multi_text_default_properties(user_properties) {
    const properties = {
       is_root:user_properties.is_root,
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
-      align:user_properties.align !== undefined ? user_properties.align : ALIGN.HORIZONTAL, 
+      align:user_properties.align !== undefined ? user_properties.align : TEXT_ALIGN.HORIZONTAL, 
       
       text:user_properties.text !== undefined ? user_properties.text : 'Unamed Multi Text', 
       font_size:user_properties.font_size !== undefined ? user_properties.font_size : 10, 
@@ -279,7 +279,7 @@ export function Style_label_default_properties(user_properties) {
       col:user_properties.col !== undefined ? user_properties.col : BLUEL[4],
       dim:_,
       
-      align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+      align:(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), 
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
       style:style, 
       
@@ -316,7 +316,7 @@ export function Style_button_default_properties(user_properties) {
       text_col:user_properties.text_col !== undefined ? user_properties.text_col : WHITE, 
 
       pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
-      align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+      align:(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), 
       layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
       
       text:user_properties.text, 
@@ -347,7 +347,7 @@ export function Style_switch_button_default_properties(user_properties) {
       dim:_,
       text_col:WHITE, 
       
-      align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+      align:(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), 
       
       text_on:user_properties.text_on !== undefined ? user_properties.text_on : 'on',
       text_off:user_properties.text_off !== undefined ? user_properties.text_off : 'off',
@@ -519,7 +519,7 @@ export function Style_dropdown_default_properties(user_properties) {
          // pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
          pad:[0,0], 
 
-         align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), 
+         align:(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), 
          
          text:user_properties.text!==undefined ? user_properties.text : user_properties.name, 
          text_pad:user_properties.text_pad !== undefined ? user_properties.text_pad : [10, 6],  

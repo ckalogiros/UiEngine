@@ -60,7 +60,7 @@ const TEST_CLIP_RIGHT = 10000;
 const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget.. function reserves a _mesh_buffer element by setting it to 'true'. So instead of checking against blant  true value, we give it a meaning 
 
 
-
+const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
 
@@ -251,7 +251,7 @@ const MESH_STATE_FLAGS = {
 
 
 
-
+// TODO: Deprecated
 _CNT = 0x1;
 const SECTION = {
 
@@ -302,41 +302,10 @@ const COMPONENTS = {
 
 
 
-const MOUSE = {
-
-	BTN_ID: {
-
-		LEFT: 0,
-		MIDDLE: 1,
-		RIGHT: 2,
-	},
-};
-
-
-
-
-
-
-
-
 
 
 _CNT = 0x1;
-const RENDER_QUEUE_FLAGS = {
-	IS_ACTIVE: _CNT,
-	SKIP_PRIORITY: _CNT <<= 0x1,
-	NEEDS_UPDATE: _CNT <<= 0x1,
-}
-
-
-
-
-
-
-
-
-_CNT = 0x1;
-const ALIGN = {
+const TEXT_ALIGN = {
 
 	LEFT: _CNT,
 	RIGHT: _CNT <<= 0x1,
@@ -378,6 +347,10 @@ const LAYOUT = {
 
 const POSITION_CENTER = [0, 0, 0];
 const TEMP_RESIZE_MARGIN = [15, 15];
+
+
+
+
 const POSSITIVE = 0;
 const NEGATIVE = 0;
 
@@ -441,22 +414,7 @@ const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval
 
 // Performance Timers indexes. WRITABLE 
 const PERFORMANCE_TIMERS_IDXS = {
-	/**
-		GameLoop
-		GlDraw
-		AllTimersUpdate
-		Batch
-		Batch2
-		SceneUpdate
-		EventListener
-		HoverListener
-		MeshInfoTip
-		FramebufferRendering
-		MiscTest1
-		MiscTest2
-		MiscTest3
-		MiscTest4
-	 */
+
 	GameLoop: INT_NULL,
 	GlDraw: INT_NULL,
 	AllTimersUpdate: INT_NULL,
@@ -476,30 +434,6 @@ const PERFORMANCE_TIMERS_IDXS = {
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
 	MiscTest4: INT_NULL,
-
-	GetStrName(idx){
-		switch(idx){
-			case this.GameLoop: return 'GameLoop';
-			case this.GlDraw: return 'GlDraw';
-			case this.AllTimersUpdate: return 'AllTimersUpdate';
-			case this.Batch: return 'Batch';
-			case this.Batch2: return 'Batch2';
-			case this.SceneUpdate: return 'SceneUpdate';
-			case this.EventListener: return 'EventListener';
-			case this.HoverListener: return 'HoverListener';
-			case this.MeshInfoTip: return 'MeshInfoTip';
-			case this.FramebufferRendering: return 'FramebufferRendering';
-			case this.AddToGfxRect: return 'AddToGfxRect';
-			case this.AddToGfxText: return 'AddToGfxText';
-			case this.Animations: return 'Animations';
-			case this.Particles: return 'Particles';
-			case this.Particles: return 'Particles2';
-			case this.MiscTest1: return 'MiscTest1';
-			case this.MiscTest2: return 'MiscTest2';
-			case this.MiscTest3: return 'MiscTest3';
-			case this.MiscTest4: return 'MiscTest4';
-		}
-	}
 }
 
 _CNT = 0x1;
@@ -522,86 +456,9 @@ _CNT = 0x1;
 const ROOT_WIDGETS = {
 	NULL: 0x0,
 	CREATE_ROOT: _CNT,
-	// CREATE_BATCH: _CNT <<= 0x1,
 }
 
 
-
-
-
-
-
-
-/*************************************************************************************************/
-//  
-const GFX = {
-	PROG_IDX: 0, 
-	VB_GROUP_IDX: 1,
-	VB_IDX_START: 2,
-
-	SIZE: 2,
-};
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// Commands
-
-_CNT = 0x4;
-const COMMANDS = {
-
-	ID: {
-		MESH_BUFFER_BATCH_DESTROY: _CNT,
-		LISTENERS_BATCH_DESTROY: _CNT <<= 0x1,
-		STYLE_BATCH_DESTROY: _CNT <<= 0x1,
-	}
-};
-
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// 
-const OUT_OF_VIEW = 100000; // Out of screen view in pixels
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// 
-
-const MAT_ENABLE = {
-	ATTR_VERTEX_COLOR: _CNT++,
-	ATTR_VERTEX_GRADIENT_HORIZONTAL: _CNT++,
-	ATTR_VERTEX_GRADIENT_VERTICAL: _CNT++,
-
-	NONE: 0,
-	LEN: _CNT,
-}
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-//  
 
 
 
@@ -695,126 +552,6 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
 
 
 
-
-// const TEXTURE_PATHS = [
-
-// 	{ // 0
-// 		img_path: 'fonts/consolas_3',
-// 		img_name: FONT_CONSOLAS_12px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 1
-// 		img_path: 'fonts/consolas_4',
-// 		img_name: FONT_CONSOLAS_16px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 2
-// 		img_path: 'fonts/consolas_5',
-// 		img_name: FONT_CONSOLAS_20px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 3
-// 		img_path: 'fonts/consolas_6',
-// 		img_name: FONT_CONSOLAS_24px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 4
-// 		img_path: 'fonts/consolas_7',
-// 		img_name: FONT_CONSOLAS_28px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 5
-// 		img_path: 'fonts/consolas_8',
-// 		img_name: FONT_CONSOLAS_32px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 6
-// 		img_path: 'fonts/consolas_10',
-// 		img_name: FONT_CONSOLAS_40px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 7
-// 		img_path: 'fonts/consolas_12',
-// 		img_name: FONT_CONSOLAS_49px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 8
-// 		img_path: 'fonts/consolas_14',
-// 		img_name: FONT_CONSOLAS_58px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 9
-// 		img_path: 'fonts/consolas_16',
-// 		img_name: FONT_CONSOLAS_66px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 10
-// 		img_path: 'fonts/consolas_28',
-// 		img_name: FONT_CONSOLAS_116px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 11
-// 		img_path: 'fonts/consolas_38',
-// 		img_name: FONT_CONSOLAS_157px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 12
-// 		img_path: 'fonts/consolas_mtsdf',
-// 		img_name: FONT_CONSOLAS_MTSDF_1024,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	{ // 13
-// 		img_path: 'fonts/comic_sans_ms',
-// 		img_name: FONT_MSDF_COMIC,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	{ // 14
-// 		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
-// 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	/***************************************************************************************************/
-// 	// Textures
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_SMOKE1,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_COIN,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_TEST_APPLE,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	// {
-// 	// 	img_path: 'textures',
-// 	// 	img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
-// 	// 	img_type: 'png',
-// 	// 	metrics: null, 
-// 	// },
-// ];
 
 
 
@@ -937,7 +674,6 @@ function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MTSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MTSDF_CONSOLAS_1024 ||
-		// texture_file_id === TEXTURES.TEST_MSDF_ARIAL ||
 		texture_file_id === TEXTURES.MSDF_SYMBOLS
 	) return true;
 
@@ -1122,23 +858,6 @@ const MESH_TYPE = {
 
 
 
-
-_CNT = 0;
-const BATCH_FN_IDX = {
-	SET_WPOS4: _CNT++,
-	ADD_WPOS4: _CNT++,
-	SET_POS2: _CNT++,
-	SET_WPOS4_POS2: _CNT++,
-}
-
-
-
-
-
-
-
-
-
 /*************************************************************************************************/
 //  Particle System  
 
@@ -1153,34 +872,6 @@ const PARTICLES = {
 
 }
 
-_CNT = 0;
-const PARTICLES_DIRECTION_CLBK_FN_IDX = {
-	EMISSION: _CNT++,
-	EXPLOSION: _CNT++,
-};
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-//  Events  
-_CNT = 0x1;
-const LISTENERS_FLAGS = {
-	ANY_HOVER: _CNT <<= 0x1,
-	ANY_CLICK: _CNT <<= 0x1,
-	ANY: _CNT <<= 0x1,
-
-	HOVER: _CNT <<= 0x1,
-	CLICK: _CNT <<= 0x1,
-	ALL: _CNT <<= 0x1,
-
-
-	mask: 0x0, // the variable to sto
-};
 
 
 
@@ -1197,21 +888,9 @@ const LISTEN_EVENT_TYPES = {
 
 	NULL: _CNT <<= 1,
 
-	GetTypeFromIndex(idx) {
-	}
 };
 
-function Listen_event_types_get_type_from_index(idx) {
 
-	if (idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
-	if (idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
-}
-
-function Listen_event_get_idx_from_type(etype) {
-
-	if (etype & LISTEN_EVENT_TYPES.HOVER) return LISTEN_EVENT_TYPES_INDEX.HOVER;
-	if (etype & (LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE)) return LISTEN_EVENT_TYPES_INDEX.CLICK;
-}
 
 
 
@@ -1230,20 +909,15 @@ const LISTEN_EVENT_TYPES_INDEX = {
 
 
 
+
+
+
+
 const E = {
 	H: LISTEN_EVENT_TYPES_INDEX.HOVER,
 	C: LISTEN_EVENT_TYPES_INDEX.CLICK,
 }
 
-
-
-
-function Listeners_get_event_type_string(event_type_idx) {
-	switch (event_type_idx) {
-		case E.H: return 'Hover';
-		case E.C: return 'Click';
-	}
-}
 
 
 
@@ -1367,101 +1041,7 @@ const DEBUG = {
 
 
 
-const DEBUG_INFO = {
 
-	UI_STATS: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_TIMERS: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_MOUSE: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_GFX: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [400, 300, 10]
-	},
-	UI_MESH: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_FOCUSED: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_BATCH: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_VB_2D: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [340, 100, 10]
-	},
-
-	Reset(){
-		this.UI_STATS.IS_ON = false;
-		this.UI_STATS.IDX = INT_NULL,
-		this.UI_STATS.MESH_BUFFER_IDX = INT_NULL;
-		this.UI_STATS.POS = [0, 0, 10];
-		
-		this.UI_TIMERS.IS_ON = false;
-		this.UI_TIMERS.IDX = INT_NULL;
-		this.UI_TIMERS.MESH_BUFFER_IDX = INT_NULL;
-		this.UI_TIMERS.POS = [0, 0, 10];
-
-		this.UI_MOUSE.IS_ON = false
-		this.UI_MOUSE.IDX = INT_NULL
-		this.UI_MOUSE.MESH_BUFFER_IDX = INT_NULL
-		this.UI_MOUSE.POS = [0, 0, 10];
-
-		this.UI_GFX.IS_ON = false
-		this.UI_GFX.ROOT_IDX = INT_NULL
-		this.UI_GFX.MESH_BUFFER_IDX = INT_NULL
-		this.UI_GFX.POS = [400, 300, 10];
-		
-		this.UI_MESH.IS_ON = false
-		this.UI_MESH.ROOT_IDX = INT_NULL
-		this.UI_MESH.MESH_BUFFER_IDX = INT_NULL
-		this.UI_MESH.POS = [530, 50, 10]
-		
-		this.UI_FOCUSED.IS_ON = false
-		this.UI_FOCUSED.ROOT_IDX = INT_NULL
-		this.UI_FOCUSED.MESH_BUFFER_IDX = INT_NULL
-		this.UI_FOCUSED.POS = [530, 50, 10]
-		
-		this.UI_BATCH.IS_ON = false
-		this.UI_BATCH.IDX = INT_NULL
-		this.UI_BATCH.ROOT_IDX = INT_NULL
-		this.UI_BATCH.MESH_BUFFER_IDX = INT_NULL
-		this.UI_BATCH.POS = [530, 50, 10]
-		
-		this.UI_VB_2D.IS_ON = false
-		this.UI_VB_2D.ROOT_IDX = INT_NULL
-		this.UI_VB_2D.MESH_BUFFER_IDX = INT_NULL
-		this.UI_VB_2D.POS = [340, 100, 10]
-	}
-};
 
 
 
@@ -1489,10 +1069,6 @@ function ERROR_NULL(obj) {
 
 _CNT = 0;
 const STYLES = { // Default access indices for style arrays
-	// MARG: _CNT++,
-	// PAD: _CNT++,
-	// HOVER_MARG: _CNT++,
-
 	AXIS: {
 		ALL: 0,
 		X: 1,
@@ -1509,37 +1085,7 @@ const STYLES = { // Default access indices for style arrays
 
 /***********************************************************************************************************************************************/
 // Some global values for debug info ui display information'
-const DEBUG_INFO_STRUCTS = {
 
-	BUFFER: {
-		GENERIC: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
-			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		CHARACTER: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
-			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT8: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT16: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT32: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-
-	},
-};
 
 
 
@@ -1564,18 +1110,3 @@ const INPUT_KEYCODE_PAUSE = 80;
 
 
 
-
-/***********************************************************************************************************************************************/
-// TEMPORARY
-const TEMP_TEST_PERFORMANE_COUNTERS = {
-
-	MESH_INFO_UI: {
-		COUNT: 0,
-		MOVE: 0,
-		BATCH_STORE: 0,
-		BATCH_UPDATE: 0,
-	},
-	FRAMEBUFFER: 0,
-	MISC: null,
-	MISC_IDX: INT_NULL,
-};

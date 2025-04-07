@@ -1,8 +1,9 @@
 "use strict";
 
 import { State_mesh_set_clickhold, State_mesh_set_grabed, State_mesh_set_hovered } from "../../GlobalFunctions.js";
+import { MOUSE } from "../Controls/Input/Mouse.js";
 import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
-import { Listener_dispatch_check_hover_event, Listener_dispatch_event } from "./EventListeners.js";
+import { Listener_dispatch_check_hover_event, Listener_dispatch_event, LISTENERS_FLAGS } from "./EventListeners.js";
 
 
 
@@ -140,7 +141,6 @@ export function Events_handle_immidiate(e) {
             e.params.mesh.state.mask |= (MESH_STATE_FLAGS.IN_HOVER_COLOR | MESH_STATE_FLAGS.IN_HOVER); 
             
             State_mesh_set_hovered(e.params.mesh);
-            TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.COUNT++;
 
             // If there is a resolve function, call it.
             if(e.params.mesh.event_clbks_resolve_fn) {

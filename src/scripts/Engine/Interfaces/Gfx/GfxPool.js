@@ -1,5 +1,6 @@
 "use strict";
 
+import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Index_buffer_info_get, Index_buffer_info_reset_buffer, Index_buffer_reset_buffer } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Uniforms_buffer_reset } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gl_vertex_array_object_reset } from "../../../Graphics/Buffers/VertexArrays.js";
@@ -70,7 +71,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
          // Case the vertex buffer is empty and unused
          if((vb_group_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
 
-            if(SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
+            if(Sid_check_match(sid, vb_group_buffer.buffer[i].sid)){
    
                vb_group_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
                Renderqueue_set_active(i, true);
@@ -97,7 +98,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
 
             // vb count
             // if((vb_group_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
-            // if(SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
+            // if(Sid_check_match(sid, vb_group_buffer.buffer[i].sid)){
             /**
              * Purpose is to run for all vbs and keep the one with the apropriate count
              * 
@@ -127,8 +128,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
             // // We need to have knowledge if the meshes of the vb stored, have absolute position or not
             // const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
-            // if((has_absolute_pos === has_vb_absolute_pos) && SID.CheckSidMatch(sid, vb_sid)){
-            if(SID.CheckSidMatch(sid, vb_sid)){
+            if(Sid_check_match(sid, vb_sid)){
    
                
                if(size === INT_NULL){ // Case first match
@@ -179,7 +179,7 @@ export function Gfx_pool_find_vb_notPrivate(sid, pool_request_flags, has_absolut
             // We need to have knowledge if the meshes of the vb stored, have absolute position or not
             const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
-            if((has_absolute_pos === has_vb_absolute_pos) && SID.CheckSidMatch(sid, vb_group_buffer.buffer[i].sid)){
+            if((has_absolute_pos === has_vb_absolute_pos) && Sid_check_match(sid, vb_group_buffer.buffer[i].sid)){
    
                vb_group_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
                Renderqueue_set_active(i, true);

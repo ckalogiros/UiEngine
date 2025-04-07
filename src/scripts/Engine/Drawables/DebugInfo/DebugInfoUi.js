@@ -13,12 +13,12 @@ import { Clipy_from_group, Clipy_one_mesh } from "../Operations/Clip.js";
 import { VBI_get_byidx, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_get_count, Str_buffer_mesh_names_get_size } from "../../Core/StringBuffer.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
-import { Generic_buffers_container_get_active_count, Generic_buffers_container_get_boundary, Generic_buffers_container_get_size, New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
+import { DEBUG_INFO_STRUCTS, Generic_buffers_container_get_active_count, Generic_buffers_container_get_boundary, Generic_buffers_container_get_size, New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { RENDER_QUEUE_FLAGS, Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
 import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size, Screen_wpos_get_y } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_click_get_count, Listeners_hover_get_count, Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, Root_group_set_render_queue_flags } from "../../Core/Views/RootView.js";
 import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
@@ -29,7 +29,101 @@ import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js"
 
 
 
+export const DEBUG_INFO = {
 
+	UI_STATS: {
+		IS_ON: false,
+		IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [0, 0, 10]
+	},
+	UI_TIMERS: {
+		IS_ON: false,
+		IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [0, 0, 10]
+	},
+	UI_MOUSE: {
+		IS_ON: false,
+		IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [0, 0, 10]
+	},
+	UI_GFX: {
+		IS_ON: false,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [400, 300, 10]
+	},
+	UI_MESH: {
+		IS_ON: false,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [530, 50, 10]
+	},
+	UI_FOCUSED: {
+		IS_ON: false,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [530, 50, 10]
+	},
+	UI_BATCH: {
+		IS_ON: false,
+		IDX: INT_NULL,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [530, 50, 10]
+	},
+	UI_VB_2D: {
+		IS_ON: false,
+		ROOT_IDX: INT_NULL,
+		MESH_BUFFER_IDX: INT_NULL,
+		POS: [340, 100, 10]
+	},
+
+	Reset(){
+		this.UI_STATS.IS_ON = false;
+		this.UI_STATS.IDX = INT_NULL,
+		this.UI_STATS.MESH_BUFFER_IDX = INT_NULL;
+		this.UI_STATS.POS = [0, 0, 10];
+		
+		this.UI_TIMERS.IS_ON = false;
+		this.UI_TIMERS.IDX = INT_NULL;
+		this.UI_TIMERS.MESH_BUFFER_IDX = INT_NULL;
+		this.UI_TIMERS.POS = [0, 0, 10];
+
+		this.UI_MOUSE.IS_ON = false
+		this.UI_MOUSE.IDX = INT_NULL
+		this.UI_MOUSE.MESH_BUFFER_IDX = INT_NULL
+		this.UI_MOUSE.POS = [0, 0, 10];
+
+		this.UI_GFX.IS_ON = false
+		this.UI_GFX.ROOT_IDX = INT_NULL
+		this.UI_GFX.MESH_BUFFER_IDX = INT_NULL
+		this.UI_GFX.POS = [400, 300, 10];
+		
+		this.UI_MESH.IS_ON = false
+		this.UI_MESH.ROOT_IDX = INT_NULL
+		this.UI_MESH.MESH_BUFFER_IDX = INT_NULL
+		this.UI_MESH.POS = [530, 50, 10]
+		
+		this.UI_FOCUSED.IS_ON = false
+		this.UI_FOCUSED.ROOT_IDX = INT_NULL
+		this.UI_FOCUSED.MESH_BUFFER_IDX = INT_NULL
+		this.UI_FOCUSED.POS = [530, 50, 10]
+		
+		this.UI_BATCH.IS_ON = false
+		this.UI_BATCH.IDX = INT_NULL
+		this.UI_BATCH.ROOT_IDX = INT_NULL
+		this.UI_BATCH.MESH_BUFFER_IDX = INT_NULL
+		this.UI_BATCH.POS = [530, 50, 10]
+		
+		this.UI_VB_2D.IS_ON = false
+		this.UI_VB_2D.ROOT_IDX = INT_NULL
+		this.UI_VB_2D.MESH_BUFFER_IDX = INT_NULL
+		this.UI_VB_2D.POS = [340, 100, 10]
+	}
+};
 
 
 
@@ -84,7 +178,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'FPS:', 
-         align:ALIGN.HORIZONTAL, 
+         align:TEXT_ALIGN.HORIZONTAL, 
          pos:[0, 0, zpos + 1], 
          font_size:fontsizedynamic, 
          col:TRANSPARENCY(WHITE, transp), 
@@ -225,7 +319,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
@@ -289,7 +383,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
@@ -363,7 +457,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
@@ -436,13 +530,12 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
 
    { // Generic Buffer
-      DEBUG_INFO_STRUCTS
       ms = (g_ms) ? g_ms : 1000;
       const timer = Create_widget_multi_text({
          is_root:0x0,
@@ -508,13 +601,12 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    // Use custom interval for all debug ui for efficiency
    let generic_time_interval = INT_NULL;
 
    { // Generic Buffer
-      DEBUG_INFO_STRUCTS
       ms = (g_ms) ? g_ms : 1000;
       const timer = Create_widget_multi_text({
          is_root:0x0,
@@ -782,7 +874,7 @@ function Debug_info_create_ui_stats() {
    let dt_pad = [4, 0];
    const g_ms = 0; // Overide time interval for all 
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
 
    // Use custom interval for all debug ui for efficiency
@@ -1097,7 +1189,7 @@ function Debug_info_create_ui_performance_timers() {
    let pad2 = [4, 0];
    const g_ms = 0;
    let ms = 500;
-   const align = ALIGN.HORIZONTAL;
+   const align = TEXT_ALIGN.HORIZONTAL;
 
    //TODO: Name all the timers correctly
 
@@ -1623,7 +1715,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    const infomesh = Create_widget_multi_text({
       is_root:0x0,
       text:'Mouse:', 
-      align:ALIGN.HORIZONTAL, 
+      align:TEXT_ALIGN.HORIZONTAL, 
       pos: [0, 0, DEBUG_INFO.UI_MOUSE.POS[2] + 1], 
       font_size:fontsize, 
       col:WHITE, 
@@ -1633,7 +1725,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    });
    infomesh.align.flags = LAYOUT.HORIZONTAL;
    section.AddItem(infomesh);
-   // dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL
+   // dynamic_text, fontSize, text_col2, pad = [0, 0], bold = .5, align = TEXT_ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL
    infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, LAYOUT.VERTICAL,);
    infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [0, 0], .9, _, LAYOUT.HORIZONTAL);
    // infomesh.CreateNewText('222',        fontsize, GREEN[7], [10, 0], .9, _, LAYOUT.HORIZONTAL);
@@ -1748,7 +1840,7 @@ export function Debug_info_create_ui_focused() {
 
 
 
-   const infomesh = Create_widget_multi_text(_, 'Mouse:', ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2] + 1], fontsize, WHITE, .4, [10, 10], TEXTURES.MTSDF_CONSOLAS_1024, _, _);
+   const infomesh = Create_widget_multi_text(_, 'Mouse:', TEXT_ALIGN.HORIZONTAL, [0, 0, DEBUG_INFO.UI_FOCUSED.POS[2] + 1], fontsize, WHITE, .4, [10, 10], TEXTURES.MTSDF_CONSOLAS_1024, _, _);
    section.AddItem(infomesh);
    infomesh.CreateNewText('pos[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);
    infomesh.CreateNewText('area[-0000, -0000]', fontsize, GREEN[7], [8, 0], .9);
@@ -2005,7 +2097,7 @@ let u = 0;
 //    const fontsizedynamic = 9;
 //    const extra_pad1 = [18, 4];
 //    const extra_pad2 = [0, 4];
-//    const align = ALIGN.VERTICAL;
+//    const align = TEXT_ALIGN.VERTICAL;
 
 //    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0,0,zpos++], [0,0], GREY[1], 'Ui Geometry Info Focused', _, _, _, MESH_TYPE.DEBUG_MESH);
 //    section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
@@ -2043,7 +2135,7 @@ let u = 0;
 //    const fontsizedynamic = 9;
 //    const extra_pad1 = [18, 4];
 //    const extra_pad2 = [0, 4];
-//    const align = ALIGN.VERTICAL;
+//    const align = TEXT_ALIGN.VERTICAL;
 
 //    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0,0,zpos++], [0,0], ORANGEL[2], 'Ui Geometry Info Focused', _, _, _, MESH_TYPE.DEBUG_MESH);
 //    section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
@@ -2076,7 +2168,7 @@ let u = 0;
 //    const fontsizedynamic = 9;
 //    const extra_pad1 = [18, 4];
 //    const extra_pad2 = [0, 4];
-//    const align = ALIGN.VERTICAL;
+//    const align = TEXT_ALIGN.VERTICAL;
 
 //    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0,0,zpos++], [0,0], ORANGEL[2], 'Ui Geometry Info Focused', _, _, _, MESH_TYPE.DEBUG_MESH);
 //    section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
@@ -2145,7 +2237,7 @@ let u = 0;
 //    const fontsizedynamic = 9;
 //    const extra_pad1 = [18, 4];
 //    const extra_pad2 = [0, 4];
-//    const align = ALIGN.VERTICAL;
+//    const align = TEXT_ALIGN.VERTICAL;
 
 //    const section = Create_widget_section(_, SECTION.VERTICAL, [10, 10], [0,0,zpos++], [0,0], ORANGEL[2], 'Ui Gfx Info Focused', _, _, _ , MESH_TYPE.DEBUG_MESH);
 //    section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);

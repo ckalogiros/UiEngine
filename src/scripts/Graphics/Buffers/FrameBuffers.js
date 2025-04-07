@@ -246,7 +246,6 @@ export function FramebufferSetUpdate(fbidx) {
    // _pt_framebuffer_rendering.timer.Start();
    _fb_buffer[fbidx].needs_update = true;
    // _pt_framebuffer_rendering.timer.Stop();
-   TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER++;
 }
 
 

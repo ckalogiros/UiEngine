@@ -10,6 +10,26 @@ import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx } from ".
 
 
 
+
+
+
+let _cnt = 0x1;
+export const LISTENERS_FLAGS = {
+	ANY_HOVER: _cnt <<= 0x1,
+	ANY_CLICK: _cnt <<= 0x1,
+	ANY: _cnt <<= 0x1,
+
+	HOVER: _cnt <<= 0x1,
+	CLICK: _cnt <<= 0x1,
+	ALL: _cnt <<= 0x1,
+
+
+	mask: 0x0, // the variable to sto
+};
+
+
+
+
 /** // TODO!!: For efficiency
  * 
  * 

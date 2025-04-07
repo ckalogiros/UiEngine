@@ -15,7 +15,7 @@ import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
-import { State_mesh_reset } from "../../../../GlobalFunctions.js";
+import { Sid_check_unif_match_sids, State_mesh_reset } from "../../../../GlobalFunctions.js";
 
 
 
@@ -249,7 +249,6 @@ export class Mesh {
 
         // Styles_batch_destroy_store(this.styles);
         // BUG: There seems to be a bug in the removal of the styles from the M_Buffer, so as to the '.active_count' isn't incremented/Decremented correctly
-        // Command_buffer_store(Styles_batch_destroy_run, null, COMMANDS.ID.STYLE_BATCH_DESTROY); // Store the 'destroy styles' as a command to be executed later(once per frame)
         if (NOTIFICATIONS_ON && (this.type & MESH_TYPE.DEBUG_MESH) === 0)
             Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, this.mesh_bufferidx);
 
@@ -325,8 +324,6 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove from widget root buffer.
-        // Mesh_buffer_batch_destroy_store(this.mesh_bufferidx);
-        // Command_buffer_store(Mesh_buffer_batch_destroy_run, null, COMMANDS.ID.LISTENERS_BATCH_DESTROY)
         if ((this.components & COMPONENTS.SCROLLER) === 0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
         else alert()
 
@@ -820,7 +817,7 @@ export class Mesh {
 
         // Alert if the current mesh system does not have the uniform enabled.
         console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-        if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+        if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
 
             alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
         }

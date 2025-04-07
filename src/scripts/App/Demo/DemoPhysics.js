@@ -5,7 +5,7 @@ import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
@@ -296,7 +296,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
       let generic_time_interval = INT_NULL;
 
       { // Info
-         const nfo = Create_widget_multi_text(_, 'Vel x:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         const nfo = Create_widget_multi_text(_, 'Vel x:', TEXT_ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
@@ -316,7 +316,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
       }
       { // Info
          const ms = 60;
-         const nfo = Create_widget_multi_text(_, 'Pi Angle:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         const nfo = Create_widget_multi_text(_, 'Pi Angle:', TEXT_ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('00000', font_size, GREEN[7], pad2, .9);
@@ -328,7 +328,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
          const ball = balls_buffer[0];
 
          const ms = 60;
-         const nfo = Create_widget_multi_text(_, 'Vel:cos(atan2):', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         const nfo = Create_widget_multi_text(_, 'Vel:cos(atan2):', TEXT_ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
          info_section.AddItem(nfo);
 
          nfo.CreateNewText('00000', font_size, YELLOW[9], pad2, .9);
@@ -345,7 +345,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
          const ball = balls_buffer[0];
 
          const ms = 60;
-         const nfo = Create_widget_multi_text(_, 'Vector Mag:', ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
+         const nfo = Create_widget_multi_text(_, 'Vector Mag:', TEXT_ALIGN.HORIZONTAL, [0, 0, zpos + 1], font_size, WHITE, .5, pad1);
          info_section.AddItem(nfo);
 
 

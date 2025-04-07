@@ -8,7 +8,7 @@ import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_ro
 import { Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_app_int16_buffers } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, GREEN, GREENR, GREY, ORANGER, PURPLEB, PURPLER, TRANSPARENT, WHITE, YELLOW, YELLOWR } from "../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Drawables/Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Renderqueue_set_active, Renderqueue_set_priority_by_program, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
@@ -1313,7 +1313,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 1
-   const button1 = Create_widget_button(_, category_widgets.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button1 = Create_widget_button(_, category_widgets.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button1.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1326,7 +1326,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 6
-   const button6 = Create_widget_button(_, category_msdf_text.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button6 = Create_widget_button(_, category_msdf_text.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button6.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button6.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button6.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1339,7 +1339,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 2
-   const button2 = Create_widget_button(_, category_particles.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button2 = Create_widget_button(_, category_particles.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button2.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1352,7 +1352,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 3
-   const button3 = Create_widget_button(_, category_physics.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button3 = Create_widget_button(_, category_physics.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button3.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button3.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1365,7 +1365,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 4
-   const button4 = Create_widget_button(_, category_animations.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button4 = Create_widget_button(_, category_animations.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button4.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button4.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button4.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1378,7 +1378,7 @@ function Create_menu_items_demos(params) {
 
    /*******************************************************************************************/
    // Button 5
-   const button5 = Create_widget_button(_, category_in_practise.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
+   const button5 = Create_widget_button(_, category_in_practise.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, btn_col, text_col, [15, 8], .5, _, font);
    button5.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    button5.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    button5.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1417,7 +1417,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 1 button
    const c1 = (demo_id & subcategory_comet.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item1_btn = Create_widget_button(_, subcategory_comet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   const item1_btn = Create_widget_button(_, subcategory_comet.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item1_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1431,7 +1431,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 2 button
    const c2 = (demo_id & subcategory_glow.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item2_btn = Create_widget_button(_, subcategory_glow.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const item2_btn = Create_widget_button(_, subcategory_glow.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1444,7 +1444,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 2 button
    const c3 = (demo_id & subcategory_explosion.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item3_btn = Create_widget_button(_, subcategory_explosion.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   const item3_btn = Create_widget_button(_, subcategory_explosion.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item3_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1457,7 +1457,7 @@ function Create_menu_items_particles_demo(params, demo_id) {
    /*******************************************************************************************/
    //  Item 3 button
    const c4 = (demo_id & subcategory_smoke.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item4_btn = Create_widget_button(_, subcategory_smoke.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
+   const item4_btn = Create_widget_button(_, subcategory_smoke.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
    item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item4_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1492,7 +1492,7 @@ function Create_menu_items_physics_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 1 button
    const c1 = (demo_id & subcategory_elastic_collisions.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item1_btn = Create_widget_button(_, subcategory_elastic_collisions.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   const item1_btn = Create_widget_button(_, subcategory_elastic_collisions.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item1_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1505,7 +1505,7 @@ function Create_menu_items_physics_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 2 button
    const c2 = (demo_id & subcategory_perimetric_rotation.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item2_btn = Create_widget_button(_, subcategory_perimetric_rotation.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const item2_btn = Create_widget_button(_, subcategory_perimetric_rotation.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1518,7 +1518,7 @@ function Create_menu_items_physics_demo(params, demo_id) {
    /*******************************************************************************************/
    //  Item 3 button
    const c3 = (demo_id & subcategory_velocity_verlet.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item3_btn = Create_widget_button(_, subcategory_velocity_verlet.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   const item3_btn = Create_widget_button(_, subcategory_velocity_verlet.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item3_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1555,7 +1555,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 5 button
    const c5 = (demo_id & subcategory_animations_button.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item5_btn = Create_widget_button(_, subcategory_animations_button.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c5, text_col, [15, 8], .5, _, font);
+   const item5_btn = Create_widget_button(_, subcategory_animations_button.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c5, text_col, [15, 8], .5, _, font);
    item5_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item5_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item5_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1567,7 +1567,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 1 button
    const c1 = (demo_id & subcategory_animations1.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item1_btn = Create_widget_button(_, subcategory_animations1.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   const item1_btn = Create_widget_button(_, subcategory_animations1.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item1_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1579,7 +1579,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 1 button
    const c2 = (demo_id & subcategory_animations2.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item2_btn = Create_widget_button(_, subcategory_animations2.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const item2_btn = Create_widget_button(_, subcategory_animations2.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1591,7 +1591,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 3 button
    const c3 = (demo_id & subcategory_animations_text.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item3_btn = Create_widget_button(_, subcategory_animations_text.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   const item3_btn = Create_widget_button(_, subcategory_animations_text.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item3_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1603,7 +1603,7 @@ function Create_menu_items_animations_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 4 button
    const c4 = (demo_id & subcategory_rotating_rects.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item4_btn = Create_widget_button(_, subcategory_rotating_rects.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
+   const item4_btn = Create_widget_button(_, subcategory_rotating_rects.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c4, text_col, [15, 8], .5, _, font);
    item4_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item4_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item4_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1642,7 +1642,7 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 1 button
    const c1 = (demo_id & subcategory_snake.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item1_btn = Create_widget_button(_, subcategory_snake.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
+   const item1_btn = Create_widget_button(_, subcategory_snake.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c1, text_col, [15, 8], .5, _, font);
    item1_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item1_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item1_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1654,7 +1654,7 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 2 button
    const c2 = (demo_id & subcategory_tetris.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item2_btn = Create_widget_button(_, subcategory_tetris.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
+   const item2_btn = Create_widget_button(_, subcategory_tetris.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c2, text_col, [15, 8], .5, _, font);
    item2_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item2_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item2_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
@@ -1666,7 +1666,7 @@ function Create_menu_items_in_practise_demo(params, demo_id) {
    /*******************************************************************************************/
    // Item 3 button
    const c3 = (demo_id & subcategory_arkanoid.id) ? TRANSPARENCY(btn_col, .4) : TRANSPARENCY(btn_col, 1.);
-   const item3_btn = Create_widget_button(_, subcategory_arkanoid.name, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
+   const item3_btn = Create_widget_button(_, subcategory_arkanoid.name, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], _, c3, text_col, [15, 8], .5, _, font);
    item3_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    item3_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    item3_btn.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);

@@ -9,7 +9,7 @@ import { Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
 import { BLACK, BLUEL, GREEN, GREENL, GREY, ORANGER, PURPLE, PURPLEB, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Drawables/Operations/Recursions.js';
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
@@ -2059,7 +2059,7 @@ export function Test_noise_shader() {
       const emitter_section = Create_rect_mesh(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Emitter Test', label_style);
       emitter_section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
-      const label = Create_widget_label(_, 'Emitter Test', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
+      const label = Create_widget_label(_, 'Emitter Test', (TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
       emitter_section.AddItem(label);
 
       const emitter_switch = Create_widget_switch_simple(_, [0, 0, zpos + 2], switch_size, switch_col, switch_col2, switch_pad, _, [6, 14, 2]);
@@ -2083,7 +2083,7 @@ export function Test_noise_shader() {
       color_picker.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
       // Create label
-      const label = Create_widget_label(_, 'Color Picker', (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
+      const label = Create_widget_label(_, 'Color Picker', (TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
       color_picker.AddItem(label);
       color_picker.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -2319,7 +2319,7 @@ export function Test_noise_shader() {
    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
 
-   const btn = Create_widget_button(_, 'Emitt', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
+   const btn = Create_widget_button(_, 'Emitt', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], 20, BLUEL[6], WHITE, [5, 5], .5);
    s.AddItem(btn);
    btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);

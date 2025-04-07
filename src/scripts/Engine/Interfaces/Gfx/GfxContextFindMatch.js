@@ -1,5 +1,6 @@
 "use strict";
 
+import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";
@@ -83,7 +84,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
             // We need to have knowledge if the meshes of the vb stored, have absolute position or not
             // const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
-            if(_vb_groupidx !== INT_NULL && SID.CheckSidMatch(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx) === true)) {
+            if(_vb_groupidx !== INT_NULL && Sid_check_match(mesh.sid, Vertex_buffer_group_get_sid(_vb_groupidx) === true)) {
                if (GFX_CONEXT_DEBUG) console.error('INCORRECT _vb_groupidx passed for generating SPECIFIC gfx.\n_gfxidxs:', _vb_groupidx);
 
                // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -143,7 +144,7 @@ function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid, mesh_texidx
       // We need to have knowledge if the meshes of the vb stored, have absolute position or not
       const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
-      if((mesh_has_absolute_pos === has_vb_absolute_pos) && SID.CheckSidMatch(target_sid, gfx_sid)) {
+      if((mesh_has_absolute_pos === has_vb_absolute_pos) && Sid_check_match(target_sid, gfx_sid)) {
 
          // Check also if mesh has texture and the texidx matches the vb group's texidx
          const texidx = Vertex_buffer_group_get_texidx(vb_groupidx);
@@ -196,7 +197,7 @@ function Find_match_from_children(mesh, parent) {
       if (child && child.gfx) {
 
          
-         if((SID.CheckSidMatch(mesh.sid, child.sid))) {
+         if((SID.Sid_check_match(mesh.sid, child.sid))) {
             
             const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (child.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION)
             // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -208,7 +209,7 @@ function Find_match_from_children(mesh, parent) {
             }
             
          }
-         else if (child.text_mesh && child.text_mesh.gfx && SID.CheckSidMatch(mesh.sid, child.text_mesh.sid)) {
+         else if (child.text_mesh && child.text_mesh.gfx && Sid_check_match(mesh.sid, child.text_mesh.sid)) {
             
             const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (child.text_mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION)
             // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -242,7 +243,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
    if (!parent || !parent.gfx) return { vb_groupidx: vb_groupidx, done: true }
 
    
-   if(SID.CheckSidMatch(mesh.sid, parent.sid)) {
+   if(Sid_check_match(mesh.sid, parent.sid)) {
       
       const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (parent.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION);   
       // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -254,7 +255,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
    }
    // Check if the parent has a text_mesh
    // Below we avoid a cyclical dependecy: If the mesh is a text mesh, the the parent.text_mesh is the mesh its self, so maybe this couuld cause problems 
-   else if (parent.text_mesh && parent !== mesh.parent && SID.CheckSidMatch(mesh.sid, parent.text_mesh.sid)) {
+   else if (parent.text_mesh && parent !== mesh.parent && Sid_check_match(mesh.sid, parent.text_mesh.sid)) {
       
       const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (parent.text_mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION);   
       // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -305,7 +306,7 @@ function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
 
    
    // If the mesh match the parent sid, use parent's gfx buffer
-   if (SID.CheckSidMatch(mesh.sid, parent.sid)) {
+   if (Sid_check_match(mesh.sid, parent.sid)) {
 
       // In case mesh is the parent mesh, obviously we haven't created yet any gfx, so return -1 in order to create new vertex buffer
       if (mesh === parent) return INT_NULL;

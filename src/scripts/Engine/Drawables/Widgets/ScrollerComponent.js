@@ -12,7 +12,7 @@ import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 

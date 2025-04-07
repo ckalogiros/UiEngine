@@ -3,6 +3,7 @@ import { Shaders_load } from './GlShaders.js';
 import { Uniforms_block_create_shared_uniform, Uniforms_buffer_set_uniform } from './Buffers/UniformBuffers.js';
 import { New_generic_buffer, New_int8_buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
+import { Sid_check_match } from '../GlobalFunctions.js';
 
 
 
@@ -100,7 +101,7 @@ export function Program_program_exists_from_sid(sid) {
 
 	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
 	for (let i = 0; i <= _programs.boundary; i++)
-		if (SID.CheckSidMatch(sid, _programs.buffer[i].sid)) return i;
+		if (Sid_check_match(sid, _programs.buffer[i].sid)) return i;
 
 	return INT_NULL;
 }
@@ -261,7 +262,7 @@ class Gl_Program {
 
 	// Check id sid matches with the program's sid.
 	CheckSidMatch(sid) {
-		return SID.CheckSidMatch(sid, this.sid);
+		return Sid_check_match(sid, this.sid);
 	}
 
 

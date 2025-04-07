@@ -883,8 +883,6 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       }
    }
 
-   // TEMP_TEST_PERFORMANE_COUNTERS.MISC = `total:${total_count}, removed:${count1}, added:${count2}`;
-
    return changes_hapened;
 }
 

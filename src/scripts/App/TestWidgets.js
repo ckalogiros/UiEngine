@@ -4,7 +4,7 @@ import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label } from '.
 import { View_build_group_from_root_mesh } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, WHITE } from '../Engine/Drawables/Material/Base/Colors.js';
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Drawables/Operations/Recursions.js';
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
@@ -329,7 +329,7 @@ export function TestWidgetsGeneric() {
 
             // { // Create the button for going to the top
 
-            //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+            //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
             //     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             //     btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -543,7 +543,7 @@ export function TestWidgetsGeneric() {
 // Widget Creation Functions
 function Test_reload_app() {
 
-    const reload_btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Reload', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 140, 10, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
+    const reload_btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Reload', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 140, 10, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
     reload_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     reload_btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
@@ -1338,10 +1338,10 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
         // label.text_mesh.SetColorRGB(REDL);
         // label.text_mesh.RenderTextFromString('REDL');
 
-        // label.Align(ALIGN.BOTTOM | ALIGN.LEFT, [0, 0]);
-        // label.Align(ALIGN.BOTTOM | ALIGN.RIGHT, [0, 0]);
-        // label.Align(ALIGN.TOP | ALIGN.LEFT, [0, 0]);
-        // label.Align(ALIGN.TOP | ALIGN.RIGHT, [0, 0]);
+        // label.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.LEFT, [0, 0]);
+        // label.Align(TEXT_ALIGN.BOTTOM | TEXT_ALIGN.RIGHT, [0, 0]);
+        // label.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.LEFT, [0, 0]);
+        // label.Align(TEXT_ALIGN.TOP | TEXT_ALIGN.RIGHT, [0, 0]);
     }
 
 
@@ -1352,7 +1352,7 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
 
 function CreateButton(x = 20, y = 400, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
-    const btn = Create_widget_button(is_root, 'Button', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
+    const btn = Create_widget_button(is_root, 'Button', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     // btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -1382,8 +1382,8 @@ function CreateButton(x = 20, y = 400, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     // // btn.text_mesh.SetColorRGB(BLUE_10_120_220);
 
-    // // btn.Align(ALIGN.LEFT | ALIGN.TOP, [0, 0]);
-    // // btn.Align(ALIGN.RIGHT | ALIGN.BOTTOM, [15, 5]);
+    // // btn.Align(TEXT_ALIGN.LEFT | TEXT_ALIGN.TOP, [0, 0]);
+    // // btn.Align(TEXT_ALIGN.RIGHT | TEXT_ALIGN.BOTTOM, [15, 5]);
 
     return btn;
 }
@@ -2293,7 +2293,7 @@ function CreateDropdown2InSection(pos, id) {
     for (let i = 0; i < sub_dp1_count; i++) {
 
 
-        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5,);
+        const label = Create_widget_label(_, `sssdsdsdsdsLabel ${id++}`, TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, pos[2]], fontsize, GREY[1], WHITE, [14, 4], .5,);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -3247,7 +3247,7 @@ function Test_performance_align_functions() {
     // {
 
 
-    //     const fps_label = Create_widget_label(_, '0000000', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 1], fontsize, PURPLER[1], WHITE, [20, 10], .5,);
+    //     const fps_label = Create_widget_label(_, '0000000', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 1], fontsize, PURPLER[1], WHITE, [20, 10], .5,);
     //     Widget_gfx_ready_enable({ mesh: fps_label, enable_sdf_rect: 10, });
     //     {
     //         fps_label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
@@ -3534,27 +3534,27 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 
 
     // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
     // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
+    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
     //     l.GenGfxCtx();
     //     scroller.AddItemToScrolledSection(l);
     // }
@@ -3931,7 +3931,7 @@ function Help() {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
 
-        const label = Create_widget_label(_, msgs[i], ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(YELLOWR[7], 1.), BLACK, [7, 3], .5, [0, 4, 3]);
+        const label = Create_widget_label(_, msgs[i], TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 0], 7, TRANSPARENCY(YELLOWR[7], 1.), BLACK, [7, 3], .5, [0, 4, 3]);
         label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
@@ -4038,7 +4038,7 @@ function MeshInfo() {
 
     // /********************************************************************************************************************************************************/
     // // All the info text                            _, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1
-    // const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], pad, .4);
+    // const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', TEXT_ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], pad, .4);
     // first_text_child_idx = section.AddItem(infomesh);
 
     // // For mesh-parent-rect 
@@ -4054,11 +4054,10 @@ function MeshInfo() {
     // infomesh.SetName('Info Mesh 2');
 
     // // DEBUG COUNTERS 
-    // TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX = infomesh.CreateNewText('GENERIC DEBUG: 00000000000000000000', fontsize, BLUE_10_120_220, pad, .9);
     // section.geom.pos[0] = VIEWPORT.RIGHT - infomesh.GetMaxWidth() * 2 - 30;
     // section.geom.pos[1] = VIEWPORT.TOP;
 
-    // infomesh.Align_pre(infomesh, ALIGN.VERTICAL)
+    // infomesh.Align_pre(infomesh, TEXT_ALIGN.VERTICAL)
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -4070,9 +4069,6 @@ function MeshInfo() {
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-    // View_build_group_from_root_mesh(section);
-    // DEBUG_INFO.UI_MESH.IDX = section.idx;
 
     return section;
 }
@@ -4135,10 +4131,7 @@ function MeshInfoUpdate(params) {
             msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
         }
 
-        // msgs.push(`Framebuffer counter:${TEMP_TEST_PERFORMANE_COUNTERS.FRAMEBUFFER}`);
-        // msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${TEMP_TEST_PERFORMANE_COUNTERS.MISC}`;
         const mouse_pos = Mouse_get_pos();
-        msgs[TEMP_TEST_PERFORMANE_COUNTERS.MISC_IDX] = `MISC:${mouse_pos[0]} ${mouse_pos[1]}`;
 
         // Update info text
         for (let i = 0; i <= textMesh.children.boundary; i++) {
@@ -4161,14 +4154,14 @@ function Create3DCubes(scene) {
         {
             const geom = new CubeGeometry([80, 450, -1], [100, 100, 100], [1, 1, 1]);
             const mat = new Material_TEMP_fromBufferFor3D(WHITE)
-            mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-                color: [
-                    0.9, 0.0, 0.0, .4,
-                    0.0, 0.9, 0.1, .4,
-                    0.0, 0.0, 0.9, .4,
-                    0.9, 0.0, 0.9, .4
-                ]
-            });
+            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
+            //     color: [
+            //         0.9, 0.0, 0.0, .4,
+            //         0.0, 0.9, 0.1, .4,
+            //         0.0, 0.0, 0.9, .4,
+            //         0.9, 0.0, 0.9, .4
+            //     ]
+            // });
             const cube = new Mesh(geom, mat);
             scene.AddMesh(cube);
 
@@ -4179,14 +4172,14 @@ function Create3DCubes(scene) {
         {
             const geom = new CubeGeometry([240, 450, -1], [100, 100, 100], [1, 1, 1]);
             const mat = new Material_TEMP_fromBufferFor3D(WHITE);
-            mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-                color: [
-                    1.0, 1.0, 0.0, .4,
-                    0.0, 0.7, 0.4, .4,
-                    0.0, 1.0, 0.0, .4,
-                    1.0, 0.0, 1.0, .4,
-                ]
-            });
+            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
+            //     color: [
+            //         1.0, 1.0, 0.0, .4,
+            //         0.0, 0.7, 0.4, .4,
+            //         0.0, 1.0, 0.0, .4,
+            //         1.0, 0.0, 1.0, .4,
+            //     ]
+            // });
             const cube2 = new Mesh(geom, mat);
             scene.AddMesh(cube2);
             console.log('cube2:', SID.GetTypeToString(cube2.sid), cube2.sid)
@@ -4196,14 +4189,14 @@ function Create3DCubes(scene) {
         {
             const geom = new CubeGeometry([400, 450, -1], [100, 100, 100], [1, 1, 1]);
             const mat = new Material_TEMP_fromBufferFor3D(WHITE);
-            mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-                color: [
-                    0.9, 0.0, 0.0, .4,
-                    0.0, 0.9, 0.1, .4,
-                    0.0, 0.0, 0.9, .4,
-                    0.9, 0.0, 0.9, .4
-                ]
-            });
+            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
+            //     color: [
+            //         0.9, 0.0, 0.0, .4,
+            //         0.0, 0.9, 0.1, .4,
+            //         0.0, 0.0, 0.9, .4,
+            //         0.9, 0.0, 0.9, .4
+            //     ]
+            // });
             const cube3 = new Mesh(geom, mat);
             scene.AddMesh(cube3);
             console.log('cube3:', SID.GetTypeToString(cube3.sid), cube3.sid)

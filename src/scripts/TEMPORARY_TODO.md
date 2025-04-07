@@ -37,12 +37,12 @@ Also see if the align for text in buttons-labels is needed
 * Set the .align.flags in classes: 
 Example
    const infomesh = Create_widget_multi_text({
-      align:ALIGN.HORIZONTAL, // DOES NOT STORE THE ALIGN IN THE CONSTRUCTOR
+      align:TEXT_ALIGN.HORIZONTAL, // DOES NOT STORE THE TEXT_ALIGN IN THE CONSTRUCTOR
    });
    infomesh.align.flags = LAYOUT.HORIZONTAL;
 
 * Create_widget_multi_text,
-   remove OLD Align:ALIGN.HORIZONTAL OR rename it to corespond a specific alignment for multi-text,
+   remove OLD Align:TEXT_ALIGN.HORIZONTAL OR rename it to corespond a specific alignment for multi-text,
 
 * What is the difference of 
 GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);

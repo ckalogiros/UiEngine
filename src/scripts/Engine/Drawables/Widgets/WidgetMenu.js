@@ -335,7 +335,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
                   child.geom.dim[0] = this.geom.dim[1];
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -345,7 +345,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
          close_btn.geom.dim[1] = this.geom.dim[1];
          // close_btn.geom.dim[0] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, close_btn);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, close_btn);
       }
 
 
@@ -396,7 +396,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -407,7 +407,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
          minimize_btn.geom.dim[0] = this.geom.dim[1];
 
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, minimize_btn);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, minimize_btn);
       }
 
 
@@ -447,7 +447,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
                   child.geom.dim[1] = this.geom.dim[1];
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -456,7 +456,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
          mesh.geom.dim[1] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, mesh);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, mesh);
       }
 
 

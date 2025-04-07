@@ -12,7 +12,7 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
         console.error('Handles only text as text_mesh of a mesh\nAlign_text_in_rect_parent()\nAlignment.js');
         return;
     }
-    // if(Align === undefined) Align = (ALIGN.HOR_CENTER | ALIGN.VERT_CENTER);
+    // if(Align === undefined) Align = (TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER);
 
     const text_mesh = parent.text_mesh;
 
@@ -25,29 +25,29 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
 
     
 
-    if(Align & ALIGN.RIGHT){
+    if(Align & TEXT_ALIGN.RIGHT){
         const d = pos[0] + parent.geom.dim[0]*2 - text_width - pad[0];
         text_mesh.geom.pos[0] = d;
     }
-    else if(Align & ALIGN.LEFT){
+    else if(Align & TEXT_ALIGN.LEFT){
         const d = pos[0] + pad[0];
         text_mesh.geom.pos[0] = d;
     }
-    else if(Align & ALIGN.HOR_CENTER){
+    else if(Align & TEXT_ALIGN.HOR_CENTER){
         const d = (parent.geom.dim[0]*2 -text_width);
         text_mesh.geom.pos[0] = pos[0] + d/2;
     }
-    if(Align & ALIGN.VERT_CENTER){
+    if(Align & TEXT_ALIGN.VERT_CENTER){
         const d = (parent.geom.dim[1]*2 - text_height);
         // const d = (parent.geom.dim[1] - text_height);
         // text_mesh.geom.pos[1] = pos[1] + d/2;
         text_mesh.geom.pos[1] = pos[1] + d+40;
     }
-    else if(Align & ALIGN.BOTTOM){
+    else if(Align & TEXT_ALIGN.BOTTOM){
         const d = pos[1] + parent.geom.dim[1]*2 - text_mesh.geom.dim[1]*2 + pad[1];
         text_mesh.geom.pos[1] = d;
     }
-    else if(Align & ALIGN.TOP){
+    else if(Align & TEXT_ALIGN.TOP){
         text_mesh.geom.pos[1] = pos[1] + pad[1];
     }
     
@@ -62,9 +62,9 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
  */
 export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0], second_pad = [0, 0], advancex) {
 
-    // Check if any of the acceptable ALIGN flags are passed.
-    if((flags & (ALIGN.VERTICAL | ALIGN.HORIZONTAL)) === 0) {
-        console.warn('NO APROPRIATE ALIGN FLAG IS PASSED');
+    // Check if any of the acceptable TEXT_ALIGN flags are passed.
+    if((flags & (TEXT_ALIGN.VERTICAL | TEXT_ALIGN.HORIZONTAL)) === 0) {
+        console.warn('NO APROPRIATE TEXT_ALIGN FLAG IS PASSED');
         return;
     }
 
@@ -75,12 +75,12 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
     // const w = (first_mesh.dim[0]*advancex)*first_num_faces*2;
     const w = first_mesh.text_width;
 
-    if(flags & ALIGN.VERTICAL){
+    if(flags & TEXT_ALIGN.VERTICAL){
         second_mesh.pos[0] = first_mesh.dim[0];
         second_mesh.pos[1] = first_mesh.pos[1];
         second_mesh.pos[1] += (first_mesh.dim[1] + first_pad[1]) + second_mesh.dim[1];
     }
-    else if(flags & ALIGN.HORIZONTAL){
+    else if(flags & TEXT_ALIGN.HORIZONTAL){
         second_mesh.pos[0] = first_mesh.pos[0] + first_pad[0];
         // second_mesh.pos[0] += (w+first_mesh.dim[0] + first_pad[0]) + (second_mesh.dim[0] + second_pad[0]);
         // second_mesh.pos[0] += (w + first_pad[0]);
@@ -96,7 +96,7 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
 
 /**
  * Align only to the top-bottom, left-right relative to src_mesh rectangle
- * @param {BIT_FIELD} flags type of struct ALIGN
+ * @param {BIT_FIELD} flags type of struct TEXT_ALIGN
  * @param {src_mesh.geom} src_mesh type of: Geometry2D
  * @param {dst_mesh.geom} dst_mesh type of: Geometry2D
  * @param {arr[2]} pad type of: int arr[2] | default values if not set:[0,0]
@@ -106,33 +106,33 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
 export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], advancex=1, src_pad) {
 
     const pos = [0,0];
-    // Check if any of the acceptable ALIGN flags are passed.
-    // if((flags & (ALIGN.TOP | ALIGN.BOTTOM | ALIGN.LEFT | ALIGN.RIGHT)) === 0) {
-    if(!(flags & ALIGN.TOP) && !(flags & ALIGN.BOTTOM) && !(flags & ALIGN.LEFT) && !(flags & ALIGN.RIGHT)) {
-        console.warn('NO APROPRIATE ALIGN FLAG IS PASSED');
+    // Check if any of the acceptable TEXT_ALIGN flags are passed.
+    // if((flags & (TEXT_ALIGN.TOP | TEXT_ALIGN.BOTTOM | TEXT_ALIGN.LEFT | TEXT_ALIGN.RIGHT)) === 0) {
+    if(!(flags & TEXT_ALIGN.TOP) && !(flags & TEXT_ALIGN.BOTTOM) && !(flags & TEXT_ALIGN.LEFT) && !(flags & TEXT_ALIGN.RIGHT)) {
+        console.warn('NO APROPRIATE TEXT_ALIGN FLAG IS PASSED');
         return pos;
     }
 
 
-    if (flags & (ALIGN.VERT_CENTER)){
+    if (flags & (TEXT_ALIGN.VERT_CENTER)){
         pos[0] = src_pad[0];
     }
-    if (flags & (ALIGN.HOR_CENTER)){
+    if (flags & (TEXT_ALIGN.HOR_CENTER)){
         pos[1] = src_pad[1];
     }
 
 
-    if (flags & (ALIGN.LEFT)){
+    if (flags & (TEXT_ALIGN.LEFT)){
         pos[0] =  -(src_pad[0]*2)+pad[0]*2;
     }
-    else if (flags & (ALIGN.RIGHT)){
+    else if (flags & (TEXT_ALIGN.RIGHT)){
         pos[0] =  (src_pad[0]*2)-pad[0]*2;
     }
-    if (flags & (ALIGN.TOP)){
+    if (flags & (TEXT_ALIGN.TOP)){
         // pos[1] = d.y - ((s.y + s.h) - d.h);
         pos[1] = (-src_pad[0]) + pad[1];
     }
-    else if (flags & (ALIGN.BOTTOM)){
+    else if (flags & (TEXT_ALIGN.BOTTOM)){
         pos[1] =  (src_pad[0]) - pad[1];
     }
 

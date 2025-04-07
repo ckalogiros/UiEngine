@@ -3,7 +3,7 @@
 import { Index_buffer_reset } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Vertex_buffer_create_attribs_info_per_vb_instanced } from "../../../Graphics/ShaderAttributes.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Drawables/Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Relative_pos_comp_move_right_buffer } from "../../Drawables/Operations/RelativePosComponent.js";
 import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";

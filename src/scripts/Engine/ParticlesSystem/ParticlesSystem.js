@@ -1,5 +1,6 @@
 "use strict";
 
+import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -643,7 +644,7 @@ class Emitter {
 
       // Alert if the current mesh system does not have the uniform enabled.
       console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-      if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+      if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
 
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
       }
@@ -707,7 +708,7 @@ class Emitter {
 
       // Alert if the current particle system does not have the uniform enabled.
       console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-      if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+      if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
       }
 

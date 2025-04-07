@@ -87,7 +87,7 @@ export class Renderer {
 
       if (STATE.loop.paused === false) {
 
-         // TimeUpdate();
+         TimeUpdate();
 
          // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
 

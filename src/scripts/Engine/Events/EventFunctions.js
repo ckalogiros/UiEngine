@@ -1,12 +1,13 @@
 "use strict";
 
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { Root_group_view_buffer_get_root_meshidx } from "../../Core/Views/RootView.js";
-import { Listener_assign_parent_event, Listener_create_root_view } from "../../Events/EventListeners.js";
+import { Listen_event_types_get_type_from_index } from "../../GlobalFunctions.js";
+import { Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
+import { Root_group_view_buffer_get_root_meshidx } from "../Core/Views/RootView.js";
+import { Listener_assign_parent_event, Listener_create_root_view } from "./EventListeners.js";
 
 
 /** // IMPORTANT: Cannot/MustNot return null, only INT_NULL */
-export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
+function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
 
     if (mesh.parent === null) return INT_NULL;
 
@@ -60,19 +61,9 @@ export function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
         current = Mesh_buffer_get_mesh_byidx(root_meshidx)
     }
 
-    // // HERE! We want to create an event if the listeners buffer is null OR if the current TYPE_IDX is null
-    // if (current.listeners === null || current.listeners.buffer[EVENT_TYPE_IDX] === null) {
-    //     alert('0188263541 UNUSED IF STATMENT')
-    //     // const etype = Listen_event_types_get_type_from_index(EVENT_TYPE_IDX);
-    //     // current.CreateListenEvent(etype, FAKE_LISTEN_EVENT);
-    //     // current.AddListenEvent(EVENT_TYPE_IDX, null, null, null);
-    //     // Listener_create_root_view(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX]);
-    // }
 
     if(current.listeners && current.listeners.buffer[EVENT_TYPE_IDX]) return current.listeners.buffer[EVENT_TYPE_IDX]
     return null;
-    // const parent_event_idx = current.listeners.buffer[EVENT_TYPE_IDX];
-    // return parent_event_idx;
 }
 
 

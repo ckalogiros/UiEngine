@@ -8,7 +8,7 @@ import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniforms
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Drawables/Operations/Recursions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../../../Engine/Timers/TimeIntervals.js";

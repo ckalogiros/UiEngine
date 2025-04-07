@@ -15,7 +15,7 @@ export function Ui_create_label_switch(name, font_size, switch_size, switch_fn, 
    section.SetName(`DBG_UI ${name}`);
    section.rel_comp = Relative_pos_comp_create_new_comp();
    
-   const label = Create_widget_label(Style_label_default_properties({is_root:_, text:`${name}`, align:(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER), pos:[0, 0, zindex + 2], font_size:font_size, col:label_col, text_col:label_text_col, text_pad:label_pad, style:label_style, }));
+   const label = Create_widget_label(Style_label_default_properties({is_root:_, text:`${name}`, align:(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), pos:[0, 0, zindex + 2], font_size:font_size, col:label_col, text_col:label_text_col, text_pad:label_pad, style:label_style, }));
    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:rcorners,});
    section.AddItem(label);
    
