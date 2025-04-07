@@ -9,6 +9,20 @@ import { RegisterEvent } from "../../Events/Events.js";
 import { Scene_camera_scroll_add } from "../../Scenes.js";
 
 
+
+
+export const MOUSE = {
+
+	BTN_ID: {
+		LEFT: 0,
+		MIDDLE: 1,
+		RIGHT: 2,
+	},
+};
+
+
+
+
 const mouse = {
 
    /**

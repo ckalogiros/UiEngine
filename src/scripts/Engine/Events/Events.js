@@ -1,5 +1,6 @@
 "use strict";
 
+import { MOUSE } from "../Controls/Input/Mouse.js";
 import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Listener_dispatch_check_hover_event, Listener_dispatch_event } from "./EventListeners.js";
 

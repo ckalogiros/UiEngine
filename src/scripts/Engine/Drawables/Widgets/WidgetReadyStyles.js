@@ -1,6 +1,6 @@
 "use strict";
 
-import { BLUEL, GREY, WHITE, YELLOWL } from "../Material/Base/Colors";
+import { BLUEL, GREY, WHITE, YELLOWL } from "../Material/Base/Colors.js";
 
 // inspection of correct widget properties passed as parameters to widget creation function
 // OR widget configuration

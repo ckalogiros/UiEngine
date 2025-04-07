@@ -415,32 +415,6 @@ const MESH_STATE = {
 	STICKY_POSX: _CNT <<= 0x1, 
 	STICKY_POSY: _CNT <<= 0x1,
 
-	
-	ToString(mask) {
-
-		let str = '';
-		if (mask & this.IN_FOCUS) str += 'IN_FOCUS,'
-		if (mask & this.IN_HOVER) str += 'IN_HOVER,'
-		if (mask & this.IN_SCALE) str += 'IN_SCALE,'
-		if (mask & this.IN_MOVE) str += 'IN_MOVE,'
-		if (mask & this.IN_GRAB) str += 'IN_GRAB,'
-		if (mask & this.IN_HOVER_COLOR) str += 'IN_HOVER_COLOR,'
-
-		if (mask & this.IS_MOVABLE) str += 'IS_MOVABLE,'
-		if (mask & this.IS_GRABABLE) str += 'IS_GRABABLE,'
-
-		if (mask & this.CLICKED_MOUSE_L) str += 'CLICKED_MOUSE_L,'
-		if (mask & this.CLICKED_MOUSE_M) str += 'CLICKED_MOUSE_M,'
-		if (mask & this.CLICKED_MOUSE_R) str += 'CLICKED_MOUSE_R,'
-
-		if (mask & this.IS_HOVERABLE) str += 'IS_HOVERABLE,'
-		if (mask & this.HAS_POPUP) str += 'HAS_POPUP,'
-		if (mask & this.IS_HOVER_COLORABLE) str += 'IS_HOVER_COLORABLE,'
-
-		return str;
-		// console.info(str)
-	},
-
 
 	Print(mask) {
 		console.info(this.ToString(mask))
@@ -467,15 +441,6 @@ const COMPONENTS = {
 
 
 
-const MOUSE = {
-
-	BTN_ID: {
-
-		LEFT: 0,
-		MIDDLE: 1,
-		RIGHT: 2,
-	},
-};
 
 
 
@@ -486,12 +451,8 @@ const MOUSE = {
 
 
 
-_CNT = 0x1;
-const RENDER_QUEUE_FLAGS = {
-	IS_ACTIVE: _CNT,
-	SKIP_PRIORITY: _CNT <<= 0x1,
-	NEEDS_UPDATE: _CNT <<= 0x1,
-}
+
+
 
 
 

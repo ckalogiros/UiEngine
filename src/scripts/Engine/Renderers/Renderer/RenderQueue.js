@@ -10,6 +10,12 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../Drawables/DebugInfo
 
 const MAX_DRAWQUEUE_COUNT = 64; // Number of vertex buffers for the queue  
 const NOTIFICATIONS_ON = true;
+let _cnt = 0x1;
+export const RENDER_QUEUE_FLAGS = {
+	IS_ACTIVE: _cnt,
+	SKIP_PRIORITY: _cnt <<= 0x1,
+	NEEDS_UPDATE: _cnt <<= 0x1,
+}
 
 
 
