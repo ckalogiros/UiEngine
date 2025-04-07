@@ -1,6 +1,7 @@
 "use strict";
 
 import { Str_buffer_store } from "../Core/StringBuffer.js";
+import { INT_NULL } from "../Global/EngineConstants.js";
 
 
 

@@ -7,57 +7,56 @@ const PI = 3.14159;
 let _CNT = 0x1;
 
 
-const INT_NULL = -1; // For case like 0 index arrays, where the number 0 index cannot be used as null element for a buffer
+export const INT_NULL = -1; // For case like 0 index arrays, where the number 0 index cannot be used as null element for a buffer
 
 
-const MAX_INT8 = 127;
-const MIN_INT8 = -128;
-const MAX_INT16 = 32767;
-const MIN_INT16 = -32768;
-const MAX_INT32 = 0x7FFFFFFF; // 2147483647;
-const MIN_INT32 = -2147483648;
+export const MAX_INT8 = 127;
+export const MIN_INT8 = -128;
+export const MAX_INT16 = 32767;
+export const MIN_INT16 = -32768;
+export const MAX_INT32 = 0x7FFFFFFF; // 2147483647;
+export const MIN_INT32 = -2147483648;
 // const MAX_INT64 =  0x7FFFFFFFFFFFFFFF; // 9223372036854775807
 // const MINX_INT64 = -9223372036854775808;
-const MAX_UINT8 = 0xff; // 255
-const MAX_UINT16 = 65535;
-const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
+export const MAX_UINT8 = 0xff; // 255
+export const MAX_UINT16 = 65535;
+export const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
 // const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
 
-const MAX_BIT_MASK = 0xFFFFFFFFFFFFF;
-const MAX_BIT_MASK_COMBINATIONS = 52;
+export const MAX_BIT_MASK = 0xFFFFFFFFFFFFF;
+export const MAX_BIT_MASK_COMBINATIONS = 52;
 
-const MILISEC_TO_SEC = 0.001;
-const NANOSEC = 0.000001;
-
-
-const ALL = 0xffff;
+export const MILISEC_TO_SEC = 0.001;
+export const NANOSEC = 0.000001;
 
 
-
-const FAKE_LISTEN_EVENT = true;
+export const ALL = 0xffff;
 
 
 
-const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should change or remain the same.
+export const FAKE_LISTEN_EVENT = true;
 
 
-const _ = undefined;
+
+export const UNCHANGED = 0xffff; // Just a flag, used for checking if a value should change or remain the same.
 
 
-const NO_MESH_PARENT = INT_NULL; // Just a flag, as a way to check if the parent of a mesh is not null but is not part of the parent's children buffer either.
+export const _ = undefined;
+
+
+export const NO_MESH_PARENT = INT_NULL; // Just a flag, as a way to check if the parent of a mesh is not null but is not part of the parent's children buffer either.
 
 
 // For renderqueue
-const FIRST = 1;
-const LAST = 2;
+export const FIRST = 1;
+export const LAST = 2;
 
 
-const TEST_CLIP_TOP = -10000;
-const TEST_CLIP_BOTTOM = 10000;
-const TEST_CLIP_LEFT = 0;
-const TEST_CLIP_RIGHT = 10000;
-
-const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget.. function reserves a _mesh_buffer element by setting it to 'true'. So instead of checking against blant  true value, we give it a meaning 
+export const TEST_CLIP_TOP = -10000;
+export const TEST_CLIP_BOTTOM = 10000;
+export const TEST_CLIP_LEFT = 0;
+export const TEST_CLIP_RIGHT = 10000;
+export const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget.. function reserves a _mesh_buffer element by setting it to 'true'. So instead of checking against blant  true value, we give it a meaning 
 
 
 
@@ -70,7 +69,7 @@ const APP = {
 
 
 //
-const TYPES = {
+export const TYPES = {
 
 	ID: 'TYPES',
 
@@ -115,18 +114,18 @@ const TYPES = {
 
 
 // Type Sizes in bytes
-const INT8_BYTE_SIZE = 1; // 1 Bytes
-const INT16_BYTE_SIZE = 2; // 2 Bytes
-const INT32_BYTE_SIZE = 4; // 4 Bytes
-const UINT8_BYTE_SIZE = 1; // 1 Bytes
-const UINT16_BYTE_SIZE = 2; // 2 Bytes
-const UINT32_BYTE_SIZE = 4; // 4 Bytes
-const FLOAT32_BYTE_SIZE = 4; // 4 Bytes
-const VEC2_BYTE_SIZE = 2 * FLOAT32_BYTE_SIZE; // 8 Bytes
-const VEC3_BYTE_SIZE = 3 * FLOAT32_BYTE_SIZE; // 12 Bytes
-const VEC4_BYTE_SIZE = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
-const MAT2X2_BYTE_SIZE = 2 * VEC2_BYTE_SIZE; // 16 Bytes
-const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
+export const INT8_BYTE_SIZE = 1; // 1 Bytes
+export const INT16_BYTE_SIZE = 2; // 2 Bytes
+export const INT32_BYTE_SIZE = 4; // 4 Bytes
+export const UINT8_BYTE_SIZE = 1; // 1 Bytes
+export const UINT16_BYTE_SIZE = 2; // 2 Bytes
+export const UINT32_BYTE_SIZE = 4; // 4 Bytes
+export const FLOAT32_BYTE_SIZE = 4; // 4 Bytes
+export const VEC2_BYTE_SIZE = 2 * FLOAT32_BYTE_SIZE; // 8 Bytes
+export const VEC3_BYTE_SIZE = 3 * FLOAT32_BYTE_SIZE; // 12 Bytes
+export const VEC4_BYTE_SIZE = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
+export const MAT2X2_BYTE_SIZE = 2 * VEC2_BYTE_SIZE; // 16 Bytes
+export const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
 
 
@@ -136,7 +135,7 @@ const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
 
 // In order to update the correct uniform of a uniform block, we store the index to the block'a uniform location.
-const UBS = {
+export const UBS = {
 	PROJECTION_LOC: INT_NULL,
 	RESOLUTION_LOC: INT_NULL,
 	TIME_LOC: INT_NULL,
@@ -152,7 +151,7 @@ const UBS = {
 let _idx = 0;
 /*************************************************************************************************/
 // Application Constants 
-const PLATFORM = {
+export const PLATFORM = {
 	WIN_NT_IMPL: false,
 	WIN_PHONE_IMPL: false,
 	ANDROID_IMPL: false,
@@ -170,7 +169,7 @@ const PLATFORM = {
 
 /*************************************************************************************************/
 // Engine Constants
-const DEVICE = {
+export const DEVICE = {
 	MAX_WIDTH: 1600,
 	MAX_HEIGHT: 800,
 	width: 0,
@@ -187,7 +186,7 @@ const DEVICE = {
 
 
 
-const VIEWPORT = {
+export const VIEWPORT = {
 	WIDTH: 0,
 	HEIGHT: 0,
 	LEFT: 0,
@@ -210,7 +209,7 @@ const VIEWPORT = {
 
 
 
-const STATE = {
+export const STATE = {
 
 	scene: {
 		active: null,
@@ -345,7 +344,7 @@ const STATE = {
 
 
 _CNT = 0x1;
-const SECTION = {
+export const SECTION = {
 
 	VERTICAL: _CNT,
 	HORIZONTAL: _CNT <<= 0x1,
@@ -382,7 +381,7 @@ const SECTION = {
 
 
 _CNT = 0x1;
-const MESH_STATE = {
+export const MESH_STATE = {
 
 	ACTIVE: _CNT,
 	CLIPED_Y: _CNT <<= 1,
@@ -456,7 +455,7 @@ const MESH_STATE = {
 
 
 _CNT = 0x1;
-const COMPONENTS = {
+export const COMPONENTS = {
 	SCROLLER: _CNT,
 }
 
@@ -467,7 +466,7 @@ const COMPONENTS = {
 
 
 
-const MOUSE = {
+export const MOUSE = {
 
 	BTN_ID: {
 
@@ -487,7 +486,7 @@ const MOUSE = {
 
 
 _CNT = 0x1;
-const RENDER_QUEUE_FLAGS = {
+export const RENDER_QUEUE_FLAGS = {
 	IS_ACTIVE: _CNT,
 	SKIP_PRIORITY: _CNT <<= 0x1,
 	NEEDS_UPDATE: _CNT <<= 0x1,
@@ -501,7 +500,7 @@ const RENDER_QUEUE_FLAGS = {
 
 
 _CNT = 0x1;
-const ALIGN = {
+export const ALIGN = {
 
 	LEFT: _CNT,
 	RIGHT: _CNT <<= 0x1,
@@ -522,7 +521,7 @@ const ALIGN = {
 
 
 _CNT = 0x1;
-const LAYOUT = {
+export const LAYOUT = {
 
 	HORIZONTAL: _CNT <<= 0x1,
 	VERTICAL: _CNT <<= 0x1,
@@ -541,10 +540,10 @@ const LAYOUT = {
 
 
 
-const POSITION_CENTER = [0, 0, 0];
-const TEMP_RESIZE_MARGIN = [15, 15];
-const POSSITIVE = 0;
-const NEGATIVE = 0;
+export const POSITION_CENTER = [0, 0, 0];
+export const TEMP_RESIZE_MARGIN = [15, 15];
+export const POSSITIVE = 0;
+export const NEGATIVE = 0;
 
 
 
@@ -554,8 +553,8 @@ const NEGATIVE = 0;
 
 
 // SEE ## THRESHOLD
-const DEFAULT_CLAMP_THRESHOLD = 200; // in pixels. Suppose to be added/sutracted to the clamp value to form an upper/lower limit
-const CLAMP = {
+export const DEFAULT_CLAMP_THRESHOLD = 200; // in pixels. Suppose to be added/sutracted to the clamp value to form an upper/lower limit
+export const CLAMP = {
 	Y: 1, 		// The index of the value 'clampy' of the array 'clamp' of class Mesh
 	Y_UP: 0, 	// Sub-Index to the value 'y upp' of the array 'clamp' of class Mesh
 	Y_DOWN: 1,  // Sub-Index of the value 'y down' of the array 'clamp' of class Mesh
@@ -575,7 +574,7 @@ const CLAMP = {
 
 /*************************************************************************************************/
 // Widgets's Constants 
-const DP_MENU_STATE = {
+export const DP_MENU_STATE = {
 	ON: 0x1,   // Exists in the gfx buffer.
 	OFF: 0x2,  // Not in the gfx buffer.
 	OFF_FAKE: 0x4,   // Exists in the gfx but is not displayed on screen(fake removed).
@@ -590,8 +589,8 @@ const DP_MENU_STATE = {
 
 /*************************************************************************************************/
 // Loaders's Constants 
-const CHAR_ARRAY_START_OFFSET = ' '.charCodeAt(0);
-const CHAR_ARRAY_LETTERS_START_OFFSET = 'A'.charCodeAt(0);
+export const CHAR_ARRAY_START_OFFSET = ' '.charCodeAt(0);
+export const CHAR_ARRAY_LETTERS_START_OFFSET = 'A'.charCodeAt(0);
 
 
 
@@ -602,10 +601,10 @@ const CHAR_ARRAY_LETTERS_START_OFFSET = 'A'.charCodeAt(0);
 
 /*************************************************************************************************/
 // Timer's Constants 
-const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval clbk function.
+export const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval clbk function.
 
 // Performance Timers indexes. WRITABLE 
-const PERFORMANCE_TIMERS_IDXS = {
+export const PERFORMANCE_TIMERS_IDXS = {
 	/**
 		GameLoop
 		GlDraw
@@ -668,7 +667,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 }
 
 _CNT = 0x1;
-const PERFORMANCE_TIMER = {
+export const PERFORMANCE_TIMER = {
 	BASE: _CNT,
 	DETAILED: _CNT <<= 0x1,
 	BASE_FN_IDX: 0,
@@ -684,7 +683,7 @@ const PERFORMANCE_TIMER = {
 /*************************************************************************************************/
 // 
 _CNT = 0x1;
-const ROOT_WIDGETS = {
+export const ROOT_WIDGETS = {
 	NULL: 0x0,
 	CREATE_ROOT: _CNT,
 	// CREATE_BATCH: _CNT <<= 0x1,
@@ -699,7 +698,7 @@ const ROOT_WIDGETS = {
 
 /*************************************************************************************************/
 //  
-const GFX = {
+export const GFX = {
 	PROG_IDX: 0, 
 	VB_GROUP_IDX: 1,
 	VB_IDX_START: 2,
@@ -718,7 +717,7 @@ const GFX = {
 // Commands
 
 _CNT = 0x4;
-const COMMANDS = {
+export const COMMANDS = {
 
 	ID: {
 		MESH_BUFFER_BATCH_DESTROY: _CNT,
@@ -737,7 +736,7 @@ const COMMANDS = {
 
 /*************************************************************************************************/
 // 
-const OUT_OF_VIEW = 100000; // Out of screen view in pixels
+export const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
 
@@ -749,7 +748,7 @@ const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 /*************************************************************************************************/
 // 
 
-const MAT_ENABLE = {
+export const MAT_ENABLE = {
 	ATTR_VERTEX_COLOR: _CNT++,
 	ATTR_VERTEX_GRADIENT_HORIZONTAL: _CNT++,
 	ATTR_VERTEX_GRADIENT_VERTICAL: _CNT++,
@@ -775,7 +774,7 @@ const MAT_ENABLE = {
 
 
 
-function TRANSPARENCY(col, transparency) {
+export function TRANSPARENCY(col, transparency) {
 
 	// Muust make a copy, else it stores the transparency to the Global Color 
 	return new Float32Array([
@@ -794,9 +793,9 @@ function TRANSPARENCY(col, transparency) {
 
 
 /*************************************************************************************************/
-const RESOURCES_PATH = '/resources';
+export const RESOURCES_PATH = '/resources';
 let g_cnt = 0;
-const TEXTURE_TYPE = {
+export const TEXTURE_TYPE = {
 	TYPE_FONT: 0x1,
 	TYPE_VARIANT_FONT: 0x1,
 	TYPE_FONT_SYMBOL: 0x2,
@@ -811,34 +810,34 @@ const TEXTURE_TYPE = {
 
 
 // Font textures
-const FONT_CONSOLAS_12px = 'consolas_3';
-const FONT_CONSOLAS_16px = 'consolas_4';
-const FONT_CONSOLAS_20px = 'consolas_5';
-const FONT_CONSOLAS_24px = 'consolas_6';
-const FONT_CONSOLAS_28px = 'consolas_7';
-const FONT_CONSOLAS_32px = 'consolas_8';
-const FONT_CONSOLAS_40px = 'consolas_10';
-const FONT_CONSOLAS_49px = 'consolas_12';
-const FONT_CONSOLAS_58px = 'consolas_14';
-const FONT_CONSOLAS_66px = 'consolas_16';
-const FONT_CONSOLAS_116px = 'consolas_28';
-const FONT_CONSOLAS_157px = 'consolas_38';
-const FONT_CONSOLAS_MTSDF_1024 = 'consolas_mtsdf_1024';
-const FONT_MSDF_COMIC = 'comicz';
-const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
+export const FONT_CONSOLAS_12px = 'consolas_3';
+export const FONT_CONSOLAS_16px = 'consolas_4';
+export const FONT_CONSOLAS_20px = 'consolas_5';
+export const FONT_CONSOLAS_24px = 'consolas_6';
+export const FONT_CONSOLAS_28px = 'consolas_7';
+export const FONT_CONSOLAS_32px = 'consolas_8';
+export const FONT_CONSOLAS_40px = 'consolas_10';
+export const FONT_CONSOLAS_49px = 'consolas_12';
+export const FONT_CONSOLAS_58px = 'consolas_14';
+export const FONT_CONSOLAS_66px = 'consolas_16';
+export const FONT_CONSOLAS_116px = 'consolas_28';
+export const FONT_CONSOLAS_157px = 'consolas_38';
+export const FONT_CONSOLAS_MTSDF_1024 = 'consolas_mtsdf_1024';
+export const FONT_MSDF_COMIC = 'comicz';
+export const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
 // Textures Atlases
-const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
+export const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 // Textures
-const TEXTURE_SMOKE1 = 'smoke_1_256';
-const TEXTURE_COIN = 'Coin_1_32';
-const TEXTURE_TEST_APPLE = 'apple_1_64x73';
+export const TEXTURE_SMOKE1 = 'smoke_1_256';
+export const TEXTURE_COIN = 'Coin_1_32';
+export const TEXTURE_TEST_APPLE = 'apple_1_64x73';
 // Textures Atlases with variant font sizes
-const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
+export const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
 
 
 
 // Atlas Textures Variant Scales <names>
-const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
+export const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
 	S1_0:0, 
 	S1_5:1, 
 	S2_0:2, 
@@ -992,7 +991,7 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
  * Also set an Init function to resolve the index of each texture name below
  */
 g_cnt = 0;
-const TEXTURES = {
+export const TEXTURES = {
 
 	// POTENTIAL_BUG: 
 	// IMPORTANT:Font textures MUST precede all other textures
@@ -1035,7 +1034,7 @@ const TEXTURES = {
 // Set default font texture
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLA_VARIANT_FONT;
 
-const ATLASES_SUB_TEXTURES = { // 58 total
+export const ATLASES_SUB_TEXTURES = { // 58 total
 	MSDF_SYMBOLS: {
 		original 	: 0,
 		close_1 		: 1,
@@ -1098,7 +1097,7 @@ const ATLASES_SUB_TEXTURES = { // 58 total
 }
 
 
-function FONT_IS_MSDF(texture_file_id) {
+export function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MTSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MTSDF_CONSOLAS_1024 ||
@@ -1108,14 +1107,14 @@ function FONT_IS_MSDF(texture_file_id) {
 
 	return false;
 }
-function FONT_IS_VARIANT(texture_file_id) {
+export function FONT_IS_VARIANT(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.CONSOLA_VARIANT_FONT
 	) return true;
 
 	return false;
 }
-function TEXTURE_IS_FONT(texture_file_id) {
+export function TEXTURE_IS_FONT(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MTSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MTSDF_CONSOLAS_1024 ||
@@ -1141,7 +1140,7 @@ function TEXTURE_IS_FONT(texture_file_id) {
 // Framebuffers
 
 _CNT = 0x0;
-const FRAMEBUFFER_TYPE = {
+export const FRAMEBUFFER_TYPE = {
 	SCREEN_DIMENTION: 0x1, // Framebuffer's dimentions at canvas dimentions
 	PORTION_DIMENTION: 0x2, // Framebuffer's dimentions are specific 
 };
@@ -1161,7 +1160,7 @@ _CNT = 0x1;
 let cnt2 = 0x1;
 let cnt3 = 0x1;
 // let cnt4 = 0x1;
-const ANIMATIONS = {
+export const ANIMATIONS = {
 	TYPE: {
 		COLOR: _CNT,
 		WPOS: _CNT<<=0x1,
@@ -1205,7 +1204,7 @@ const ANIMATIONS = {
 
 
 _CNT = 0x1;
-const CLBK_ANIMATIONS = {
+export const CLBK_ANIMATIONS = {
 
 	TEXT_TRANSLATE_X:_CNT,
 	TEXT_TRANSLATE_Y:_CNT<<=0x1,
@@ -1228,7 +1227,7 @@ _CNT = 0x1;
 // MAX cnt is 31 times shifted and the 32nd is valid but a negative number
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
 // TODO: Not enough space for all types. Re-organize and re-implement
-const MESH_TYPE = {
+export const MESH_TYPE = {
 
 	DEBUG_MESH: _CNT,
 
@@ -1289,7 +1288,7 @@ const MESH_TYPE = {
 
 
 _CNT = 0;
-const BATCH_FN_IDX = {
+export const BATCH_FN_IDX = {
 	SET_WPOS4: _CNT++,
 	ADD_WPOS4: _CNT++,
 	SET_POS2: _CNT++,
@@ -1308,7 +1307,7 @@ const BATCH_FN_IDX = {
 //  Particle System  
 
 _CNT = 0x1;
-const PARTICLES = {
+export const PARTICLES = {
    HAS_START_POS_VARIATION: _CNT,
    HAS_RANDOM_POLAR_COORD: _CNT<<=0x1,
    HAS_JIGGLE: _CNT<<=0x1,
@@ -1319,7 +1318,7 @@ const PARTICLES = {
 }
 
 _CNT = 0;
-const PARTICLES_DIRECTION_CLBK_FN_IDX = {
+export const PARTICLES_DIRECTION_CLBK_FN_IDX = {
 	EMISSION: _CNT++,
 	EXPLOSION: _CNT++,
 };
@@ -1334,7 +1333,7 @@ const PARTICLES_DIRECTION_CLBK_FN_IDX = {
 /*************************************************************************************************/
 //  Events  
 _CNT = 0x1;
-const LISTENERS_FLAGS = {
+export const LISTENERS_FLAGS = {
 	ANY_HOVER: _CNT <<= 0x1,
 	ANY_CLICK: _CNT <<= 0x1,
 	ANY: _CNT <<= 0x1,
@@ -1355,7 +1354,7 @@ const LISTENERS_FLAGS = {
 
 
 _CNT = 0x1;
-const LISTEN_EVENT_TYPES = {
+export const LISTEN_EVENT_TYPES = {
 	HOVER: _CNT <<= 1,
 	CLICK_UP: _CNT <<= 1,
 	MOVE: _CNT <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
@@ -1366,13 +1365,13 @@ const LISTEN_EVENT_TYPES = {
 	}
 };
 
-function Listen_event_types_get_type_from_index(idx) {
+export function Listen_event_types_get_type_from_index(idx) {
 
 	if (idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
 	if (idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
 }
 
-function Listen_event_get_idx_from_type(etype) {
+export function Listen_event_get_idx_from_type(etype) {
 
 	if (etype & LISTEN_EVENT_TYPES.HOVER) return LISTEN_EVENT_TYPES_INDEX.HOVER;
 	if (etype & (LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE)) return LISTEN_EVENT_TYPES_INDEX.CLICK;
@@ -1386,7 +1385,7 @@ function Listen_event_get_idx_from_type(etype) {
 
 _CNT = 0;
 /** CAUTION: This is an enum for indexing the Listen_Events class buffer NOT the  Listener_Hover class buffer which is a separate class*/
-const LISTEN_EVENT_TYPES_INDEX = {
+export const LISTEN_EVENT_TYPES_INDEX = {
 	HOVER: _CNT++, // HOVER event belongs to another class, that is the Listener_Hover class.
 	CLICK: _CNT++,
 	// MOVE event registers with the CLICK event, no need to create new event in the ListeEvents buffer.
@@ -1395,7 +1394,7 @@ const LISTEN_EVENT_TYPES_INDEX = {
 
 
 
-const E = {
+export const E = {
 	H: LISTEN_EVENT_TYPES_INDEX.HOVER,
 	C: LISTEN_EVENT_TYPES_INDEX.CLICK,
 }
@@ -1403,7 +1402,7 @@ const E = {
 
 
 
-function Listeners_get_event_type_string(event_type_idx) {
+export function Listeners_get_event_type_string(event_type_idx) {
 	switch (event_type_idx) {
 		case E.H: return 'Hover';
 		case E.C: return 'Click';
@@ -1418,7 +1417,7 @@ function Listeners_get_event_type_string(event_type_idx) {
 
 
 _CNT = 0x1;
-const EVENT_HANDLER_TYPE = {
+export const EVENT_HANDLER_TYPE = {
 	MOUSE_MOVE: _CNT,
 	MOUSE_CLICK_DOWN: _CNT <<= 0x1,
 	MOUSE_CLICK_UP: _CNT <<= 0x1,
@@ -1434,7 +1433,7 @@ const EVENT_HANDLER_TYPE = {
 
 
 _CNT = 0x1;
-const INFO_LISTEN_EVENT_TYPE = {
+export const INFO_LISTEN_EVENT_TYPE = {
 
 	UI_INFO_MESH: _CNT <<= 0x1,
 	UI_INFO_GFX: _CNT <<= 0x1,
@@ -1454,7 +1453,7 @@ const INFO_LISTEN_EVENT_TYPE = {
 
 
 _CNT = 0;
-const INTERVALS = {
+export const INTERVALS = {
 
 	MOVE: _CNT++,
 	UPDATE: _CNT++,
@@ -1473,7 +1472,7 @@ const INTERVALS = {
 /*************************************************************************************************/
 // Debugging. Switching On/Off console.log() in the code.
 
-const DEBUG = {
+export const DEBUG = {
 
 	DEFENSIVE: true, // For code that will slow down the app, but essential for critical errors
 	CORE: {
@@ -1532,7 +1531,7 @@ const DEBUG = {
 
 
 
-const DEBUG_INFO = {
+export const DEBUG_INFO = {
 
 	UI_STATS: {
 		IS_ON: false,
@@ -1653,7 +1652,7 @@ function ERROR_NULL(obj) {
 
 
 _CNT = 0;
-const STYLES = { // Default access indices for style arrays
+export const STYLES = { // Default access indices for style arrays
 	// MARG: _CNT++,
 	// PAD: _CNT++,
 	// HOVER_MARG: _CNT++,
@@ -1674,7 +1673,7 @@ const STYLES = { // Default access indices for style arrays
 
 /***********************************************************************************************************************************************/
 // Some global values for debug info ui display information'
-const DEBUG_INFO_STRUCTS = {
+export const DEBUG_INFO_STRUCTS = {
 
 	BUFFER: {
 		GENERIC: {
@@ -1715,14 +1714,14 @@ const DEBUG_INFO_STRUCTS = {
 
 /***********************************************************************************************************************************************/
 // INPUT - KEYBOARD
-const INPUT_KEYCODE_LEFT = 37;
-const INPUT_KEYCODE_UP = 38;
-const INPUT_KEYCODE_RIGHT = 39;
-const INPUT_KEYCODE_DOWN = 40;
-const INPUT_KEYCODE_SPACE = 32;
-const INPUT_KEYCODE_A = 65;
-const INPUT_KEYCODE_D = 68;
-const INPUT_KEYCODE_PAUSE = 80;
+export const INPUT_KEYCODE_LEFT = 37;
+export const INPUT_KEYCODE_UP = 38;
+export const INPUT_KEYCODE_RIGHT = 39;
+export const INPUT_KEYCODE_DOWN = 40;
+export const INPUT_KEYCODE_SPACE = 32;
+export const INPUT_KEYCODE_A = 65;
+export const INPUT_KEYCODE_D = 68;
+export const INPUT_KEYCODE_PAUSE = 80;
 
 
 
@@ -1732,7 +1731,7 @@ const INPUT_KEYCODE_PAUSE = 80;
 
 /***********************************************************************************************************************************************/
 // TEMPORARY
-const TEMP_TEST_PERFORMANE_COUNTERS = {
+export const TEMP_TEST_PERFORMANE_COUNTERS = {
 
 	MESH_INFO_UI: {
 		COUNT: 0,

@@ -8,7 +8,9 @@ import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operati
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
 import { Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { ROOT_WIDGETS, TEXTURES } from "../../Engine/Global/EngineConstants.js";
 import { Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
+import { SID } from "../../Graphics/Global/GfxConstants.js";
 import { Program_get_uniform_from_name } from "../../Graphics/ShaderPrograms.js";
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Widget_gfx_ready_enable } from "./WidgetGfxReady.js";

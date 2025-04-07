@@ -12,6 +12,8 @@
  * and a 
  */
 
+import { u } from "../../../Global/GfxConstants.js";
+
 export const frag_glow_call = `
   // vec4 glowcol = Glow(final_color.a, scale_down, u_gen_ctrl_map_cnt);
   // final_color.rgb += glowcol.rgb; // Adds the glow to the any previous function calculations

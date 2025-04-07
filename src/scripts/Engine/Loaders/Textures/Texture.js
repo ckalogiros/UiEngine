@@ -30,6 +30,7 @@ import { Texture_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } f
 import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
 import { atlas_variants_consola_1024x1024_8px_scale12_extended_ascii } from "../../../../../resources/fonts/atlas_variants/consola/atlas_variants_consola_1024x1024_8px_scale12_extended_ascii.js";
+import { ATLAS_TEXTURE_VARIANT_FONT_CONSOLA, FONT_CONSOLAS_MTSDF_1024, FONT_MSDF_COMIC, INT_NULL, TEST_FONT_MSDF_ARIAL, TEXTURE_ATLAS_MSDF_SYMBOLS, TEXTURE_COIN, TEXTURE_SMOKE1, TEXTURE_TEST_APPLE } from "../../Global/EngineConstants.js";
 
 // TODO: Make texture buffer from New_generic_buffer();
 // TODO: Rename all font words with atlas, since an atlas texture consists of subtextures and has uv coordinates from a metrics file

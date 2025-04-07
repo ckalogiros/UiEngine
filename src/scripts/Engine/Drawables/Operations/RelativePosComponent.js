@@ -1,6 +1,7 @@
 "use strict";
 
 import { Free_int8_buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { _ } from "../../Global/EngineConstants.js";
 
 /**
  * IMPLEMENTATION:
@@ -11,7 +12,7 @@ import { Free_int8_buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.
  * For now the rel_pos.buffer element is returned to any mesh as a refference, NOT as an index.
  */
 
-_CNT = 0;
+let _CNT = 0;
 export const REL_POS = {
    LEFT: _CNT++,
    RIGHT: _CNT++,

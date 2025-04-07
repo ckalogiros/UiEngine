@@ -5,6 +5,7 @@
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
 import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_xy, Gl_set_wpos_x, Gl_set_wpos_y, Gl_add_wpos_y } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as VbOps from  '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { SID } from '../../../Graphics/Global/GfxConstants.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { WHITE } from '../Material/Base/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from './MeshHelperFunctions.js';

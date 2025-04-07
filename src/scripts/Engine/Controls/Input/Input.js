@@ -7,6 +7,8 @@ import { Mouse_on_move, Mouse_on_down, Mouse_on_up, Mouse_on_out, Mouse_on_wheel
 import { OnKeyDown, OnKeyUp } from "./Keyboard.js";
 import { Renderer_set_canvas_size } from "../../Renderers/Renderer.js";
 import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
+import { DEVICE, PLATFORM, POSITION_CENTER, VIEWPORT } from "../../Global/EngineConstants.js";
+import { gfxCtx } from "../../../Graphics/Global/GfxConstants.js";
 
 
 
@@ -30,13 +32,13 @@ function OnWindowResize(e) {
 
 export function On_window_resize() {
 
-  
+
   DEVICE.width = window.innerWidth;
   DEVICE.height = window.innerHeight;
-  
+
   // Store the difference of the cur and prev canvas dimentions
-  const xdif = DEVICE.width - VIEWPORT.WIDTH; 
-  const ydif = DEVICE.height - VIEWPORT.HEIGHT; 
+  const xdif = DEVICE.width - VIEWPORT.WIDTH;
+  const ydif = DEVICE.height - VIEWPORT.HEIGHT;
 
   VIEWPORT.WIDTH = DEVICE.width;
   VIEWPORT.HEIGHT = DEVICE.height;
@@ -144,8 +146,8 @@ export function Device_set_up() {
   const dpr = 1.;
 
   // const canvas = document.getElementById("canvas");
-  DEVICE.width = window.innerWidth*dpr;
-  DEVICE.height = window.innerHeight*dpr;
+  DEVICE.width = window.innerWidth * dpr;
+  DEVICE.height = window.innerHeight * dpr;
   console.log('DEVICE width: ', DEVICE.width, ' height: ', DEVICE.height)
   // console.log('WINDOW: ', window)
 
@@ -155,8 +157,8 @@ export function Device_set_up() {
   //   VIEWPORT.HEIGHT = DEVICE.height;
   // }
   // else {
-    VIEWPORT.WIDTH = DEVICE.width;
-    VIEWPORT.HEIGHT = DEVICE.height;
+  VIEWPORT.WIDTH = DEVICE.width;
+  VIEWPORT.HEIGHT = DEVICE.height;
   // }
   // Update (global) VIEWPORT object
   console.log('VIEWPORT.WIDTH: ', VIEWPORT.WIDTH, ' VIEWPORT.HEIGHT: ', VIEWPORT.HEIGHT)
@@ -175,36 +177,36 @@ export function Device_set_up() {
 
   POSITION_CENTER[0] = VIEWPORT.WIDTH / 2;
   POSITION_CENTER[1] = VIEWPORT.HEIGHT / 2;
-  
-  DEVICE.info = {
-    inner_width:window.innerWidth,
-    inner_height:window.innerHeight,
-    outer_width:window.outerWidth,
-    outer_height:window.outerHeight,
-    
-    page_xoffset:window.pageXOffset,
-    page_yoffset:window.pageYOffset,
-    
-    gpu:window.navigator.gpu,
-    
-    virtual_keyboard:window.navigator.virtualKeyboard,
 
-    offsetHeight:   document.documentElement.offsetHeight,
-    offsetLeft:   document.documentElement.offsetLeft,
-    offsetParent:   document.documentElement.offsetParent,
-    offsetTop:   document.documentElement.offsetTop,
-    offsetWidth:   document.documentElement.offsetWidth,
-    clientHeight:   document.documentElement.clientHeight,
-    clientLeft:   document.documentElement.clientLeft,
-    clientTop:   document.documentElement.clientTop,
-    clientWidth:   document.documentElement.clientWidth,
+  DEVICE.info = {
+    inner_width: window.innerWidth,
+    inner_height: window.innerHeight,
+    outer_width: window.outerWidth,
+    outer_height: window.outerHeight,
+
+    page_xoffset: window.pageXOffset,
+    page_yoffset: window.pageYOffset,
+
+    gpu: window.navigator.gpu,
+
+    virtual_keyboard: window.navigator.virtualKeyboard,
+
+    offsetHeight: document.documentElement.offsetHeight,
+    offsetLeft: document.documentElement.offsetLeft,
+    offsetParent: document.documentElement.offsetParent,
+    offsetTop: document.documentElement.offsetTop,
+    offsetWidth: document.documentElement.offsetWidth,
+    clientHeight: document.documentElement.clientHeight,
+    clientLeft: document.documentElement.clientLeft,
+    clientTop: document.documentElement.clientTop,
+    clientWidth: document.documentElement.clientWidth,
 
     canvas_top: canvas.getBoundingClientRect().top,
     canvas_bot: canvas.getBoundingClientRect().bottom,
     canvas_left: canvas.getBoundingClientRect().left,
     canvas_right: canvas.getBoundingClientRect().right,
   };
-  
+
   // IMPORTANT window variables
   // window.client_information:
   //    .platform
@@ -215,15 +217,15 @@ export function Device_set_up() {
   {
     // alert(`top: ${body.getBoundingClientRect().top}`);
     // alert(`left: ${body.getBoundingClientRect().left}`);
-    
-    
+
+
     // alert(`offsetHeight: ${DEVICE.info.offsetHeight}`);
     // alert(`offsetParent: ${DEVICE.info.offsetParent}`);
     // alert(`offsetTop: ${DEVICE.info.offsetTop}`);
     // alert(`offsetParent: ${DEVICE.info.offsetParent}`);
     // alert(`clientTop: ${DEVICE.info.clientTop}`);
     // alert(`clientTop: ${DEVICE.info.clientTop}`);
-    
+
     // alert(`canvas top: ${canvas.getBoundingClientRect().top}`);
     // alert(`height: ${canvas.getBoundingClientRect().height}`);
     // alert(`y: ${canvas.getBoundingClientRect().y}`);
@@ -234,7 +236,7 @@ export function Device_set_up() {
   // console.log('DOCUMENT', document);
   // console.log('VIEWPORT', VIEWPORT);
   // console.log('DEVICE', DEVICE);
-  
+
   /**
     offsetHeight: 1032
     offsetLeft: 0
@@ -252,163 +254,166 @@ export function Device_set_up() {
 
 
 
-      // Test cursor
-    // document.elm.style.border = "3px solid #FF0000";
-    // document.activeElement.style.cursor = url("https://img.icons8.com/doodle/48/000000/cancel-2.png"), auto;
+  // Test cursor
+  // document.elm.style.border = "3px solid #FF0000";
+  // document.activeElement.style.cursor = url("https://img.icons8.com/doodle/48/000000/cancel-2.png"), auto;
 
-    /** Default mouse pointers */
-    // document.activeElement.style.cursor = "alias";
-    // document.activeElement.style.cursor = "all-scroll";
-    // document.activeElement.style.cursor = "auto";
-    // document.activeElement.style.cursor = "cell";
-    // document.activeElement.style.cursor = "col-resize";
-    // document.activeElement.style.cursor = "context-menu";
-    // document.activeElement.style.cursor = "copy";
-    // document.activeElement.style.cursor = "crosshair";
-    // document.activeElement.style.cursor = "default";
-    // document.activeElement.style.cursor = "e-resize";
-    // document.activeElement.style.cursor = "ew-resize";
-    // document.activeElement.style.cursor = "grab";
-    // document.activeElement.style.cursor = "grabbing";
-    // document.activeElement.style.cursor = "help";
-    // document.activeElement.style.cursor = "move";
-    // document.activeElement.style.cursor = "n-resize";
-    // document.activeElement.style.cursor = "ne-resize";
-    // document.activeElement.style.cursor = "nesw-resize";
-    // document.activeElement.style.cursor = "ns-resize";
-    // document.activeElement.style.cursor = "nw-resize";
-    // document.activeElement.style.cursor = "nwse-resize";
-    // document.activeElement.style.cursor = "no-drop";
-    // document.activeElement.style.cursor = "none";
-    // document.activeElement.style.cursor = "not-allowed";
-    // document.activeElement.style.cursor = "pointer";
-    // document.activeElement.style.cursor = "progress";
-    // document.activeElement.style.cursor = "row-resize";
-    // document.activeElement.style.cursor = "s-resize";
-    // document.activeElement.style.cursor = "se-resize";
-    // document.activeElement.style.cursor = "sw-resize";
-    // document.activeElement.style.cursor = "text";
-    // document.activeElement.style.cursor = "w-resize";
-    // document.activeElement.style.cursor = "wait";
-    // document.activeElement.style.cursor = "zoom-in";
-    // document.activeElement.style.cursor = "zoom-out";
-    
-    /**Custom  mouse pointers */
-    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/move.cur"), auto';
-    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/ubuntu/rinux_real_nswe-resize.cur"), auto';
-    // document.activeElement.style.cursor = 'url("../resources/icons/cursor/small-windows/move.cur"), auto';
-    
-    // const url = new URL("../App/move.cur", document.baseURI);
-    // const url = new URL("../App/move.cur", document.baseURI);
-    // console.log(url.hostname); 
-    // console.log(url.pathname); 
-    // document.activeElement.style.cursor =  url;
+  /** Default mouse pointers */
+  // document.activeElement.style.cursor = "alias";
+  // document.activeElement.style.cursor = "all-scroll";
+  // document.activeElement.style.cursor = "auto";
+  // document.activeElement.style.cursor = "cell";
+  // document.activeElement.style.cursor = "col-resize";
+  // document.activeElement.style.cursor = "context-menu";
+  // document.activeElement.style.cursor = "copy";
+  // document.activeElement.style.cursor = "crosshair";
+  // document.activeElement.style.cursor = "default";
+  // document.activeElement.style.cursor = "e-resize";
+  // document.activeElement.style.cursor = "ew-resize";
+  // document.activeElement.style.cursor = "grab";
+  // document.activeElement.style.cursor = "grabbing";
+  // document.activeElement.style.cursor = "help";
+  // document.activeElement.style.cursor = "move";
+  // document.activeElement.style.cursor = "n-resize";
+  // document.activeElement.style.cursor = "ne-resize";
+  // document.activeElement.style.cursor = "nesw-resize";
+  // document.activeElement.style.cursor = "ns-resize";
+  // document.activeElement.style.cursor = "nw-resize";
+  // document.activeElement.style.cursor = "nwse-resize";
+  // document.activeElement.style.cursor = "no-drop";
+  // document.activeElement.style.cursor = "none";
+  // document.activeElement.style.cursor = "not-allowed";
+  // document.activeElement.style.cursor = "pointer";
+  // document.activeElement.style.cursor = "progress";
+  // document.activeElement.style.cursor = "row-resize";
+  // document.activeElement.style.cursor = "s-resize";
+  // document.activeElement.style.cursor = "se-resize";
+  // document.activeElement.style.cursor = "sw-resize";
+  // document.activeElement.style.cursor = "text";
+  // document.activeElement.style.cursor = "w-resize";
+  // document.activeElement.style.cursor = "wait";
+  // document.activeElement.style.cursor = "zoom-in";
+  // document.activeElement.style.cursor = "zoom-out";
+
+  /**Custom  mouse pointers */
+  // document.activeElement.style.cursor = 'url("../resources/icons/cursor/move.cur"), auto';
+  // document.activeElement.style.cursor = 'url("../resources/icons/cursor/ubuntu/rinux_real_nswe-resize.cur"), auto';
+  // document.activeElement.style.cursor = 'url("../resources/icons/cursor/small-windows/move.cur"), auto';
+
+  // const url = new URL("../App/move.cur", document.baseURI);
+  // const url = new URL("../App/move.cur", document.baseURI);
+  // console.log(url.hostname); 
+  // console.log(url.pathname); 
+  // document.activeElement.style.cursor =  url;
 
 
-/**
-alias
-all-scroll
-auto
-cell
-col-resize
-context-menu
-copy
-crosshair
-default
-e-resize
-ew-resize
-grab
-grabbing
-help
-move
-n-resize
-ne-resize
-nesw-resize
-ns-resize
-nw-resize
-nwse-resize
-no-drop
-none
-not-allowed
-pointer
-progress
-row-resize
-s-resize
-se-resize
-sw-resize
-text
-w-resize
-wait
-zoom-in
-zoom-out
-myBall.cur
- */
+  /**
+  alias
+  all-scroll
+  auto
+  cell
+  col-resize
+  context-menu
+  copy
+  crosshair
+  default
+  e-resize
+  ew-resize
+  grab
+  grabbing
+  help
+  move
+  n-resize
+  ne-resize
+  nesw-resize
+  ns-resize
+  nw-resize
+  nwse-resize
+  no-drop
+  none
+  not-allowed
+  pointer
+  progress
+  row-resize
+  s-resize
+  se-resize
+  sw-resize
+  text
+  w-resize
+  wait
+  zoom-in
+  zoom-out
+  myBall.cur
+   */
 }
 
 
 
 export function Detect_host_platform() {
 
-  const wn = window.navigator;
-  // console.debug(wn)
+    const wn = window.navigator;
 
-  const msg = 'The engine is not fully suported';
+    // console.debug(wn)
 
-  /** Windows Smartphone
-   * Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Mobile Safari/537.36 Edge/14.14263
-   */
-  if (/IEMobile/i.test(wn.userAgent)) {
-    PLATFORM.WIN_PHONE_IMPL = true;
-    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
-    console.log('-- Windows Phone Platform --');
-    alert(`-- Windows Phone Platform --\n${msg}`);
-  }
-  else if (/Android/i.test(wn.userAgent)) {
-    PLATFORM.ANDROID_IMPL = true;
-    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
-    console.log('-- Android Phone Platform --')
-    alert(`-- Android Phone Platform --\n${msg}`, )
-  }
-  else if (/iPhone|iPad|iPod/i.test(wn.userAgent)) {
-    PLATFORM.I_PHONE_IMPL = true;
-    PLATFORM.ANY_SMARTPHONE_DEVICE = true;
-    console.log('-- Iphone Phone Platform --')
-    alert(`-- Iphone Phone Platform --\n${msg}`)
-  }
-  /** Windows NT
-   * Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0 
-   */
+    const msg = 'The engine is not fully suported';
 
-  // Browser detection
-  // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigator
-  /**
-   * function getBrowserName(userAgent) {
-    // The order matters here, and this may report false positives for unlisted browsers.
-  
-    if (userAgent.includes("Firefox")) {
-      // "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0"
-      return "Mozilla Firefox";
-    } else if (userAgent.includes("SamsungBrowser")) {
-      // "Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G955F Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/9.4 Chrome/67.0.3396.87 Mobile Safari/537.36"
-      return "Samsung Internet";
-    } else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
-      // "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36 OPR/90.0.4480.54"
-      return "Opera";
-    } else if (userAgent.includes("Edge")) {
-      // "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299"
-      return "Microsoft Edge (Legacy)";
-    } else if (userAgent.includes("Edg")) {
-      // "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36 Edg/104.0.1293.70"
-      return "Microsoft Edge (Chromium)";
-    } else if (userAgent.includes("Chrome")) {
-      // "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
-      return "Google Chrome or Chromium";
-    } else if (userAgent.includes("Safari")) {
-      // "Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1"
-      return "Apple Safari";
-    } else {
-      return "unknown";
+    /** Windows Smartphone
+     * Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Mobile Safari/537.36 Edge/14.14263
+     */
+    if (/IEMobile/i.test(wn.userAgent)) {
+      PLATFORM.WIN_PHONE_IMPL = true;
+      PLATFORM.ANY_SMARTPHONE_DEVICE = true;
+      console.log('-- Windows Phone Platform --');
+      alert(`-- Windows Phone Platform --\n${msg}`);
     }
-  }
-   */
+    else if (/Android/i.test(wn.userAgent)) {
+      PLATFORM.ANDROID_IMPL = true;
+      PLATFORM.ANY_SMARTPHONE_DEVICE = true;
+      console.log('-- Android Phone Platform --')
+      alert(`-- Android Phone Platform --\n${msg}`,)
+    }
+    else if (/iPhone|iPad|iPod/i.test(wn.userAgent)) {
+      PLATFORM.I_PHONE_IMPL = true;
+      PLATFORM.ANY_SMARTPHONE_DEVICE = true;
+      console.log('-- Iphone Phone Platform --')
+      alert(`-- Iphone Phone Platform --\n${msg}`)
+    }
+
+    /** Windows NT
+     * Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0 
+     */
+
+    // Browser detection
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigator
+    /**
+     * function getBrowserName(userAgent) {
+      // The order matters here, and this may report false positives for unlisted browsers.
+    
+      if (userAgent.includes("Firefox")) {
+        // "Mozilla/5.0 (X11; Linux i686; rv:104.0) Gecko/20100101 Firefox/104.0"
+        return "Mozilla Firefox";
+      } else if (userAgent.includes("SamsungBrowser")) {
+        // "Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G955F Build/PPR1.180610.011) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/9.4 Chrome/67.0.3396.87 Mobile Safari/537.36"
+        return "Samsung Internet";
+      } else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+        // "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36 OPR/90.0.4480.54"
+        return "Opera";
+      } else if (userAgent.includes("Edge")) {
+        // "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299"
+        return "Microsoft Edge (Legacy)";
+      } else if (userAgent.includes("Edg")) {
+        // "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36 Edg/104.0.1293.70"
+        return "Microsoft Edge (Chromium)";
+      } else if (userAgent.includes("Chrome")) {
+        // "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+        return "Google Chrome or Chromium";
+      } else if (userAgent.includes("Safari")) {
+        // "Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1"
+        return "Apple Safari";
+      } else {
+        return "unknown";
+      }
+    }
+     */
+
 }

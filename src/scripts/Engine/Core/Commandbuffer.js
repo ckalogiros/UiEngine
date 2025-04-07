@@ -1,5 +1,6 @@
 "use strict";
 
+import { _ } from '../Global/EngineConstants.js';
 import { New_generic_buffer } from './Buffers.js';
 
 /**

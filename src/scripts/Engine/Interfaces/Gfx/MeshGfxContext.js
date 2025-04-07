@@ -15,6 +15,8 @@ import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
+import { BUFFER_STATE, GFX_CTX_FLAGS, GFX_VBIDX_RENAME_ME, SID, UNIFORM } from "../../../Graphics/Global/GfxConstants.js";
+import { VIEWPORT } from "../../Global/EngineConstants.js";
 
 
 

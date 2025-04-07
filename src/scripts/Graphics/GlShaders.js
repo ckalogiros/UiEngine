@@ -1,5 +1,6 @@
 "use strict";
 import * as dbg from './Debug/GfxDebug.js'
+import { SID } from './Global/GfxConstants.js';
 import { Shaders_build_vertex_shader, Shaders_build_fragment_shader } from './Shaders/ShaderBuilder/ShaderBuilder.js';
 
 

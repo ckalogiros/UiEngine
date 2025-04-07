@@ -1,6 +1,7 @@
 "use strict"
 
-import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics, Metrics_loader_load_custom_metrics } from "./MetricsLoader";
+import { TEXTURES } from "../../Global/EngineConstants.js";
+import { Metrics_loader_load_chlumsky_msdf_metrics, Metrics_loader_load_chlumsky_msdf_variant_fonts_metrics, Metrics_loader_load_custom_metrics } from "./MetricsLoader.js";
 
 
 

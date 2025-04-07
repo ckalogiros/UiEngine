@@ -15,6 +15,8 @@ import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Mesh_create_style_from_values } from '../Operations/MeshHelperFunctions.js';
 import { Style_rect_default_properties, Style_slider_simple_default_properties } from './WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../../../App/Widgets/WidgetGfxReady.js';
+import { SID, UNIF_TYPE, UNIFORM } from '../../../Graphics/Global/GfxConstants.js';
+import { LISTEN_EVENT_TYPES, MESH_STATE, MESH_TYPE, ROOT_WIDGETS } from '../../Global/EngineConstants.js';
 
 
 

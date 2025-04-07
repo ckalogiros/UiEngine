@@ -13,6 +13,8 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { GFX_CTX_FLAGS, SID, UNIF_TYPE, UNIFORM } from "../../../Graphics/Global/GfxConstants.js";
+import { MESH_STATE, ROOT_WIDGETS } from "../../Global/EngineConstants.js";
 
 
 

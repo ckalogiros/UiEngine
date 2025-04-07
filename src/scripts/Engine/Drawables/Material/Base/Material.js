@@ -5,6 +5,8 @@ import { Gl_set_rgb, Gl_set_rgba } from '../../../../Graphics/Buffers/VertexBuff
 import { Texture_load_texture_byid } from '../../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../../Core/Buffers.js';
 import { Texture_metrics_get_texture_pixel_size, Uv_get_uv_coords } from '../../../Loaders/Textures/TextureUvMap.js';
+import { SID } from '../../../../Graphics/Global/GfxConstants.js';
+import { DEBUG, MESH_TYPE, TEXTURE_TYPE } from '../../../Global/EngineConstants.js';
 
 
 

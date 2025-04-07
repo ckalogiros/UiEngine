@@ -1,6 +1,7 @@
 "use strict";
 
 import { RotateY, RotateZ } from "../../Helpers/Math/Matrix.js";
+import { SID } from "../Global/GfxConstants.js";
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_offset_size_attribs_per_vertex } from "../ShaderAttributes.js";
 import { Program_get_shader_attribs_indexing } from "../ShaderPrograms.js";
 import { Index_buffer_get_by_ibidx } from "./IndexBuffers.js";

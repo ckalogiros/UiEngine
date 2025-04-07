@@ -14,6 +14,7 @@ import { Attribute_get_type_extension, Shader_Attributes, Shader_bit_flags_get_a
 import { frag_noise_voronoi_1, frag_noise_voronoi_1_call, frag_noise_voronoi_2, frag_noise_voronoi_2_call } from './Functions/fragment.noise_voronoi.js';
 import { frag_noise_worley_1, frag_noise_worley_1_call, frag_noise_worley_2, frag_noise_worley_2_call, frag_noise_worley_3_types, frag_noise_worley_3_types_call, frag_noise_worley_3D, frag_noise_worley_3D_call } from './Functions/fragment.noise_worley.js';
 import { shader_operations } from './ShaderChunks/ShaderOperations.js';
+import { SID } from '../../Global/GfxConstants.js';
 
 
 

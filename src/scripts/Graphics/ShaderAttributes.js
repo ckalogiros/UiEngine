@@ -2,6 +2,8 @@
 
 import { New_generic_buffer  } from "../Engine/Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer.js";
+import { _, DEBUG, INT_NULL } from "../Engine/Global/EngineConstants.js";
+import { SID } from "./Global/GfxConstants.js";
 import { Shader_Attributes } from "./ShaderBitFlags.js";
 
 

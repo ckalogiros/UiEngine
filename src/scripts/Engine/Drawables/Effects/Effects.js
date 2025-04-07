@@ -12,13 +12,15 @@
 
 "use strict";
 
-import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoisConstants.js";
+import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoidConstants.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Gl_set_dim_xy, Gl_set_generic2, Gl_set_rgba, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { GFX_CTX_FLAGS, SID } from "../../../Graphics/Global/GfxConstants.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { View_add_to_group, View_build_group_from_root_mesh } from "../../Core/Views/MeshBufferViews.js";
+import { _, INT_NULL } from "../../Global/EngineConstants.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
 import { Style_rect_default_properties } from "../Widgets/WidgetReadyStyles.js";
@@ -32,7 +34,7 @@ const PRE_INITIALIZED_EXPLOSION_MESHES = 32;
 
 
 
-_CNT = 0;
+let _CNT = 0;
 export const EFFECTS_TYPES = {
    EXPLOSION_CIRCLE: {
       ID:_CNT++,

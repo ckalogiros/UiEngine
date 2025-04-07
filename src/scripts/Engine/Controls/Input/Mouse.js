@@ -6,6 +6,7 @@ import { Abs, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
+import { EVENT_HANDLER_TYPE, INFO_LISTEN_EVENT_TYPE, INT_NULL, VIEWPORT } from "../../Global/EngineConstants.js";
 import { Scene_camera_scroll_add } from "../../Scenes.js";
 
 

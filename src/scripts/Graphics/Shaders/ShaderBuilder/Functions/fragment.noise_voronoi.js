@@ -1,4 +1,7 @@
 // export const frag_noise_voronoi_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_1() );'
+
+import { u } from "../../../Global/GfxConstants.js";
+
 // export const frag_noise_voronoi_1_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_1() );'
 export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1(scale_down, u_gen_ctrl_map_cnt, time);'
 

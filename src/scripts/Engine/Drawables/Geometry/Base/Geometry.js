@@ -2,6 +2,8 @@
 
 import * as math from '../../../../Helpers/Math/MathOperations.js'
 import * as glBufferOps from '../../../../Graphics/Buffers/VertexBuffersOps.js'
+import { SID } from '../../../../Graphics/Global/GfxConstants.js';
+import { MESH_TYPE } from '../../../Global/EngineConstants.js';
 
 
 

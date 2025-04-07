@@ -1,6 +1,7 @@
 "use strict";
 
 import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
+import { _ } from "./Global/EngineConstants.js";
 
 
 

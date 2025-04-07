@@ -2,7 +2,7 @@
 
 
 
-// const GL_TYPES = {
+// export const GL_TYPES = {
 
 //    FLOAT: 5126,
 //    FLOAT_32_UNSIGNED_INT_24_8_REV: 36269,
@@ -21,7 +21,7 @@
 // }
 
 
-const GL_TYPES = {
+export const GL_TYPES = {
 
    FLOAT: 5126,
    FLOAT_VEC2: 35664,
@@ -50,7 +50,7 @@ function GL_GET_ERROR(line){
 /* WebGl Types: From THREE.js
 
 
-const WEBGL_CONSTANTS = {
+export const WEBGL_CONSTANTS = {
 	FLOAT: 5126,
 	//FLOAT_MAT2: 35674,
 	FLOAT_MAT3: 35675,
@@ -72,7 +72,7 @@ const WEBGL_CONSTANTS = {
 	UNSIGNED_SHORT: 5123
 };
 
-const WEBGL_COMPONENT_TYPES = {
+export const WEBGL_COMPONENT_TYPES = {
 	5120: Int8Array,
 	5121: Uint8Array,
 	5122: Int16Array,
@@ -81,7 +81,7 @@ const WEBGL_COMPONENT_TYPES = {
 	5126: Float32Array
 };
 
-const WEBGL_FILTERS = {
+export const WEBGL_FILTERS = {
 	9728: NearestFilter,
 	9729: LinearFilter,
 	9984: NearestMipmapNearestFilter,
@@ -90,13 +90,13 @@ const WEBGL_FILTERS = {
 	9987: LinearMipmapLinearFilter
 };
 
-const WEBGL_WRAPPINGS = {
+export const WEBGL_WRAPPINGS = {
 	33071: ClampToEdgeWrapping,
 	33648: MirroredRepeatWrapping,
 	10497: RepeatWrapping
 };
 
-const WEBGL_TYPE_SIZES = {
+export const WEBGL_TYPE_SIZES = {
 	'SCALAR': 1,
 	'VEC2': 2,
 	'VEC3': 3,
@@ -106,7 +106,7 @@ const WEBGL_TYPE_SIZES = {
 	'MAT4': 16
 };
 
-const ATTRIBUTES = {
+export const ATTRIBUTES = {
 	POSITION: 'position',
 	NORMAL: 'normal',
 	TANGENT: 'tangent',
@@ -117,21 +117,21 @@ const ATTRIBUTES = {
 	JOINTS_0: 'skinIndex',
 };
 
-const PATH_PROPERTIES = {
+export const PATH_PROPERTIES = {
 	scale: 'scale',
 	translation: 'position',
 	rotation: 'quaternion',
 	weights: 'morphTargetInfluences'
 };
 
-const INTERPOLATION = {
+export const INTERPOLATION = {
 	CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
 		                        // keyframe track will be initialized with a default interpolation type, then modified.
 	LINEAR: InterpolateLinear,
 	STEP: InterpolateDiscrete
 };
 
-const ALPHA_MODES = {
+export const ALPHA_MODES = {
 	OPAQUE: 'OPAQUE',
 	MASK: 'MASK',
 	BLEND: 'BLEND'

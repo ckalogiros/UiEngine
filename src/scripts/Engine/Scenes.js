@@ -4,6 +4,7 @@ import { Vertex_buffer_group_update_scissorbox_all_vb } from '../Graphics/Buffer
 import { M_Buffer } from './Core/Buffers.js';
 import { Screen_wpos_add_y, Screen_wpos_set_y } from './Core/MeshUniformsBuffer.js';
 import { HandleEvents } from './Events/Events.js';
+import { MESH_TYPE, STATE, VIEWPORT } from './Global/EngineConstants.js';
 
 
 

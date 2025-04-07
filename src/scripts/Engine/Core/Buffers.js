@@ -1,5 +1,7 @@
 "use strict";
 
+import { _, DEBUG, DEBUG_INFO_STRUCTS, INT_NULL } from "../Global/EngineConstants.js";
+
 
 
 // TODO: Implement all Realloc() functions growing algorithm. NOT doubling but just big enough

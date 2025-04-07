@@ -3,6 +3,7 @@
 import { Gl_batch_set_RGBA, Gl_batch_set_pos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer } from "../Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
+import { _, ANIMATIONS, INT_NULL } from "../Global/EngineConstants.js";
 
 
 /**

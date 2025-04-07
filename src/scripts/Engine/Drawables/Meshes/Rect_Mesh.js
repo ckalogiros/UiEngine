@@ -15,6 +15,8 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Shader_attributes_get_attribs } from "../../../Graphics/ShaderAttributes.js";
+import { _, INT_NULL, MESH_STATE, MESH_TYPE, ROOT_WIDGETS } from "../../Global/EngineConstants.js";
+import { SID, UNIF_TYPE, UNIFORM } from "../../../Graphics/Global/GfxConstants.js";
 
 
 

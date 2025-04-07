@@ -1,5 +1,7 @@
 "use strict"
 
+import { INT_NULL } from "../../Engine/Global/EngineConstants.js";
+import { SID } from "../Global/GfxConstants.js";
 import { Shader_attributes_get_attribs } from "../ShaderAttributes.js";
 
 
@@ -12,7 +14,6 @@ import { Shader_attributes_get_attribs } from "../ShaderAttributes.js";
 // Function Selector
 /**************************************************************************************************************************************/
 
-_CNT = 0;
 const FUNCTION_TABLE_IDXS = {
    COL4_WPOS3_VPOS2_RCORNERS_FEATHER: INT_NULL,
    // COL4_WPOS3_VPOS2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY: INT_NULL,

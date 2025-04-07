@@ -29,6 +29,8 @@ import { CALLBACK_ANIMATION_TYPE_FLAGS } from "../Engine/Animations/CallbackAnim
 import { Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "./Widgets/WidgetGfxReady.js";
 import { Align_pre_simple } from "./Tests/TestAlignNestedSections.js";
+import { _, LISTEN_EVENT_TYPES, PLATFORM, ROOT_WIDGETS, SECTION, TEXTURES } from "../Engine/Global/EngineConstants.js";
+import { MESH_ENABLE, SID } from "../Graphics/Global/GfxConstants.js";
 
 
 

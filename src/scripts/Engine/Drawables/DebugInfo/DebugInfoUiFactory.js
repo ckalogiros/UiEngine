@@ -1,6 +1,8 @@
 "use strict";
 
+import { MESH_ENABLE, SID } from "../../../Graphics/Global/GfxConstants.js";
 import { Create_rect_mesh, Create_widget_label, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
+import { SECTION } from "../../Global/EngineConstants.js";
 import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
 import { Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_switch_default_properties } from "../Widgets/WidgetReadyStyles.js";
 

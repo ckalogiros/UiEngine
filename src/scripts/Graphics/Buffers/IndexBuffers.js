@@ -2,6 +2,8 @@
 
 
 import { New_generic_buffer } from '../../Engine/Core/Buffers.js';
+import { _, DEBUG, INT_NULL } from '../../Engine/Global/EngineConstants.js';
+import { BUFFER_STATE, GL_STATE, SID } from '../Global/GfxConstants.js';
 import { Typed_array_create_from_type } from './TypedArrayBuffersInterface.js';
 
 

@@ -1,5 +1,7 @@
 "use strict";
 
+import { MESH_ENABLE, SID, UNIF_TYPE } from "../../Graphics/Global/GfxConstants.js";
+
 
 
 

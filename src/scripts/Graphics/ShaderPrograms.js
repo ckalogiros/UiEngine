@@ -3,6 +3,8 @@ import { Shaders_load } from './GlShaders.js';
 import { Uniforms_block_buffer_create, Uniforms_buffer_set_uniform } from './Buffers/UniformBuffers.js';
 import { New_generic_buffer, New_int8_buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
+import { GL_STATE, SID } from './Global/GfxConstants.js';
+import { _, INT_NULL } from '../Engine/Global/EngineConstants.js';
 
 
 

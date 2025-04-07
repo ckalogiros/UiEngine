@@ -1,3 +1,5 @@
+import { u } from "../../../Global/GfxConstants.js";
+
 export const frag_noise_worley_3_types_call = '   final_color = blend_mode_vec4( final_color, frag_noise_worley_3_types(scale_down, u_gen_ctrl_map_cnt, time) );'
 // export const frag_noise_worley_3_types_call = '   final_color = frag_noise_worley_3_types();'
 

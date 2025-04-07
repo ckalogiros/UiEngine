@@ -1,9 +1,11 @@
 "use strict";
 
 import { Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { GFX_CTX_FLAGS, SID } from "../../../Graphics/Global/GfxConstants.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_vbidx_view_get } from "../../Core/Views/RootView.js";
+import { MESH_TYPE } from "../../Global/EngineConstants.js";
 
 
 

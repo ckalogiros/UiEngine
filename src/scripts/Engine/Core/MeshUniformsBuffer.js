@@ -9,6 +9,7 @@
 
 import { Vertex_buffer_group_get, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_set_and_update_wpos_uniform } from "../Drawables/Operations/MeshHelperFunctions.js";
+import { _, INT_NULL } from "../Global/EngineConstants.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
@@ -91,7 +92,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
-   let parent_posidx = INT_NULL
+   let parent_posidx = INT_NULL;
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 

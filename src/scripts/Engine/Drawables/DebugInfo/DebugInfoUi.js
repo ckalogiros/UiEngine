@@ -27,6 +27,8 @@ import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js"
 import { Style_dropdown_default_properties, Style_rect_default_properties, Style_section_default_properties } from "../Widgets/WidgetReadyStyles.js";
 import { Demo_complicated_widget_layout } from "../../../App/Demo/DemoWidgets.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { _, ALIGN, DEBUG_INFO, INT_NULL, LISTEN_EVENT_TYPES, PERFORMANCE_TIMERS_IDXS, SECTION, TEXTURES, VIEWPORT } from "../../Global/EngineConstants.js";
+import { GFX_CTX_FLAGS, gfxCtx, MESH_ENABLE, SID } from "../../../Graphics/Global/GfxConstants.js";
 
 
 

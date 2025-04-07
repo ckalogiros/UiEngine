@@ -7,6 +7,7 @@ import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
+import { _ } from "../Global/EngineConstants.js";
 
 
 
@@ -56,7 +57,7 @@ export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.b
 
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
-if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===INT_NULL) {
+if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===LargestContentfulPaint) {
 
    console.error('441552413332', 'mesh_bufferidx', mesh_bufferidx, '_mesh_buffer.buffer', _mesh_buffer.buffer)
    alert('441552413332');

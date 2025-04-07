@@ -12,10 +12,11 @@
 "use strict";
 
 import { New_generic_buffer } from "../../Core/Buffers.js";
+import { _, INT_NULL } from "../../Global/EngineConstants.js";
 import { Dbg_ui_init_buffer_entries, Dbg_ui_reset_buffer_entries, Dbg_ui_store_changes } from "./DebugInfoUi.js";
 
 
-_CNT = 0x1;
+let _CNT = 0x1;
 let xxx = 0x1;
 export const NOTIFICATION_TYPE = {
    

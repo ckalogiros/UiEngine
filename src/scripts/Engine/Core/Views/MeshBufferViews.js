@@ -1,6 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { _, INT_NULL } from "../../Global/EngineConstants.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuffer.js";
@@ -42,7 +43,7 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuff
  */
 
 
-_CNT = 0;
+let _CNT = 0;
 export const VIEW_INFO = {
    VB_GROUP_IDX: _CNT++,
    START: _CNT++,

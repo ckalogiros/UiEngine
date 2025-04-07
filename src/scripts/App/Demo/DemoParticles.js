@@ -26,6 +26,8 @@ import { Widget_ready_slider } from '../Widgets/WidgetReadyWidgets.js';
 import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
 import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
+import { PARTICLES, ROOT_WIDGETS, TEXTURES, VIEWPORT } from '../../Engine/Global/EngineConstants.js';
+import { SID } from '../../Graphics/Global/GfxConstants.js';
 
 
 const default_font = TEXTURES.MTSDF_CONSOLAS_1024;

@@ -4,6 +4,8 @@ import { Texture_create_renderbuffer_texture, Texture_set_texture_name } from ".
 import { Gl_draw_specific } from "../GlDraw.js";
 import { Create_mesh_for_framebuffer } from "../../Engine/Drawables/Meshes/FramebufferMesh.js";
 import { Str_buffer_change } from "../../Engine/Core/StringBuffer.js";
+import { FRAMEBUFFER_TYPE, VIEWPORT } from "../../Engine/Global/EngineConstants.js";
+import { FB } from "../Global/GfxConstants.js";
 
 // SEE: ## Framebuffer VS Renderbuffer
 

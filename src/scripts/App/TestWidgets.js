@@ -53,6 +53,8 @@ import { Performance_timer_start, Performance_timer_stop, PerformanceTimersGetFp
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_section_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer, Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from './Widgets/WidgetGenericControlsReady.js';
+import { LAYOUT, LISTEN_EVENT_TYPES, MESH_STATE, ROOT_WIDGETS, SECTION } from '../Engine/Global/EngineConstants.js';
+import { GFX_CTX_FLAGS } from '../Graphics/Global/GfxConstants.js';
 
 
 {
@@ -135,7 +137,7 @@ function CreateManySections(scene) {
     
     
     {
-        const black = Create_rect_mesh(Style_rect_default_properties({ options: SECTION.HORIZONTAL, pad: [15, 15], pos: [0, 0, 1], dim: [20, 20], col: TRANSPARENCY(BLACK, tr), layout:LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF}));
+        const black = Create_rect_mesh(Style_rect_default_properties({ pad: [15, 15], pos: [0, 0, 1], dim: [20, 20], col: TRANSPARENCY(BLACK, tr), layout:LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF}));
         Widget_gfx_ready_enable({mesh:black, enable_sdf_rect:rcorners1, })
         black.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         black.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF

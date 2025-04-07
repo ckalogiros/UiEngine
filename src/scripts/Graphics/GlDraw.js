@@ -5,6 +5,8 @@ import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buf
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Renderer_webgl_begin_timer_query, Renderer_webgl_end_timer_query } from '../Engine/Renderers/Renderer.js';
+import { GL_STATE } from './Global/GfxConstants.js';
+import { INT_NULL } from '../Engine/Global/EngineConstants.js';
 
 
 

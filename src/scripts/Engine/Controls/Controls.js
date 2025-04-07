@@ -1,5 +1,6 @@
 "use strict";
 
+import { VIEWPORT } from "../Global/EngineConstants.js";
 import { Mouse_get_pos_dif } from "./Input/Mouse.js";
 
 /**

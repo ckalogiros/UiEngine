@@ -5,6 +5,7 @@ import { Uniforms_buffer_reset } from "../../../Graphics/Buffers/UniformBuffers.
 import { Gl_vertex_array_object_reset } from "../../../Graphics/Buffers/VertexArrays.js";
 import { VBI_get_byidx, Vertex_buffer_group_get, Vertex_buffer_group_reset, Vertex_buffer_info_reset, Vertex_buffer_reset_full } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_remove_geometry } from "../../../Graphics/Buffers/VertexBuffersOps.js";
+import { BUFFER_STATE, GFX_POOL_REQUESTS, SID } from "../../../Graphics/Global/GfxConstants.js";
 import { Shader_attributes_reset } from "../../../Graphics/ShaderAttributes.js";
 import { Program_reset, Program_full_reset_stored_shader_operation } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";

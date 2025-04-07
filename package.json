@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Game Engine",
     "main": "Entry.js",
-    "type": "commonjs",
+    "type": "module",
     "author": "CHR",
     "license": "MIT",
     "repository": {

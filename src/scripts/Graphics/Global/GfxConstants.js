@@ -1,10 +1,12 @@
 "use strict";
 
+import { INT_NULL } from "../../Engine/Global/EngineConstants.js";
+
 /*******************************************************************************************************************************************************/
 // Graphics Globals
 
 
-const gfxCtx = {
+export const gfxCtx = {
     gl: null,
     extentions_string: '', 
     ext: null,
@@ -17,7 +19,7 @@ const gfxCtx = {
 
 
 
-const GL_STATE = {
+export const GL_STATE = {
     BOUND_PROG_IDX: INT_NULL, // The current bound gl program index
     BOUND_PROG: INT_NULL, // The current bound gl program 
     BOUND_VAO: INT_NULL, // The current bound vertex array  
@@ -42,14 +44,14 @@ const GL_STATE = {
 
 
 /** This is a special character used in shader code, to denote that a (uniform) variable is to be 'collected' so that the application can use the uniform's name  */
-const u = '_';
+export const u = '_';
 
 
 
 
 
-_CNT = 0x1;
-const TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN = {
+let _CNT = 0x1;
+export const TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN = {
 	rect_123_234: _CNT,
 };
 
@@ -62,7 +64,7 @@ const TEMPORARY_INDEX_BUFFER_RECOGNITION_PATTERN = {
 
 _CNT = 0x1;
 /** Grouping shader programs. Example: group for debug user interface meshes, default group meshes */
-const GFX_GROUPS = {
+export const GFX_GROUPS = {
 
     DEBUG: {
         IDX: INT_NULL, // The index of the group of programs dedicated for displaing debug info. 
@@ -102,7 +104,7 @@ const GFX_GROUPS = {
  */
 
 let BIT1 = 0x1, BIT2 = 0x1, BIT3 = 0x1, BIT4 = 0x1, BIT5 = 0x1, BIT6 = 0x1, BIT7 = 0x1, BIT8 = 0x1, BITTEST = 0x1;
-const SID = {
+export const SID = {
 
     SHAD: {
         INDEXED: BIT1,
@@ -414,30 +416,30 @@ const SID = {
 
 
 // TODO: Create a smaller buffer that ca resize its self
-const MAX_VERTEX_BUFFER_SIZE = 64;
-const MAX_INDEX_BUFFER_SIZE = 64;
-const INDICES_PER_RECT = 6;
-const VERTS_PER_RECT = 6;
-const VERTS_PER_RECT_INDEXED = 4;
-// const INDEX_BUFFER_TRIANGLE_INDICES = 4;
+export const MAX_VERTEX_BUFFER_SIZE = 64;
+export const MAX_INDEX_BUFFER_SIZE = 64;
+export const INDICES_PER_RECT = 6;
+export const VERTS_PER_RECT = 6;
+export const VERTS_PER_RECT_INDEXED = 4;
+// export const INDEX_BUFFER_TRIANGLE_INDICES = 4;
 
-const V_COL_COUNT = 4; // Number of floats for vertex buffer's attribute
-const V_POS_COUNT = 2;
-const V_SCALE_COUNT = 2;
-const V_TEX_COUNT = 2;
-const V_WPOS_COUNT = 3;
-const V_WPOS_TIME_COUNT = 4; // Use the 4th element for the time attribute 
-const V_STYLE_COUNT = 3;
-const V_BORDER_WIDTH = 1, V_BORDER_FEATHER = 1, V_ROUND_CORNERS = 1;
-const V_TIME_COUNT = 1;
-const V_GENERIC_ATTR1_VEC4_COUNT = 4;
-const V_SDF_COUNT = 2;
-const V_GENERIC2_COUNT = 2;
+export const V_COL_COUNT = 4; // Number of floats for vertex buffer's attribute
+export const V_POS_COUNT = 2;
+export const V_SCALE_COUNT = 2;
+export const V_TEX_COUNT = 2;
+export const V_WPOS_COUNT = 3;
+export const V_WPOS_TIME_COUNT = 4; // Use the 4th element for the time attribute 
+export const V_STYLE_COUNT = 3;
+export const V_BORDER_WIDTH = 1, V_BORDER_FEATHER = 1, V_ROUND_CORNERS = 1;
+export const V_TIME_COUNT = 1;
+export const V_GENERIC_ATTR1_VEC4_COUNT = 4;
+export const V_SDF_COUNT = 2;
+export const V_GENERIC2_COUNT = 2;
 
 // The style's buffer attribute strides(buffer indexes) 
-const V_ROUND_CORNER_STRIDE = 0;
-const V_BORDER_WIDTH_STRIDE = 1;
-const V_BORDER_FEATHER_STRIDE = 2;
+export const V_ROUND_CORNER_STRIDE = 0;
+export const V_BORDER_WIDTH_STRIDE = 1;
+export const V_BORDER_FEATHER_STRIDE = 2;
 
 
 
@@ -447,7 +449,7 @@ const V_BORDER_FEATHER_STRIDE = 2;
 
 
 _CNT = 1;
-const MESH_ENABLE = {
+export const MESH_ENABLE = {
 
     GFX: {
 
@@ -507,7 +509,7 @@ const MESH_ENABLE = {
 
 
 // TODO: Rename. This is a global storage of vertex buffer indexes concerning specific types of meshes been drawn together(like scrollers)
-const GFX_VBIDX_RENAME_ME = {
+export const GFX_VBIDX_RENAME_ME = {
     SCROLLER_VB_IDX: INT_NULL,
 
 
@@ -520,7 +522,7 @@ const GFX_VBIDX_RENAME_ME = {
 
 
 _CNT = 0x1;
-const GFX_CTX_FLAGS = {
+export const GFX_CTX_FLAGS = {
 
     
     /** If any of the options fail to find match, then new vertex buffer is created */
@@ -560,7 +562,7 @@ const GFX_CTX_FLAGS = {
 
 
 _CNT = 0x1;
-const BUFFER_STATE = {
+export const BUFFER_STATE = {
 
     // SHOW: _CNT,
     NEEDS_UPDATE: _CNT,
@@ -577,7 +579,7 @@ const BUFFER_STATE = {
 
 
 _CNT = 0x1;
-const GFX_POOL_REQUESTS = {
+export const GFX_POOL_REQUESTS = {
 
     ANY: _CNT,
     // FIRST_SMALL: _CNT <<= 0x1,
@@ -595,7 +597,7 @@ const GFX_POOL_REQUESTS = {
 
 
 _CNT = 0x1;
-const BUFFER_TYPE = {
+export const BUFFER_TYPE = {
 
     FLOAT32: _CNT,
     UINT16: _CNT <<= 0x1,
@@ -618,7 +620,7 @@ const BUFFER_TYPE = {
 
 
 _CNT = 0x1;
-const PROGRAM_STATE = {
+export const PROGRAM_STATE = {
     ACTIVE: _CNT, // UNNECESSARY: Possibly has no usefuleness
     UNIFORMS_NEED_UPDATE: _CNT <<= 0x1,
     // NEEDS_UPDATE: _CNT <<= 0x1,
@@ -644,7 +646,7 @@ const PROGRAM_STATE = {
 // UNIFORMS
 
 _CNT = 0x1;
-const UNIFORM = {
+export const UNIFORM = {
     NULL: 0x0,
     IN_VS: _CNT,
     IN_FS: _CNT<<=0x1,
@@ -653,7 +655,7 @@ const UNIFORM = {
 
 
 
-// const TEMP_UNIFORM_BUFFER_INDEXES = {
+// export const TEMP_UNIFORM_BUFFER_INDEXES = {
 //     U_WPOS: INT_NULL, // Stores the index of the wpos uniform of theWill be set by the Program, wwhen the uniform
 // }
 
@@ -661,7 +663,7 @@ const UNIFORM = {
 
 // Store key-value pairs of texture name - texture index(for the global texture array. See GlTextures.js)
 // TODO: Create buffers of fonts and farmebuffers
-const Bound_texture = {
+export const Bound_texture = {
     // atlas: INT_NULL,
     // font: INT_NULL,
     // frameBufferTexture0: INT_NULL,
@@ -679,7 +681,7 @@ const Bound_texture = {
 
 
 _CNT=0x1;
-const UNIF_TYPE = {
+export const UNIF_TYPE = {
 
     ID:'UNIF_TYPE',
 
@@ -777,7 +779,7 @@ const UNIF_TYPE = {
 /*************************************************************************************************/
 // Graphics Constants
 
-const TRIG = {
+export const TRIG = {
     COS: 0,
     SIN: 0,
 
@@ -793,7 +795,7 @@ const TRIG = {
 /*************************************************************************************************/
 // Framebuffer
 _CNT = 0x1;
-const FB = {
+export const FB = {
     NEW: _CNT <<= 0x1, // represents the creation of new farmebuffer
     STATIC: {
         ID: _CNT <<= 0x1,
@@ -875,9 +877,9 @@ class ROTATION3D {
 
 
 
-const ROT3D = new ROTATION3D();
+export const ROT3D = new ROTATION3D();
 
-const RX3D = [
+export const RX3D = [
     1, 0, 0,
     0, TRIG.COS, -TRIG.SIN,
     0, TRIG.SIN, TRIG.COS,
@@ -889,7 +891,7 @@ const RX3D = [
 
 
 
-const RY3D = [
+export const RY3D = [
     TRIG.COS, 0, TRIG.SIN,
     0, 1, 0,
     -TRIG.SIN, 0, TRIG.COS,
@@ -902,7 +904,7 @@ const RY3D = [
 
 
 
-const RZ3D = [
+export const RZ3D = [
     TRIG.COS, -TRIG.SIN, 0,
     TRIG.SIN, TRIG.COS, 0,
     0, 0, 1,

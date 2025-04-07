@@ -27,6 +27,8 @@ import { Root_group_batch_buffer_reset, Root_group_buffer_reset, Root_group_buff
 import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 // import { Font_texture_init_buffers, Font_texture_reset_buffers } from '../Engine/Loaders/Font/Font.js';
 import { Uv_texture_init_buffers, Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
+import { _, PLATFORM, TEXTURES, TIME_INTERVAL_REPEAT_ALWAYS } from '../Engine/Global/EngineConstants.js';
+import { GL_STATE, SID } from '../Graphics/Global/GfxConstants.js';
 
 
 // var osu = require('node-os-utils')
@@ -54,9 +56,12 @@ export function AppInit() {
     
 
     // Device_set_up()
-    Detect_host_platform();
-    Device_set_up();
-    Input_create_user_input_listeners();
+    if (typeof window !== 'undefined' && window.document) {
+
+        Detect_host_platform();
+        Device_set_up();
+        Input_create_user_input_listeners();
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Create Renderer and Scene

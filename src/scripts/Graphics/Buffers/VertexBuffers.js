@@ -14,6 +14,8 @@ import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBu
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
 import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { _, INT_NULL, VIEWPORT } from "../../Engine/Global/EngineConstants.js";
+import { BUFFER_STATE, GL_STATE, SID } from "../Global/GfxConstants.js";
 
 
 
@@ -1424,7 +1426,7 @@ export function Gl_vertex_buffer_print() {
 
 
 
-_CNT = 0x1;
+let _CNT = 0x1;
 const VB_TO_STRING_FLAGS = {
     COLOR: _CNT,
     WPOS: _CNT <<= 0x1,

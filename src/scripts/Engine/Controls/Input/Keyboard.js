@@ -27,8 +27,10 @@ import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_g
 import { Shaders_print_loop } from "../../../Graphics/GlShaders.js";
 import { Arkanois_print_scrore_mod } from "../../../App/Demo/Games/Arkanoid/ScoreMod.js";
 import { Uvmaps_print } from "../../Loaders/Textures/TextureUvMap.js";
+import { DEVICE, STATE, VIEWPORT } from "../../Global/EngineConstants.js";
+import { GL_STATE } from "../../../Graphics/Global/GfxConstants.js";
 
-_CNT = 0;
+let _CNT = 0;
 const p = _CNT++;
 const a1 = _CNT++;
 const a2 = _CNT++;

@@ -1,6 +1,8 @@
 "use strict";
 
 import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
+import { _, INT_NULL } from "../../Engine/Global/EngineConstants.js";
+import { UNIF_TYPE, UNIFORM } from "../Global/GfxConstants.js";
 import { Program_use_program } from "../ShaderPrograms.js";
 import { UNIFORM_BLOCK_SHARED_NAME } from "../Shaders/ShaderBuilder/ShaderBuilder.js";
 

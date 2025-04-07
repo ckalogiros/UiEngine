@@ -2,6 +2,7 @@
 
 import { New_generic_buffer } from '../Core/Buffers.js';
 import { Str_buffer_get_by_idx, Str_buffer_store } from '../Core/StringBuffer.js';
+import { _, INT_NULL, PERFORMANCE_TIMER, PERFORMANCE_TIMERS_IDXS } from '../Global/EngineConstants.js';
 
 
 

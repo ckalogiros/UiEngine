@@ -14,6 +14,8 @@ import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
 import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
+import { PERFORMANCE_TIMERS_IDXS, VIEWPORT } from "../Global/EngineConstants.js";
+import { gfxCtx } from "../../Graphics/Global/GfxConstants.js";
 
 
 

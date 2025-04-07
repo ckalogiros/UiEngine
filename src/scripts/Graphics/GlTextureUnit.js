@@ -1,5 +1,8 @@
 "use strict";
 
+import { INT_NULL } from "../Engine/Global/EngineConstants.js";
+import { GL_STATE } from "./Global/GfxConstants.js";
+
 
 
 

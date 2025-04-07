@@ -1,6 +1,7 @@
 "use strict";
 
 import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
+import { INT_NULL } from "../Global/EngineConstants.js";
 import { TimeGet } from "./Time.js";
 
 

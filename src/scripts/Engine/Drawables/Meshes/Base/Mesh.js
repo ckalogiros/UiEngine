@@ -15,6 +15,9 @@ import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
+import { GFX_CTX_FLAGS, GFX_GROUPS, GFX_POOL_REQUESTS, SID, UNIF_TYPE, UNIFORM } from "../../../../Graphics/Global/GfxConstants.js";
+import { AppInit } from "../../../../App/App.js";
+import { INTERVALS, LAYOUT, LISTEN_EVENT_TYPES, MESH_STATE, MESH_TYPE } from "../../../Global/EngineConstants.js";
 
 
 
@@ -132,7 +135,7 @@ export class Mesh {
 
         this.shader_ops_idxs = New_int8_buffer(8, 'Mesh.shader_ops_idxs');
         this.uniforms = [];
-        if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
+        if (AppInit.ENABLE_SHADER_PROJECTION_MATRIX)
             this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
 
 

@@ -1,6 +1,7 @@
 import { Mouse_get_pos_dif } from '../../Controls/Input/Mouse.js';
 import { Timer_get_global_timer } from '../../Timers/Timers.js';
 import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
+import { VIEWPORT } from '../../Global/EngineConstants.js';
 
 
 
@@ -18,7 +19,7 @@ import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
 
 const DEG2RAD = Math.PI / 180;
 
-_CNT = 1;
+let _CNT = 1;
 export const CAMERA_CONTROLS = {
 	PAN: _CNT++,
 	ROTATE: _CNT++,

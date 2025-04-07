@@ -10,9 +10,11 @@ import { Components_create_scroller_component, Scoller_component_gengfx_and_rend
 import { Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
+import { INT_NULL, INTERVALS, PERFORMANCE_TIMER, PLATFORM, ROOT_WIDGETS, TEXTURES, VIEWPORT } from "../../Engine/Global/EngineConstants.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { MESH_ENABLE, SID, UNIF_TYPE } from "../../Graphics/Global/GfxConstants.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";

@@ -1,6 +1,7 @@
 "use strict";
 
 import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { SID } from "../../Graphics/Global/GfxConstants.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
 

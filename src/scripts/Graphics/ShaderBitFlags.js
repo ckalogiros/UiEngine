@@ -1,5 +1,8 @@
 "use strict"
 
+import { DEBUG, MAX_BIT_MASK } from "../Engine/Global/EngineConstants.js";
+import { GL_TYPES } from "./Global/WebGlConstants.js";
+
 
 // Generic Bit Flags array. 
 let BIT = 0x1;

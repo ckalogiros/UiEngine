@@ -1,12 +1,14 @@
 "use strict";
 
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { SID, UNIF_TYPE, UNIFORM } from "../../../Graphics/Global/GfxConstants.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
 import { Create_rect_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
+import { LISTEN_EVENT_TYPES, MESH_STATE, ROOT_WIDGETS } from "../../Global/EngineConstants.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
