@@ -704,12 +704,12 @@ export class Mesh {
             };
             this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
             this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
         if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
             this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
             this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+            this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
         if (flags === SID.SHAD.FN_NOISE) {
             const param = { // Create default attribs values
@@ -717,7 +717,7 @@ export class Mesh {
             };
             this.sid.shad |= SID.SHAD.FN_NOISE;
             this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS2,); // Enable pass of the attributes to fragment shader
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
         }
         if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
         if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }

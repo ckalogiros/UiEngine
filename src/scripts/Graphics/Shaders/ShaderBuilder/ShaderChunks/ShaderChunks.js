@@ -384,8 +384,6 @@ vec3 blend_color_remove_b_from_a(vec3 a, vec3 b) { return ${blend_color_blend_mo
 
 const blend_mode_decider = `
 
-#define u_blending_mode 0
-
 #define ADD   0
 #define SUB   1
 #define MUL   2
