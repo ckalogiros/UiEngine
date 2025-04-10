@@ -16,6 +16,7 @@ import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
+import { TEMP_build_mesh_attributes } from "../../../App/Widgets/WidgetGfxReady.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -200,6 +201,8 @@ export class Rect_Mesh extends Mesh {
          if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
+
+      TEMP_build_mesh_attributes(this)
 
    }
    Render(run_for_children = true) {

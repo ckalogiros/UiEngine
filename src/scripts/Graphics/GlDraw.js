@@ -20,7 +20,7 @@ const B = .1;
 // const R = (1/255) * 72;
 // const G = (1/255) * 32;
 // const B = (1/255) * 72;
-
+// let set = true
 export function Gl_draw(gl) {
 
     // Renderer_webgl_begin_timer_query(gfxCtx);
@@ -94,9 +94,9 @@ export function Gl_draw(gl) {
                     
                     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                    // TODO: Set bufferData instead
-                    // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.STATIC_DRAW);
                     gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
+                    // if(set){gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); }
+                    // else gl.bufferSubData(gl.ARRAY_BUFFER, 0, vb_data);
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
                     GL_STATE.BOUND_VBO = vb_info.vbo;
                     GL_STATE.BOUND_VBIDX = vb_info.vbidx;
@@ -139,7 +139,6 @@ export function Gl_draw(gl) {
     }
 
     // Renderer_webgl_end_timer_query(gfxCtx);
-    
 }
 
 

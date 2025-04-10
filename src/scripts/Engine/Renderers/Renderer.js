@@ -184,8 +184,8 @@ function Renderer_create_webgl_context(canvas) {
       gl.GEQUAL (pass if the incoming value is greater than or equal to the depth buffer value)
       gl.ALWAYS (always pass)
     */
-   // gl.enable(gl.DEPTH_TEST);
-   // gl.depthFunc(gl.ALWAYS)
+   gl.enable(gl.DEPTH_TEST);
+   gl.depthFunc(gl.ALWAYS)
    // gl.depthFunc(gl.GREATER)
    // gl.depthFunc(gl.LEQUAL)
    // gl.depthFunc(gl.GEQUAL)

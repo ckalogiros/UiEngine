@@ -1,0 +1,14 @@
+# lite-server 
+* bs-config.json
+{
+   "port":6001,
+   "files":["./src/**/*.{html}", "./style/**/*.{css}", "./src/scripts/**/*", "./resources"],
+   "server":{
+       "baseDir":"./src",
+       "routes": {
+          "/src": "./src",
+          "/scripts": "./src/scripts",
+          "/resources": "./resources"
+      }
+    }
+}

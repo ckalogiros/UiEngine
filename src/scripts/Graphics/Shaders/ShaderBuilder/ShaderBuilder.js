@@ -945,7 +945,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
    const vertex_shader = vs_chunks.filter(filterEmptyLine).join('\n')
 
-   // const vs = Vertex_shader_includes_resolve(vertex_shader);
    const vs = Shader_includes_resolve(vertex_shader);
 
    const attribsidx = Shader_attributes_create(ret.attribs_info);

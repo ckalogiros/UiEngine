@@ -27,7 +27,6 @@ import { metrics_comicsanscz_mtsdf_1024 } from '../../../../../resources/fonts/c
 // import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { metrics_consolas_mtsdf_1024 } from '../../../../../resources/fonts/consolas_mtsdf/metrics/metrics_consolas_mtsdf_1024.js';
 import { Texture_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
-import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
 import { atlas_variants_consola_1024x1024_8px_scale12_extended_ascii } from "../../../../../resources/fonts/atlas_variants/consola/atlas_variants_consola_1024x1024_8px_scale12_extended_ascii.js";
 
@@ -51,78 +50,7 @@ let _textureBufferCount = 0;
 /** */
 const TEXTURE_PATHS = [
 
-	// { // 0
-	// 	img_path: 'fonts/consolas_3',
-	// 	img_name: FONT_CONSOLAS_12px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 1
-	// 	img_path: 'fonts/consolas_4',
-	// 	img_name: FONT_CONSOLAS_16px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 2
-	// 	img_path: 'fonts/consolas_5',
-	// 	img_name: FONT_CONSOLAS_20px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 3
-	// 	img_path: 'fonts/consolas_6',
-	// 	img_name: FONT_CONSOLAS_24px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 4
-	// 	img_path: 'fonts/consolas_7',
-	// 	img_name: FONT_CONSOLAS_28px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 5
-	// 	img_path: 'fonts/consolas_8',
-	// 	img_name: FONT_CONSOLAS_32px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 6
-	// 	img_path: 'fonts/consolas_10',
-	// 	img_name: FONT_CONSOLAS_40px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 7
-	// 	img_path: 'fonts/consolas_12',
-	// 	img_name: FONT_CONSOLAS_49px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 8
-	// 	img_path: 'fonts/consolas_14',
-	// 	img_name: FONT_CONSOLAS_58px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 9
-	// 	img_path: 'fonts/consolas_16',
-	// 	img_name: FONT_CONSOLAS_66px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 10
-	// 	img_path: 'fonts/consolas_28',
-	// 	img_name: FONT_CONSOLAS_116px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 11
-	// 	img_path: 'fonts/consolas_38',
-	// 	img_name: FONT_CONSOLAS_157px,
-	// 	img_type: 'bmp',
-		
-	// },
+	
 	{ // 0
 		img_path: 'fonts/consolas_mtsdf',
 		img_name: FONT_CONSOLAS_MTSDF_1024,
@@ -131,13 +59,7 @@ const TEXTURE_PATHS = [
 	},
 	{ // 1
 		img_path: 'fonts/comic_sans_ms',
-		img_name: FONT_MSDF_COMIC,
-		img_type: 'png',
-		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 2
-		img_path: 'fonts/TEST',
-		img_name: TEST_FONT_MSDF_ARIAL,
+		img_name: FONT_COMIC_MTSDF_1024,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
@@ -231,8 +153,7 @@ function Texture_pair_texture_to_metrics_file(img_name) {
 		// case FONT_CONSOLAS_116px: { return CONSOLAS_116Hpx; }	
 		// case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
 		case FONT_CONSOLAS_MTSDF_1024: { return metrics_consolas_mtsdf_1024; }	
-		case FONT_MSDF_COMIC: { return metrics_comicsanscz_mtsdf_1024; }	
-		case TEST_FONT_MSDF_ARIAL: { return test_arial_msdf; }	
+		case FONT_COMIC_MTSDF_1024: { return metrics_comicsanscz_mtsdf_1024; }	
 		case ATLAS_TEXTURE_VARIANT_FONT_CONSOLA: { return atlas_variants_consola_1024x1024_8px_scale12_extended_ascii; }	
 		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
 		default: console.error('01928374655637.  Texture_pair_texture_to_metrics_file() failed to find metrics for texture:', img_name)

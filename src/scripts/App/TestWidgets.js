@@ -32,6 +32,7 @@ import { App_reinitialize, App_reset } from './App.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from './Widgets/WidgetGenericControlsReady.js';
 import { Effect_explosion_circle_get_mesh_byidx, Effects_create_explosion_circle } from '../Engine/Drawables/Effects/Effects.js';
 import { Linear_interpolation } from '../Helpers/Math/MathFunctions.js';
+import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
 
 
 
@@ -72,7 +73,7 @@ export function TestWidgetsGeneric() {
     // Demos_welcome_menu();
 
     { // Games
-        // Arkanoid_initialize();
+        Arkanoid_initialize();
         // Arkanoid_test_game_options();
 
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -243,12 +244,6 @@ export function TestWidgetsGeneric() {
         // Window_menu();
     }
 
-
-
-
-    /*************************************************************************************************************************/
-    // Test Interactions-Animations
-
     { // Annimations
 
         { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribute
@@ -287,12 +282,6 @@ export function TestWidgetsGeneric() {
 
         }
     }
-
-
-
-    /*************************************************************************************************************************/
-    // Test more complex structures
-
 
     { // DEMOS
 
@@ -422,8 +411,6 @@ export function TestWidgetsGeneric() {
         }
     }
 
-    // NOT YET TESTED AND CORRECTED WITH NEW WIDGET CREATION STYLE
-
     { // Reload
         // Test_reload_app();
     }
@@ -474,13 +461,6 @@ export function TestWidgetsGeneric() {
 
         }
     }
-
-    { // Shaders Tests
-        // Test_shaders_test1();
-        // Test_shaders_test2();
-        // Test_shaders_test3();
-        // Test_shaders_test4();
-    }
     
     { // Shader Operations
         
@@ -505,10 +485,19 @@ export function TestWidgetsGeneric() {
         // Shader_color_functions_noise_test();
 
         // TODO: Create particles with explosion circle and animate the timer
-        Shader_color_functions_explosion_circle(100, 0);
+        // Shader_color_functions_explosion_circle(100, 0);
 
     }
+    
+    
+    // NOT YET TESTED AND CORRECTED WITH NEW WIDGET CREATION STYLE
 
+    { // Shaders Tests
+        // Test_shaders_test1();
+        // Test_shaders_test2();
+        // Test_shaders_test3();
+        // Test_shaders_test4();
+    }
     // TODO: NEEDS REIMPLEMENTION
     { // Framebuffer
 

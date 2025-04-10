@@ -1,5 +1,8 @@
 TODO
 
+* Remove functions from {geom, mat}, {mesh} and if possible create functions and not methods
+   Also reduce the memory footprint of Mesh etc.
+
 * Re-implement 'current_event_callback_idx' and 'event_clbks_resolve_fn' for many callbacks in a Mesh
 
 * Align_NEW rename to align or layout and remove Align() if it is unused(check to see)

@@ -1,3 +1,6 @@
+
+* Replace u_generic_ve3 with u_generic_controls (in effects)
+
 * Re think the root group, view group.
 * Implement a Gl_add and _set function, that runs once per vb and updates all consecutive meshes in the buffer for N meshes.
    The point being reduce the Gl calls to the number of vertex buffers, but the meshes must belong in a group.

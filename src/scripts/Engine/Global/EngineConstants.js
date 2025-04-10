@@ -503,21 +503,8 @@ const TEXTURE_TYPE = {
 
 
 // Font textures
-const FONT_CONSOLAS_12px = 'consolas_3';
-const FONT_CONSOLAS_16px = 'consolas_4';
-const FONT_CONSOLAS_20px = 'consolas_5';
-const FONT_CONSOLAS_24px = 'consolas_6';
-const FONT_CONSOLAS_28px = 'consolas_7';
-const FONT_CONSOLAS_32px = 'consolas_8';
-const FONT_CONSOLAS_40px = 'consolas_10';
-const FONT_CONSOLAS_49px = 'consolas_12';
-const FONT_CONSOLAS_58px = 'consolas_14';
-const FONT_CONSOLAS_66px = 'consolas_16';
-const FONT_CONSOLAS_116px = 'consolas_28';
-const FONT_CONSOLAS_157px = 'consolas_38';
 const FONT_CONSOLAS_MTSDF_1024 = 'consolas_mtsdf_1024';
-const FONT_MSDF_COMIC = 'comicz';
-const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
+const FONT_COMIC_MTSDF_1024 = 'comicz';
 // Textures Atlases
 const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 // Textures
@@ -566,26 +553,8 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
 g_cnt = 0;
 const TEXTURES = {
 
-	// POTENTIAL_BUG: 
-	// IMPORTANT:Font textures MUST precede all other textures
-
-	// Font Textures
-	// CONSOLAS_12px: g_cnt++,
-	// CONSOLAS_16px: g_cnt++,
-	// CONSOLAS_20px: g_cnt++,
-	// CONSOLAS_24px: g_cnt++,
-	// CONSOLAS_28px: g_cnt++,
-	// CONSOLAS_32px: g_cnt++,
-	// CONSOLAS_40px: g_cnt++,
-	// CONSOLAS_49px: g_cnt++,
-	// CONSOLAS_58px: g_cnt++,
-	// CONSOLAS_66px: g_cnt++,
-	// CONSOLAS_116px: g_cnt++,
-	// CONSOLAS_157px: g_cnt++,
-
 	MTSDF_CONSOLAS_1024: g_cnt++, // index:[12]
 	MTSDF_COMIC_1024: g_cnt++,
-	TEST_MSDF_ARIAL: g_cnt++,
 	CONSOLA_VARIANT_FONT: g_cnt++,
 
 	TEXTURE_FONTS_COUNT: g_cnt,

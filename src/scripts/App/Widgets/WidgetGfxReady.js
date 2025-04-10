@@ -1,5 +1,7 @@
 "use strict";
 
+import { Shader_attributes_get_attribs } from "../../Graphics/ShaderAttributes.js";
+
 
 
 
@@ -78,4 +80,11 @@ export function Widget_gfx_ready_enable({
       mesh.GfxEnableBlend(enable_blend_mode);
    }
 
+}
+
+
+export function TEMP_build_mesh_attributes(mesh) {
+
+   const attribs_info = Shader_attributes_get_attribs(mesh.gfx.prog.attribsidx);
+   console.log('attribs_info', attribs_info)
 }
