@@ -12,9 +12,13 @@
         "directory": "/"
     },
     "scripts": {
-
+        "start": "npm run lite",
+        "lite": "lite-server --port 6001"
+    },
+    "dependencies": {
+        "light-server": "^2.9.1"
     },
     "devDependencies": {
-        "vite": "^6.2.5"
+        "lite-server": "^2.6.1"
     }
 }

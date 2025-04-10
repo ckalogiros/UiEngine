@@ -109,7 +109,9 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
 
-      this.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
+      // this.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
+      // this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF;
+      this.align.flags = properties.dp.layout !== undefined ? properties.dp.layout : LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
 
       properties.dp.pos[2] += 1;
       this.menu = Create_rect_mesh(properties.menu);
@@ -119,6 +121,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
+      
       
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;

@@ -7,7 +7,7 @@ import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/
 
 import { Detect_host_platform, Device_set_up, Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
-import { Time_intervals_destroy } from '../Engine/Timers/TimeIntervals.js';
+import { Time_intervals_destroy, Time_intervals_init_time, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
 import { Dbg_ui_info_all_reset, Debug_info_ui_performance_set_initial_position_screen_right } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Listener_init_event_storage_buffers, Listener_reset_event_storage_buffers_dealocate } from '../Engine/Events/EventListeners.js';
@@ -40,10 +40,10 @@ export function AppInit() {
     // SID.Init();
 
 
-    // Time_intervals_init_time();
+    Time_intervals_init_time();
 
     // Create and initialize the buffers that will be storing texture-font-uv data. 
-    // Texture_init_texture_storage_buffer();
+    Texture_init_texture_storage_buffer();
 
     
 
@@ -52,9 +52,7 @@ export function AppInit() {
     Device_set_up();
     Input_create_user_input_listeners();
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Create Renderer and Scene
-    */
+    /* Create Renderer and Scene */
     const scene = Scenes_create_scene();
     const camera = new CameraOrthographic();
     // const camera = new CameraPerspective();
@@ -73,10 +71,10 @@ export function AppInit() {
     Renderqueue_init();
     
     Performance_timers_init_all();
-    // Time_intervals_initialize();                // Time_intervals_destroy()
+    Time_intervals_initialize();                // Time_intervals_destroy()
     Listener_init_event_storage_buffers();      // Listener_reset_event_storage_buffers()
     Notifications_initialize();                 // Notifications_reset()
-    // Callback_animations_initialize();           // Callback_animations_destroy()
+    Callback_animations_initialize();           // Callback_animations_destroy()
 
 
     // if(PLATFORM.ANY_SMARTPHONE_DEVICE) TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLAS_12px;

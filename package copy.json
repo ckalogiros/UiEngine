@@ -1,0 +1,20 @@
+{
+    "name": "gameengine",
+    "version": "1.0.0",
+    "description": "Game Engine",
+    "main": "Entry.js",
+    "type": "commonjs",
+    "author": "CHR",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ckalogiros/GameEngine.git",
+        "directory": "/"
+    },
+    "scripts": {
+
+    },
+    "devDependencies": {
+        "vite": "^6.2.5"
+    }
+}

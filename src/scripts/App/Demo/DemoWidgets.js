@@ -153,14 +153,17 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    const rcorners = 10;
    const font_size = 10;
    const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   const text_pad = [20, 12];
+   // const text_pad = [20, 12];
+   const text_pad = [20, 0];
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [10, 20], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], col: TRANSPARENCY(GREY[3], .8) }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .8) }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
-   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL | LAYOUT.FIXED_HEIGHT;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    section.SetName('Demo_widgets_scrolled_labels');
+
+   section.geom.dim[1] += section.StylesGetPad(STYLES.AXIS.Y); // Adding the pad
 
 
    const info = Create_widget_label(Style_label_default_properties({ text: text_sample_scroller, col: GREY[2], text_col: GREENL[9], text_pad: text_pad, texture_id: default_font, font_size: font_size, }));
@@ -169,7 +172,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    info.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    section.AddItem(info);
 
-   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [15, 15], col: TRANSPARENCY(GREY[1], .8) }));
+   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], col: TRANSPARENCY(GREY[1], .8) }));
    Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, });
    scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
 
@@ -221,7 +224,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
 
    const height = scroller_height - info.geom.dim[1] * 2 + 10;
-   const scroller_component = Components_create_scroller_component(10, height, scrolled_section, 100);
+   const scroller_component = Components_create_scroller_component(10, height, scrolled_section, 10);
    Scoller_component_gengfx_and_render(scroller_component, scrolled_section);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled_section.root_posidx, scroller_component.root_posidx);
    Listeners_set_priority(E.C, scroller_component.listeners);
@@ -230,12 +233,12 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    Scroller_component_calculate_handle_pos_dim(scrolled_section, scroller_component);
 
    // Set scissor box
-   const mx = scrolled_section.mesh_bufferidx;
-   const my = scroller_component.mesh_bufferidx;
-   const mw = scrolled_section.mesh_bufferidx;
-   const mh = scroller_component.mesh_bufferidx;
-   Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
-   Vertex_buffer_group_create_scissorbox(scrolled_section.children.buffer[0].text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
+   // const mx = scrolled_section.mesh_bufferidx;
+   // const my = scroller_component.mesh_bufferidx;
+   // const mw = scrolled_section.mesh_bufferidx;
+   // const mh = scroller_component.mesh_bufferidx;
+   // Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
+   // Vertex_buffer_group_create_scissorbox(scrolled_section.children.buffer[0].text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
 
 
    // Unfortunately must Re-render the menu_panel for the clipping of the scroller to take place
@@ -705,7 +708,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
 
 
-   const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0, 0, 1], col: GREY[5], btn_col: BLUEL[9], menu_col: YELLOWL[3], text_pad: text_pad, text_pad: text_pad, font_size: font_size, }));
+   const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0, 0, 1], col: GREY[5], btn_col: BLUEL[9], menu_col: YELLOWL[3], text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, })
    section.AddItem(dp);
 

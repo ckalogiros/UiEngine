@@ -89,41 +89,41 @@ export class Renderer {
 
          TimeUpdate();
 
-         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
-         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
-         // Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
-         // Timers_update_global_timer(); // This is a globbal timer, going only forward
-         // Timers_update();
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
+         Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
+         Timers_update_global_timer(); // This is a globbal timer, going only forward
+         Timers_update();
          // // Step_timers_update();
-         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
 
-         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
-         // Mesh_animations_run();
-         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
+         Mesh_animations_run();
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Animations);
 
-         // Callback_animations_run();
+         Callback_animations_run();
 
          // Framebuffer_update_draw();
          this.scene.OnUpdate();
 
-         // Notifications_update();
+         Notifications_update();
 
          Uniforms_block_update_uniform();
 
-         // Particle_system_update()
+         Particle_system_update()
 
-         // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
+         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
-         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)
 
-         // Input_reset();
+         Input_reset();
 
-         // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
+         Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GameLoop);
          
-         // Performance_timers_update_tick();
+         Performance_timers_update_tick();
 
-         // TimeSample();
+         TimeSample();
 
       }
 

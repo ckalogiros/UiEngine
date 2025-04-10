@@ -2,20 +2,12 @@
     "version": "0.2.0",
     "configurations": [
 
-        // {
-        //     "type": "chrome",
-        //     "request": "launch",
-        //     "name": "Launch Chrome against localhost",
-        //     "sourceMaps": false,
-        //     // "url": "http://localhost:6001/src/index.html",
-        //     "url": "http://localhost:6001",
-        //     "webRoot": "${workspaceFolder}/src"
-        // },
+
         {
             "name": "Launch Chrome",
             "request": "launch",
             "type": "chrome",
-            "url": "http://localhost:6001/src/",
+            "url": "http://localhost:6001/",
             "trace": true,
             "sourceMaps": true,
             "perScriptSourcemaps": "yes",

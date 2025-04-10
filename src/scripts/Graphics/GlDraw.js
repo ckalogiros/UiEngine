@@ -11,9 +11,9 @@ import { Program_get_programs } from './ShaderPrograms.js';
 
 
 // rgb(38, 27, 37)
-const R = .05;
-const G = .05;
-const B = .05;
+const R = .1;
+const G = .1;
+const B = .1;
 // const R = (1/255) * 32;
 // const G = (1/255) * 32;
 // const B = (1/255) * 32;

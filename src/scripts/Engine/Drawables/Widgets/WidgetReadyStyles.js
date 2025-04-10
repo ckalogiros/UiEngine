@@ -483,7 +483,7 @@ export function Style_dropdown_default_properties(user_properties) {
          sub_texture_id:_,
          variant_idx:_,
                
-         layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.RESIZE_PARENT|LAYOUT.HORIZONTAL,
+         layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL,
 
          is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
       },

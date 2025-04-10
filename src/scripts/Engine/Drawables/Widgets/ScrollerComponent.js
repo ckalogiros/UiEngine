@@ -167,8 +167,8 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
 
 
    /* Set bar position */
-   // bar.geom.pos[0] = scrolled_section.GetPosX()+(scrolled_section.geom.dim[0]*2)-10;
    bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2;
+   // bar.geom.pos[0] = scrolled_section.GetPosX()+(scrolled_section.geom.dim[0]*2)-10;
    // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] - handle_pad[0];
    // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] + handle_pad[0];
    // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + handle_pad[0];

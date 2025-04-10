@@ -339,7 +339,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     
     // Set apropriate callback
     anim.UpdateClbk = Choose_update_callback(anim_type_flag);
-    anim.TestRenameMe = Update_test(vals_len)
+    // anim.TestRenameMe = Update_test(vals_len);
     
     anim.is_active = true;
     anim.in_animation = true;
@@ -427,8 +427,8 @@ export function Mesh_animations_run(){
                     
                     const vb_data = anim.vb_data[j];
                     const anim_data = anim.anim_data[j].data;
-                    // Min_max(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
-                    anim.TestRenameMe(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+                    Min_max(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+                    // anim.TestRenameMe(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
 
                     anim.UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
                                                      vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 

@@ -241,7 +241,7 @@ export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim
       rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       rect.Render()
 
-      rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
+      rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx)
 
       if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
       Construct_listen_events_from_mesh_tree(rect);

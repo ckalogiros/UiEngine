@@ -958,8 +958,8 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
         const start = vb_info.count;
         gfx.vb.starts.buffer[i] = start;
 
-        // Reallocate vertex buffer if it has no more space
-        let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 1
+        
+        let verts_per_rect = (gfx.vb.is_per_vertex.buffer[i]) ? vb_group.vertices_per_face : 6
         let total_attribs = 0;
         if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
             verts_per_rect = 2;

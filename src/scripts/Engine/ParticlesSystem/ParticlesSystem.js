@@ -1087,6 +1087,7 @@ export function Particle_system_update() {
             if (emitter.properties_flags & PARTICLES.HAS_JIGGLE) {
 
                // TODO: Make jiggle slower. Must include time, expand the jiggle through frames
+               // In order to make the jiggle smoother, there must be a smooth interpolation between randomness
                const jigglex = emitter.jigglex;
                const jiggley = emitter.jiggley;
                const x = GetRandomInt(particle.pos[0] - jigglex, particle.pos[0] + jigglex);

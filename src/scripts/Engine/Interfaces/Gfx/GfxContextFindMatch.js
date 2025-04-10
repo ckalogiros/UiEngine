@@ -197,7 +197,7 @@ function Find_match_from_children(mesh, parent) {
       if (child && child.gfx) {
 
          
-         if((SID.Sid_check_match(mesh.sid, child.sid))) {
+         if((Sid_check_match(mesh.sid, child.sid))) {
             
             const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (child.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION)
             // Check also if mesh has texture and the texidx matches the vb group's texidx
