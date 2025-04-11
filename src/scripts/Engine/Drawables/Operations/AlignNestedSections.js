@@ -244,12 +244,9 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
 
    if (mesh.gfx) {
       Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1])
-      // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0], mesh.geom.pos[1]);
-      // mesh.geom.UpdateSetWposXY(mesh.gfx);
       Mesh_set_dim_xy(mesh);
       Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
    }
-   // console.log(mesh.GetName())
    const size_x = accum_row_max_size_x;
    const size_y = total_size_y;
    return {

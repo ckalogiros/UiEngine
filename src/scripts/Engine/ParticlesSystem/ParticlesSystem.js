@@ -12,6 +12,7 @@ import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/B
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Material, Material_Texture } from "../Drawables/Material/Base/Material.js";
+import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
@@ -643,7 +644,7 @@ class Emitter {
 
 
       // Alert if the current mesh system does not have the uniform enabled.
-      console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
+      console.error('No Uniform ', unif_name, ' found for mesh:', Mesh_get_name(this));
       if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
 
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
@@ -707,7 +708,7 @@ class Emitter {
 
 
       // Alert if the current particle system does not have the uniform enabled.
-      console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
+      console.error('No Uniform ', unif_name, ' found for mesh:', Mesh_get_name(this));
       if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
       }
@@ -1434,7 +1435,7 @@ export function Particle_system_print_info() {
    for (let i = 0; i <= _emitters.boundary; i++) {
 
       const emitter = _emitters.buffer[i];
-      const parent = (emitter.parent !== null) ? emitter.parent.GetName() : 'null'
+      const parent = (emitter.parent !== null) ? Mesh_get_name(emitter.parent) : 'null'
 
       console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),
          '\nindex:', emitter.idx,

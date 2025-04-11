@@ -3,6 +3,7 @@
 import { State_mesh_set_clicked, State_mesh_set_clickhold } from '../../../GlobalFunctions.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Base/Colors.js';
+import { Mesh_listener_add, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
 import { Widget_Label } from './WidgetLabel.js';
 import { Style_button_default_properties } from './WidgetReadyStyles.js';
 
@@ -65,12 +66,12 @@ export class Widget_Button extends Widget_Label {
          
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
       
@@ -79,14 +80,14 @@ export class Widget_Button extends Widget_Label {
 
 
    OnClick(params) {
-
+      console.log('9009w8989ufuijshkjfdskjm')
       const mesh = params.evt_params.target_mesh;
 
       // Case the mesh has a chain callback function to call. (For now the button's chain callbacks are not chained)
       if (mesh.evt_params && mesh.evt_params.EventClbk) {
 
          // Create time interval to continuosly press the button
-         if (mesh.StateCheck(MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
+         if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params

@@ -8,7 +8,7 @@ import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
-import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_xy, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -218,17 +218,17 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	Move(x, y) {
+	// Move(x, y) {
 
-		if (x === 0 && y === 0) return;
+	// 	if (x === 0 && y === 0) return;
 
-		this.geom.pos[0] += x;
-		this.geom.pos[1] += y;
-		this.geom.AddWposXY(this.gfx, x, y);
+	// 	this.geom.pos[0] += x;
+	// 	this.geom.pos[1] += y;
+	// 	this.geom.AddWposXY(this.gfx, x, y);
 
-		// console.log(this.GetName(), this.geom.pos)
+	// 	// console.log(this.GetName(), this.geom.pos)
 
-	}
+	// }
 
 
 	ListenEventConstruct() { return false; }
@@ -841,7 +841,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
 		// Move 'this' text
-		mesh.geom.AddWposXY(mesh.gfx, mouse_pos.x, -mouse_pos.y,);
+		Mesh_add_wpos_xy(mesh, mouse_pos.x, -mouse_pos.y,);
 
 		// Move children text
 		for (let i = 0; i <= mesh.children.boundary; i++) {

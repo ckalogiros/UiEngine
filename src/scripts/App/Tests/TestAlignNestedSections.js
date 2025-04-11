@@ -10,6 +10,7 @@ import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Gl_set_angle, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 import { Widget_ready_label, Widget_ready_slider } from "../Widgets/WidgetReadyWidgets.js";
+import { Mesh_get_name } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -68,7 +69,7 @@ function Find_last_right_aligned_child_from_parent(cur_pos_x = 0, parent = null,
 
       // pos_x = parent_pos_x + parent.geom.dim[0]*2 - (cur_mesh.geom.dim[0]*2); // Float mesh to the parent's right side, pads included
       pos_x = parent.geom.pos[0] + parent.geom.dim[0] * 2 + parent_pad_x - (cur_mesh.geom.dim[0] * 2); // Float mesh to the parent's right side, pads included
-      console.log('0 -', cur_mesh.GetName())
+      console.log('0 -', Mesh_get_name(cur_mesh))
    }
 
    return pos_x;
@@ -203,8 +204,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10],) {
 
    }
 
-   // console.log('  total_size_y', total_size_y, 'row_max_size_y', row_max_size_y, mesh.GetName())
-
    const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
 
@@ -338,8 +337,6 @@ function Align_pre_simple___with_float_right(mesh, pos_x = 0, pos_y = 0, pad = [
       if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
 
    }
-
-   // console.log('  total_size_y', total_size_y, 'row_max_size_y', row_max_size_y, mesh.GetName())
 
    const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;

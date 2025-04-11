@@ -1,6 +1,7 @@
 "use strict";
 
 import { Free_int8_buffer, M_Buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { Mesh_get_name } from "./MeshPropertiesFunctions.js";
 
 /**
  * IMPLEMENTATION:
@@ -173,7 +174,7 @@ function _Relative_pos_comp_recalc_left(whereidx, parent){
       const elemidx = children.buffer[i];
       const elem = parent.children.buffer[elemidx];
 
-      console.log('1111111111111111111111', elem.GetName())
+      console.log('1111111111111111111111', Mesh_get_name(elem))
 
       if(elem.state.mask & MESH_STATE_FLAGS.ACTIVE){
          x += elem.geom.dim[0]*2;

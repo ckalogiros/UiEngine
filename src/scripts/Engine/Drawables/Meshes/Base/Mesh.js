@@ -16,6 +16,7 @@ import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { CopyMat4 } from "../../../../Helpers/Math/MathOperations.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
 import { Sid_check_unif_match_sids, State_mesh_reset } from "../../../../GlobalFunctions.js";
+import { Mesh_get_name } from "../../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -367,8 +368,6 @@ export class Mesh {
         // if (this.rel_comp) this.rel_comp.Destroy();
 
     }
-    /** */
-    StateCheck(bit) { return this.state.mask & bit; }
 
 
 
@@ -381,6 +380,7 @@ export class Mesh {
     /*******************************************************************************************************************************************************/
 
     /** */
+    // TODO: Just replace all '.CreateListenEvent()' calls or implement the new way via 'Widget_gfx_
     CreateListenEvent(etype, is_fake_event = false) {
 
         if (!this.listeners) {
@@ -422,55 +422,55 @@ export class Mesh {
     }
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     /** */
-    AddListenEvent(etypeidx, Clbk = null, params = null) {
+    // AddListenEvent(etypeidx, Clbk = null, params = null) {
 
-        if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
-        if ((this.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0x0) {
-            // console.error('0198815 \nMesh is INACTIVE to add a listen event \n', this.GetName());
-            return;
-        }
+    //     if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
+    //     if ((this.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0x0) {
+    //         // console.error('0198815 \nMesh is INACTIVE to add a listen event \n', this.GetName());
+    //         return;
+    //     }
 
 
-        const is_fake = (this.state.mask & MESH_STATE_FLAGS.IS_FAKE_EVENT) ? true : false;
-        this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
-    }
+    //     const is_fake = (this.state.mask & MESH_STATE_FLAGS.IS_FAKE_EVENT) ? true : false;
+    //     this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
+    // }
     // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
     /** */
-    ChangeListenEvent(etypeidx, Clbk = null, params = null) {
+    // ChangeListenEvent(etypeidx, Clbk = null, params = null) {
 
-        if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) { // HERE: see if can remove check
+    //     if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) { // HERE: see if can remove check
 
-            Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
-        }
-    }
+    //         Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
+    //     }
+    // }
+    // /** */
+    // RemoveAllListenEvents() {
+
+    //     if (!this.listeners) return;
+
+    //     for (let i = 0; i <= this.listeners.boundary; i++) {
+
+    //         if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
+    //             Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
+    //             this.listeners.buffer[i] = INT_NULL;
+    //         }
+    //     }
+    // }
     /** */
-    RemoveAllListenEvents() {
+    // CreateEventCallback(params = null, event_clbks_resolve_fn = null) {
 
-        if (!this.listeners) return;
+    //     if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
+    //     if (this.event_clbks === null) this.event_clbks = New_generic_buffer(_, 'Mesh event_clbks');
 
-        for (let i = 0; i <= this.listeners.boundary; i++) {
+    //     // Automaticaly enable event callback if the first event callback is activated. 
+    //     // For the rest of the callback events, the user is responsible to set the current active by setting current_event_callback_idx
+    //     const evt_clbk_idx = this.event_clbks.Add(params);
+    //     if (evt_clbk_idx === 0) this.current_event_callback_idx = evt_clbk_idx;
 
-            if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
-                Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
-                this.listeners.buffer[i] = INT_NULL;
-            }
-        }
-    }
-    /** */
-    CreateEventCallback(params = null, event_clbks_resolve_fn = null) {
-
-        if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
-        if (this.event_clbks === null) this.event_clbks = New_generic_buffer(_, 'Mesh event_clbks');
-
-        // Automaticaly enable event callback if the first event callback is activated. 
-        // For the rest of the callback events, the user is responsible to set the current active by setting current_event_callback_idx
-        const evt_clbk_idx = this.event_clbks.Add(params);
-        if (evt_clbk_idx === 0) this.current_event_callback_idx = evt_clbk_idx;
-
-        // User created function to resolve the event callback
-        if (event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn;
-        return evt_clbk_idx;
-    }
+    //     // User created function to resolve the event callback
+    //     if (event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn;
+    //     return evt_clbk_idx;
+    // }
 
 
 
@@ -491,13 +491,6 @@ export class Mesh {
 
 
 
-
-    /** */
-    RotateZ(angle) { Gl_rotate_z_2d(this.gfx, this.geom.dim, angle); }
-    /** */
-    RotateAddZ(angle) { Gl_rotate_add_z_2d(this.gfx, this.geom.dim, angle); }
-    /** */
-    RotateY(angle) { Gl_rotate_y_2d(this.gfx, this.geom.dim, angle); }
 
     /** */
     StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
@@ -780,7 +773,7 @@ export class Mesh {
 
 
         // Alert if the current mesh system does not have the uniform enabled.
-        console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
+        console.error('No Uniform ', unif_name, ' found for mesh:', Mesh_get_name(this));
         if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
 
             alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
@@ -825,15 +818,6 @@ export class Mesh {
         this.children_scrollers_buffer.Add(scroller_comp_idx);
         this.has_children_scrollers = true;
     }
-
-
-    /** */
-    SetName(name = null) {
-        if (name !== '' && name) this.nameidx = Str_buffer_mesh_names_store(name, this.mesh_bufferidx, this.type & MESH_TYPE.DEBUG_MESH);
-        /**DEBUG*/this.name = name
-    }
-    /** */
-    GetName() { return Str_buffer_mesh_names_get_by_idx(this.nameidx); }
 
 }
 

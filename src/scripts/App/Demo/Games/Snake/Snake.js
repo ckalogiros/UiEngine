@@ -24,6 +24,7 @@ import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/Mat
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
 import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -719,7 +720,7 @@ click mouse button.`;
       },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
 }
 /** */
@@ -1786,7 +1787,7 @@ function Snake_options_callback(params) {
       },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
    return menu_panel;
 

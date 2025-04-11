@@ -14,6 +14,7 @@ import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js"
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create, Mesh_listener_add } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -276,12 +277,12 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
    }
@@ -499,7 +500,7 @@ export class Close_Button extends Widget_Button {
       }
 
       // Pass the root and the callback for destroying the parent widget
-      this.CreateEventCallback(params);
+      Mesh_event_callback_create(this, params);
    }
 
 
@@ -566,7 +567,7 @@ export class Widget_Minimize extends Widget_Button {
          evt_params: root,
       }
 
-      this.CreateEventCallback(params);
+      Mesh_event_callback_create(this, params);
 
    }
 

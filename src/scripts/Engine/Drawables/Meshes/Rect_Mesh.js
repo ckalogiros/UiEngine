@@ -18,6 +18,7 @@ import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focuse
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { TEMP_build_mesh_attributes } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_get_name, Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -42,7 +43,7 @@ export class Rect_Mesh extends Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
 
       this.StylesSetPad(properties.pad);
-      this.SetName(`${properties.name}`);
+      Mesh_set_name(this, `${properties.name}`);
 
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -216,14 +217,13 @@ export class Rect_Mesh extends Mesh {
          for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
             if (child) child.Render();
-            // console.log('2', child.GetName())
          }
       }
 
    }
    AddToGfx() {
 
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
@@ -234,7 +234,7 @@ export class Rect_Mesh extends Mesh {
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, this.GetName())
+      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, Mesh_get_name(this))
 
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
@@ -287,12 +287,12 @@ export class Rect_Mesh extends Mesh {
          
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
 
@@ -308,7 +308,7 @@ export class Rect_Mesh extends Mesh {
       if (section.evt_params && section.evt_params.EventClbk) {
 
          // Create time interval to continuosly press the button
-         if (section.StateCheck(MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
+         if (Mesh_state_check(section, MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
             const EventClbk = section.evt_params.EventClbk;
             const target_params = section.evt_params.params.target_params
@@ -365,7 +365,7 @@ export class Rect_Mesh extends Mesh {
          const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, section);
          section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (section.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
+         if (Mesh_state_check(section, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
             State_mesh_set_grabed(section);
             State_mesh_set_focused(section);
@@ -387,7 +387,7 @@ export class Rect_Mesh extends Mesh {
       const root = params.params;
 
       // NOTE: We use the same element of the mesh's interval buffer for the resize event as the move event, they cannot both exist at the same time. 
-      if (root.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+      if (Mesh_state_check(root, MESH_STATE_FLAGS.IN_GRAB) === 0 && root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
          const intervalIdx = root.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);
@@ -451,14 +451,6 @@ export class Rect_Mesh extends Mesh {
          // Root_group_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
       }
    }
-   RotateZ(angle) {
-
-      super.RotateZ(angle);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) Section_rotatez_children_recursive(child, angle);
-      }
-   }
 
 }
 
@@ -468,7 +460,7 @@ export function Rect_mesh_on_move_clbk(params) {
    const section = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (section.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (Mesh_state_check(section, MESH_STATE_FLAGS.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);

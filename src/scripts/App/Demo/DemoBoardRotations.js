@@ -12,6 +12,8 @@ import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
+import { Mesh_rotate_z } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -148,7 +150,7 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
             o: slope_params_pointer,
          },
       }
-      mesh.CreateEventCallback(event_clbk_params);
+      Mesh_event_callback_create(mesh, event_clbk_params);
 
    }
 
@@ -217,7 +219,7 @@ function Animation_rotate_run(params) {
 
    const rot = (slope * params.equalize * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
 
 
@@ -274,7 +276,7 @@ function Animation_rotate_back_run(params) {
 
    const rot = ((1. - slope) * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
    rotation = rot;
 

@@ -25,6 +25,7 @@ import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js"
 import { Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_get_name, Mesh_set_name } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -160,7 +161,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.SetName('InfoUi-static');
+   Mesh_set_name(section, 'InfoUi-static');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -311,7 +312,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.SetName('MorePerformanceTimers');
+   Mesh_set_name(section, 'MorePerformanceTimers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -375,7 +376,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.SetName('ApplicationBuffers');
+   Mesh_set_name(section, 'ApplicationBuffers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -449,7 +450,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
 
-   section.SetName('ApplicationBuffers');
+   Mesh_set_name(section, 'ApplicationBuffers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -522,7 +523,7 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int16_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
 
-   section.SetName('ApplicationBuffers');
+   Mesh_set_name(section, 'ApplicationBuffers');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -2395,7 +2396,7 @@ function Debug_info_create_mesh_info(params) {
 function Debug_info_mesh_add_meshes_as_tree_struct(mesh, parent) {
 
    // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
-   const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:`${mesh.GetName()}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREY[5], .5), menu_col:TRANSPARENCY(GREY[1], .8), text_pad:temp_btnpad, pad:[4, 4]}));
+   const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:`${Mesh_get_name(mesh)}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREY[5], .5), menu_col:TRANSPARENCY(GREY[1], .8), text_pad:temp_btnpad, pad:[4, 4]}));
    dp_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    dp_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    parent.AddToMenu(dp_mesh);
@@ -2457,7 +2458,7 @@ function Debug_info_mesh_update(params) {
          return;
       }
 
-      const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:` ${added_mesh_gfx.mesh.GetName()}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREEN[7], .5), menu_col:GREY[1], pad:[8, 3]}));
+      const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:` ${Mesh_get_name(added_mesh_gfx.mesh)}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREEN[7], .5), menu_col:GREY[1], pad:[8, 3]}));
       Widget_gfx_ready_enable({mesh:dp_mesh, enable_sdf_rect:10},);
       root_info_dp.AddToMenu(dp_mesh);
 
@@ -2539,7 +2540,7 @@ function Debug_info_create_batch_info(params) {
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('InfoUi-Batch section');
+   Mesh_set_name(section, 'InfoUi-Batch section');
 
 
    const info1 = Create_widget_text(_, `Batch store: ${TEMP_TEST_PERFORMANE_COUNTERS.MESH_INFO_UI.BATCH_STORE}0000`, [0, 0, 10], 10, YELLOW[9]);
@@ -3175,7 +3176,7 @@ function Dbg_ui_mesh_tree_create_entry(params) {
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
 
-   console.log(scrolled.GetName(), scrolled)
+   console.log(Mesh_get_name(scrolled), scrolled)
 
 }
 
@@ -3226,7 +3227,7 @@ function TEMPORARY(mesh, parent, root_entry_dp) {
 
 
       // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
-      const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:`${mesh.GetName()}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREY[5], .5), menu_col:TRANSPARENCY(GREY[1], .8), text_pad:temp_btnpad, pad:[4, 4]}));
+      const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({text:`${Mesh_get_name(mesh)}`, pos:[0, 0, parent.geom.pos[2] + 1], col:TRANSPARENCY(GREY[5], .5), menu_col:TRANSPARENCY(GREY[1], .8), text_pad:temp_btnpad, pad:[4, 4]}));
       Widget_gfx_ready_enable({mesh:dp_mesh, enable_sdf_rect:10});
       parent.AddToMenu(dp_mesh);
 
@@ -3488,7 +3489,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
 function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col_menu, col_dp, margin, style, btn_pad = [4, 2]) {
 
    { // Create info name
-      const info_name = Create_widget_label(_, info_data.GetName(), _, [0, 0, 1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
+      const info_name = Create_widget_label(_, Mesh_get_name(info_data), _, [0, 0, 1], 9, PURPLEB[9], _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
       // info_name.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       info_name.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
       info_name.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.r_corners);
@@ -3970,7 +3971,7 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
             const mesh = Mesh_buffer_get_mesh_byidx(meshidx)
             if (mesh) {
 
-               const info = Create_widget_text(_, `idx:[${meshidx}] ${mesh.GetName()}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
+               const info = Create_widget_text(_, `idx:[${meshidx}] ${Mesh_get_name(mesh)}`, pos, _, _, _, _, _, MESH_TYPE.DEBUG_MESH);
                info.SetTypeDebug();
                all_meshes_buffer.AddToMenu(info);
             }

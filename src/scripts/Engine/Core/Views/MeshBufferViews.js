@@ -1,6 +1,7 @@
 "use strict";
 
 import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuffer.js";
@@ -355,7 +356,7 @@ function Remove_vb_data_from_view_recursive(mesh) {
 
    const buffer = _view_buffer.buffer[groupidx].vb.buffer[group_vbidx].data;
 
-   /**DEBUG*/ if (groupidx === INT_NULL || group_vbidx === INT_NULL || group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.GetName(), ' mesh group idxs', mesh.group_bufferidxs)
+   /**DEBUG*/ if (groupidx === INT_NULL || group_vbidx === INT_NULL || group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', Mesh_get_name(mesh), ' mesh group idxs', mesh.group_bufferidxs)
 
    buffer.RemoveByIdx(group_meshidx);
 
@@ -374,7 +375,7 @@ function Remove_vb_data_from_view_recursive(mesh) {
       const text_group_vbidx = mesh.text_mesh.group_bufferidxs[1];
       const text_group_meshidx = mesh.text_mesh.group_bufferidxs[2];
 
-      /**DEBUG*/ if (text_groupidx === INT_NULL || text_group_vbidx === INT_NULL || text_group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', mesh.text_mesh.GetName(), ' mesh group idxs', mesh.text_mesh.group_bufferidxs)
+      /**DEBUG*/ if (text_groupidx === INT_NULL || text_group_vbidx === INT_NULL || text_group_meshidx === INT_NULL) console.error('MESH HAS NULL GROUP:', Mesh_get_name(mesh.text_mesh), ' mesh group idxs', mesh.text_mesh.group_bufferidxs)
 
       _view_buffer.buffer[text_groupidx].vb.buffer[text_group_vbidx].data.RemoveByIdx(text_group_meshidx);
 

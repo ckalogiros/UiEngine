@@ -1,10 +1,8 @@
 "use strict";
 
 import { RotateY, RotateZ } from "../../Helpers/Math/Matrix.js";
-import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_offset_size_attribs_per_vertex } from "../ShaderAttributes.js";
-import { Program_get_shader_attribs_indexing } from "../ShaderPrograms.js";
+import { Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size_attribs_per_vertex } from "../ShaderAttributes.js";
 import { Index_buffer_get_by_ibidx } from "./IndexBuffers.js";
-import { Set_vertex_position_VPOS2 } from "./VertexBufferFillOps.js";
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_remove_geometry, Vertex_buffer_state_enable } from "./VertexBuffers.js";
 
 

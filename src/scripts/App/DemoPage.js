@@ -30,6 +30,7 @@ import { Style_button_default_properties, Style_rect_default_properties, Style_s
 import { Widget_gfx_ready_enable } from "./Widgets/WidgetGfxReady.js";
 import { Align_pre_simple } from "./Tests/TestAlignNestedSections.js";
 import { Mesh_get_real_pos_y } from "../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -271,7 +272,7 @@ Explore the demos and discover the possibilities!`;
       },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
 }
 
@@ -852,7 +853,7 @@ function Create_menu_popup(params) {
       evt_clbks: () => { params.params.menu_panel = null; },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 }
 
 
@@ -1289,7 +1290,7 @@ function Options_menu_callback(params) {
       },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 }
 
 

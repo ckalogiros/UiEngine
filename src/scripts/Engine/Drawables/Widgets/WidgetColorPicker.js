@@ -15,6 +15,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, PURPLE, RED, REDL, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Style_label_default_properties, Style_rect_default_properties, Style_slider_simple_default_properties } from "./WidgetReadyStyles.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
 
@@ -217,7 +218,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
          num_faces: 1, layout: LAYOUT.HORIZONTAL, 
       }));
       Widget_gfx_ready_enable({ mesh: slider_tran, enable_sdf_rect: properties.rcorners.slider_trans, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
-      slider_tran.SetName('Slider Transparency');
+      Mesh_set_name(slider_tran, 'Slider Transparency');
       // slider_tran.align.flags = LAYOUT.HORIZONTAL;
 
       slider_trans_idx = panel.AddItem(slider_tran);
@@ -249,7 +250,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
       Widget_gfx_ready_enable({ mesh: slider_hue, enable_sdf_rect: properties.rcorners.slider_hue, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      slider_hue.SetName('Slider Hue');
+      Mesh_set_name(slider_hue, 'Slider Hue');
       // slider_hue.align.flags = LAYOUT.VERTICAL;
       slider_hue_idx = this.AddItem(slider_hue);
 
@@ -470,7 +471,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
             target_mesh: mesh,
             params: null,
          };
-         color_pick_mesh.AddListenEvent(E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(color_pick_mesh, E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
       }
 
       { // Hue Slider
@@ -482,7 +483,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
             target_mesh: hue_mesh,
             params: null,
          };
-         hue_mesh.AddListenEvent(E.C, hue_mesh.OnClick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(hue_mesh, E.C, hue_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
          /**
           * Here we set up a connection between the slider and this class 'OnClickHuePick()'.
@@ -513,7 +514,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
             target_mesh: transp_slider_mesh,
             params: null,
          };
-         transp_slider_mesh.AddListenEvent(E.C, transp_slider_mesh.OnClick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(transp_slider_mesh, E.C, transp_slider_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
          // Create the callback that the slider will call to run the local method for transparency slider
          const clbk_params_transparency_slider = {
@@ -550,7 +551,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
          const idx = Time_intervals_create(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (widget.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
+         if (Mesh_state_check(widget, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
             State_mesh_set_grabed(widget);
             State_mesh_set_focused(widget);
@@ -985,7 +986,7 @@ function On_move_clbk(params) {
    const widget = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (widget.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (Mesh_state_check(widget, MESH_STATE_FLAGS.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);

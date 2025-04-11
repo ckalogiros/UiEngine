@@ -3,6 +3,7 @@
 import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Mesh_set_dim_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
 
 
@@ -40,7 +41,7 @@ const _ready_animations_buffer = [
 /**
  * HERE:
  * Για να εχουμε σωστη διαχειρηση των callback animations of the mesh class,
- * we need to create a resolveCallback function pointer in the mesh class and pass it with .CreateEventCallback.
+ * we need to create a resolveCallback function pointer in the mesh class and pass it with Mesh_event_callback_create.
  * So int the event listeners, the mesh will call the resolveCallback function pointer, which will call the callback function.
  * That way user chooses the callback function to be called when the event is triggered in the event listeners.
  */
@@ -101,7 +102,7 @@ export function Callback_animations_create_specific(target_mesh, animation_type_
          target_mesh.event_clbks.buffer[i].Clbk(clbk_params, event_handler_type);
       }
    }
-   target_mesh.CreateEventCallback(event_clbk_params, event_clbks_resolve_fn);
+   Mesh_event_callback_create(target_mesh, event_clbk_params, event_clbks_resolve_fn);
 
 }
 

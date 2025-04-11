@@ -33,7 +33,8 @@ import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel }
 import { Effect_explosion_circle_get_mesh_byidx, Effects_create_explosion_circle } from '../Engine/Drawables/Effects/Effects.js';
 import { Linear_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
-import { Mesh_get_real_pos_y } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
+import { Mesh_get_real_pos_y, Mesh_rotate_z } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
+import { Mesh_get_name } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 
 
 
@@ -57,7 +58,7 @@ export function TestWidgetsGeneric() {
 
     { // Statistics
         let yy = 0, pp = 23;
-        // const d1 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, yy); yy += d1.geom.dim[1] * 2
+        const d1 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1]*2
         // const d5 = Debug_info_ui_static_app_generic_buffers_container(ROOT_WIDGETS.CREATE_ROOT, 0, yy);yy += d5.geom.dim[1]*2
@@ -74,7 +75,7 @@ export function TestWidgetsGeneric() {
     // Demos_welcome_menu();
 
     { // Games
-        // Arkanoid_initialize();
+        Arkanoid_initialize();
         // Arkanoid_test_game_options();
 
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -82,13 +83,14 @@ export function TestWidgetsGeneric() {
     }
 
     { // Quick widget enable
-        CreateSimpleWidgetText()
-        CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
-        CreateSliderSimple();
-        Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, 'Ready Slider', _, )
-        CreateDropdownTree([0, 0, 0])
-        CreateScrollerClampAlphaTest(_, 0, 400, 10, 12)
-        Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
+        // CreateSimpleWidgetText()
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
+        // CreateSliderSimple();
+        // Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, 'Ready Slider', _, )
+        // CreateDropdownTree([0, 0, 0])
+        // CreateScrollerClampAlphaTest(_, 0, 400, 10, 12)
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
+        // Test_rotate_section_with_round_corners();
     }
 
 
@@ -593,8 +595,8 @@ function Test_rotate_section_with_round_corners() {
         const mesh = params.params
         // const t = (Timer_get_global_timer_cycle()-.5)*10;
         const rot = (Timer_get_global_timer()) * 1;
-        mesh.RotateZ(rot);
-        Gl_set_angle(mesh.gfx, rot);
+        Mesh_rotate_z(mesh, rot);
+        // Gl_set_angle(mesh.gfx, rot);
 
     }, line1)
 
@@ -937,7 +939,6 @@ function TexturedRect(is_root = 0x0, name = 'TexturedRect', x = 0, y = 0, dim = 
 
 
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.SetName(name);
 
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
     // section.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.R_CORNERS|SID.ATTR.FEATHER);
@@ -1027,7 +1028,7 @@ Also the sdf rect shader operation uses the folowng code for rotations:
 
                 const child = target_mesh.children.buffer[i];
                 child.GfxUniformSetAndUpdate('u_generic_controls', rot, 0);
-                child.RotateZ(rot);
+                Mesh_rotate_z(child, rot);
             }
 
         }, params,
@@ -1111,11 +1112,10 @@ function SectionResizable(pos) {
     const dim = [200, 200];
     // const dim = [400, VIEWPORT.HEIGHT / 2];
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: _, pad: marg, pos: pos, dim: dim, col: TRANSPARENCY(BLUEL[5], tr), }));
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: _, pad: marg, pos: pos, dim: dim, col: TRANSPARENCY(BLUEL[5], tr), name:`section${grey_cnt++}`}));
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, })
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
-    section.SetName(`section${grey_cnt++}`);
 
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1226,10 +1226,7 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
         text_col: _,
         is_debug_mesh: false,
     }));
-    Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, });
-
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+    Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}});
 
 
     // label.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
@@ -1358,8 +1355,7 @@ function CreateSwitch() {
 function CreateSliderSimple(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const slider = Create_widget_slider_simple(Style_slider_simple_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [100, 100, 0], col: GREY[5], dim: [100, 4], pad: [10, 10], }));
-    Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, });
-    slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
@@ -1419,9 +1415,7 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 
 
     const line = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: TRANSPARENCY(col, 1), name: 'sdf linem2', style: [0, 10, 1.8] }));
-    Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, })
-    line.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-    line.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+    Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}})
 
     // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1675,7 +1669,6 @@ function CreateDropdownTreeHorizontalLayout(pos = [0, 0, 0], is_root = ROOT_WIDG
     return dp;
 }
 
-
 function TestAlignNew(pos = [0, 0, 0]) {
 
     const widgets_construct = () => {
@@ -1880,8 +1873,6 @@ function TestAlignNew(pos = [0, 0, 0]) {
     return dp;
 }
 
-
-
 function Render_font_symbols_atlas_texture(x, y) {
 
     const section = Create_rect_mesh(Style_rect_default_properties({
@@ -2030,9 +2021,6 @@ function Render_font_symbols_atlas_texture(x, y) {
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 }
 
-
-
-
 function CreateDropdown3(pos, dim) {
 
     const pad = [4, 2]
@@ -2084,9 +2072,6 @@ function CreateDropdown3(pos, dim) {
     View_build_group_from_root_mesh(dp)
 
 }
-
-
-
 
 function CreateDropdown2InSection(pos, id) {
 
@@ -2208,10 +2193,6 @@ function CreateDropdown2InSection(pos, id) {
 
 }
 
-
-
-
-
 function CreateManySectionsMinimal(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const tr = .7;
@@ -2283,8 +2264,6 @@ function CreateManySectionsMinimal(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     return blu;
 }
-
-
 
 function CreateManySections(scene) {
 
@@ -2434,7 +2413,6 @@ function CreateManySections(scene) {
     return blu;
 }
 
-
 function Test_align_many_sliders() {
 
     const pos = [0, 0, 0];
@@ -2446,7 +2424,6 @@ function Test_align_many_sliders() {
     root.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     root.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     root.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-    root.SetName('root');
     root.StylesSetPad([10, 10])
 
 
@@ -2456,8 +2433,6 @@ function Test_align_many_sliders() {
         r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         // r1.align.flags = LAYOUT.HORIZONTAL;
         r1.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-        // r1.align.flags = LAYOUT.RESIZE_SELF;
-        r1.SetName('1')
         r1.StylesSetPad([10, 10])
         root.AddItem(r1)
 
@@ -2507,7 +2482,6 @@ function Test_align_many_sliders() {
             // r1.align.flags = LAYOUT.HORIZONTAL;
             r1.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
             // r1.align.flags = LAYOUT.RESIZE_SELF;
-            r1.SetName('1')
             r1.StylesSetPad([10, 10])
             root.AddItem(r1)
             // { const label = Widget_ready_label(_, `B`, tex_id, 0, 0, fonst_size, TRANSPARENCY(BLUEL[6], .7), _, _); label.StylesSetPad([0, 0]); label.align.flags |= LAYOUT.HORIZONTAL; r1.AddItem(label); }
@@ -2519,7 +2493,6 @@ function Test_align_many_sliders() {
 
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.VERTICAL;
-                r2.SetName('1-1')
                 r1.AddItem(r2)
             }
             {
@@ -2528,7 +2501,6 @@ function Test_align_many_sliders() {
 
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.VERTICAL;
-                r2.SetName('1-1')
                 r1.AddItem(r2)
             }
 
@@ -2614,9 +2586,7 @@ function Test_align_many_sliders() {
             Widget_gfx_ready_enable({ mesh: r1, enable_sdf_rect: 10, });
 
             r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-            // r1.align.flags = LAYOUT.HORIZONTAL;
             r1.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-            r1.SetName('2')
             r1.StylesSetPad([10, 10])
             root.AddItem(r1)
 
@@ -2625,7 +2595,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('1-1')
                 r1.AddItem(r2)
             }
             {
@@ -2633,7 +2602,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('3-1')
                 r1.AddItem(r2)
             }
             {
@@ -2641,7 +2609,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.VERTICAL;
-                r2.SetName('3-1')
                 r1.AddItem(r2)
             }
             {
@@ -2649,7 +2616,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('3-1')
                 r1.AddItem(r2)
             }
             {
@@ -2657,7 +2623,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('3-1')
                 r1.AddItem(r2)
             }
         }
@@ -2668,7 +2633,6 @@ function Test_align_many_sliders() {
             r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             // r1.align.flags = LAYOUT.HORIZONTAL;
             r1.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF;
-            r1.SetName('3')
             r1.StylesSetPad([10, 10])
             root.AddItem(r1)
             {
@@ -2723,7 +2687,6 @@ function Test_align_many_sliders() {
             r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             // r1.align.flags = LAYOUT.HORIZONTAL;
             r1.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-            r1.SetName('4')
             r1.StylesSetPad([10, 10])
             root.AddItem(r1)
 
@@ -2732,7 +2695,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('4-1')
                 r1.AddItem(r2)
             }
             {
@@ -2748,7 +2710,6 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.VERTICAL;
-                r2.SetName('4-2')
                 r1.AddItem(r2)
             }
             {
@@ -2756,21 +2717,18 @@ function Test_align_many_sliders() {
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('4-1')
                 r1.AddItem(r2)
             } {
                 const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: pos, dim: [20, 20], col: TRANSPARENCY(PURPLE[5], 1) }));
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.HORIZONTAL;
-                r2.SetName('4-1')
                 r1.AddItem(r2)
             } {
                 const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: pos, dim: [20, 20], col: TRANSPARENCY(PURPLE[5], 1) }));
                 Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10, });
                 r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
                 r2.align.flags = LAYOUT.VERTICAL;
-                r2.SetName('4-1')
                 r1.AddItem(r2)
             }
         }
@@ -2780,8 +2738,6 @@ function Test_align_many_sliders() {
             Widget_gfx_ready_enable({ mesh: r1, enable_sdf_rect: 10, });
             r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             r1.align.flags = LAYOUT.VERTICAL;
-            r1.SetName('4')
-            // r1.StylesSetPad([10,10])
             root.AddItem(r1)
         }
         /** */
@@ -2790,7 +2746,6 @@ function Test_align_many_sliders() {
             Widget_gfx_ready_enable({ mesh: r1, enable_sdf_rect: 10, });
             r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             r1.align.flags = LAYOUT.HORIZONTAL;
-            r1.SetName('5')
             root.AddItem(r1)
         }
     }
@@ -2809,8 +2764,6 @@ function Test_align_many_sliders() {
     Construct_listen_events_from_mesh_tree(root)
     Construct_listen_events_relations_from_mesh_tree(root);
 }
-
-
 
 function Test_performance_align_functions() {
 
@@ -3072,8 +3025,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: TRANSPARENCY(GREY[0], 1.) }));
-    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15, });
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
     section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
 
 
@@ -3204,7 +3156,6 @@ function TestScrollerComponent2() {
         const s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 100, 0], dim: [100, 40], col: GREY[4] }));
         Widget_gfx_ready_enable_default(s, rcorners)
         s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        s.SetName('Main Section');
 
 
 
@@ -3213,13 +3164,11 @@ function TestScrollerComponent2() {
             const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [100, 40], col: YELLOWR[4] }));
             Widget_gfx_ready_enable_default(s2, rcorners);
             s.AddItem(s2)
-            s2.SetName('SS1');
             s2.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
             const dp = Create_widget_dropdown(Style_dropdown_default_properties({ name: 'DP2', pos: [0, 0, 1], col: GREY[1], }));
             Widget_gfx_ready_enable_default(dp, rcorners)
             Dropdown_roots_set_root(dp, dp);
-            dp.SetName('DP1');
             s2.AddItem(dp)
 
             for (let i = 0; i < 2; i++) {
@@ -3296,7 +3245,6 @@ function TestScrollerComponent3() {
     s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     Widget_gfx_ready_enable_default(s, rcorners);
-    s.SetName('Scrolled Section');
 
 
 
@@ -3305,13 +3253,11 @@ function TestScrollerComponent3() {
     const s2 = Create_rect_mesh(_, SECTION.VERTICAL, [10, 10], [0, 0, 0], [100, 40], YELLOWR[4]);
     Widget_gfx_ready_enable_default(s2, rcorners);
     s.AddItem(s2)
-    s2.SetName('SS2');
 
 
     const dp = Create_widget_dropdown(_, 'DP', [0, 0, 1], GREY[1], PURPLEB[2], _, _, _,);
     Widget_gfx_ready_enable_default(dp, rcorners);
     Dropdown_roots_set_root(dp, dp);
-    dp.SetName('DP');
     s2.AddItem(dp)
 
     // s2.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
@@ -3323,7 +3269,6 @@ function TestScrollerComponent3() {
 
         const dp1 = Create_widget_dropdown(_, 'DP' + i, [0, 0, 1], GREY[1], PURPLEB[2], _, _, _,);
         Widget_gfx_ready_enable_default(dp1, rcorners);
-        dp1.SetName('DP' + i);
         Dropdown_roots_set_root(dp, dp1);
         dp.AddToMenu(dp1)
 
@@ -3335,12 +3280,10 @@ function TestScrollerComponent3() {
 
             const s3 = Create_rect_mesh(_, SECTION.VERTICAL, [10, 10], [10, 10, 0], [100, 40], BLUEL[4]);
             Widget_gfx_ready_enable_default(s3, rcorners);
-            s3.SetName('S3');
             dp1.AddToMenu(s3)
 
             const dp2 = Create_widget_dropdown(_, 'DP' + j, [0, 0, 1], GREY[1], PURPLEB[2], _, _, _,);
             Widget_gfx_ready_enable_default(dp2, rcorners);
-            dp2.SetName('DP' + j);
             Dropdown_roots_set_root(dp1, dp2);
             // dp.AddToMenu(dp1)
             s3.AddItem(dp2)
@@ -3411,21 +3354,18 @@ function Sections2(is_root, layout) {
     layout |= LAYOUT.RESIZE_SELF
 
     // const grey = Create_rect_mesh(is_root, layout, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
-    const grey = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(GREY[0], tr), layout: layout, }));
+    const grey = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(GREY[0], tr), layout: layout, name:`grey${grey_cnt++}` }));
     Widget_gfx_ready_enable({ mesh: grey, enable_sdf_rect: 10, });
     grey.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    grey.SetName(`grey${grey_cnt++}`);
 
-    const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(GREEN[3], tr), layout: layout, }));
+    const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(GREEN[3], tr), layout: layout, name:`green${green_cnt++}`}));
     Widget_gfx_ready_enable({ mesh: green, enable_sdf_rect: 10, });
     green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName(`green${green_cnt++}`);
     grey.AddItem(green);
 
-    const orange = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(ORANGE[7], tr), layout: layout, }));
+    const orange = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: dim, col: TRANSPARENCY(ORANGE[7], tr), layout: layout, name:`orange${orange_cnt++}`}));
     Widget_gfx_ready_enable({ mesh: orange, enable_sdf_rect: 10, });
     orange.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    orange.SetName(`orange${orange_cnt++}`);
     green.AddItem(orange);
 
     return grey;
@@ -3438,24 +3378,20 @@ function Sections4(is_root, layout) {
     const blu = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(GREY[1], tr), layout: layout, }));
     Widget_gfx_ready_enable({ mesh: blu, enable_sdf_rect: 10, });
     blu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    blu.SetName('grey');
 
     const red = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(REDL[1], tr), layout: layout, }));
     Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 10, });
     red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    red.SetName('red');
     blu.AddItem(red);
 
     const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(GREEN[6], tr), layout: layout, }));
     Widget_gfx_ready_enable({ mesh: green, enable_sdf_rect: 10, });
     green.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName('green');
     blu.AddItem(green);
 
     const p = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(PURPLE[6], tr), layout: layout, }));
     Widget_gfx_ready_enable({ mesh: p, enable_sdf_rect: 10, });
     p.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    green.SetName('purple');
     blu.AddItem(p);
     ;
 
@@ -3476,14 +3412,12 @@ function Help() {
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.SetName('Help section')
 
     // scene.StoreMesh(section)
     const s1 = Create_rect_mesh(_, LAYOUT.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .6));
     s1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     s1.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     s1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-    s1.SetName('Help section 2')
 
     let msgs = [];
     for (let i = 0; i < DEBUG_PRINT_KEYS.length; i++) {
@@ -3642,7 +3576,7 @@ function MeshInfoUpdate(params) {
 
         prev_infomesh = infoMesh;
 
-        textMesh.RenderTextFromString(infoMesh.GetName());
+        textMesh.RenderTextFromString(Mesh_get_name(infoMesh));
 
         const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start} faces:${infoMesh.geom.num_faces}` : 'null'
 
@@ -3665,18 +3599,18 @@ function MeshInfoUpdate(params) {
 
                 const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
 
-                msgs.push(`Plain Text:${child.GetName()}, dim: ${child.mesh_bufferidx}`);
+                msgs.push(`Plain Text:${Mesh_get_name(child)}, dim: ${child.mesh_bufferidx}`);
                 msgs.push(`{pos:[${FloorArr3(child.geom.pos)}]} {dim:[${child.geom.dim}]}, {alpha:${child.mat.col[3]}}`);
                 msgs.push(`1gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
             }
             else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
-                msgs.push(`Text_mesh: id:${child.text_mesh.mesh_bufferidx}, name:${child.text_mesh.GetName()},`);
+                msgs.push(`Text_mesh: id:${child.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(child.text_mesh)},`);
                 msgs.push(`{pos:[${FloorArr3(child.text_mesh.geom.pos)}]}, {dim: [${child.text_mesh.geom.dim}]}, {alpha:${child.text_mesh.mat.col[3]}}`);
                 msgs.push(`2gfx: {prog:${child.text_mesh.gfx.prog.idx}}, {vb:${child.text_mesh.gfx.vb.idx}}, {start:${child.text_mesh.gfx.vb.start}}, {faces:${child.text_mesh.geom.num_faces}}`);
             }
         }
         else if (infoMesh.text_mesh) {
-            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.mesh_bufferidx}, name:${infoMesh.text_mesh.GetName()},`);
+            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(infoMesh.text_mesh)},`);
             msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
             msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
         }

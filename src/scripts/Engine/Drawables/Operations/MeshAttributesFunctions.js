@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y, Gl_rotate_z_2d, Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_set_angle } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { WHITE } from '../Material/Base/Colors.js';
@@ -304,3 +304,21 @@ export function Mesh_add_dim_y(mesh, y) {
 
 
 
+/*********************************************************************/
+// Rotations
+/*********************************************************************/
+/** */
+export function Mesh_rotate_z(mesh, angle) { 
+   Gl_rotate_z_2d(mesh.gfx, mesh.geom.dim, angle);
+   Gl_set_angle(mesh.gfx, angle); 
+}
+/** */
+export function Mesh_rotate_add_z(mesh, angle) { 
+   Gl_rotate_add_z_2d(mesh.gfx, mesh.geom.dim, angle); 
+   Gl_set_angle(mesh.gfx, angle); 
+}
+/** */
+export function Mesh_rotate_y(mesh, angle) { 
+   Gl_rotate_y_2d(mesh.gfx, mesh.geom.dim, angle); 
+   Gl_set_angle(mesh.gfx, angle); 
+}

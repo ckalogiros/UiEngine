@@ -1,5 +1,6 @@
 "use strict";
 
+import { Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Shader_attributes_get_attribs } from "../../Graphics/ShaderAttributes.js";
 
 
@@ -39,6 +40,7 @@ export function Widget_gfx_ready_enable({
    enable_col_per_vertex,
    enable_attr_angle,
    enable_blend_mode,
+   listener={ type:0x0, Clbk:null, params:null},
 }) {
 
    // mesh.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
@@ -79,6 +81,14 @@ export function Widget_gfx_ready_enable({
    if (enable_blend_mode !== undefined) {
       mesh.GfxEnableBlend(enable_blend_mode);
    }
+
+   if (listener.type !== 0x0) {
+      if(listener.type &  LISTEN_EVENT_TYPES.HOVER) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.HOVER, listener.Clbk, listener.params);
+      if(listener.type &  LISTEN_EVENT_TYPES.MOVE) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.MOVE, listener.Clbk, listener.params);
+      if(listener.type &  LISTEN_EVENT_TYPES.CLICK_UP) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.CLICK_UP, listener.Clbk, listener.params);
+   }
+
+
 
 }
 

@@ -5,6 +5,7 @@ import { Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx } from "../
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_vbidx_view_get } from "../../Core/Views/RootView.js";
+import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -39,7 +40,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 
          if (parent === null) {
 
-            if (GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', mesh.GetName(), mesh);
+            if (GFX_CONEXT_DEBUG) console.warn('NO parent exists for mesh to generate gfx.\nRevert to generate from root buffer. mesh:', Mesh_get_name(mesh), mesh);
 
             // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
@@ -65,7 +66,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       else {
          console.error(
             'NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'',
-            'mesh', mesh.GetName(), 'parent',
+            'mesh', Mesh_get_name(mesh), 'parent',
             // 'mesh', mesh.GetName(), 'parent', parent.GetName(),
          );
       }

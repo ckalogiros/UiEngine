@@ -4,6 +4,7 @@ import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuff
 import { View_get_view_byidx } from "../../Core/Views/MeshBufferViews.js";
 import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "./MeshAttributesFunctions.js";
+import { Mesh_get_name, Mesh_listener_remove, Mesh_state_check } from "./MeshPropertiesFunctions.js";
 
 
 
@@ -102,7 +103,7 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
                mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
                mesh.StateEnable(MESH_STATE_FLAGS.CLIPED_X);
                changes_hapened = true;
-               mesh.RemoveAllListenEvents();
+               Mesh_listener_remove(mesh);
             }
          }
          else{
@@ -151,7 +152,7 @@ if(mesh === _)
                mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
                mesh.StateEnable(MESH_STATE_FLAGS.CLIPED_Y);
                changes_hapened = true;
-               mesh.RemoveAllListenEvents();
+               Mesh_listener_remove(mesh);
             }
          }
          else{
@@ -185,15 +186,9 @@ function TEMP_init(group){
       const meshshes_idx = group.vb.buffer[i].data;
       temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
       temp.prev_top_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
-      // temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
-      // temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
-      // temp.prev_top_out[i] = null;
-      // temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(1+i)
-      temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(7+i)
-      temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(9+i)
+      temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(7+i);
+      temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(9+i);
 
-      // console.log(temp.prev_top_in[i].GetName(), temp.prev_top_out[i].GetName())
-      // console.log(temp.prev_bot_in[i].GetName(), temp.prev_bot_out[i].GetName())
    }
 }
 const temp = {
@@ -721,7 +716,7 @@ export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
    const DBG = false
-   if (!mesh.StateCheck(MESH_STATE_FLAGS.HAS_CLIP) || !mesh.children.boundary) return;
+   if (!Mesh_state_check(mesh, MESH_STATE_FLAGS.HAS_CLIP) || !mesh.children.boundary) return;
 
 
    let changes_hapened = false;
@@ -758,7 +753,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
    
                   child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
                   // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces);
-                  if(DBG) console.log('REMOVE', child.mesh_bufferidx, child.GetName())
+                  if(DBG) console.log('REMOVE', child.mesh_bufferidx, Mesh_get_name(child))
                   child.gfx.vb.start = INT_NULL;
                   changes_hapened = true;
    
@@ -790,7 +785,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             if (c_top > limit.up) {  // Enable all meshes that are below the upper limit 
 
                child.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-               if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
+               if(DBG)console.log('ADD', child.mesh_bufferidx, Mesh_get_name(child))
                changes_hapened = true;
 
                if (child.children.active_count) { // Run for all children widgets recursively
@@ -831,7 +826,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             if (c_top > clampY[CLAMP.Y_DOWN]) {  // Disable all meshes that are higher than the lower limit 
                child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
-               if(DBG)console.log('REMOVE', child.mesh_bufferidx, child.GetName())
+               if(DBG)console.log('REMOVE', child.mesh_bufferidx, Mesh_get_name(child))
                child.gfx.vb.start = INT_NULL;
                changes_hapened = true;
 
@@ -867,7 +862,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
                   if (c_bottom < limit.down){ // Enable all meshes that are higher than the lower limit 
                   child.state.mask |= MESH_STATE_FLAGS.ACTIVE;
    
-                  if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
+                  if(DBG)console.log('ADD', child.mesh_bufferidx, Mesh_get_name(child))
                   changes_hapened = true;
    
                   // Run for all children widgets recursively
@@ -975,7 +970,7 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
             // child.StateEnable(MESH_STATE_FLAGS.ACTIVE|MESH_STATE_FLAGS.CLIPED_Y)
             child.StateEnable(MESH_STATE_FLAGS.ACTIVE)
             child.StateDisable(MESH_STATE_FLAGS.CLIPED_Y)
-            console.log(child.GetName(), child.state.mask)
+            console.log(Mesh_get_name(child), child.state.mask)
    
             if (lastupper === INT_NULL) {
                lastupper = i;

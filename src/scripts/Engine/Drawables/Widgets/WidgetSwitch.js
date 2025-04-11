@@ -11,6 +11,7 @@ import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add } from "../Operations/MeshPropertiesFunctions.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
@@ -399,12 +400,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
 

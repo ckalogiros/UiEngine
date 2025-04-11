@@ -14,6 +14,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
+import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -61,7 +62,7 @@ export class Widget_Label extends Rect_Mesh {
             is_debug_mesh:properties.is_debug_mesh,
         }));
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        this.SetName(properties.text)
+        Mesh_set_name(this, properties.text)
         
         this.text_mesh = text_mesh;
         
@@ -303,7 +304,6 @@ export class Widget_Label extends Rect_Mesh {
         if (this.is_gfx_inserted) {
             /** If the alignment happens after the widgets insertion to the vertex buffers, we must update the vertex buffers too. */
             Mesh_add_wpos_xy(this.text_mesh, move_dif[0], move_dif[1]);
-            // this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, move_dif[0], move_dif[1]);
         }
         else {
             this.text_mesh.geom.pos[0] += move_dif[0];
@@ -359,7 +359,7 @@ export class Widget_Label extends Rect_Mesh {
         this.geom.pos[1] += y;
         Mesh_add_wpos_y(this, y,);
         this.text_mesh.geom.pos[1] += y;
-        this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y,);
+        Mesh_add_wpos_y(this.text_mesh, y,);
     }
 
 
@@ -551,12 +551,12 @@ export class Widget_Label extends Rect_Mesh {
 
             // Construct HOVER event
             if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-                mesh.AddListenEvent(E.H, null, null);
+                Mesh_listener_add(mesh, E.H, null, null);
             }
             // Construct CLICK_UP/MOVE event
             if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
                 const evt_params = { target_mesh: mesh, };
-                mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+                Mesh_listener_add(mesh,E.C, mesh.OnClick, evt_params);
             }
         }
     }
@@ -583,7 +583,7 @@ export class Widget_Label extends Rect_Mesh {
             let is_resizesed = false;
 
             // Check for Resize
-            if (mesh.StateCheck(MESH_STATE_FLAGS.IS_RESIZEABLE)) {
+            if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_RESIZEABLE)) {
 
                 const point = Mouse_get_pos();
 
@@ -621,7 +621,7 @@ export class Widget_Label extends Rect_Mesh {
             }
 
 
-            if (mesh.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
+            if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
                 State_mesh_set_grabed(mesh);
                 mesh.StateEnable(MESH_STATE_FLAGS.IN_GRAB);
@@ -636,7 +636,7 @@ export class Widget_Label extends Rect_Mesh {
 
         const mesh = params.params;
 
-        if (mesh.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+        if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
             const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
             Time_intervals_destroy_byidx(intervalIdx);
@@ -691,7 +691,7 @@ function Label_on_move_clbk(params) {
      */
     const mesh = params.params;
 
-    if (mesh.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+    if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
         const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
         Time_intervals_destroy_byidx(intervalIdx);
@@ -709,8 +709,8 @@ function Label_on_move_clbk(params) {
     }
     else { // Else update the label alone 
 
-        mesh.geom.AddWposXY(mesh.gfx, mouse_dif.x, -mouse_dif.y);
-        mesh.text_mesh.geom.AddWposXY(mesh.text_mesh.gfx, mouse_dif.x, -mouse_dif.y);
+        Mesh_add_wpos_xy(mesh, mouse_dif.x, -mouse_dif.y);
+        Mesh_add_wpos_xy(mesh.text_mesh, mouse_dif.x, -mouse_dif.y);
     }
 
 

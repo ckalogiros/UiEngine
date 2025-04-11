@@ -10,6 +10,7 @@ import { Close_Button, Widget_Menu_Bar, Widget_Minimize } from "../Drawables/Wid
 import { Widget_Switch_Simple } from "../Drawables/Widgets/WidgetSwitch.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Widget_Color_Picker } from "../Drawables/Widgets/WidgetColorPicker.js";
+import { Mesh_set_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 
 /**
  * All Functions to create widgets.
@@ -73,7 +74,7 @@ export function Create_text_mesh(properties) {
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`TEXT_MESH[${mesh_bufferidx}]:{${properties.text}}`);
+   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `TEXT_MESH[${mesh_bufferidx}]:{${properties.text}}`);
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -90,7 +91,7 @@ export function Create_widget_text(properties) {
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`WidgetText[${mesh_bufferidx}]{${properties.text}}`);
+   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `WidgetText[${mesh_bufferidx}]{${properties.text}}`);
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh);
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -107,7 +108,7 @@ export function Create_widget_multi_text(properties) {
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`[${mesh_bufferidx}]{${properties.text}}-MULTI_TEXT`); // Set name after mesh_bufferidx is created
+   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `[${mesh_bufferidx}]{${properties.text}}-MULTI_TEXT`); // Set name after mesh_bufferidx is created
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -122,7 +123,7 @@ export function Create_widget_label(properties) {
    const mesh_bufferidx = _mesh_buffer.Reserve();
    
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, properties));
-   _mesh_buffer.buffer[mesh_bufferidx].SetName(`LABEL[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
+   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `LABEL[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
 
    if (NOTIFICATIONS_ON && properties.is_debug_mesh === 0x0)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
@@ -289,7 +290,7 @@ export function Create_widget_text_for_debug_ui_only(is_root = 0x0, text, pos, f
 
    // Store the meshbuffer's index to the newly created mesh.
    _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   _mesh_buffer.buffer[mesh_bufferidx].name = `[${mesh_bufferidx}]{${text}}-WIDGET_TEXT`;
+   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `[${mesh_bufferidx}]{${text}}-WIDGET_TEXT`);
 
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)

@@ -10,6 +10,7 @@ import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buff
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -870,7 +871,7 @@ export function Root_group_buffer_print_w1() {
 
          const root_mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
 
-         console.log('root:', root_mesh.GetName(),
+         console.log('root:', Mesh_get_name(root_mesh),
             'size:', root_group_view_buffer.buffer[i].size,
             'boun:', root_group_view_buffer.buffer[i].boundary,
             'coun:', root_group_view_buffer.buffer[i].active_count,
@@ -890,7 +891,7 @@ export function Root_group_buffer_print_w1() {
                      'state', mesh.state.mask,
                      'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE_FLAGS.ACTIVE,
                      'root_pos', mesh.root_posidx,
-                     'name', mesh.geom.pos, mesh.GetName());
+                     'name', mesh.geom.pos, Mesh_get_name(mesh));
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
                else {
@@ -908,7 +909,7 @@ export function Root_group_buffer_print_w1() {
                      'pos', mesh.geom.pos,
                      // 'dim', mesh.geom.dim,
                      // 'rel pos', mesh.geom.pos, 
-                     mesh.GetName(),
+                     Mesh_get_name(mesh),
                   );
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
@@ -927,7 +928,7 @@ export function Root_group_buffer_print_w6() {
       if (root_group_view_buffer.buffer[i]) {
          const root_mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
 
-         console.log('mesh_bufferidx:', root_group_view_buffer.buffer[i].buffer[0], 'name:', root_mesh.GetName(),
+         console.log('mesh_bufferidx:', root_group_view_buffer.buffer[i].buffer[0], 'name:', Mesh_get_name(root_mesh),
             'size:', root_group_view_buffer.buffer[i].size,
             'boun:', root_group_view_buffer.buffer[i].boundary,
             'coun:', root_group_view_buffer.buffer[i].active_count,
@@ -975,7 +976,7 @@ export function Widget_root_per_vb_meshidx_print_w4() {
          if (!_root_per_vb_meshidx_buffer.buffer[i]) { console.log('EMPTY'); return };
 
          const mesh = Mesh_buffer_get_mesh_byidx(_root_per_vb_meshidx_buffer.buffer[i].meshidx)
-         console.log('mesh_bufferidx:', _root_per_vb_meshidx_buffer.buffer[i].meshidx, 'root_bufferidx:', _root_per_vb_meshidx_buffer.buffer[i].rootidx, 'mesh name', mesh.GetName())
+         console.log('mesh_bufferidx:', _root_per_vb_meshidx_buffer.buffer[i].meshidx, 'root_bufferidx:', _root_per_vb_meshidx_buffer.buffer[i].rootidx, 'mesh name', Mesh_get_name(mesh))
          for (let j = 0; j < _root_per_vb_meshidx_buffer.buffer[i].vb.length; j++) {
             console.log('  vb:', j,
                'num_faces:', _root_per_vb_meshidx_buffer.buffer[i].vb[j].num_faces,

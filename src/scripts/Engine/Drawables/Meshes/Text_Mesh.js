@@ -11,6 +11,7 @@ import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb
 import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
 import { Geometry2D_Text } from "../Geometry/Base/Geometry.js";
+import { Mesh_get_name } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -647,10 +648,10 @@ export class Text_Mesh extends Mesh {
             
             // The first face exists as an entity, the rest are constructed here and stored only to the vertex buffer
             if (i === 0) {
-               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
+               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
             }
             else { // Avoid function call to store any data to '.gfx.start' etc and to accumulate all char faces to the vertex buffer. 
-               Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${this.GetName()}`);
+               Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
             }
    
             // Advance to next free char position

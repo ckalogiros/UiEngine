@@ -29,6 +29,7 @@ import { Slider_connect } from "../../../../Engine/Drawables/Widgets/WidgetSlide
 import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from "../../../Widgets/WidgetGenericControlsReady.js";
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
 import { Mesh_get_real_pos_xy, Mesh_set_wpos_x, Mesh_update_set_wpos_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_change_clbk, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -172,7 +173,7 @@ function Arkanoid_initialize_start_menu(x, y) {
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, y, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[1]}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, });
-   section.SetName('Arkanoid-Start Menu Panel');
+   Mesh_set_name(section, 'Arkanoid-Start Menu Panel');
    section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
    section.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
@@ -238,7 +239,7 @@ function Arkanoid_initialize_game(x, y) {
 
    const menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y], col:GREY[2], layout:LAYOUT.HORIZONTAL}));
    Widget_gfx_ready_enable({mesh:menu, enable_sdf_rect:10, enable_pass_vpos:true,});
-   menu.SetName('Arkanoid-Menu');
+   Mesh_set_name(menu, 'Arkanoid-Menu');
    menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
    // const control_values = [.7, .26, .4, .0];
    // const control_values = [.7, .6, .4, .0];
@@ -359,7 +360,7 @@ function Arkanoid_initialize_game(x, y) {
 
    const game_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[ARKANOID_SECTION_PAD_X, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[2]}));
    Widget_gfx_ready_enable({mesh:game_panel, enable_sdf_rect:10, });
-   game_panel.SetName('Arkanoid-Game Panel');
+   Mesh_set_name(game_panel,'Arkanoid-Game Panel');
    game_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP); // Event for start ball move
 
    game_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
@@ -438,7 +439,7 @@ function Arkanoid_initialize_game(x, y) {
 
 
    const ball_release_params = { player: player };
-   game_panel.ChangeListenEvent(E.C, Arkanoid_on_click_callback, ball_release_params);
+   Mesh_listener_change_clbk(game_panel, E.C, Arkanoid_on_click_callback, ball_release_params);
 
 
    // console.warn('player', player.mesh.geom.pos);

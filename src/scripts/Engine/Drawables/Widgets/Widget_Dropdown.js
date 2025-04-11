@@ -14,6 +14,7 @@ import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js"
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
+import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -70,7 +71,7 @@ function Dropdown_roots_destroy_byidx(rootidx, caller_mesh_bufferidx) {
 /**Debug-Print */
 export function Dropdown_roots_print_root_buffer() {
    for (let i = 0; i <= _root_dropdown.boundary; i++) {
-      console.log('id:', _root_dropdown.buffer[i].mesh_bufferidx, ' name:', _root_dropdown.buffer[i].GetName(), ' pos:', _root_dropdown.buffer[i].geom.pos);
+      console.log('id:', _root_dropdown.buffer[i].mesh_bufferidx, ' name:', Mesh_get_name(_root_dropdown.buffer[i]), ' pos:', _root_dropdown.buffer[i].geom.pos);
    }
 }
 
@@ -136,9 +137,9 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       this.menu_active = false;
 
-      btn.SetName(`Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
-      this.menu.SetName(`Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
-      this.SetName(`Dropdown[${this.mesh_bufferidx}]{${properties.btn.text}}`);
+      Mesh_set_name(btn, `Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
+      Mesh_set_name(this.menu, `Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
+      Mesh_set_name(this, `Dropdown[${this.mesh_bufferidx}]{${properties.btn.text}}`);
 
       btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
 
@@ -396,7 +397,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 
 
       this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
-      if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', this.GetName())
+      if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', Mesh_get_name(this))
 
       return this.gfx;
    }
@@ -463,21 +464,27 @@ export class Widget_Dropdown extends Rect_Mesh {
          
          // Construct HOVER event
          if (dp.listeners && dp.listeners.buffer[E.H] === INT_NULL) {
-            dp.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(dp, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (dp.listeners && dp.listeners.buffer[E.C] === INT_NULL) {
 
-            // Create listener on dropdow only for move events OR for hierarchy reasons, if we need to be the parent event of all mesh events in its menu 
+            // Create listener on dropdown only for move events OR for hierarchy reasons, if we need to be the parent event of all mesh events in its menu 
             const evt_params = { target_mesh: dp, };
-            dp.AddListenEvent(E.C, dp.OnClick, evt_params);
-            btn.AddListenEvent(E.C, dp.OnClick, evt_params);
-         }
-         else if (btn.listeners && btn.listeners.buffer[E.C] === INT_NULL) { // Definitely create dropdown's button click
+            // // Mesh_listener_add(dp, E.C, dp.OnClick, evt_params);
+            // Mesh_listener_add(btn, E.C, dp.OnClick, evt_params);
+            // // btn.AddListenEvent(E.C, dp.OnClick, evt_params);
 
-            // const evt_params = { target_mesh: btn, };
-            const evt_params = { target_mesh: dp, }; // TODO: HERE!!! implement the OnClick  to take either dp or btn as target_mesh
-            btn.AddListenEvent(E.C, dp.OnClick, evt_params);
+            Mesh_listener_add(dp, E.C, dp.OnClick, evt_params);
+            Mesh_listener_add(btn, E.C, dp.OnClick, evt_params);
+
+            // dp.AddListenEvent(E.C, dp.OnClick, evt_params);
+            // btn.AddListenEvent(E.C, dp.OnClick, evt_params);
+         }
+         else if (btn.listeners && btn.listeners.buffer[E.C] === INT_NULL) { // Definitely need to create dropdown's button click
+
+            const evt_params = { target_mesh: dp, };
+            Mesh_listener_add(btn, E.C, dp.OnClick, evt_params);
          }
       }
 
@@ -494,10 +501,12 @@ export class Widget_Dropdown extends Rect_Mesh {
       const dp = params.evt_params.target_mesh;
 
       /*DEBUG*/if (!params.evt_params) { console.error('Target_params.params is null, in a OnClick() event. evt_params:', params.evt_params); return; }
-      /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', dp.GetName()); return; }
+      /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', Mesh_get_name(dp)); return; }
 
       const btn = dp.children.buffer[0];
       // Dropdown_roots_get_root_by_idx(dp.rootidx);
+
+      console.log('9009w8989ufuijshkjfdskjm')
 
       // Check if the button is clicked
       if(params.meshidx === btn.mesh_bufferidx){
@@ -551,7 +560,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-      if (dp.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE)) {
+      if (Mesh_state_check(dp, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
          State_mesh_set_grabed(dp);
          State_mesh_set_focused(dp);
@@ -740,7 +749,7 @@ export class Widget_Dropdown extends Rect_Mesh {
                   item.SetIsGfxInserted(false);
    
                   // console.log(item.GetName())
-                  item.RemoveAllListenEvents();
+                  Mesh_listener_remove(item);
                   
                   
                   if (item.isOn & DP_MENU_STATE.ON) this.#DeactivateMenu(item); // Run recursive for every dropdown in every menu
@@ -753,7 +762,7 @@ export class Widget_Dropdown extends Rect_Mesh {
                      item.SetIsGfxInserted(false);
                      
                      // console.log(item.GetName())
-                     item.RemoveAllListenEvents();
+                     Mesh_listener_remove(item);
                   }
                }
             }

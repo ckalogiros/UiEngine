@@ -1,6 +1,7 @@
 "use strict";
 
 import { Str_buffer_store } from "../Core/StringBuffer.js";
+import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -304,7 +305,7 @@ export function Timers_print_timers() {
     for (let i = 0; i < _timers.size; i++) {
         const t = _timers.buffer[i]; // Cash
         if (t.isActive) {
-            console.log(`${i}:t:${t.t.toFixed(2)}|d:${t.duration}|name:${t.GetName()}`)
+            console.log(`${i}:t:${t.t.toFixed(2)}|d:${t.duration}|name:${Mesh_get_name(t)}`)
         }
     }
 }

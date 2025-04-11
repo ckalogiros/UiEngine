@@ -8,6 +8,7 @@ import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_dim_xy, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
@@ -279,7 +280,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
 
       brick.mesh.SetColorRGBA(color);
       console.log(color)
-      brick.mesh.SetName(name);
+      Mesh_set_name(brick.mesh,name);
 
       brick.flags = flags;
 

@@ -16,6 +16,7 @@ import { Mesh_create_style_from_values } from '../Operations/MeshHelperFunctions
 import { Style_rect_default_properties, Style_slider_simple_default_properties } from './WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../../../App/Widgets/WidgetGfxReady.js';
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from '../../../GlobalFunctions.js';
+import { Mesh_event_callback_create, Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
 
 
 
@@ -78,8 +79,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          Root_group_view_buffer_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
       }
 
-      handle.SetName('Slider handle');
-      this.SetName('Slider Bar');
+      Mesh_set_name(handle, 'Slider handle');
+      Mesh_get_name(this, 'Slider Bar');
 
 
       handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
@@ -264,12 +265,12 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
    Rerender() {
 
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
       this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
       const handle = this.children.buffer[0];
-      Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, _, handle.GetName());
+      Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle));
       handle.is_gfx_inserted = true;
       handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
    }
@@ -311,12 +312,12 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
 
@@ -327,8 +328,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    RemoveAllListenEvents() {
 
       const handle = this.children.buffer[0];
-      if (handle !== null) handle.RemoveAllListenEvents();
-      super.RemoveAllListenEvents();
+      if (handle !== null) Mesh_listener_remove(handle);
+      Mesh_listener_remove(this);
    }
 
 
@@ -583,7 +584,7 @@ export function Slider_horizontal_on_update_handle(_params) {
    const bar = _params.params;
    const handle = bar.children.buffer[0];
 
-   if (bar.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+   if (Mesh_state_check(bar, MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
@@ -634,7 +635,7 @@ export function Slider_vertical_on_update_handle(_params) {
    const bar = _params.params;
    const handle = bar.children.buffer[0];
 
-   if (bar.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+   if (Mesh_state_check(bar, MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
@@ -711,7 +712,7 @@ export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
    }
 
    // bar.CreateEventCallback(params);
-   bar.CreateEventCallback(params);
+   Mesh_event_callback_create(bar, params);
 
    // Run the callback to set the sliders initial value.
    Clbk(params, bar.slider_val);
@@ -728,7 +729,7 @@ export function Slider_connect(slider, Clbk, clbk_params, call_immediately = tru
       clbk_params: clbk_params,
    }
 
-   bar.CreateEventCallback(params);
+   Mesh_event_callback_create(bar, params);
 
    // Run the callback to set the sliders initial value.
    if (call_immediately) Clbk(params, bar.slider_val);
@@ -913,14 +914,14 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          bar.AddToWidgetRootBuffer(this.root_bufferidx);
       }
 
-      value_text.SetName(this.GetName() + ' - value_text');
-      this.SetName('Widget_Slider_XX1');
+      Mesh_set_name(value_text, Mesh_get_name(this) + ' - value_text');
+      Mesh_set_name(this, 'Widget_Slider_XX1');
 
 
       // this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
 
       bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
+ 
       this.SetLayout(properties.layout);
 
    }
@@ -1239,19 +1240,19 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // Reset gfx start for the mesh
       // Add to vertexbuffer
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, this.GetName());
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
       this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
       this.text_mesh.AddToGfxFromReset();
 
       const bar = this.children.buffer[this.bar_idx];
-      Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, _, bar.GetName());
+      Vertex_buffer_add_vertices(bar.gfx, bar.geom, bar.mat, _, Mesh_get_name(bar));
       bar.is_gfx_inserted = true;
       bar.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
       const handle = bar.children.buffer[0];
-      Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, _, handle.GetName());
+      Vertex_buffer_add_vertices(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle));
       handle.is_gfx_inserted = true;
       handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
@@ -1304,22 +1305,21 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
-
          // Construct for the bar
          if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
-            bar.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(bar, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            bar.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(bar, E.C, mesh.OnClick, evt_params);
          }
       }
 
@@ -1365,7 +1365,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          State_mesh_set_clicked(mesh);
 
-         if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && mesh.StateCheck(MESH_STATE_FLAGS.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+         if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
             const idx = Time_intervals_create(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
@@ -1388,7 +1388,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // Destroy the time interval and the Move operation, if the mesh is not grabed
       // MESH_STATE_FLAGS.IN_GRAB is deactivated upon mouse click up in Events.js.
-      if (mesh.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+      if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IN_GRAB) === 0 && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
          const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
          Time_intervals_destroy_byidx(intervalIdx);

@@ -14,6 +14,7 @@ import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_x, Mesh_set_dim_y, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -245,12 +246,12 @@ function Scroller_component_listen_event_construct() {
 
       // Construct for bar
       if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
-         bar.AddListenEvent(E.H, null, null);
+         Mesh_listener_add(bar, E.H, null, null);
       }
       // Construct CLICK_UP/MOVE event
       if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
          const evt_params = { target_mesh: bar, };
-         bar.AddListenEvent(E.C, bar.OnClick, evt_params);
+         Mesh_listener_add(bar, E.C, bar.OnClick, evt_params);
       }
 
    }
@@ -277,7 +278,7 @@ function Scroller_component_on_update_handle(_params) {
    const bar = _params.params;
    const handle = bar.children.buffer[0];
 
-   if (bar.StateCheck(MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
+   if (Mesh_state_check(bar, MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
       const intervalIdx = bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];

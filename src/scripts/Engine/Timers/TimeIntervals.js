@@ -1,6 +1,7 @@
 "use strict";
 
 import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
+import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { TimeGet } from "./Time.js";
 
 
@@ -236,7 +237,7 @@ class TimeIntervals {
 
       console.log('Num Interval timers: ', this.count);
       for (let i = 0; i < this.count; i++) {
-         console.log(`${this.ti[i].idx}: name:${this.ti[i].GetName()} | interval:${this.ti[i].interval}  | t:${this.ti[i].t}`);
+         console.log(`${this.ti[i].idx}: name:${Mesh_get_name(this.ti[i])} | interval:${this.ti[i].interval}  | t:${this.ti[i].t}`);
       }
    }
 

@@ -62,21 +62,19 @@ pressing the \"p\" key on the keyboard.\
    const rcorners = 10;
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), name:'Demo_widgets'}));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
    section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('Demo_widgets');
 
 
 
 
 
    /** Create the info for the user */
-   const s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], col: TRANSPARENCY(GREY[1], .4), }));
+   const s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], col: TRANSPARENCY(GREY[1], .4), name:'Demo_widgets'}));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
    s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
-   s.SetName('Demo_widgets');
    section.AddItem(s);
 
 
@@ -158,11 +156,10 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    const text_pad = [20, 0];
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .8) }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .8), name:'Demo_widgets_scrolled_labels' }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
    section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL | LAYOUT.FIXED_HEIGHT;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('Demo_widgets_scrolled_labels');
 
    section.geom.dim[1] += section.StylesGetPad(STYLES.AXIS.Y); // Adding the pad
 
@@ -173,14 +170,13 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    info.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    section.AddItem(info);
 
-   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], col: TRANSPARENCY(GREY[1], .8) }));
+   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], col: TRANSPARENCY(GREY[1], .8), name:'scrolled_section' }));
    Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, });
    scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
 
    scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
    scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
    scrolled_section.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
-   scrolled_section.SetName('scrolled_section');
    section.AddItem(scrolled_section);
 
 
@@ -197,7 +193,6 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       label.align.flags = LAYOUT.VERTICAL;
       label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
       scrolled_section.AddItem(label);
-      label.SetName(`${i}`);
       label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    }
 
@@ -285,15 +280,9 @@ nested layouts with well-aligned items.\
    const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
    // if (!PLATFORM.ANY_SMARTPHONE_DEVICE) default_font = TEXTURES.CONSOLAS_16px;
 
-   const root_s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [15, 15], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], dim: [100, 100], col: TRANSPARENCY(GREY[3], .4) }));
+   const root_s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [15, 15], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], dim: [100, 100], col: TRANSPARENCY(GREY[3], .4), name:'Demo_widgets_sections' }));
    Widget_gfx_ready_enable({ mesh: root_s, enable_sdf_rect: rcorners, })
-   root_s.SetName('Demo_widgets_sections');
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) root_s.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
-
-   const r_corners = 6;
-   const feather = 1.8;
 
 
    /** Create the info for the uuser */
@@ -302,10 +291,9 @@ nested layouts with well-aligned items.\
    root_s.AddItem(info);
 
 
-   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+   const l1_s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.VERTICAL, pad: [15, 15], dim: min_size, col: TRANSPARENCY(GREY[1], tr), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'Section l1_s' }));
    l1_s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
    Widget_gfx_ready_enable({ mesh: l1_s, enable_sdf_rect: rcorners });
-   l1_s.SetName('Section l1_s');
    root_s.AddItem(l1_s);
 
 
@@ -691,10 +679,9 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
    // if (!PLATFORM.ANY_SMARTPHONE_DEVICE) font_size = 8;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], col: TRANSPARENCY(GREY[3], .4), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'Demo_widgets_dropdown' }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('Demo_widgets_dropdown')
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
@@ -958,11 +945,10 @@ GENERIC WIDGETS\
 
    const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, options: SECTION.HORIZONTAL, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], dim: [100, 100], col: TRANSPARENCY(GREY[3], .6), }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, options: SECTION.HORIZONTAL, pad: [20, 20], pos: [pos[0] + l_pad, pos[1] + t_pad, 0], dim: [100, 100], col: TRANSPARENCY(GREY[3], .6), name:'Demo_widgets'}));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
    section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.SetName('Demo_widgets');
    section.options = SECTION.HORIZONTAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
 
 
@@ -980,10 +966,9 @@ GENERIC WIDGETS\
 
    // Create Button Widget with counter on click
    {
-      const s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[3], .4) }));
+      const s = Create_rect_mesh(Style_rect_default_properties({ is_root: _, options: SECTION.HORIZONTAL, pad: [10, 10], dim: [0, 0], col: TRANSPARENCY(GREY[3], .4), name:'Button panel' }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
       s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
-      s.SetName('Button panel');
       section.AddItem(s);
 
       const btn = Create_widget_button(Style_button_default_properties({ text: 'Button', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, col: BLUEL[7], text_col: WHITE, text_pad: [16, 8], texture_id: default_font, font_size: font_size, }));

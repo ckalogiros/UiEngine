@@ -9,6 +9,7 @@ import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/C
 import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
+import { Mesh_event_callback_create } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
@@ -1581,7 +1582,7 @@ function Tetris_start_menu(section_, emitter_) {
       },
    }
 
-   menu_panel.CreateEventCallback(evt_clbk_params);
+   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
 }
 

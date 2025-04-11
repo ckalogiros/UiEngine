@@ -6,6 +6,7 @@ import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Events_handle_immidiate } from "./Events.js";
 import { Mesh_buffer_get_mesh_bounding_box, Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
+import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -111,7 +112,7 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
    /**DEBUG */const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
    const event_idx = _listeners_buffer_storage.buffer[TYPE_IDX].Add({
-      /**DEBUG */name: (mesh) ? mesh.GetName() : 'NO SOURCE PARAMS',
+      /**DEBUG */name: (mesh) ? Mesh_get_name(mesh) : 'NO SOURCE PARAMS',
       type: TYPE_IDX,
       parent_idx: INT_NULL,
       Clbk: Clbk,
@@ -825,7 +826,7 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
    if(idx === INT_NULL) return;
 
    const mesh = Mesh_buffer_get_mesh_byidx(buffer[idx].meshidx);
-   const is_scroller = mesh.GetName()==='ScrollBar'
+   const is_scroller = Mesh_get_name(mesh)==='ScrollBar'
 
 
    // Store the element to be shifted 
@@ -1069,8 +1070,7 @@ function Listener_debug_print_info_recursive(TYPE_IDX, view, count) {
             const is_fake = event.is_fake;
             const has_view = event.view ? true : false;
 
-            // console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${mesh.GetName()}) `);
-            console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${mesh.GetName()}-${-mesh.mesh_bufferidx})`);
+            console.log(`${r} :[${e.event_idx}] (is child:${is_child_event}) (is fake:${is_fake}) (has view:${has_view}) (parent:${event.parent_idx}) (${Mesh_get_name(mesh)}-${-mesh.mesh_bufferidx})`);
             total_count++;
          }
 

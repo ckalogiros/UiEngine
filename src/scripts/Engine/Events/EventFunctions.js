@@ -3,6 +3,7 @@
 import { Listen_event_types_get_type_from_index } from "../../GlobalFunctions.js";
 import { Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
 import { Root_group_view_buffer_get_root_meshidx } from "../Core/Views/RootView.js";
+import { Mesh_get_name, Mesh_listener_add } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Listener_assign_parent_event, Listener_create_root_view } from "./EventListeners.js";
 
 
@@ -36,13 +37,11 @@ function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
             // Create FAKE event
             current.CreateListenEvent(etype, true); 
             // Construct
-            current.AddListenEvent(EVENT_TYPE_IDX, null, null); 
+            Mesh_listener_add(current, EVENT_TYPE_IDX, null, null); 
 
             // Find parent ELSE create root view event
             const parent_eventidx = Find_parent_listen_event(EVENT_TYPE_IDX, current)
         
-            // if(parent_eventidx === current.listeners.buffer[EVENT_TYPE_IDX]) alert('2')
-
             // The third check is to avoid the fouund parent event being the root, so no root view has been created 
             if (parent_eventidx !== null && parent_eventidx !== INT_NULL && parent_eventidx !== current.listeners.buffer[EVENT_TYPE_IDX]) { 
                 Listener_assign_parent_event(EVENT_TYPE_IDX, current.listeners.buffer[EVENT_TYPE_IDX], parent_eventidx)
@@ -94,7 +93,7 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
                 
                 // ERROR CHECK: Case parent event is INT_NULL
                 if(parent_events && parent_events.buffer[etype] === INT_NULL) {
-                    console.error('mesh', mesh.GetName(), '\nlisteners', mesh.listeners, '\nparent_events', parent_events, 'etype', etype);
+                    console.error('mesh', Mesh_get_name(mesh), '\nlisteners', mesh.listeners, '\nparent_events', parent_events, 'etype', etype);
                     // alert('7266534');
                 }
 
@@ -158,18 +157,11 @@ export function Construct_listen_events_from_mesh_tree(mesh){
      * the listener construction will fail.
      */
     const continue_with_children = mesh.ListenEventConstruct();
-    // console.log('name:', mesh.GetName(), mesh.listeners.buffer )
     
     // Recurse 
-    // if(continue_with_children)
-    {
-        
-        for (let i=0; i <= mesh.children.boundary; i++){
-            const child = mesh.children.buffer[i];
-            // console.log('child:', child.GetName(), child.listeners )
-            Construct_listen_events_from_mesh_tree(child)
-        }
+    for (let i=0; i <= mesh.children.boundary; i++){
+        const child = mesh.children.buffer[i];
+        Construct_listen_events_from_mesh_tree(child)
     }
-    // else console.error('SKIP', mesh.GetName(), mesh.children.buffer)
 }
     

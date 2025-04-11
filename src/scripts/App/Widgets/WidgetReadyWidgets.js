@@ -64,8 +64,7 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
    }));
 
    // Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 8, });
-   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect:8, });
-   slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect:8, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}});
 
    slider.SetInitialValue(initial_val);
 

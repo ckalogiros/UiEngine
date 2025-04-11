@@ -19,7 +19,7 @@ import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 import { Widget_ready_label } from "../Widgets/WidgetReadyWidgets.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
-import { Mesh_set_dim_xy, Mesh_set_wpos_xy, Mesh_update_set_dim_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_xy, Mesh_update_set_dim_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -56,10 +56,9 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       let ypos = y, xpos = x;
       let slope = 0.05;
 
-      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'Animations-Scale'}));
       Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[6])});
       panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-      panel.SetName('Animations-Scale');
 
       ypos = 0;
       ypos += pad2;
@@ -261,11 +260,10 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
 
    const rcorners = 10
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1]}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope'}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2])});
    panel.align.flags = (LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF);
    panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   panel.SetName('Demo_animations_with_slider_slope');
    
    const text = 'Use the slider to change the slope\nof the logarithmic function.';
    const label = Widget_ready_label(_, text, _, _, _, 10, _, _, _, false);
@@ -352,11 +350,10 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
 
    const rcorners = 10;
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1]}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope'}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2])});
    panel.SetLayout(LAYOUT.VERTICAL| SECTION.RESIZE_SELF);
    panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   panel.SetName('Demo_animations_with_slider_slope');
 
    const text = 'Use the "Options" menu to change properties.';
    const label = Widget_ready_label(_, text, _, _, _, 10, _, _, _, false);
@@ -410,9 +407,8 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       pass: SID.ATTR.WPOS3,
    }
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_rrot:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1]}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_rrot:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_ready_button_with_panel'}));
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:true,});
-   panel.SetName('Demo_animations_ready_button_with_panel');
 
 
 
@@ -524,10 +520,9 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    let zpos = 10;
 
    // const menu_panel = Create_rect_mesh(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'MenuLoadPanel',}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10}); //, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[2])});
    menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-   menu_panel.SetName('MenuLoadPanel');
    menu_panel.SetLayout(LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF);
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    
@@ -991,7 +986,7 @@ function Animation_rotate_run(params) {
 
    const rot = (slope * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
    rotation = rot;
 
@@ -1020,7 +1015,7 @@ function Animation_rotate_back_run(params) {
 
    const rot = ((1. - slope) * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
    rotation = rot;
 

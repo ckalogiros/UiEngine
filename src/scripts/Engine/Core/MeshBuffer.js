@@ -8,6 +8,7 @@ import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
 import { Mesh_get_real_pos_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -47,7 +48,7 @@ export function Mesh_buffer_get_size() { return _mesh_buffer.size; }
 
 export function Mesh_buffer_get_mesh_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx]; }
 export function Mesh_buffer_get_mesh_gfx_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].gfx; }
-export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].GetName(); }
+export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return Mesh_get_name(_mesh_buffer.buffer[mesh_bufferidx]); }
 
 
 export function Mesh_buffer_get_mesh_pos(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.pos; }
