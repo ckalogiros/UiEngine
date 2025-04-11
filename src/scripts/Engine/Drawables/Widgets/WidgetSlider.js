@@ -1419,21 +1419,20 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       if (x === 0 && y === 0) return;
 
-      // AddArr2(this.geom.pos, [x, y]);
-      // Mesh_add_wpos_xy(this, x, y,);
       Mesh_add_and_copy_wpos_xy(this, x, y,);
       
       const bar = this.children.buffer[this.bar_idx];
       Mesh_add_wpos_xy(bar, x, y,);
       
-      const name_text = this.text_mesh;
-      name_text.geom.AddWposXY(name_text.gfx, x, y,);
+      // const name_text = this.text_mesh;
+      // Mesh_add_wpos_xy(name_text, x, y,);
+      console.log('[][][]][][]]]]][][')
       
       const handle = bar.children.buffer[0];
       Mesh_add_wpos_xy(handle, x, y,);
       
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.geom.AddWposXY(value_text.gfx, x, y,);
+      Mesh_add_wpos_xy(value_text, x, y,);
       
    }
    
@@ -1442,23 +1441,19 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       
       if (x === 0) return;
       
-      // this.geom.pos[0] += [x];
-      // this.geom.AddWposX(this.gfx, x);
       Mesh_add_and_copy_wpos_x(this, x);
       
       const bar = this.children.buffer[this.bar_idx];
-      // bar.geom.AddWposX(bar.gfx, x);
       Mesh_add_wpos_x(bar, x);
       
       const name_text = this.text_mesh;
-      name_text.geom.AddWposX(name_text.gfx, x);
+      Mesh_add_wpos_x(name_text, x);
       
       const handle = bar.children.buffer[0];
-      // handle.geom.AddWposX(handle.gfx, x);
       Mesh_add_wpos_x(handle, x);
       
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.geom.AddWposX(value_text.gfx, x);
+      Mesh_add_wpos_x(value_text, x);
       
    }
    
@@ -1467,25 +1462,21 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       
       if (y === 0) return;
       
-      // this.geom.pos[1] += y;
-      // this.geom.AddWposY(this.gfx, y);
       Mesh_add_and_copy_wpos_y(this, y);
       
       const bar = this.children.buffer[this.bar_idx];
       bar.geom.pos[1] += y;
-      // bar.geom.AddWposY(bar.gfx, y);
       Mesh_add_wpos_y(bar, y);
       
       const name_text = this.text_mesh;
-      name_text.geom.AddWposY(name_text.gfx, y);
+      Mesh_add_wpos_y(name_text, y);
       
       const handle = bar.children.buffer[0];
       handle.geom.pos[1] += y;
-      // handle.geom.AddWposY(handle.gfx, y);
       Mesh_add_wpos_y(handle, y);
 
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.geom.AddWposY(value_text.gfx, y);
+      Mesh_add_wpos_y(value_text, y);
 
    }
 

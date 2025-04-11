@@ -1,5 +1,8 @@
 TODO
 
+* The 'Gl_set_dim_xy' maybe should be abstracted to Mesh_update_attr_dimentions
+Also instead of dim for vpos we should use vpos
+
 * Remove functions from {geom, mat}, {mesh} and if possible create functions and not methods
    Also reduce the memory footprint of Mesh etc.
 

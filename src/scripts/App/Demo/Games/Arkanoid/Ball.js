@@ -6,6 +6,7 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_set_wpos_xy, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
@@ -32,9 +33,10 @@ const BALL_DIM_X = BALL_SIZE;
 const BALL_DIM_Y = BALL_SIZE;
 const BALL_SPEED = 4;
 const MAX_BALLS_COUNT = 3;
+const MAX_ACCEL = 9;
 
 
-const ACCEL_FROM_BOUNDS = 1;
+const ACCEL_FROM_BOUNDS = 3;
 const ACCEL_FROM_PLAYER = 2;
 
 
@@ -336,7 +338,7 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
          else if (ball_top < bound_top) {
             ph.vely *= -1;
             ball_pos[1] = ball_size;
-            // ph.accely += ACCEL_FROM_BOUNDS;
+            ph.accely += ACCEL_FROM_BOUNDS;
             hit = true;
          }
          if (ball_right > bound_right) {
@@ -423,12 +425,16 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
          ph.vely *= point_of_contact[1];
       }
 
+      if(ph.accelx > MAX_ACCEL) console.log('accel x:',ph.accelx);
+      if(ph.accely > MAX_ACCEL)  console.log('accel y:',ph.accely);
+      if(ph.accelx > MAX_ACCEL) ph.accelx = MAX_ACCEL;
+      if(ph.accely > MAX_ACCEL) ph.accely = MAX_ACCEL;
 
       ball.mesh.geom.pos[0] += ph.velx * (ph.speed + ph.accelx);
       ball.mesh.geom.pos[1] += ph.vely * (ph.speed + ph.accely);
-      ball.mesh.geom.SetWposXY(ball.mesh.gfx, ball.mesh.geom.pos[0] + ball_size, ball.mesh.geom.pos[1] + ball_size);
+      Mesh_update_set_wpos_xy(ball.mesh);
 
-      if (ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point values
+      if (ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point vales
       else if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')
       if (ph.accely < .1) ph.accely = 0; // Avoid accel from reaching very small floating point values
       else if (ph.accely > 0) ph.accely *= .99; //else console.log('Accel y is diminished')
@@ -516,7 +522,7 @@ function Ball_animation_scale_up_run(params) {
    ball.geom.dim[0] = ball_size;
    ball.geom.dim[1] = ball_size;
 
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Mesh_update_set_dim_xy(ball);
    Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
    Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
 
@@ -568,7 +574,7 @@ function Ball_animation_scale_down_run(params) {
    ball.geom.dim[0] = ball_size;
    ball.geom.dim[1] = ball_size;
 
-   ball.geom.SetDimXY(ball.gfx, ball_size, ball_size);
+   Mesh_update_set_dim_xy(ball);
    Gl_set_dim_xy(ball.gfx, ball_size, ball_size);
    Gl_set_attr_round_corners(ball.gfx, ball.geom.dim[0]);
 
@@ -590,7 +596,7 @@ function Ball_animation_scale_down_stop(params) {
    params.ball.mesh.geom.dim[0] = ball_initial_dimx;
    params.ball.mesh.geom.dim[1] = ball_initial_dimx;
 
-   params.ball.mesh.geom.SetDimXY(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
+   Mesh_update_set_dim_xy(params.ball.mesh);
    Gl_set_dim_xy(params.ball.mesh.gfx, ball_initial_dimx, ball_initial_dimx);
    Gl_set_attr_round_corners(params.ball.mesh.gfx, ball_initial_dimx);
 
@@ -644,30 +650,13 @@ function Ball_animation_squash_run(params) {
 
       // Update ball tail particle emitter
       Particle_system_emitter_set_size(params.ball.tail_emitter_idx, -size, size); // Scale up emitter and its particles
-      // Particle_system_emitter_add_size_xy(params.ball.tail_emitter_idx, -size, size); // Scale up emitter and its particles
 
    }
-
-   // else if(params.ball.lock_squash_anim && ball.geom.dim[1] < params.ball_initial_size + lim) {
-
-   //    const slope = Logarithmic_interpolation(timer, slope_constant);
-   //    const size = slope*2;
-
-   //    ball.geom.dim[1] += size;
-   //    ball.geom.dim[0] -= size;
-   //    // ball.geom.AddWposY(ball.gfx, size);
-   //    // ball.geom.AddWposY(ball.gfx, size*-params.direction.y);
-   //    // ball.geom.AddWposXY(ball.gfx, -size*params.direction.x, -size*params.direction.y);
-   //    // if(ball.geom.dim[1] >= params.ball_initial_size + lim) params.ball.lock_squash_anim = false;
-
-   //    // Update ball tail particle emitter
-   //    // Particle_system_emitter_add_size_xy(params.ball.tail_emitter_idx, size, -size); // Scale up emitter and its particles
-   // }
    else {
       ball.geom.dim[1] = params.ball_initial_size;
       ball.geom.dim[0] = params.ball_initial_size;
-      // ball.geom.AddWposY(ball.gfx, size);
-      ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+      // Mesh_add_wpos_y(ball, size);
+      Mesh_update_set_dim_xy(ball);
       Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
       Gl_set_attr_round_corners(ball.gfx, params.ball_initial_size);
 
@@ -678,7 +667,7 @@ function Ball_animation_squash_run(params) {
 
       return false;
    }
-   ball.geom.SetDimXY(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
+   Mesh_update_set_dim_xy(ball);
    Gl_set_dim_xy(ball.gfx, ball.geom.dim[0], ball.geom.dim[1]);
    Gl_set_attr_round_corners(ball.gfx, Min(ball.geom.dim[0], ball.geom.dim[1]));
 

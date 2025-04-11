@@ -9,7 +9,7 @@ import { Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/Vertex
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Create_text_mesh } from "../../Core/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
-import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_add_and_copy_wpos_xy, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_relative_x, Mesh_set_wpos_relative_xy, Mesh_set_wpos_relative_y, Mesh_set_wpos_y, Mesh_update_set_wpos_x, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
@@ -301,10 +301,9 @@ export class Widget_Label extends Rect_Mesh {
 
         // Update vertex buffers
         if (this.is_gfx_inserted) {
-            /** If the alignment happens after the widgets insertion to 
-             * the vertex buffers, we must update the vertex buffers too.
-             */
-            this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, move_dif[0], move_dif[1]);
+            /** If the alignment happens after the widgets insertion to the vertex buffers, we must update the vertex buffers too. */
+            Mesh_add_wpos_xy(this.text_mesh, move_dif[0], move_dif[1]);
+            // this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, move_dif[0], move_dif[1]);
         }
         else {
             this.text_mesh.geom.pos[0] += move_dif[0];
@@ -341,54 +340,48 @@ export class Widget_Label extends Rect_Mesh {
 
     AddWposXY(x, y) {
 
-        this.geom.AddWposXY(this.gfx, x, y,);
-        this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y,);
+        Mesh_add_and_copy_wpos_xy(this, x, y,);
+        Mesh_add_and_copy_wpos_xy(this.text_mesh, x, y,);
     }
 
 
     AddWposX(x) {
 
-        this.geom.AddWposX(this.gfx, x,);
-        this.text_mesh.AddWposX(x);
+        this.geom.pos[0] += x;
+        Mesh_add_wpos_x(this, x,);
+        this.text_mesh.geom.pos[0] += x;
+        Mesh_add_wpos_x(this.text_mesh, x);
     }
 
 
     AddWposY(y) {
 
         this.geom.pos[1] += y;
-        this.geom.AddWposY(this.gfx, y,);
+        Mesh_add_wpos_y(this, y,);
         this.text_mesh.geom.pos[1] += y;
         this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y,);
-        // if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-        //     this.geom.AddWposY(this.gfx, y, );
-        // }
-        // this.text_mesh.geom.pos[1] += y;
-        // if(this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-        //     this.text_mesh.geom.AddWposY(this.text_mesh.gfx, y, );
-        // }
     }
 
 
     SetWposXY(x, y) {
-        super.SetWposXY(x, y);
-        // this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
-        // this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
-        // this.text_mesh.geom.AddWposXY(this.text_mesh.gfx, x, y);
-        this.text_mesh.geom.SetWposXYFromAddWPos(this.text_mesh.gfx, x, y);
+        this.geom.pos[0] = x;
+        this.geom.pos[1] = y;
+        Mesh_update_set_wpos_xy(this);
+        Mesh_set_wpos_relative_xy(this.text_mesh, x, y);
     }
 
 
     SetWposX(x) {
-        super.SetWposX(x);
-        // this.text_mesh.geom.pos[0] = x - this.text_mesh.text_width;
-        this.text_mesh.geom.SetWposXFromAddWPos(this.text_mesh.gfx, x);
+        this.geom.pos[0] = x;
+        Mesh_update_set_wpos_x(this);
+        Mesh_set_wpos_relative_x(this.text_mesh, x);
     }
-
-
+    
+    
     SetWposY(y) {
-        super.SetWposY(y);
-        // this.text_mesh.geom.pos[1] = y - this.text_mesh.text_height;
-        this.text_mesh.geom.SetWposYFromAddWPos(this.text_mesh.gfx, y);
+        this.geom.pos[1] = y;
+        Mesh_update_set_wpos_y(this);
+        Mesh_set_wpos_relative_y(this.text_mesh, y);
     }
 
 

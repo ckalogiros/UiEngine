@@ -2054,13 +2054,6 @@ function Test_slider_control_pad(x, y) {
       const pad_y = root_mesh.StylesGetPad(STYLES.AXIS.Y);
       root_mesh.geom.dim[0] = ret.dim_x + pad_x;
       root_mesh.geom.dim[1] = ret.dim_y + pad_y;
-      // target_mesh.geom.dim[0] = ret.dim_x + val;
-      // target_mesh.geom.dim[1] = ret.dim_y + val;
-
-      // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0]+target_mesh.geom.dim[0], target_mesh.geom.pos[1]+target_mesh.geom.dim[1])
-      // // Gl_set_wpos_xy(target_mesh.gfx, target_mesh.geom.pos[0], target_mesh.geom.pos[1]);
-      // target_mesh.geom.SetDim(target_mesh.geom.dim, target_mesh.gfx);
-      // Gl_set_dim_xy(target_mesh.gfx, target_mesh.geom.dim[0], target_mesh.geom.dim[1]);
 
    }, params2,
    );

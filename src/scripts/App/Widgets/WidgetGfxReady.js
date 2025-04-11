@@ -85,6 +85,6 @@ export function Widget_gfx_ready_enable({
 
 export function TEMP_build_mesh_attributes(mesh) {
 
-   const attribs_info = Shader_attributes_get_attribs(mesh.gfx.prog.attribsidx);
-   console.log('attribs_info', attribs_info)
+   // const attribs_info = Shader_attributes_get_attribs(mesh.gfx.prog.attribsidx);
+   // console.log('attribs_info', attribs_info)
 }

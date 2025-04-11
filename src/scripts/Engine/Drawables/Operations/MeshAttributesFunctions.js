@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { WHITE } from '../Material/Base/Colors.js';
@@ -169,31 +169,33 @@ export function Mesh_get_real_pos_y(mesh, ) {
 export function Set_time(mesh, t) {
    mesh.geom.time = t;
 }
-/** */
-export function Mesh_set_wpos_xy(mesh, ) {
+
+
+
+/** World Position*/
+export function Mesh_update_set_wpos_xy(mesh, ) {
    Gl_set_wpos_xy( mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
 }
 /** */
-export function Mesh_set_wpos_x(mesh, ) {
+export function Mesh_update_set_wpos_x(mesh, ) {
    Gl_set_wpos_x( mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.num_faces );
 }
 /** */
-export function Mesh_set_wpos_y(mesh, ) {
+export function Mesh_update_set_wpos_y(mesh, ) {
    Gl_set_wpos_y( mesh.gfx, mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
 }
 /** */
-export function Mesh_set_dim_xy(mesh, ) {
-   Gl_set_vpos_xy( mesh.gfx, mesh.geom.dim[0], mesh.geom.num_faces );
+export function Mesh_set_wpos_xy(mesh, x, y) {
+   Gl_set_wpos_xy( mesh.gfx, x + mesh.geom.dim[0], y + mesh.geom.dim[1]+y, mesh.geom.num_faces );
 }
 /** */
-export function Mesh_set_dim_x(mesh, ) {
-   Gl_set_vpos_x( mesh.gfx, mesh.geom.dim[0], mesh.geom.num_faces );
+export function Mesh_set_wpos_x(mesh, x) {
+   Gl_set_wpos_x( mesh.gfx, x + mesh.geom.dim[0], mesh.geom.num_faces );
 }
 /** */
-export function Mesh_set_dim_y(mesh, ) {
-   Gl_set_vpos_y( mesh.gfx, mesh.geom.dim[1], mesh.geom.num_faces );
+export function Mesh_set_wpos_y(mesh, y) {
+   Gl_set_wpos_y( mesh.gfx, y + mesh.geom.dim[1], mesh.geom.num_faces );
 }
-
 /** */
 export function Mesh_add_wpos_xy(mesh, x, y) {
    Gl_add_wpos_xy( mesh.gfx, x, y, mesh.geom.num_faces );
@@ -206,10 +208,10 @@ export function Mesh_add_wpos_x(mesh, x) {
 export function Mesh_add_wpos_y(mesh, y) {
    Gl_add_wpos_y( mesh.gfx, y, mesh.geom.num_faces );
 }
-/** */
+/** Add position to mesh and vertex buffer */
 export function Mesh_add_and_copy_wpos_xy(mesh, x, y) {
    mesh.geom.pos[0] += x;
-   mesh.geom.pos[0] += y;
+   mesh.geom.pos[1] += y;
    Gl_add_wpos_xy( mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
 }
 /** */
@@ -219,6 +221,86 @@ export function Mesh_add_and_copy_wpos_x(mesh, x) {
 }
 /** */
 export function Mesh_add_and_copy_wpos_y(mesh, y) {
-   mesh.geom.pos[0] += y;
+   mesh.geom.pos[1] += y;
    Gl_add_wpos_y( mesh.gfx, mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
 }
+/** Set position to mesh and vertex buffer */
+export function Mesh_set_and_copy_wpos_xy(mesh, x, y) {
+   mesh.geom.pos[0] = x;
+   mesh.geom.pos[1] = y;
+   Gl_set_wpos_xy( mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
+}
+/** */
+export function Mesh_set_and_copy_wpos_x(mesh, x) {
+   mesh.geom.pos[0] = x;
+   Gl_set_wpos_x( mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.num_faces );
+}
+/** */
+export function Mesh_set_and_copy_wpos_y(mesh, y) {
+   mesh.geom.pos[1] = y;
+   Gl_set_wpos_y( mesh.gfx, mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces );
+}
+/** Set relative world position (via current pos difference) */
+export function Mesh_set_wpos_relative_xy(mesh, x, y) { 
+   const difx = x-mesh.geom.pos[0];
+   mesh.geom.pos[0] = x;
+   const dify = y-mesh.geom.pos[0];
+   mesh.geom.pos[1] = y;
+   Gl_set_wpos_xy(mesh.gfx, difx, dify, mesh.num_faces);
+}
+/** */
+export function Mesh_set_wpos_relative_x(mesh, x) { 
+   const dif = x-mesh.geom.pos[0];
+   mesh.geom.pos[0] = x;
+   Gl_add_wpos_x(mesh.gfx, dif, mesh.num_faces);
+}
+/** */
+export function Mesh_set_wpos_relative_y(mesh, y) {
+   const dif = y-mesh.geom.pos[0];
+   mesh.geom.pos[1] = y;
+   Gl_set_wpos_y(mesh.gfx, dif, mesh.num_faces);
+}
+
+
+
+
+
+/** Vertex Position */
+export function Mesh_update_set_dim_xy(mesh, ) {
+   Gl_set_vpos_xy( mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1], mesh.geom.num_faces );
+}
+/** */
+export function Mesh_update_set_dim_x(mesh, ) {
+   Gl_set_vpos_x( mesh.gfx, mesh.geom.dim[0], mesh.geom.num_faces );
+}
+/** */
+export function Mesh_update_set_dim_y(mesh, ) {
+   Gl_set_vpos_y( mesh.gfx, mesh.geom.dim[1], mesh.geom.num_faces );
+}
+/** */
+export function Mesh_set_dim_xy(mesh, x, y) {
+   Gl_set_vpos_xy( mesh.gfx, x, y, mesh.geom.num_faces );
+}
+/** */
+export function Mesh_set_dim_x(mesh, x) {
+   Gl_set_vpos_x( mesh.gfx, x, mesh.geom.num_faces );
+}
+/** */
+export function Mesh_set_dim_y(mesh, y) {
+   Gl_set_vpos_y( mesh.gfx, y, mesh.geom.num_faces );
+}
+/** */
+export function Mesh_add_dim_xy(mesh, x, y) {
+   Gl_add_vpos_xy( mesh.gfx, x, y, mesh.geom.num_faces );
+}
+/** */
+export function Mesh_add_dim_x(mesh, x) {
+   Gl_add_vpos_x( mesh.gfx, x, mesh.geom.num_faces );
+}
+/** */
+export function Mesh_add_dim_y(mesh, y) {
+   Gl_add_vpos_y( mesh.gfx, y, mesh.geom.num_faces );
+}
+
+
+

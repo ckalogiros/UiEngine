@@ -18,7 +18,7 @@ import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/Math
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../Widgets/WidgetGenericControlsReady.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
-import { Mesh_add_wpos_xy, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_xy, Mesh_get_real_pos_y, Mesh_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -1169,7 +1169,7 @@ function Animate_elastic_collisions_balls(params) {
       }
 
 
-      ball.geom.SetWposXY(ball.gfx, ball.geom.pos[0], ball.geom.pos[1]);
+      Mesh_set_wpos_xy(ball, ball.geom.pos[0], ball.geom.pos[1]);
 
       phys1.overlap[0] = 0;
       phys1.overlap[1] = 0;

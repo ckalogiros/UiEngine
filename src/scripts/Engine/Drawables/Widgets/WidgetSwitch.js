@@ -10,7 +10,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
-import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
@@ -257,10 +257,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
-      this.geom.AddWposXY(this.gfx, x, y,);
+      Mesh_add_wpos_xy(this, x, y,);
       this.children.buffer[0].geom.pos[0] += x;
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposXY(this.gfx, x, y,);
+      Mesh_add_wpos_xy(this.children.buffer[0], x, y,);
 
    }
 
@@ -270,9 +270,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (x === 0) return;
 
       this.geom.pos[0] += x;
-      this.geom.AddWposX(this.gfx, x,);
+      Mesh_add_wpos_x(this, x,);
       this.children.buffer[0].geom.pos[0] += x;
-      this.children.buffer[0].geom.AddWposX(this.gfx, x,);
+      Mesh_add_wpos_x(this.children.buffer[0], x,);
    }
 
 
@@ -281,9 +281,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (y === 0) return;
 
       this.geom.pos[1] += y;
-      this.geom.AddWposY(this.gfx, y,);
+      Mesh_add_wpos_y(this, y,);
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposY(this.gfx, y,);
+      Mesh_add_wpos_y(this.children.buffer[0], y,);
 
    }
 
@@ -425,12 +425,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);
          switch_handle.geom.pos[0] += mesh.geom.dim[0];
-         switch_handle.geom.AddWposX(switch_handle.gfx, mesh.geom.dim[0],);
+         Mesh_add_wpos_x(switch_handle, mesh.geom.dim[0],);
       }
       else {
          Set_default_color_rgba(mesh);
          switch_handle.geom.pos[0] -= mesh.geom.dim[0];
-         switch_handle.geom.AddWposX(switch_handle.gfx, -mesh.geom.dim[0],);
+         Mesh_add_wpos_x(switch_handle, -mesh.geom.dim[0],);
       }
 
 

@@ -403,7 +403,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
 
             target_mesh.geom.dim[0] = sizex;
             target_mesh.geom.dim[1] = sizey;
-            target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
+            Mesh_update_set_dim_xy(target_mesh);
             Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
             Mesh_add_wpos_xy(target_mesh, difx, dify);

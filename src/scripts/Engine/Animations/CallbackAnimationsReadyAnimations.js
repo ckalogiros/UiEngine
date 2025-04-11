@@ -2,6 +2,7 @@
 
 import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
+import { Mesh_set_dim_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
 
 
@@ -333,7 +334,7 @@ function Animation_scale_inflate_run(params) {
    // const sizex = target_mesh.geom.dim[0] + amt;
    // const sizey = target_mesh.geom.dim[1] + amt;
 
-   target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
+   Mesh_update_set_dim_xy(target_mesh);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
    // target_mesh.geom.dim[0] = sizex;
@@ -394,7 +395,7 @@ function Animation_scale_deflate_run(params) {
    const sizex = params.start_dimx + amt;
    const sizey = params.start_dimy + amt * .3;
 
-   target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
+   Mesh_set_dim_xy(target_mesh.gfx, sizex, sizey);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
    // target_mesh.geom.dim[0] = sizex;

@@ -948,25 +948,25 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	SetWposXFromAddWPos(x) {
-		this.geom.SetWposXFromAddWPos(x);
-	}
+	// SetWposXFromAddWPos(x) {
+	// 	this.geom.SetWposXFromAddWPos(x);
+	// }
 
 
-	SetWposYFromAddWPos(y) {
-		this.geom.SetWposYFromAddWPos(y);
-	}
+	// SetWposYFromAddWPos(y) {
+	// 	this.geom.SetWposYFromAddWPos(y);
+	// }
 
 
-	TEMP_recalc(x, y) {
-		alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
-		// this.geom.pos[0] = x;
-		// this.geom.pos[1] = y;
-		// for (let i = 0; i <= this.children.boundary; i++) {
-		//    const child = this.children.buffer[i];
-		//    if (child) child.TEMP_recalc(x, y);
-		// }
-	}
+	// TEMP_recalc(x, y) {
+	// 	alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
+	// 	// this.geom.pos[0] = x;
+	// 	// this.geom.pos[1] = y;
+	// 	// for (let i = 0; i <= this.children.boundary; i++) {
+	// 	//    const child = this.children.buffer[i];
+	// 	//    if (child) child.TEMP_recalc(x, y);
+	// 	// }
+	// }
 
 
 	SetPosZNoGfxUpdate(z) {

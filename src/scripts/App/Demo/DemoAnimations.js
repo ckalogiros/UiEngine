@@ -19,6 +19,7 @@ import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 import { Widget_ready_label } from "../Widgets/WidgetReadyWidgets.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
+import { Mesh_set_dim_xy, Mesh_set_wpos_xy, Mesh_update_set_dim_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -812,12 +813,14 @@ function Animation_scale_up_run(params) {
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const size = mesh.geom.dim[0] + (slope * scale);
 
-   mesh.geom.SetDimXY(mesh.gfx, size, size);
+   // mesh.geom.SetDimXY(mesh.gfx, size, size);
+   Mesh_set_dim_xy(mesh, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
    const diffx = mesh.geom.pos[0] + (slope * scale);
    const diffy = mesh.geom.pos[1] + (slope * scale);
-   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   Mesh_set_wpos_xy(mesh, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
@@ -845,12 +848,13 @@ function Animation_scale_down_run(params) {
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const size = mesh.geom.dim[0] + ((1. - slope) * scale);
-   mesh.geom.SetDimXY(mesh.gfx, size, size);
+   // mesh.geom.SetDimXY(mesh.gfx, size, size);
+   Mesh_set_dim_xy(mesh, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
    const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
    const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
-   mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
+   Mesh_set_wpos_xy(mesh, diffx, diffy);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));

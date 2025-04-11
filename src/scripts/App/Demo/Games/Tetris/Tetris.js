@@ -913,9 +913,9 @@ function Cell_reset_mesh(mesh, colidx, rowidx, color) {
    Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0] + TOKEN_SIZE, mesh.geom.pos[1] + TOKEN_SIZE);
    mesh.geom.dim[0] = TOKEN_SIZE;
    mesh.geom.dim[1] = TOKEN_SIZE;
+   Mesh_update_set_dim_xy(mesh);
    Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
 
-   mesh.geom.SetDimXY(mesh.gfx, TOKEN_SIZE, TOKEN_SIZE);
 
    mesh.SetColorAllRGB(color);
 

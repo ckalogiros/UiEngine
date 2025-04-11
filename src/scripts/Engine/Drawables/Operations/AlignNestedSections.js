@@ -1,5 +1,7 @@
 "use strict";
 
+import { Mesh_set_dim_xy } from "./MeshAttributesFunctions";
+
 
 /** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
 export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
@@ -244,7 +246,7 @@ export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10
       Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0]+mesh.geom.dim[0], mesh.geom.pos[1]+mesh.geom.dim[1])
       // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0], mesh.geom.pos[1]);
       // mesh.geom.UpdateSetWposXY(mesh.gfx);
-      mesh.geom.SetDim([mesh.geom.dim[0], mesh.geom.dim[1]], mesh.gfx);
+      Mesh_set_dim_xy(mesh);
       Gl_set_dim_xy(mesh.gfx, mesh.geom.dim[0], mesh.geom.dim[1]);
    }
    // console.log(mesh.GetName())

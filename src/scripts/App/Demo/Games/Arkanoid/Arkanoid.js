@@ -28,6 +28,7 @@ import { Gl_set_rgb } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Slider_connect } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from "../../../Widgets/WidgetGenericControlsReady.js";
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
+import { Mesh_get_real_pos_xy, Mesh_set_wpos_x, Mesh_update_set_wpos_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -490,7 +491,8 @@ function Arkanoid_run(params) {
    // Set player's new position
    const new_posx = posx;
    player.mesh.geom.pos[0] = new_posx;
-   player.mesh.SetWposX(new_posx + player_half_dimx);
+   Mesh_update_set_wpos_x(player.mesh);
+   // player.mesh.SetWposX(new_posx + player_half_dimx);
 
 
    const pl_left = player.mesh.geom.pos[0];
@@ -507,12 +509,12 @@ function Arkanoid_run(params) {
          // Make the ball not leave the players's width area
          if (ball.mesh.geom.pos[0] < pl_left) {
             ball.mesh.geom.pos[0] = pl_left;
-            ball.mesh.geom.SetWposX(ball.mesh.gfx, pl_left);
+            Mesh_set_wpos_x(ball.mesh, pl_left);
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
          }
          else if (ball.mesh.geom.pos[0] > pl_right) {
             ball.mesh.geom.pos[0] = pl_right;
-            ball.mesh.geom.SetWposX(ball.mesh.gfx, pl_right);
+            Mesh_set_wpos_x(ball.mesh, pl_right);
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
          }
       }

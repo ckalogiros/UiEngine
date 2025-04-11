@@ -6,6 +6,7 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -187,10 +188,10 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
       powup.geom.pos[1] = y - h + h_src;
       Gl_set_wpos_xy(powup.gfx, powup.geom.pos[0] + w, powup.geom.pos[1] + h);
 
+      
       powup.geom.dim[0] = w;
       powup.geom.dim[1] = h;
-
-      powup.geom.SetDimXY(powup.gfx, w, h);
+      Mesh_update_set_dim_xy(powup);
 
       powup.SetColorRGBA(color);
 

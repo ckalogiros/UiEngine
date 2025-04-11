@@ -23,7 +23,7 @@ import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } 
 import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
-import { Mesh_add_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -1156,7 +1156,7 @@ function Animation_scale_down_run(params) {
       // Avoid smaller than snake.min_size body meshes
       body.mesh.geom.dim[0] = body.size;
       body.mesh.geom.dim[1] = body.size;
-      body.mesh.geom.SetDimXY(body.mesh.gfx, body.size, body.size);
+      Mesh_update_set_dim_xy(body.mesh);
       Gl_set_dim_xy(body.mesh.gfx, body.size, body.size);
 
       body.mesh.mat.style.rcorners = body.mesh.geom.dim[0];
@@ -1674,11 +1674,11 @@ function Snake_options_callback(params) {
             Gl_add_vpos_y(body.mesh.gfx, pos_dif);
             Gl_add_vpos_x(body.mesh.gfx, pos_dif);
 
+            
+            body.size = calc_size;
             body.mesh.geom.dim[0] = calc_size;
             body.mesh.geom.dim[1] = calc_size;
-
-            body.size = calc_size;
-            body.mesh.geom.SetDimXY(body.mesh.gfx, calc_size, calc_size);
+            Mesh_update_set_dim_xy(body.mesh);
             Gl_set_dim_xy(body.mesh.gfx, calc_size, calc_size);
 
 

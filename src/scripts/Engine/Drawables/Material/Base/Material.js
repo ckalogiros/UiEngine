@@ -15,11 +15,6 @@ import { Texture_metrics_get_texture_pixel_size, Uv_get_uv_coords } from '../../
 /** */
 export class Material {
 
-   // TODO
-   // col_id; // An index to the Str_buffer. As a name, is the name of the shader's color attribute. 
-   // uv_id; // An index to the Str_buffer. As a name, is the name of the shader's textureCoord attribute. 
-   // style_id; // An index to the Str_buffer. As a name, is the name of the shader's textureCoord attribute. 
-
    constructor(col = [1, 1, 1, 1]) {
 
       this.sid = {
@@ -57,19 +52,19 @@ export class Material {
       }
 
    }
-   // SetColorAllRGB(col, gfx, num_faces) {
-   //    math.CopyArr3(this.col, col);
-   //    math.CopyArr3(this.defCol, col);
-   //    Gl_set_rgb(gfx, this.col, num_faces);
-   // }
-   // SetColorRGB(col, gfx, num_faces) {
-   //    math.CopyArr3(this.col, col);
-   //    Gl_set_rgb(gfx, this.col, num_faces);
-   // }
-   // SetColorRGBA(col, gfx, num_faces) {
-   //    math.CopyArr4(this.col, col);
-   //    Gl_set_rgba(gfx, this.col, num_faces);
-   // }
+   SetColorAllRGB(col, gfx, num_faces) {
+      math.CopyArr3(this.col, col);
+      math.CopyArr3(this.defCol, col);
+      Gl_set_rgb(gfx, this.col, num_faces);
+   }
+   SetColorRGB(col, gfx, num_faces) {
+      math.CopyArr3(this.col, col);
+      Gl_set_rgb(gfx, this.col, num_faces);
+   }
+   SetColorRGBA(col, gfx, num_faces) {
+      math.CopyArr4(this.col, col);
+      Gl_set_rgba(gfx, this.col, num_faces);
+   }
 
 }
 /** */

@@ -1,12 +1,12 @@
 "use strict";
 import { FloorArr2, FloorArr3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider } from '../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
 import { View_build_group_from_root_mesh } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../Engine/Core/Views/RootView.js';
-import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA } from '../Engine/Drawables/Material/Base/Colors.js';
+import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER } from '../Engine/Drawables/Material/Base/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
+import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
 import { Align_expand, Align_pre_simple, Test_alignment } from './Tests/TestAlignNestedSections.js';
 import { Widget_gfx_ready_enable } from './Widgets/WidgetGfxReady.js';
@@ -81,6 +81,15 @@ export function TestWidgetsGeneric() {
         // Game_snake(45, true);
     }
 
+    { // Quick widget enable
+        CreateSimpleWidgetText()
+        CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,18);
+        CreateSliderSimple();
+        Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, 'Ready Slider', _, )
+        CreateDropdownTree([0, 0, 0])
+        CreateScrollerClampAlphaTest(_, 0, 400, 10, 12)
+        Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
+    }
 
 
     // Test: Alignment
@@ -175,7 +184,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Dropdown
 
-        CreateDropdownTree([0, 0, 0])
+        // CreateDropdownTree([0, 0, 0])
 
         // CreateDropdownTreeHorizontalLayout();
 
@@ -189,7 +198,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Scroller
 
-        const scroller = CreateScrollerClampAlphaTest(_, 100, 100, 100, 12)
+        // const scroller = CreateScrollerClampAlphaTest(_, 0, 100, 10, 12)
 
         // TODO:UN_IMPLEMENTED
         // TestScrollerComponentDropdown();
@@ -204,7 +213,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Colorpicker
 
-        Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, 0x0);
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, _, _, _, _, _, 0x0);
 
         /* Test change color of a mesh using the colorpicker */
         // {
@@ -3114,13 +3123,13 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
         Scroller_component_calculate_handle_pos_dim(section, scroller_component);
 
 
-        // Set scissor box
-        const mx = section.mesh_bufferidx;
-        const my = scroller_component.mesh_bufferidx;
-        const mw = section.mesh_bufferidx;
-        const mh = scroller_component.mesh_bufferidx;
-        Vertex_buffer_group_create_scissorbox(section.gfx.vb.groupidx, mx, my, mw, mh);
-        Vertex_buffer_group_create_scissorbox(label.text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
+        // // Set scissor box
+        // const mx = section.mesh_bufferidx;
+        // const my = scroller_component.mesh_bufferidx;
+        // const mw = section.mesh_bufferidx;
+        // const mh = scroller_component.mesh_bufferidx;
+        // Vertex_buffer_group_create_scissorbox(section.gfx.vb.groupidx, mx, my, mw, mh);
+        // Vertex_buffer_group_create_scissorbox(label.text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
 
 
         // Unfortunately must Re-render the section for the clipping of the scroller to take place

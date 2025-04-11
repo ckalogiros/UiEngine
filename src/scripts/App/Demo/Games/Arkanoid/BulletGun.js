@@ -6,6 +6,7 @@ import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_set_dim_y } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -384,7 +385,7 @@ function Gun_create_animation_run(params) {
 
    const dify = gun.geom.dim[1] - sizey;
    gun.geom.dim[1] = sizey;
-   gun.geom.SetDimY(gun.gfx, sizey,);
+   Mesh_set_dim_y(gun, sizey,);
    Gl_set_dim_y(gun.gfx, sizey,);
    gun.geom.pos[1] += dify;
    Gl_add_wpos_y(gun.gfx, dify,)
@@ -404,7 +405,7 @@ function Gun_create_animation_stop(params) {
    params.gun.mesh2.geom.pos[1] += params.gun.mesh2.geom.dim[1];
    Gl_add_wpos_y(params.gun.mesh2.gfx, params.gun.mesh2.geom.dim[1],)
    params.gun.mesh2.geom.dim[1] = 0;
-   params.gun.mesh2.geom.SetDimY(params.gun.mesh2.gfx, 0,);
+   Mesh_set_dim_y(params.gun.mesh2, 0,);
    Gl_set_dim_y(params.gun.mesh2.gfx, 0,);
    Gl_set_alpha(params.gun.mesh2.gfx, 1);
 
@@ -428,7 +429,7 @@ function Gun_create_animation_gun_scale_mesh2_run(params) {
 
    const dify = gun.geom.dim[1] - sizey;
    gun.geom.dim[1] = sizey;
-   gun.geom.SetDimY(gun.gfx, sizey,);
+   Mesh_set_dim_y(gun, sizey,);
    Gl_set_dim_y(gun.gfx, sizey,);
    gun.geom.pos[1] += dify;
    Gl_add_wpos_y(gun.gfx, dify,)
