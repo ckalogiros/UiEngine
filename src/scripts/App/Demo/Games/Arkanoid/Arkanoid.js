@@ -157,7 +157,7 @@ function Arkanoid_on_click_callback(params) {
    }
    else if (ARK_STATE.IS(ARK_STATE.START)) {
 
-      const intersects = Check_intersection_point_rect(_arkanoid_struct.start_menu.start_btn.GetPosXY(), _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
+      const intersects = Check_intersection_point_rect(Mesh_get_real_pos_xy(_arkanoid_struct.start_menu.start_btn), _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
       if (intersects)
          Arkanoid_load_state(ARK_STATE.IN_GAME_PLAY);
 
@@ -471,7 +471,7 @@ function Arkanoid_run(params) {
 
    const panel = params.params.panel;
    const player = params.params.player;
-   const game_panel_pos = panel.GetPosXY();
+   const game_panel_pos = Mesh_get_real_pos_xy(panel);
    let mouse_posx = Mouse_get_posx();
 
 
@@ -547,10 +547,10 @@ function Arkanoid_run(params) {
 /** */
 function Arkanoid_initiate_stage_completed(player) {
 
-   Ball_print();
-   Coin_print();
-   Powup_print();
-   Effects_print();
+   // Ball_print();
+   // Coin_print();
+   // Powup_print();
+   // Effects_print();
 
 
 

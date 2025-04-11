@@ -9,7 +9,7 @@ import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } fro
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
-import { Set_color_a } from '../Operations/MeshAttributesFunctions.js';
+import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Mesh_create_style_from_values } from '../Operations/MeshHelperFunctions.js';
@@ -517,7 +517,7 @@ function Slider_horizontal_move_handle(bar, handle) {
    const bar_length = bar.geom.dim[0] * 2;
    if (handle.geom.pos[0] + x >= bar.geom.pos[0] && handle.geom.pos[0] + handle.geom.dim[0] * 2 + x <= bar.geom.pos[0] + bar_length) {
       handle.geom.pos[0] += x;
-      handle.geom.AddWposX(handle.gfx, x,);
+      Mesh_add_wpos_x(handle, x,);
    }
 
    // TODO: It is very complicated that we do not have a pipeline for the "mesh update gfx buffers". We need something more concrete  as to where the updates are passing through
@@ -534,7 +534,7 @@ function Slider_vertical_move_handle(bar, handle) {
    const bar_length = bar.geom.dim[1] * 2 * bar.geom.num_faces;
    if (handle.geom.pos[1] + y >= bar.geom.pos[1] && handle.geom.pos[1] + handle.geom.dim[1] * 2 + y <= bar.geom.pos[1] + bar_length) {
       handle.geom.pos[1] += y;
-      handle.geom.AddWposY(handle.gfx, y,);
+      Mesh_add_wpos_y(handle, y,);
    }
 
    handle.SetUpdateFrameBuffer();
@@ -687,7 +687,7 @@ export function Slider_simple_set_value(slider_bar, new_value) {
       // const pos = ((bar.geom.dim[0] * 2 * bar.geom.num_faces)) * new_value;
       const pos = ((bar.geom.dim[0] * 2)) * new_value;
       handle.geom.pos[0] = pos - (handle.geom.dim[0] * 2 * bar.slider_val - extra_padd); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-      handle.geom.UpdateSetWposX(handle.gfx)
+      Mesh_set_wpos_x(handle);
    }
    else {
 
@@ -1419,63 +1419,70 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       if (x === 0 && y === 0) return;
 
-      AddArr2(this.geom.pos, [x, y]);
-      this.geom.AddWposXY(this.gfx, x, y,);
-
+      // AddArr2(this.geom.pos, [x, y]);
+      // Mesh_add_wpos_xy(this, x, y,);
+      Mesh_add_and_copy_wpos_xy(this, x, y,);
+      
       const bar = this.children.buffer[this.bar_idx];
-      bar.geom.AddWposXY(bar.gfx, x, y,);
-
+      Mesh_add_wpos_xy(bar, x, y,);
+      
       const name_text = this.text_mesh;
       name_text.geom.AddWposXY(name_text.gfx, x, y,);
-
+      
       const handle = bar.children.buffer[0];
-      handle.geom.AddWposXY(handle.gfx, x, y,);
-
+      Mesh_add_wpos_xy(handle, x, y,);
+      
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.geom.AddWposXY(value_text.gfx, x, y,);
-
+      
    }
-
-
+   
+   
    AddWposX(x) {
-
+      
       if (x === 0) return;
-
-      this.geom.pos[0] += [x];
-      this.geom.AddWposX(this.gfx, x);
-
+      
+      // this.geom.pos[0] += [x];
+      // this.geom.AddWposX(this.gfx, x);
+      Mesh_add_and_copy_wpos_x(this, x);
+      
       const bar = this.children.buffer[this.bar_idx];
-      bar.geom.AddWposX(bar.gfx, x);
-
+      // bar.geom.AddWposX(bar.gfx, x);
+      Mesh_add_wpos_x(bar, x);
+      
       const name_text = this.text_mesh;
       name_text.geom.AddWposX(name_text.gfx, x);
-
+      
       const handle = bar.children.buffer[0];
-      handle.geom.AddWposX(handle.gfx, x);
-
+      // handle.geom.AddWposX(handle.gfx, x);
+      Mesh_add_wpos_x(handle, x);
+      
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.geom.AddWposX(value_text.gfx, x);
-
+      
    }
-
-
+   
+   
    AddWposY(y) {
-
+      
       if (y === 0) return;
-
-      this.geom.pos[1] += y;
-      this.geom.AddWposY(this.gfx, y);
-
+      
+      // this.geom.pos[1] += y;
+      // this.geom.AddWposY(this.gfx, y);
+      Mesh_add_and_copy_wpos_y(this, y);
+      
       const bar = this.children.buffer[this.bar_idx];
       bar.geom.pos[1] += y;
-      bar.geom.AddWposY(bar.gfx, y);
-
+      // bar.geom.AddWposY(bar.gfx, y);
+      Mesh_add_wpos_y(bar, y);
+      
       const name_text = this.text_mesh;
       name_text.geom.AddWposY(name_text.gfx, y);
-
+      
       const handle = bar.children.buffer[0];
       handle.geom.pos[1] += y;
-      handle.geom.AddWposY(handle.gfx, y);
+      // handle.geom.AddWposY(handle.gfx, y);
+      Mesh_add_wpos_y(handle, y);
 
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.geom.AddWposY(value_text.gfx, y);

@@ -18,6 +18,7 @@ import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/Math
 import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../Widgets/WidgetGenericControlsReady.js";
 import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
+import { Mesh_add_wpos_xy, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -447,7 +448,7 @@ function Animate_sattelite(params) {
          hit = true;
       }
 
-      ball.geom.AddWposXY(ball.gfx, x, y);
+      Mesh_add_wpos_xy(ball, x, y);
       /* Uncomment to speed uup the balls velocity each time it collides to a wall */
       // if(hit && phys.speed < 3) {
       //    phys.speed *= 1.05;
@@ -466,8 +467,8 @@ function Animate_sattelite(params) {
       const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter, and we add the   
       const b = (cy + (r * Math.cos(angle)));
 
-      sat.geom.SetWposXY(sat.gfx, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
-      sat.geom.AddWposXY(sat.gfx, a, b);
+      Mesh_add_wpos_xy(sat, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
+      Mesh_add_wpos_xy(sat, a, b);
 
 
 
@@ -746,7 +747,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    let yy = 0;
    const pos = [
       section.geom.pos[0] + section.geom.dim[0] * 2 + pad,
-      section.GetPosY() + yy,
+      Mesh_get_real_pos_y(section) + yy,
       0
    ];
    const info_section_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[5, 5], pos:pos, col:GREY[1]}));
@@ -758,7 +759,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
          const pos = [
             section.geom.pos[0] + section.geom.dim[0] * 2 + pad + pad,
-            section.GetPosY() + yy,
+            Mesh_get_real_pos_y(section) + yy,
             0
          ];
          const info_section = Create_rect_mesh(Style_rect_default_properties({pad:[5, 5], pos:pos, col:GREY[2]}));
@@ -857,7 +858,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       const needs_scroller = (info_section_panel.geom.dim[1] > elastic_collisions_panel_dim[1]) ? true : false
       if (needs_scroller) {
 
-         // const scroller_component = Components_create_scroller_component(10, elastic_collisions_panel_dim[1], info_section_panel, info_section_panel.GetPosY(),);
          const scroller_component = Components_create_scroller_component(10, elastic_collisions_panel_dim[1], info_section_panel, _,);
          Scoller_component_gengfx_and_render(scroller_component, info_section_panel);
          Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx, scroller_component.root_posidx);

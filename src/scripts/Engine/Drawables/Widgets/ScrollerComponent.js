@@ -14,6 +14,7 @@ import { GREY } from "../Material/Base/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
+import { Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_get_real_pos_y, Mesh_set_dim_y, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -116,9 +117,9 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.SCROLLER_VB);
 
    // Set positions after 'GenGfxCtx' so that the bar's
-   bar.geom.pos[0] = mesh.GetPosX()+mesh.geom.dim[0]*2
-   bar.geom.pos[0] = mesh.GetPosX()+mesh.geom.dim[0]*2
-   bar.geom.pos[1] = mesh.GetPosY();
+   bar.geom.pos[0] = Mesh_get_real_pos_x(mesh)+mesh.geom.dim[0]*2
+   bar.geom.pos[0] = Mesh_get_real_pos_x(mesh)+mesh.geom.dim[0]*2
+   bar.geom.pos[1] = Mesh_get_real_pos_y(mesh);
    
    // Set handle pos
    const handle = bar.children.buffer[0];
@@ -167,12 +168,8 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
 
 
    /* Set bar position */
-   bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2;
-   // bar.geom.pos[0] = scrolled_section.GetPosX()+(scrolled_section.geom.dim[0]*2)-10;
-   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] - handle_pad[0];
-   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + bar.geom.dim[0] + handle_pad[0];
-   // bar.geom.pos[0] = scrolled_section.GetPosX()+scrolled_section.geom.dim[0]*2 + handle_pad[0];
-   bar.geom.UpdateSetWposX(bar.gfx);
+   bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section)+scrolled_section.geom.dim[0]*2;
+   Mesh_set_wpos_x(bar);
    const clean_bar_height = bar.geom.dim[1];
    
    /* Set handle size */
@@ -185,8 +182,8 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    /* Set handle position */
    handle.geom.pos[0] = bar.geom.pos[0]+handle_pad[0];
 
-   handle.geom.UpdateSetDimY(handle.gfx);
-   handle.geom.UpdateSetWposXY(handle.gfx);
+   Mesh_set_dim_y(handle);
+   Mesh_set_wpos_xy(handle);
    Gl_set_dim_y(handle.gfx, handle.geom.dim[1], 1)
 
 
@@ -196,7 +193,7 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar);
 
 
-   Scroller_clip_scrolled_section(scrolled_section, bar.GetPosY(), bar.geom.dim[1]);
+   Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
 
 
 } 
@@ -206,8 +203,8 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
 function Scroller_component_update_handle_pos_from_scrolled_section(scrolled_section, bar) {
 
 
-   const scroller_top = bar.GetPosY();
-   const scrolled_top = scrolled_section.GetPosY();
+   const scroller_top = Mesh_get_real_pos_y(bar);
+   const scrolled_top = Mesh_get_real_pos_y(scrolled_section);
    const handle = bar.children.buffer[0];
    const handle_pad = handle.StylesGetPad(STYLES.AXIS.Y);
 
@@ -233,7 +230,7 @@ function Scroller_component_update_handle_pos_from_scrolled_section(scrolled_sec
    const pos_dim_ratio = Scroller_component_calculate_handle_position_ratio(bar, handle); // Calculate handles's ratio based on the handles position in the scrollbar and the dimention of the handle.
    const pad_ratio = (pos_dim_ratio * 2 - 1);
    handle.geom.pos[1] += handle_pad*-pad_ratio; // We need to contribute the analogue percentage value of the handle's pad, according to the handles position
-   handle.geom.UpdateSetWposY(handle.gfx)
+   Mesh_set_wpos_y(handle);
 
 }
 
@@ -296,12 +293,8 @@ function Scroller_component_on_update_handle(_params) {
    const scrolled_section = bar.scrolled_section;
    Scroller_component_move_handle(bar, handle);
    Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar);
+   Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
 
-   Scroller_clip_scrolled_section(scrolled_section, bar.GetPosY(), bar.geom.dim[1]);
-
-   // Root_group_reset_gfxs(scrolled_section.root_bufferidx)
-   // Root_group_rerender_from_root_reconstruct_listeners(scrolled_section.root_bufferidx);
-   
 }
 
 
@@ -321,7 +314,7 @@ function Scroller_component_move_handle(bar, handle) {
    if (handle.geom.pos[1] + y >= bar.geom.pos[1] + handle_pad &&
       handle.geom.pos[1] + handle.geom.dim[1] * 2 + y <= bar.geom.pos[1] + bar_length - handle_pad) {
       handle.geom.pos[1] += y;
-      handle.geom.AddWposY(handle.gfx, y, );
+      Mesh_add_wpos_y(handle, y, );
    }
 }
 
@@ -397,7 +390,7 @@ function Scroller_component_onClick(params) {
    
    
    // Check if the click happened on bar
-   const bar_pos = bar.GetPosXY();
+   const bar_pos = Mesh_get_real_pos_xy(bar);
    if (point[0] > bar_pos[0] + bar.StylesGetHoverMargin(STYLES.AXIS.X)) { // Check only if click is on the right of the left side of the bar mesh
       console.log('CLICKED', 'point', point, 'bar_pos', bar_pos)
       
@@ -431,7 +424,6 @@ function Scroller_clip_scrolled_section(scrolled_section, clip_top, height) {
    // Clip scrolled mesh to the height of the scroller
    if(scrolled_section.group_bufferidxs[0] !== INT_NULL){
 
-      // const clip_top = scrolled_section.GetPosY();
       const clip_bottom = clip_top + height * 2;
       Clipy_from_group(scrolled_section.group_bufferidxs[0], clip_top, clip_bottom);
    }
@@ -446,8 +438,8 @@ function Scroller_clip_scrolled_section(scrolled_section, clip_top, height) {
 function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar) {
 
 
-   const scroller_top = bar.GetPosY();
-   const scrolled_posy = scrolled_section.GetPosY();
+   const scroller_top = Mesh_get_real_pos_y(bar);
+   const scrolled_posy = Mesh_get_real_pos_y(scrolled_section);
    const handle = bar.children.buffer[0];
 
    // Calculate the ratio of the scrolled section height to that of the scrollers
@@ -512,12 +504,12 @@ export function Scroller_component_movexy(scroller_buffer_idxs, x, y){
 
       bar.geom.pos[0] += rootpos[0];
       bar.geom.pos[1] += rootpos[1];
-      bar.geom.AddWposXY(bar.gfx, rootpos[0], rootpos[1]);
+      Mesh_add_wpos_xy(bar, rootpos[0], rootpos[1]);
    
       const handle = bar.children.buffer[0];
       handle.geom.pos[0] += rootpos[0];
       handle.geom.pos[1] += rootpos[1];
-      handle.geom.AddWposXY(handle.gfx, rootpos[0], rootpos[1]);
+      Mesh_add_wpos_xy(handle, rootpos[0], rootpos[1]);
       // console.log(bar.mesh_bufferidx, bar.GetName())
    }
 

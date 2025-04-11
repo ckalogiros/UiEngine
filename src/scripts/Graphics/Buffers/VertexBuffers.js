@@ -14,6 +14,7 @@ import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBu
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
 import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -595,8 +596,8 @@ export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
 
     // if(a==1 && mx.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) {a=0;return;}
 
-    const x = mx.GetPosX();
-    const y = my.GetPosY();
+    const x = Mesh_get_real_pos_x(mx);
+    const y = Mesh_get_real_pos_y(my);
     const w = mw.geom.dim[0] * 2;
     const h = mh.geom.dim[1] * 2;
     const H = VIEWPORT.HEIGHT;

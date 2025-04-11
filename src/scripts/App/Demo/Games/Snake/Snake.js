@@ -23,6 +23,7 @@ import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } 
 import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
+import { Mesh_add_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -328,8 +329,8 @@ export function Game_snake(y = 0, controls_create = true) {
                const new_posx = head.geom.pos[0] + head.geom.dim[0];
                const new_posy = head.geom.pos[1] + head.geom.dim[1];
 
-               nose.geom.SetWposXY(nose.gfx, new_posx, new_posy);
-               nose.geom.AddWposXY(nose.gfx, a, b);
+               Mesh_add_wpos_xy(nose, new_posx, new_posy);
+               Mesh_add_wpos_xy(nose, a, b);
                // TODO: Set the round corners for styled nose mesh
             }
 
@@ -784,7 +785,7 @@ function Animate_snake(params) {
    const yy = y * diry;
    head.geom.pos[0] += xx;
    head.geom.pos[1] += yy;
-   head.geom.AddWposXY(head.gfx, xx, yy);
+   Mesh_add_wpos_xy(head, xx, yy);
 
    snake.vel[0] *= dirx;
    snake.vel[1] *= diry;
@@ -957,7 +958,7 @@ function Animate_snake(params) {
 
             body_mesh.geom.pos[0] += xx2;
             body_mesh.geom.pos[1] += yy2;
-            body_mesh.geom.AddWposXY(body_mesh.gfx, xx2, yy2);
+            Mesh_add_wpos_xy(body_mesh, xx2, yy2);
 
 
             prev_mesh = body_mesh;
@@ -988,8 +989,8 @@ function Animate_snake(params) {
    const new_posx = head.geom.pos[0] + head.geom.dim[0];
    const new_posy = head.geom.pos[1] + head.geom.dim[1];
 
-   nose.geom.SetWposXY(nose.gfx, new_posx, new_posy);
-   nose.geom.AddWposXY(nose.gfx, a, b);
+   Mesh_add_wpos_xy(nose, new_posx, new_posy);
+   Mesh_add_wpos_xy(nose, a, b);
    // TODO: Set the round corners for styled nose mesh
 
    // Update the rotation ammount from the user input
@@ -1047,7 +1048,7 @@ function Animation_scale_up_run(params) {
    if (bodyidx === 0) {
 
       const nose = params.nose;
-      nose.geom.AddWposXY(nose.gfx, res * 1 * snake.vel[0], res * 1 * snake.vel[1]);
+      Mesh_add_wpos_xy(nose, res * 1 * snake.vel[0], res * 1 * snake.vel[1]);
    }
 
 
@@ -1142,7 +1143,7 @@ function Animation_scale_down_run(params) {
       if (bodyidx === 0) {
 
          const nose = params.nose;
-         nose.geom.AddWposXY(nose.gfx, (-res) * snake.vel[0] * 1., (-res) * snake.vel[1] * 1.);
+         Mesh_add_wpos_xy(nose, (-res) * snake.vel[0] * 1., (-res) * snake.vel[1] * 1.);
       }
 
 

@@ -24,6 +24,7 @@ import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get,
 import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 import { Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -1862,7 +1863,7 @@ export function Debug_info_create_ui_focused() {
 
    View_build_group_from_root_mesh(section);
 
-   const clip_top = section.GetPosY();
+   const clip_top = Mesh_get_real_pos_y(section);
    const clip_bottom = clip_top + section.geom.dim[1] * 2;
    Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
 

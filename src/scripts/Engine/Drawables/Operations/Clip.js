@@ -3,6 +3,7 @@
 import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_get_view_byidx } from "../../Core/Views/MeshBufferViews.js";
 import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "./MeshAttributesFunctions.js";
 
 
 
@@ -36,7 +37,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
          }
          else{
             
-            const right  = mesh.GetPosX() + mesh.geom.defDim[0]*2;
+            const right  = Mesh_get_real_pos_x(mesh) + mesh.geom.defDim[0]*2;
             const reduce = (right) - limit.right;
             alert('CORRECT THIS:\nmesh.geom.pos[0] + mesh.geom.defDim[0]\n At Clip.js')
             // TODO: Also check all 'mesh.geom.pos'
@@ -91,7 +92,7 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
       for(let j=1; j<=meshshes_idx.boundary; j++){
          
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         const left    = mesh.GetPosX();
+         const left    = Mesh_get_real_pos_x(mesh);
          const right   = left + mesh.geom.dim[0]*2;
    
          if(left > limit.right){
@@ -139,7 +140,7 @@ const mb = Mesh_buffer_get();
    const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
 if(mesh === _)
    console.log('j', j, 'view', meshshes_idx, 'mesh_buffer', mb)
-         const top      = mesh.GetPosY();
+         const top      = Mesh_get_real_pos_y(mesh);
          const bottom   = top + mesh.geom.dim[1]*2;
 
    
@@ -221,7 +222,7 @@ export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_
          let prev_top_in = temp.prev_top_in[i];
          
          let cur = prev_top_in;
-         let pos_top = cur.GetPosY()
+         let pos_top = Mesh_get_real_pos_y(cur)
          let pos_bot = pos_top + cur.geom.dim[1]*2
          
          
@@ -244,7 +245,7 @@ export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_
          }
 
          cur = temp.prev_bot_out[i];
-         pos_top = cur.GetPosY()
+         pos_top = Mesh_get_real_pos_y(cur)
          // pos_bot = pos_top + cur.geom.dim[1]*2
          if(pos_top < limit.down){
             
@@ -550,7 +551,7 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
 
-   const top   = mesh.GetPosY();
+   const top   = Mesh_get_real_pos_y(mesh);
    const bot   = top + mesh.geom.dim[1]*2;
 
    if((bot >= limit.up && top < limit.up) || (bot > limit.down && top < limit.down)){

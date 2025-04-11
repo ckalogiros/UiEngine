@@ -1,7 +1,21 @@
 {
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "name": "Launch localhost",
+            "url": "http://localhost:6001/",
+            "firefoxExecutable": "C:\\UserPrograms\\Internet\\Firefox\\firefox.exe",
+            "webRoot": "${workspaceFolder}/src",
+            "pathMappings": [
+                {
+                    "url": "http://localhost:6001/src",
+                    "path": "${workspaceFolder}/src"
+                }
+            ]
+        },
 
         {
             "name": "Launch Chrome",
@@ -12,27 +26,7 @@
             "sourceMaps": true,
             "perScriptSourcemaps": "yes",
             "webRoot": "${workspaceFolder}/src"
-            // "webRoot": "${workspaceFolder}/src"
-          }
-        // {
-        //     "type": "chrome",
-        //     "request": "launch",
-        //     "name": "Launch Chrome against localhost",
-        //     // "url": "http://localhost:6001/src/index.html",
-        //     "url": "http://localhost:6001/",
-        //     "webRoot": "${workspaceFolder}/src",
-        //     "sourceMaps": false,
-        //     "trace": true, // Add this to get debug logs
-        //     // "skipFiles": ["<node_internals>/**"],
-        //     // "runtimeArgs": [
-        //     //     "--disable-extensions",
-        //     //     // "--no-sandbox",
-        //     //     "--disable-gpu",
-        //     //     //     "--enable-source-maps"
-        //     // ]
-            
-        // },
-
+        }
     ],
 
 }

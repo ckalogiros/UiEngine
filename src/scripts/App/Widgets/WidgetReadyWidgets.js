@@ -406,7 +406,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
             target_mesh.geom.SetDimXY(target_mesh.gfx, sizex, sizey);
             Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
-            target_mesh.geom.AddWposXY(target_mesh.gfx, difx, dify);
+            Mesh_add_wpos_xy(target_mesh, difx, dify);
 
             if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
                target_mesh.mat.style.rcorners = rcorners * Max(max, 2);

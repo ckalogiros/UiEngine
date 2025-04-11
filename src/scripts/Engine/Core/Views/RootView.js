@@ -9,6 +9,7 @@ import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority
 import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -903,7 +904,7 @@ export function Root_group_buffer_print_w1() {
                      // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                      // 'state', mesh.state.mask,
                      'start', mesh.gfx.vb.starts.buffer[0],
-                     'realpos', mesh.GetPosX(), mesh.GetPosY(),
+                     'realpos', Mesh_get_real_pos_x(mesh), Mesh_get_real_pos_y(mesh),
                      'pos', mesh.geom.pos,
                      // 'dim', mesh.geom.dim,
                      // 'rel pos', mesh.geom.pos, 

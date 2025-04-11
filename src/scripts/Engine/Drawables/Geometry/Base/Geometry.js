@@ -45,46 +45,46 @@ export class Geometry2D {
 
     }
 
-    AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_vpos_xy(gfx, x, y, num_faces); }
-    AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
-    AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
-    SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
-    SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
-    SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }
+    // AddDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_vpos_xy(gfx, x, y, num_faces); }
+    // AddDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_vpos_x( gfx, x, num_faces); }
+    // AddDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_vpos_y( gfx, y, num_faces); }
+    // SetDimXY    (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_vpos_xy(gfx, x, y, num_faces); }
+    // SetDimX     (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_vpos_x( gfx, x, num_faces); }
+    // SetDimY     (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_vpos_y( gfx, y, num_faces); }
 
-    UpdateAddDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-    UpdateAddDimX   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_x( gfx, this.dim[0], num_faces); }
-    UpdateAddDimY   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_y( gfx, this.dim[1], num_faces); }
-    UpdateSetDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
-    UpdateSetDimX   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
-    UpdateSetDimY   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
-    UpdateAddWposXY (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
-    UpdateAddWposX  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
-    UpdateAddWposY  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
-    UpdateSetWposXY (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
-    UpdateSetWposX  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
-    UpdateSetWposY  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
+    // UpdateAddDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+    // UpdateAddDimX   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_x( gfx, this.dim[0], num_faces); }
+    // UpdateAddDimY   (gfx, num_faces=1)  { glBufferOps.Gl_add_vpos_y( gfx, this.dim[1], num_faces); }
+    // UpdateSetDimXY  (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_xy(gfx, this.dim[0], this.dim[1], num_faces); }
+    // UpdateSetDimX   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_x( gfx, this.dim[0], num_faces); }
+    // UpdateSetDimY   (gfx, num_faces=1)  { glBufferOps.Gl_set_vpos_y( gfx, this.dim[1], num_faces); }
+    // UpdateAddWposXY (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
+    // UpdateAddWposX  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
+    // UpdateAddWposY  (gfx, num_faces=1)  { glBufferOps.Gl_add_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
+    // UpdateSetWposXY (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_xy(gfx, this.pos[0]+this.dim[0], this.pos[1]+this.dim[1], num_faces); }
+    // UpdateSetWposX  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_x( gfx, this.pos[0]+this.dim[0], num_faces); }
+    // UpdateSetWposY  (gfx, num_faces=1)  { glBufferOps.Gl_set_wpos_y( gfx, this.pos[1]+this.dim[1], num_faces); }
 
-    AddWposXY   (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_wpos_xy(gfx, x, y, num_faces); }
-    AddWposX    (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_wpos_x( gfx, x, num_faces); }
-    AddWposY    (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_wpos_y( gfx, y, num_faces); }
-    SetWposXY   (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_wpos_xy(gfx, x, y, num_faces); }
-    SetWposX    (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_wpos_x( gfx, x, num_faces); }
-    SetWposY    (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_wpos_y( gfx, y, num_faces); }
-    SetDim(dim, gfx) {
+    // AddWposXY   (gfx, x, y, num_faces=1)    { glBufferOps.Gl_add_wpos_xy(gfx, x, y, num_faces); }
+    // AddWposX    (gfx, x   , num_faces=1)    { glBufferOps.Gl_add_wpos_x( gfx, x, num_faces); }
+    // AddWposY    (gfx, y   , num_faces=1)    { glBufferOps.Gl_add_wpos_y( gfx, y, num_faces); }
+    // SetWposXY   (gfx, x, y, num_faces=1)    { glBufferOps.Gl_set_wpos_xy(gfx, x, y, num_faces); }
+    // SetWposX    (gfx, x   , num_faces=1)    { glBufferOps.Gl_set_wpos_x( gfx, x, num_faces); }
+    // SetWposY    (gfx, y   , num_faces=1)    { glBufferOps.Gl_set_wpos_y( gfx, y, num_faces); }
+    // SetDim(dim, gfx) {
 
-        const dimentions = [0, 0];
+    //     const dimentions = [0, 0];
 
-        if (dim[0] !== UNCHANGED) dimentions[0] = dim[0]; // Set x dimention
-        else dimentions[0] = this.dim[0]; // else use the same x dimention
+    //     if (dim[0] !== UNCHANGED) dimentions[0] = dim[0]; // Set x dimention
+    //     else dimentions[0] = this.dim[0]; // else use the same x dimention
 
-        if (dim[1] !== UNCHANGED) dimentions[1] = dim[1];
-        else dimentions[1] = this.dim[1];
+    //     if (dim[1] !== UNCHANGED) dimentions[1] = dim[1];
+    //     else dimentions[1] = this.dim[1];
 
-        math.CopyArr2(this.dim, dimentions);
-        glBufferOps.Gl_set_vpos_xy(gfx, dimentions[0], dimentions[1]);
-    }
-    StoreDefPos(pos) { math.CopyArr2(this.defPos, pos); }
+    //     math.CopyArr2(this.dim, dimentions);
+    //     glBufferOps.Gl_set_vpos_xy(gfx, dimentions[0], dimentions[1]);
+    // }
+    // StoreDefPos(pos) { math.CopyArr2(this.defPos, pos); }
 
 }
 /** */

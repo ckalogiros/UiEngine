@@ -497,34 +497,34 @@ export class Mesh {
 
     SetDim(dim) { this.SetUpdateFrameBuffer(); this.geom.SetDimXY(this.gfx, dim[0], dim[1],); }
 
-    /** */
-    GetPosXY() {
+    // /** */
+    // GetPosXY() {
 
-        const p = Mesh_unif_get_vb_root_wpos(this.root_posidx);
-        let pos = [p[0], p[1], 0];
+    //     const p = Mesh_unif_get_vb_root_wpos(this.root_posidx);
+    //     let pos = [p[0], p[1], 0];
 
-        pos[0] += this.geom.pos[0];
-        pos[1] += this.geom.pos[1];
-        return pos;
-    }
-    /** */
-    GetPosX() {
+    //     pos[0] += this.geom.pos[0];
+    //     pos[1] += this.geom.pos[1];
+    //     return pos;
+    // }
+    // /** */
+    // GetPosX() {
 
-        // let p = Mesh_unif_get_vb_root_wposx(this.root_posidx) + Screen_wpos_get_x();
-        let p = Mesh_unif_get_vb_root_wposx(this.root_posidx);
+    //     // let p = Mesh_unif_get_vb_root_wposx(this.root_posidx) + Screen_wpos_get_x();
+    //     let p = Mesh_unif_get_vb_root_wposx(this.root_posidx);
 
-        return p + this.geom.pos[0];
-    }
-    /** */
-    GetPosY() {
+    //     return p + this.geom.pos[0];
+    // }
+    // /** */
+    // GetPosY() {
 
-        let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
-        return p + this.geom.pos[1];
-    }
-    /** */
-    SetTime(t) {
-        this.geom.time = t;
-    }
+    //     let p = Mesh_unif_get_vb_root_wposy(this.root_posidx);
+    //     return p + this.geom.pos[1];
+    // }
+    // /** */
+    // SetTime(t) {
+    //     this.geom.time = t;
+    // }
 
 
 

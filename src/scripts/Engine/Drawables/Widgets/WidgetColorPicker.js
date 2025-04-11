@@ -14,6 +14,7 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, PURPLE, RED, REDL, WHITE, YELLOW } from "../Material/Base/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Style_label_default_properties, Style_rect_default_properties, Style_slider_simple_default_properties } from "./WidgetReadyStyles.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
 
@@ -817,8 +818,8 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const panel2 = panel.children.buffer[panel2_idx]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
 
       const click_pos = params.click_pos;
-      const x = click_pos[0] - color_pick_mesh.GetPosX(); // Tranform to mesh coordinates (0 t0 mesh dim)
-      const y = click_pos[1] - color_pick_mesh.GetPosY(); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const x = click_pos[0] -  Mesh_get_real_pos_x(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const y = click_pos[1] -  Mesh_get_real_pos_y(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
       widget.color_pick_click_pos = [x, y];
 
       const percentagex = (x / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage 

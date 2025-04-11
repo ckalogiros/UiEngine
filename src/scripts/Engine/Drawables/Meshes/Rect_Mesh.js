@@ -17,6 +17,7 @@ import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { TEMP_build_mesh_attributes } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -325,7 +326,7 @@ export class Rect_Mesh extends Mesh {
       // This is for move and/or resize events
       else if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-         const pos = section.GetPosXY();
+         const pos = Mesh_get_real_pos_xy(section);
          const right = pos[0] + section.geom.dim[0] * 2;
          const bottom = pos[1] + section.geom.dim[1] * 2;
 
@@ -399,7 +400,7 @@ export class Rect_Mesh extends Mesh {
 
 
       // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
-      const pos = root.GetPosXY();
+      const pos = Mesh_get_real_pos_xy(root);
       const min_sizex = pos[0] + 80;
       const min_sizey = pos[1] + 80;
       let changes_hapened = false;
@@ -427,7 +428,7 @@ export class Rect_Mesh extends Mesh {
 
          Root_group_reset_gfxs(root.root_bufferidx)
 
-         const root_pos = root.GetPosXY();
+         const root_pos = Mesh_get_real_pos_xy(root);
          const clip_top = root_pos[1];
          const clip_bottom = root_pos[1] + root.geom.dim[1] * 2;
          const clip_right = root_pos[0] + root.geom.dim[0] * 2;

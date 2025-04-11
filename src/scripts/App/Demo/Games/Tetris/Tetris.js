@@ -7,6 +7,7 @@ import { Create_widget_close_btn, Create_widget_label } from "../../../../Engine
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
@@ -1364,7 +1365,7 @@ function Tetris_start_menu(section_, emitter_) {
    let zpos = 10;
    const r_corners = 20;
 
-   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, section_.GetPosY(), 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
+   const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [20, 20], [VIEWPORT.WIDTH / 2, Mesh_get_real_pos_y(section_), 10], [0, 0], TRANSPARENCY(GREY[3], .9), 'section',);
    menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    menu_panel.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
@@ -2127,7 +2128,7 @@ function Animation_scale_up_stop(params) {
    cell.in_animation = false;
 
    const section = cell.mesh.parent;
-   const section_posx = section.GetPosX();
+   const section_posx = Mesh_get_real_pos_x(section);
 
    // Reset mesh's properties
    const mesh = cell.mesh;

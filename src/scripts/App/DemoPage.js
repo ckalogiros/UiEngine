@@ -29,6 +29,7 @@ import { CALLBACK_ANIMATION_TYPE_FLAGS } from "../Engine/Animations/CallbackAnim
 import { Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Widget_gfx_ready_enable } from "./Widgets/WidgetGfxReady.js";
 import { Align_pre_simple } from "./Tests/TestAlignNestedSections.js";
+import { Mesh_get_real_pos_y } from "../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -832,7 +833,7 @@ function Create_menu_popup(params) {
    // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
    menu_panel.Calc_no_gfx_update();
-   close_btn.MoveNoGfxUpdate(0, (dim[1] * 2) - (close_btn.GetPosY() - menu_panel.GetPosY()));
+   close_btn.MoveNoGfxUpdate(0, (dim[1] * 2) - (Mesh_get_real_pos_y(close_btn) - Mesh_get_real_pos_y(menu_panel)));
    menu_panel.Render();
 
 

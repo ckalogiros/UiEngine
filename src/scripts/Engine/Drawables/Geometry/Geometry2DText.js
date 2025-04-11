@@ -25,7 +25,7 @@ export class Geometry2D_Text extends Geometry2D {
    AddWposX(gfx, x) { super.AddWposX(gfx, x, this.num_faces) }
    AddWposY(gfx, y) { super.AddWposY(gfx, y, this.num_faces) }
    SetWposXY(gfx, x, y) { super.SetWposXY(gfx, x, y, this.num_faces) }
-   SetWposXYFromAddWPos(gfx, x) { 
+   SetWposXYFromAddWPos(gfx, x, y) { 
       const difx = x-this.pos[0];
       this.pos[0] = x;
       const dify = y-this.pos[0];

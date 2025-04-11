@@ -202,8 +202,8 @@ export function Ball_remove_mesh_byidx(idx = INT_NULL) {
 
    _balls_buffer.buffer[idx].Reset();
    _free_balls_buffer_idxs.Add(idx);
-
-   Ball_print_loop();
+// 
+   // Ball_print_loop();
 
 }
 /** */
@@ -633,10 +633,10 @@ function Ball_animation_squash_run(params) {
       ball.geom.dim[1] -= size;
       ball.geom.dim[0] += size;
 
-      // ball.geom.AddWposY(ball.gfx, -size);
-      // ball.geom.AddWposY(ball.gfx, size*params.direction.y);
-      // ball.geom.AddWposXY(ball.gfx, -size*params.direction.x, size*params.direction.y);
-      // ball.geom.AddWposXY(ball.gfx, 0, size*params.direction.y);
+      // Mesh_add_wpos_xy(ball, -size);
+      // Mesh_add_wpos_xy(ball, size*params.direction.y);
+      // Mesh_add_wpos_xy(ball, -size*params.direction.x, size*params.direction.y);
+      // Mesh_add_wpos_xy(ball, 0, size*params.direction.y);
       if (ball.geom.dim[1] <= params.ball_initial_size - lim) {
          params.ball.lock_squash_anim = true;
          // params.function_slope.SetTimer(0);

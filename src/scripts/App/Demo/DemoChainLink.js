@@ -6,6 +6,7 @@ import { Mouse_get_pos } from "../../Engine/Controls/Input/Mouse.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Get_fasma_color, WHITE } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -114,8 +115,8 @@ function Animate_chain_link(params) {
 
 
    const axis = [
-      mouse_pos[0] - head.GetPosX(),
-      mouse_pos[1] - head.GetPosY(),
+      mouse_pos[0] - Mesh_get_real_pos_x(head),
+      mouse_pos[1] - Mesh_get_real_pos_y(head),
    ];
 
    const dist = Magnitude(axis[0], axis[1]);
@@ -143,7 +144,7 @@ function Animate_chain_link(params) {
       // console.log('dist', dist, 'n', n);
       head.geom.pos[0] += x;
       head.geom.pos[1] += y;
-      head.geom.AddWposXY(head.gfx, x, y);
+      Mesh_add_wpos_xy(head, x, y);
 
       let prev_mesh = head;
       
@@ -152,8 +153,8 @@ function Animate_chain_link(params) {
          const next_mesh = head.children.buffer[i];
 
          const axis2 = [
-            prev_mesh.GetPosX() - next_mesh.GetPosX() ,
-            prev_mesh.GetPosY() - next_mesh.GetPosY() 
+            Mesh_get_real_pos_x(prev_mesh) - Mesh_get_real_pos_x(next_mesh) ,
+            Mesh_get_real_pos_y(prev_mesh) - Mesh_get_real_pos_y(next_mesh) 
          ];
 
          const dist2 = Magnitude(axis2[0], axis2[1]);
@@ -173,7 +174,7 @@ function Animate_chain_link(params) {
             
             next_mesh.geom.pos[0] += x2;
             next_mesh.geom.pos[1] += y2;
-            next_mesh.geom.AddWposXY(next_mesh.gfx, x2, y2);
+            Mesh_add_wpos_xy(next_mesh, x2, y2);
             
          }
 

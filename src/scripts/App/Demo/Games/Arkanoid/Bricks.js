@@ -7,7 +7,7 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREEN, GREY, PURPLE, TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
@@ -703,12 +703,12 @@ function Animation_push_up_run(params) {
 
    if (dirx !== 0 && diry !== 0) {
 
-      mesh.geom.AddWposXY(mesh.gfx, movex, movey);
+      Mesh_add_wpos_xy(mesh, movex, movey);
       params.target_dist -= params.move_dist;
    }
    else if (dirx !== 0) {
 
-      mesh.geom.AddWposX(mesh.gfx, movex);
+      Mesh_add_wpos_x(mesh, movex);
       params.target_dist -= params.move_dist;
 
       // Create brick squash
@@ -730,7 +730,7 @@ function Animation_push_up_run(params) {
    }
    else if (diry !== 0) {
 
-      mesh.geom.AddWposY(mesh.gfx, movey);
+      Mesh_add_wpos_y(mesh, movey);
       params.target_dist -= params.move_dist;
 
 
@@ -803,12 +803,12 @@ function Animation_pull_run(params) {
 
       if (dirx !== 0 && diry !== 0) {
 
-         mesh.geom.AddWposXY(mesh.gfx, -movex, -movey);
+         Mesh_add_wpos_xy(mesh, -movex, -movey);
          params.target_dist -= params.move_dist;
       }
       else if (dirx !== 0) {
 
-         mesh.geom.AddWposX(mesh.gfx, -movex);
+         Mesh_add_wpos_x(mesh, -movex);
          params.target_dist -= params.move_dist;
 
          // Create brick squash
@@ -829,7 +829,7 @@ function Animation_pull_run(params) {
       }
       else if (diry !== 0) {
 
-         mesh.geom.AddWposY(mesh.gfx, -movey);
+         Mesh_add_wpos_y(mesh, -movey);
          params.target_dist -= params.move_dist;
 
          // Create brick squash
@@ -1198,7 +1198,7 @@ function Animation_run(params) {
                if (brick.geom.dim[1] > 13 && _bricks_buffer.buffer[row.buffer[i]].is_active === false) {
 
                   const size = 2.
-                  brick.geom.AddWposY(brick.gfx, size);
+                  Mesh_add_wpos_y(brick, size);
                   brick.geom.dim[0] += size;
                   brick.geom.dim[1] -= size;
                   brick.geom.SetDimXY(brick.gfx, brick.geom.dim[0], brick.geom.dim[1]);

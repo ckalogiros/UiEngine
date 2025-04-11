@@ -13,6 +13,7 @@ import { Style_label_default_properties, Style_rect_default_properties } from ".
 import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
+import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -707,7 +708,7 @@ export class Widget_Minimize extends Widget_Button {
             // Get the group root mesh to Recalc position/dimentions 
             const group_rootidx = View_get_view_vb_root_meshidx(root.group_bufferidxs);
             const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
-            const clip_top = group_root.GetPosY();
+            const clip_top = Mesh_get_real_pos_y(group_root);
             const clip_bottom = clip_top + group_root.geom.dim[1] * 2;
             Clipy_from_tree_recursive(group_root, clip_top, clip_bottom);
 

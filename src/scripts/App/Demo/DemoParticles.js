@@ -23,6 +23,7 @@ import { Controls_create_slider_controls_from_shader_uniform_buffer } from '../W
 import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
 import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
+import { Mesh_add_wpos_xy } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 
 
 const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
@@ -1808,7 +1809,7 @@ function Animate_comet(params) {
       // const x = dir[0] * tail_emitter.speed * .5;
       const y = dir[1] * tail_emitter.speed * .5;
 
-      ball.geom.AddWposXY(ball.gfx, x, y);
+      Mesh_add_wpos_xy(ball, x, y);
       ball.geom.pos[0] += x;
       ball.geom.pos[1] += y;
 
@@ -1889,7 +1890,7 @@ function Animate_comet_perimetric(params) {
       // const y = Math.cos(1 * dir[1] * tail_emitter.speed )* 1;
 
 
-      ball.geom.AddWposXY(ball.gfx, x, y);
+      Mesh_add_wpos_xy(ball, x, y);
       ball.geom.pos[0] += x;
       ball.geom.pos[1] += y;
 

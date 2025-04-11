@@ -7,6 +7,7 @@ import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
+import { Mesh_get_real_pos_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -65,7 +66,7 @@ if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_buff
 }
 
    const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
-   const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
+   const pos = Mesh_get_real_pos_xy(_mesh_buffer.buffer[mesh_bufferidx]);
    temp_no_allocation_buffer[0][0] = pos[0] - hover_margin[0];
    temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[0];
    temp_no_allocation_buffer[1][0] = pos[1] - hover_margin[1];
@@ -85,7 +86,7 @@ export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferi
       return false;
    }
 
-   const pos = _mesh_buffer.buffer[mesh_bufferidx].GetPosXY();
+   const pos = Mesh_get_real_pos_xy(_mesh_buffer.buffer[mesh_bufferidx]);
    temp_no_allocation_buffer[0][0] = pos[0];
    // temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
    temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2;
