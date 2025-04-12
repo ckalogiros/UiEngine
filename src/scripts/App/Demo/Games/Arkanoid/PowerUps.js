@@ -2,15 +2,14 @@
 
 import { Bitwise_calc_bit_length_from_flag_base } from "../../../../Engine/Core/BitwiseOps.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_get_panel_dim_x } from "./Arkanoid.js";
 import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoisConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";

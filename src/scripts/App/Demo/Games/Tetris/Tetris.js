@@ -3,10 +3,10 @@
 import { Callback_animations_create, Callback_animations_destroy } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Input_keyboard_bind_keydown_callback, Input_keyboard_bind_keyup_callback } from "../../../../Engine/Controls/Input/Keyboard.js";
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Mesh_event_callback_create } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";

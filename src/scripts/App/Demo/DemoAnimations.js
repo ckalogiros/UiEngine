@@ -2,24 +2,23 @@
 
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from "../../Engine/Animations/CallbackAnimationsReadyAnimations.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider } from "../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider } from "../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
-import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, ORANGEL, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Get_fasma_color, GREEN, GREENL, GREY, PURPLEB, PURPLER, RED, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
-import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
-import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
-import { Widget_ready_label } from "../Widgets/WidgetReadyWidgets.js";
+import { Widget_ready_label } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
-import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_xy, Mesh_update_set_dim_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 
 
 
@@ -136,7 +135,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
          slope *= 2;
       }
 
-      Align_pre_simple(panel);
+      Align_nested_sections_pre(panel);
       // panel_scale.geom.dim[0] = inner_panel_width + pad;
       // panel_scale.geom.dim[1] = s_height + pad;
       // panel.geom.dim[0] = ((panel_scale.geom.dim[0] > label.geom.dim[0]) ? panel_scale.geom.dim[0] : label.geom.dim[0]) + 10;
@@ -229,7 +228,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
    //    panel.geom.dim[0] = ((panel_rot.geom.dim[0] > label.geom.dim[0]) ? panel_rot.geom.dim[0] : label.geom.dim[0]) + 10;
    //    panel.geom.dim[1] = label.geom.dim[1] + panel_rot.geom.dim[1] + 20;
 
-   //    // Align_pre_simple(panel);
+   //    // Align_nested_sections_pre(panel);
 
    //    // Render
    //    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
@@ -326,7 +325,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    /**********************************************************************************************************/
    // Render
 
-   Align_pre_simple(panel);
+   Align_nested_sections_pre(panel);
 
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
@@ -378,7 +377,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
    /**********************************************************************************************************/
    // Render
 
-   Align_pre_simple(panel);
+   Align_nested_sections_pre(panel);
 
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
@@ -546,7 +545,7 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    // Render Menu 
    if(root_widget) {
 
-      Align_pre_simple(menu_panel);
+      Align_nested_sections_pre(menu_panel);
 
       // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
       menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
@@ -754,7 +753,7 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
          // Construct_listen_events_relations_from_mesh_tree(slider);
       }
 
-      Align_pre_simple(mesh);
+      Align_nested_sections_pre(mesh);
 
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
@@ -932,7 +931,7 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
          Construct_listen_events_relations_from_mesh_tree(slider);
       }
 
-      Align_pre_simple(mesh);
+      Align_nested_sections_pre(mesh);
 
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
@@ -1084,7 +1083,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render 
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
@@ -1131,7 +1130,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render animated meshes
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
       section.GenGfxCtx();
       section.Render()
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)

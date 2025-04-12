@@ -3,18 +3,18 @@
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
-import { Create_rect_mesh, Create_widget_button } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
-import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
 
 
 
@@ -819,7 +819,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       
       // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
-      Align_pre_simple(widget_root)
+      Align_nested_sections_pre(widget_root)
 
       /********************************************************************************************************************/
       // Re-create listen events 
@@ -914,7 +914,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       cur_pos[1] = this.geom.pos[1]; 
       
 
-      Align_pre_simple(widget_root)
+      Align_nested_sections_pre(widget_root)
 
       /********************************************************************************************************************/
       // Re-create listen events 

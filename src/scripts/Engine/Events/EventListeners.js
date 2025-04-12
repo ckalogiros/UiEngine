@@ -1,6 +1,6 @@
 "use strict";
 
-import { Intersection_point_rect } from "../Drawables/Operations/Collisions.js";
+import { Intersection_point_rect } from "../Drawables/Operations/Intersections.js";
 import { Mouse_get_pos } from "../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../Core/Buffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";

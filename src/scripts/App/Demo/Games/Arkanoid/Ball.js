@@ -2,19 +2,18 @@
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Mesh_set_wpos_xy, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_combo_counter_reset, Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_pady } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoisConstants.js";
 import { Bricks_check_collision } from "./Bricks.js";

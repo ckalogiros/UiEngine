@@ -2,11 +2,11 @@
 
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
-import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_text } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_text } from "../Widgets/Helpers/CreateWidget.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
 import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
-import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW } from "../Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW } from "../Material/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_initialize, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_get_count, View_remove_from_group, View_set_view_vb_start, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_one_mesh } from "../Operations/Clip.js";
@@ -21,11 +21,10 @@ import { Info_listener_create_event, Info_listener_remove_event } from "./InfoLi
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, Root_group_set_render_queue_flags } from "../../Core/Views/RootView.js";
-import { Align_pre_simple } from "../../../App/Tests/TestAlignNestedSections.js";
-import { Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/WidgetReadyStyles.js";
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_set_name } from "../Operations/MeshPropertiesFunctions.js";
+import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
 
 
 
@@ -292,7 +291,80 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
+
+      section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
+      section.GenGfxCtx();
+
+      section.Render();
+      Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+
+      section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
+   }
+
+   return section;
+
+}
+export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0) {
+
+   const transp = .9;
+   const zpos = 0;
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Mesh_set_name(section, 'InfoUi-static');
+   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+
+
+   const fontsizedynamic = 7.5;
+   let pad1 = [4, 0];
+   let pad2 = [4, 0];
+   const g_ms = 0;
+   let ms = 500;
+   let generic_time_interval = INT_NULL;
+
+   { 
+      ms = (g_ms) ? g_ms : 1000;
+      const timer = Create_widget_multi_text({
+         is_root:0x0,
+         text:'FPS-AVG:', 
+         align:TEXT_ALIGN.HORIZONTAL, 
+         pos:[0, 0, zpos + 1], 
+         font_size:fontsizedynamic, 
+         col:TRANSPARENCY(WHITE, transp), 
+         bold:.5, 
+         pad:pad1, 
+         texture_id:TEXTURES.CONSOLA_VARIANT_FONT, 
+         variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
+         is_debug_mesh:false,
+      });
+      Widget_gfx_ready_enable({mesh:timer, enable_attr_dim:false,});
+      section.AddItem(timer);
+
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GameLoop);
+      timer.CreateNewText('avg_1sec:', fontsizedynamic, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
+      timer.CreateNewText('ms:', fontsizedynamic, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop worst`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
+
+      timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
+      timer.CreateNewText('worst:', fontsizedynamic, GREY[7], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.SetDynamicText(`ms${ms} Renderloop worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
+
+   }
+
+
+   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -356,7 +428,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -429,7 +501,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -502,7 +574,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -575,7 +647,7 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
       // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -645,7 +717,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
@@ -791,7 +863,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
    if (is_root_widget !== undefined) {
 
 
-      Align_pre_simple(dp);
+      Align_nested_sections_pre(dp);
 
       dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       dp.GenGfxCtx();
@@ -1753,8 +1825,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
 
 
    // Align
-   Align_pre_simple(section);
-   // Align_expand(section, section.align.flags,)
+   Align_nested_sections_pre(section);
 
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);

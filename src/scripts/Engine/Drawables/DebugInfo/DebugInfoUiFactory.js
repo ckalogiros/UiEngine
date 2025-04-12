@@ -1,9 +1,8 @@
 "use strict";
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
-import { Create_rect_mesh, Create_widget_label, Create_widget_switch_simple } from "../../Core/CreateWidget.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_switch_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_switch_simple } from "../Widgets/Helpers/CreateWidget.js";
 import { Relative_pos_comp_create_new_comp } from "../Operations/RelativePosComponent.js";
-import { Style_label_default_properties, Style_rect_default_properties, Style_switch_default_properties } from "../Widgets/WidgetReadyStyles.js";
 
 
 export function Ui_create_label_switch(name, font_size, switch_size, switch_fn, callback_params, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex){

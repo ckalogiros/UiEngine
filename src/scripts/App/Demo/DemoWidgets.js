@@ -1,26 +1,23 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
-import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
-import { Vertex_buffer_group_create_scissorbox } from '../../Graphics/Buffers/VertexBuffers.js';
 import { Gl_set_rgba } from '../../Graphics/Buffers/VertexBuffersOps.js';
 import { GetSequencedColor } from '../../Helpers/Helpers.js';
-import { CopyArr4, Min } from '../../Helpers/Math/MathOperations.js';
-import { Mesh_create_style_from_values } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
-import { Widget_msdf_text_with_scale_slider, Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from '../Widgets/WidgetReadyWidgets.js';
+import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
+import { Widget_msdf_text_with_scale_slider, Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from '../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/RenderQueue.js';
-import { Align_expand, Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
-import { Style_button_default_properties, Style_color_picker_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
-import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_color_picker_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Mesh_set_wpos_relative_x } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
+import { Align_nested_sections_pre, Align_expand } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 
 
 
@@ -109,7 +106,7 @@ pressing the \"p\" key on the keyboard.\
 
    /**************************************************************************************************************************************************/
    // Render
-   Align_pre_simple(section);
+   Align_nested_sections_pre(section);
    Align_expand(section);
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
@@ -200,7 +197,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    // Render
 
-   Align_pre_simple(section);
+   Align_nested_sections_pre(section);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
@@ -592,7 +589,7 @@ nested layouts with well-aligned items.\
    /***********************************************************************************************************************************************************/
    // Render
 
-   Align_pre_simple(root_s);
+   Align_nested_sections_pre(root_s);
 
    root_s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    View_build_group_from_root_mesh(root_s);
@@ -904,7 +901,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
    }
 
 
-   Align_pre_simple(section);
+   Align_nested_sections_pre(section);
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
@@ -1129,7 +1126,7 @@ GENERIC WIDGETS\
    /**************************************************************************************************************************************************/
    // Render
 
-   Align_pre_simple(section);
+   Align_nested_sections_pre(section);
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
@@ -1212,7 +1209,7 @@ WIDGET: COLOR-PICKER\
 
       section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-      Align_pre_simple(section);
+      Align_nested_sections_pre(section);
 
       section.Render()
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1322,7 +1319,7 @@ Adjust the font size using the slider.
 
    /********************************************************************************************************************************************************/
    // Align
-   Align_pre_simple(section);
+   Align_nested_sections_pre(section);
    Align_expand(section)
 
 
@@ -1432,7 +1429,7 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
       picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
       picker.GenGfxCtx();
-      Align_pre_simple(picker);
+      Align_nested_sections_pre(picker);
 
       picker.Render();
       Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
@@ -1532,7 +1529,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
       // if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      //    Align_pre_simple(section)
+      //    Align_nested_sections_pre(section)
 
       //    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
@@ -1725,7 +1722,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    // { const w = Many_scrollers(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dp.AddToMenu(w); }
 
 
-   Align_pre_simple(dp)
+   Align_nested_sections_pre(dp)
 
    dp.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 

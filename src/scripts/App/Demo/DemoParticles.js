@@ -2,12 +2,12 @@
 
 
 
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
-import { BLACK, BLUEL, GREEN, GREENL, GREY, ORANGER, PURPLE, PURPLEB, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Base/Colors.js';
+import { BLACK, BLUEL, GREENL, GREY, ORANGER, PURPLEB, WHITE, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from '../../Engine/Drawables/Operations/MeshHelperFunctions.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
@@ -19,11 +19,10 @@ import { Timer_get_global_timer, Timer_get_global_timer_cycle } from '../../Engi
 import { Vertex_buffer_set_and_update_uniform } from '../../Graphics/Buffers/VertexBuffers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
 import { Demo_widgets_colorpicker } from './DemoWidgets.js';
-import { Controls_create_slider_controls_from_shader_uniform_buffer } from '../Widgets/WidgetGenericControlsReady.js';
-import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/WidgetReadyStyles.js';
-import { Widget_gfx_ready_enable } from '../Widgets/WidgetGfxReady.js';
-import { Align_pre_simple } from '../Tests/TestAlignNestedSections.js';
+import { Controls_create_slider_controls_from_shader_uniform_buffer } from '../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Mesh_add_wpos_xy } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
+import { Align_nested_sections_pre } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 
 
 const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
@@ -182,7 +181,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -339,7 +338,7 @@ export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget =
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -454,7 +453,7 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -591,7 +590,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -746,7 +745,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -1495,7 +1494,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
-      Align_pre_simple(controls_section);
+      Align_nested_sections_pre(controls_section);
 
       controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);

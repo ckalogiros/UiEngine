@@ -2,15 +2,14 @@
 
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
-import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
+import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
+import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
 import { REL_POS } from "../Operations/RelativePosComponent.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
-import { Style_label_default_properties, Style_rect_default_properties } from "./WidgetReadyStyles.js";
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";

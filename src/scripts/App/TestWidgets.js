@@ -1,16 +1,15 @@
 "use strict";
 import { FloorArr2, FloorArr3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_text } from '../Engine/Core/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
 import { View_build_group_from_root_mesh } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from '../Engine/Core/Views/RootView.js';
-import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER } from '../Engine/Drawables/Material/Base/Colors.js';
+import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
-import { Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties } from '../Engine/Drawables/Widgets/WidgetReadyStyles.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
-import { Align_expand, Align_pre_simple, Test_alignment } from './Tests/TestAlignNestedSections.js';
-import { Widget_gfx_ready_enable } from './Widgets/WidgetGfxReady.js';
-import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from './Widgets/WidgetReadyWidgets.js';
+import { Test_alignment } from './Demo/DemoAlignNestedSections.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
+import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from '../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
@@ -23,18 +22,19 @@ import { Demo_animations, Demo_animations_ready_button_anim, Demo_animations_tex
 import { CALLBACK_ANIMATION_TYPE_FLAGS } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_test_dif_shaders } from './Demo/DemoParticles.js';
-import { Debug_info_ui_static, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_ui_fps_detailed, Debug_info_ui_static, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_width } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
 import { Callback_animations_create } from '../Engine/Animations/CallbackAnimations.js';
 import { App_reinitialize, App_reset } from './App.js';
-import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from './Widgets/WidgetGenericControlsReady.js';
+import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from '../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js';
 import { Effect_explosion_circle_get_mesh_byidx, Effects_create_explosion_circle } from '../Engine/Drawables/Effects/Effects.js';
 import { Linear_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
 import { Mesh_get_real_pos_y, Mesh_rotate_z } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Mesh_get_name } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
+import { Align_nested_sections_pre, Align_expand } from '../Engine/Drawables/Operations/AlignNestedSections.js';
 
 
 
@@ -58,7 +58,8 @@ export function TestWidgetsGeneric() {
 
     { // Statistics
         let yy = 0, pp = 23;
-        const d1 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, yy); yy += d1.geom.dim[1] * 2
+        // const d1 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, yy); yy += d1.geom.dim[1] * 2
+        const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, yy); // yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1]*2
         // const d5 = Debug_info_ui_static_app_generic_buffers_container(ROOT_WIDGETS.CREATE_ROOT, 0, yy);yy += d5.geom.dim[1]*2
@@ -186,7 +187,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Dropdown
 
-        // CreateDropdownTree([0, 0, 0])
+        CreateDropdownTree([0, 0, 0])
 
         // CreateDropdownTreeHorizontalLayout();
 
@@ -709,7 +710,7 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
     section.AddItem(mesh1)
 
 
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
@@ -823,7 +824,7 @@ function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget te
 
     /********************************************************************************************************************************************************/
     // Align
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
 
     /********************************************************************************************************************************************************/
@@ -888,7 +889,7 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
 
     /********************************************************************************************************************************************************/
     // Align
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
 
 
@@ -917,7 +918,7 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         }
 
 
-        Align_pre_simple(ctrl_panel);
+        Align_nested_sections_pre(ctrl_panel);
 
         /********************************************************************************************************************************************************/
         // Render
@@ -997,7 +998,7 @@ Also the sdf rect shader operation uses the folowng code for rotations:
     }
 
 
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
     section.GenGfxCtx();
@@ -1063,7 +1064,7 @@ function Rotatable_section_with_rcorners_via_attribute_rotation(pos) {
 
 
 
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
     section.GenGfxCtx();
@@ -1196,7 +1197,7 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
     }
 
 
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
     // Render
     section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
@@ -1515,7 +1516,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        Align_pre_simple(dp)
+        Align_nested_sections_pre(dp)
 
         dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         dp.Render()
@@ -1651,7 +1652,7 @@ function CreateDropdownTreeHorizontalLayout(pos = [0, 0, 0], is_root = ROOT_WIDG
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        Align_pre_simple(dp)
+        Align_nested_sections_pre(dp)
 
         dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         dp.Render()
@@ -1856,7 +1857,7 @@ function TestAlignNew(pos = [0, 0, 0]) {
     }
 
 
-    Align_pre_simple(dp)
+    Align_nested_sections_pre(dp)
 
     dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
     dp.Render()
@@ -2009,7 +2010,7 @@ function Render_font_symbols_atlas_texture(x, y) {
 
     /********************************************************************************************************************************************************/
     // Align
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
 
     /********************************************************************************************************************************************************/
     // Render
@@ -2250,7 +2251,7 @@ function CreateManySectionsMinimal(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        Align_pre_simple(blu);
+        Align_nested_sections_pre(blu);
         blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         blu.Render();
         Root_group_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
@@ -2400,7 +2401,7 @@ function CreateManySections(scene) {
 
 
 
-    Align_pre_simple(blu);
+    Align_nested_sections_pre(blu);
 
     blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     blu.Render();
@@ -2754,7 +2755,7 @@ function Test_align_many_sliders() {
 
     /********************************************************************************************************************************************************/
     // Align
-    Align_pre_simple(root);
+    Align_nested_sections_pre(root);
 
     root.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
     root.Render();
@@ -2828,7 +2829,7 @@ function Test_performance_align_functions() {
     //     const update = function (params) {
     //         Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest4)
     //         const section = params.params.mesh;
-    //         const ret = Align_pre_simple(section);
+    //         const ret = Align_nested_sections_pre(section);
     //         const pad_x = section.StylesGetPad(STYLES.AXIS.X);
     //         const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
     //         section.geom.dim[0] = ret.dim_x + pad_x;
@@ -3048,7 +3049,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 
     if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        Align_pre_simple(section)
+        Align_nested_sections_pre(section)
 
         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
@@ -3201,7 +3202,7 @@ function TestScrollerComponent2() {
         let mesh_to_add_scroller2 = null;
 
 
-        Align_pre_simple(s)
+        Align_nested_sections_pre(s)
 
         s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
@@ -4954,7 +4955,7 @@ function Window_menu() {
 
     // HERE: We want the close to be positioned float_right.
     // The menu_bar doesn't have a fixed_width but has expand.
-    // // by the time the Align_pre_simple() is called, the menu_bar hasn't been expanded, so the close isn't positoned float_right to the expanded rather the current menu_bar width
+    // // by the time the Align_nested_sections_pre() is called, the menu_bar hasn't been expanded, so the close isn't positoned float_right to the expanded rather the current menu_bar width
     /**
      * SOLUTIONS:
      * 1. We could add re-position functionality (for float_right).
@@ -4964,7 +4965,7 @@ function Window_menu() {
 
     /********************************************************************************************************************************************************/
     // Align
-    Align_pre_simple(section);
+    Align_nested_sections_pre(section);
     Align_expand(section, section.align.flags,)
 
 

@@ -1,13 +1,12 @@
 'use strict';
 
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_widget_label } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_score_calc } from "./Arkanoid.js";
 
 

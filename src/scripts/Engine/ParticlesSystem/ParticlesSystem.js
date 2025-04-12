@@ -11,7 +11,7 @@ import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
 import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
-import { Material, Material_Texture } from "../Drawables/Material/Base/Material.js";
+import { Material, Material_Texture } from "../Drawables/Material/Material.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";

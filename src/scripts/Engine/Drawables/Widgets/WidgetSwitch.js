@@ -1,9 +1,9 @@
 "use strict";
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
-import { Create_rect_mesh } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
@@ -12,7 +12,6 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_add } from "../Operations/MeshPropertiesFunctions.js";
-import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 
 
 /**

@@ -2,19 +2,18 @@
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
-import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_dim_xy, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_combo_counter_add, Arkanoid_create_update_game_loop, Arkanoid_get_panel_dim_x, Arkanoid_get_panel_pos_x, Arkanoid_get_panel_right, ARKANOID_SECTION_DIM_X } from "./Arkanoid.js";
 import { ARK_STATE, ARKANOID_COLORS, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoisConstants.js";
 import { Coin_create } from "./Coin.js";
@@ -137,13 +136,13 @@ export class Brick {
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col:color, name:name,}));
-      Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:true, });
+      const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
+      Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_src_color_in_main: true, });
 
 
       // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
       // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      
+
       mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       // mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
       this.generic_control_values = [1., .5, .3, .0];
@@ -154,8 +153,8 @@ export class Brick {
       // this.generic_control_values = [1., .26, .8, .0];
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.generic_control_values.length);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      
+      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+
 
       mesh.geom.pos[0] = posx;
       mesh.geom.pos[1] = posy;
@@ -163,8 +162,8 @@ export class Brick {
       mesh.Render();
       // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
       // // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
-      mesh.GfxUniformsSetClbk('u_generic_controls', ()=>{ 
-         return this.generic_control_values; 
+      mesh.GfxUniformsSetClbk('u_generic_controls', () => {
+         return this.generic_control_values;
       }, mesh.gfx.vb.groupidx);
       // mesh.GfxUniformSetAndUpdate('u_scale2', [1, 1]);
 
@@ -280,7 +279,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
 
       brick.mesh.SetColorRGBA(color);
       console.log(color)
-      Mesh_set_name(brick.mesh,name);
+      Mesh_set_name(brick.mesh, name);
 
       brick.flags = flags;
 
@@ -351,7 +350,7 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
             _bricks_buffer.buffer[brick.idx].mesh.geom.pos[1] -= 800;
             Gl_add_wpos_y(_bricks_buffer.buffer[brick.idx].mesh.gfx, -800);
 
-            if(vb_groupidx === INT_NULL) {
+            if (vb_groupidx === INT_NULL) {
                vb_groupidx = brick.mesh.gfx.vb.groupidx;
                BRICKS.VB_GROUP_IDX = brick.mesh.gfx.vb.groupidx;
             }
@@ -843,7 +842,7 @@ function Animation_pull_run(params) {
       }
       { // Score modifier
          score_mod.text_mesh.ScaleText(slope * scale)
-         score_mod.AddWposY(params.move_amt*.6);
+         score_mod.AddWposY(params.move_amt * .6);
       }
       return true;
    }

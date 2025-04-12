@@ -2,10 +2,10 @@
 
 import { State_mesh_set_clicked, State_mesh_set_clickhold } from '../../../GlobalFunctions.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
-import { GREY, WHITE } from '../Material/Base/Colors.js';
+import { GREY, WHITE } from '../Material/Colors.js';
 import { Mesh_listener_add, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
+import { Style_button_default_properties } from './Helpers/WidgetEnableProperties.js';
 import { Widget_Label } from './WidgetLabel.js';
-import { Style_button_default_properties } from './WidgetReadyStyles.js';
 
 
 

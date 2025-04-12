@@ -1,22 +1,22 @@
 "use strict";
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider } from "../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider } from "../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
-import { Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_app_int16_buffers } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, GREEN, GREENR, GREY, ORANGER, PURPLEB, PURPLER, TRANSPARENT, WHITE, YELLOW, YELLOWR } from "../Engine/Drawables/Material/Base/Colors.js";
+import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
+import { BLUEL, GREEN, GREENR, GREY, ORANGER, TRANSPARENT, WHITE, YELLOWR } from "../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
-import { Renderqueue_set_active, Renderqueue_set_priority_by_program, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
+import { Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
 import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
-import { Demo_clbk_animations_text_create_contols, Demo_animations, Demo_animations_text, Demo_animations_with_slider_slope, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel } from "./Demo/DemoAnimations.js";
+import { Demo_clbk_animations_text_create_contols, Demo_animations, Demo_animations_text, Demo_animations_with_slider_slope, Demo_animations_ready_button_with_panel } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
 import { Create_comet_glow_contols, Create_comet_particles, Create_comet_noise_contols, Create_glow_particles, Create_smoke_particles, Create_smoke_particles_controls, Create_explosion_particles, Create_particles_controls } from "./Demo/DemoParticles.js";
 import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
@@ -25,12 +25,10 @@ import { Game_snake } from "./Demo/Games/Snake/Snake.js";
 import { Board_rotations } from "./Demo/DemoBoardRotations.js";
 import { Tetris, Tetris_reset } from "./Demo/Games/Tetris/Tetris.js";
 import { Arkanoid_free_buffers, Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
-import { CALLBACK_ANIMATION_TYPE_FLAGS } from "../Engine/Animations/CallbackAnimationsReadyAnimations.js";
-import { Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Widget_gfx_ready_enable } from "./Widgets/WidgetGfxReady.js";
-import { Align_pre_simple } from "./Tests/TestAlignNestedSections.js";
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_get_real_pos_y } from "../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_event_callback_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Align_nested_sections_pre } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 
 
 
@@ -678,7 +676,7 @@ export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
       // window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       // window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
 
-      Align_pre_simple(window_menu);
+      Align_nested_sections_pre(window_menu);
 
       window_menu.GenGfxCtx();
       // window_menu.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTY;

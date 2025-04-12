@@ -1,5 +1,5 @@
 "use strict";
-import { COLOR_ARRAY3 } from "../Engine/Drawables/Material/Base/Colors.js";
+import { COLOR_ARRAY3 } from "../Engine/Drawables/Material/Colors.js";
 import { MapLinear } from "./Math/MathOperations.js";
 
 

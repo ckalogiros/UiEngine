@@ -1,18 +1,17 @@
 "use strict";
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../../Core/Buffers.js";
-import { Create_rect_mesh } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh } from "./Helpers/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
-import { GREY } from "../Material/Base/Colors.js";
+import { GREY } from "../Material/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
-import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
 import { Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_x, Mesh_set_dim_y, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_add, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 

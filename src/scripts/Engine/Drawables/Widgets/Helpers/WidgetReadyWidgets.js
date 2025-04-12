@@ -1,16 +1,15 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple } from "../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREY, WHITE, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
-import { Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Max } from "../../Helpers/Math/MathOperations.js";
-import { Widget_gfx_ready_enable } from "./WidgetGfxReady.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple } from "./CreateWidget.js";
+import { Mesh_unif_get_vb_root_wpos } from "../../../Core/MeshUniformsBuffer.js";
+import { Root_group_activate_all_vbs_in_renderqueue } from "../../../Core/Views/RootView.js";
+import { BLUEL, GREY, WHITE, YELLOW } from "../../Material/Colors.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventFunctions.js";
+import { Slider_connect } from "../WidgetSlider.js";
+import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
+import { Max } from "../../../../Helpers/Math/MathOperations.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
 
 
 

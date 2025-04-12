@@ -1,8 +1,8 @@
 "use strict";
 
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
-import { Geometry2D } from "../Geometry/Base/Geometry.js";
-import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Base/Material.js";
+import { Geometry2D } from "../Geometry/Geometry.js";
+import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
@@ -16,7 +16,6 @@ import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
-import { TEMP_build_mesh_attributes } from "../../../App/Widgets/WidgetGfxReady.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
@@ -203,8 +202,6 @@ export class Rect_Mesh extends Mesh {
          if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
-
-      TEMP_build_mesh_attributes(this)
 
    }
    Render(run_for_children = true) {

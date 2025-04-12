@@ -1,13 +1,12 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Core/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Base/Colors.js";
+import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
-import { Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
@@ -15,10 +14,10 @@ import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uni
 import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
-import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
-import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../Widgets/WidgetGenericControlsReady.js";
-import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
+import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js";
+import { Widget_gfx_ready_enable, Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_add_wpos_xy, Mesh_get_real_pos_y, Mesh_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 
 
 
@@ -680,7 +679,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
 
-         Align_pre_simple(controls_section);
+         Align_nested_sections_pre(controls_section);
 
          controls_section.Render();
          Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
@@ -703,7 +702,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
 
 
 
-   // Align_pre_simple(section);
+   // Align_nested_sections_pre(section);
 
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -837,7 +836,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       // Render
       info_section_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       
-      Align_pre_simple(info_section_panel);
+      Align_nested_sections_pre(info_section_panel);
       
       // info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);

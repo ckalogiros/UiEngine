@@ -1,6 +1,6 @@
 "use strict";
 
-import * as math from '../../../../Helpers/Math/MathOperations.js'
+import * as math from '../../../Helpers/Math/MathOperations.js'
 
 
 /** */

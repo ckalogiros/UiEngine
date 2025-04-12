@@ -7,12 +7,11 @@ import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Align_self_get_dif } from "../Operations/Alignment.js";
 import { Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { FramebufferSetUpdate } from "../../../Graphics/Buffers/FrameBuffers.js";
-import { Create_text_mesh } from "../../Core/CreateWidget.js";
+import { Create_text_mesh } from "./Helpers/CreateWidget.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_add_and_copy_wpos_xy, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_relative_x, Mesh_set_wpos_relative_xy, Mesh_set_wpos_relative_y, Mesh_set_wpos_y, Mesh_update_set_wpos_x, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
-import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
