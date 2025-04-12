@@ -5,7 +5,6 @@ import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
 import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
-import { REL_POS } from "../Operations/RelativePosComponent.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
@@ -314,7 +313,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
 
 
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
 
@@ -352,8 +350,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
       menu_close_btn_idx = this.AddItem(close_btn);
 
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, close_btn.idx);
-
    }
 
 
@@ -368,7 +364,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       const pad = [0, 0];
 
 
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       if (root.mesh_bufferidx === this.mesh_bufferidx) {
          console.error('FAIL TO CREATE MINIMIZE BUTTON. REASON: The root passed should not be the menu');
@@ -414,22 +409,14 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
       this.AddItem(minimize_btn);
 
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, minimize_btn.idx);
-
    }
 
 
-   // TODO: pass: REL_POS right-left-middle, so user can assign the rel pos of the mesh
    AddToMenuBar(mesh, RelPosAlign) {
-
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
-
 
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
       // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
       if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
-
-      const align_item_flag = (RelPosAlign !== undefined) ? RelPosAlign : REL_POS.LEFT;
 
 
       // Set the height of the menu item to be the same across all other items
@@ -463,10 +450,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
 
       this.AddItem(mesh)
-
-      // TODO: Use the parem 'RelPosAlign', but first implement correctly the 'REL_POS.LEFT' alingment
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
-      // if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
 }

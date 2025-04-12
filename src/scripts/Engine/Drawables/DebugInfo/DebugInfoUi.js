@@ -2046,6 +2046,7 @@ let u = 0;
 //         this.children = New_generic_buffer(_, 'Mesh children');
 //         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'NEW time_intervals');
 
+//          DEPRECATED
 //         this.rel_comp = null;
 //         this.root_posidx = INT_NULL;
 
@@ -2054,6 +2055,7 @@ let u = 0;
 //         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]];
 
 
+//          DEPRECATED
 //         this.menu_options_idx = INT_NULL;
 //         this.menu_options = {
 //             Clbk: null,

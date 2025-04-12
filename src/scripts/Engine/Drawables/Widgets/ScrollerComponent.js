@@ -18,7 +18,7 @@ import { Mesh_listener_add, Mesh_state_check } from "../Operations/MeshPropertie
 
 
 
-
+const HANDLE_MIN_HEIGHT = 10;
 
 
 
@@ -26,6 +26,7 @@ import { Mesh_listener_add, Mesh_state_check } from "../Operations/MeshPropertie
 
 const _scrollers_buffer = New_generic_buffer(_, 'Scrollers Buffer');
 
+/** */
 export function Components_get_scroller_component(scroller_comp_idx=INT_NULL){
 
    if(scroller_comp_idx === INT_NULL) return null;
@@ -34,19 +35,12 @@ export function Components_get_scroller_component(scroller_comp_idx=INT_NULL){
 
    return scroller;
 }
-
+/** */
 export function Components_scroller_component_destroy(scroller_comp_idx=INT_NULL){
 
    Free_generic_buffer(_scrollers_buffer);
 }
-
-
-
-
-
-
-
-
+/** */
 export function Components_create_scroller_component(width = 12, height=100, mesh=null, abs_ypos=0, col_bar=GREY[0], col_handle=GREY[4]){
 
    const pos = [0,0,20];
@@ -54,16 +48,13 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
    const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar, name:'ScrollBar'}));
    Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2,})
-   bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+   // bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
 
    bar.OnClick = Scroller_component_onClick;
-
    bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    bar.ListenEventConstruct = Scroller_component_listen_event_construct;
-
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
-   
    bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    
    
@@ -85,24 +76,19 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    
    const idx = _scrollers_buffer.Add(bar);
    mesh.scroller_comp_idx = idx;
-   
    mesh.scroller_comp = bar;
    mesh.components |= COMPONENTS.SCROLLER;
    
    return bar;
 
 }
-
-
-
+/** */
 export function Scoller_component_destroy(bar, ){
 
    bar.Destroy();
 
 }
-
-
-
+/** */
 export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, parent, ){
    
    // Create absolute position on canvas scrolling
@@ -138,9 +124,7 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    bar.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, bar.gfx.vb.groupidx);
    
 }
-
-
-
+/** */
 export function Scroller_component_set_pos(bar, widget_root,  difx, dify){
 
    const handle = bar.children.buffer[0];
@@ -156,9 +140,38 @@ export function Scroller_component_set_pos(bar, widget_root,  difx, dify){
    handle.geom.UpdateSetWposXY(handle.gfx);
 
 }
+/** */
+export function Scroller_component_set_listeners_priority(scroller_component) {
+
+   Listeners_set_priority(E.H, scroller_component.listeners);
+   Listeners_set_priority(E.C, scroller_component.listeners);
+
+}
+/** */
+function Scroller_component_listen_event_construct() {
+
+   const bar = this;
 
 
+   /****************************************************************************/
+   if (bar.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
+      // Construct for bar
+      if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
+         Mesh_listener_add(bar, E.H, null, null);
+      }
+      // Construct CLICK_UP/MOVE event
+      if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
+         const evt_params = { target_mesh: bar, };
+         Mesh_listener_add(bar, E.C, bar.OnClick, evt_params);
+      }
+
+   }
+
+} 
+
+
+/** */
 export function Scroller_component_calculate_handle_pos_dim(scrolled_section, bar) {
 
 
@@ -176,6 +189,10 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    const a = (clean_size * clean_size) / scrolled_section.geom.dim[1];
    if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad[1];
    else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
+   // if (a < bar.geom.dim[1] && a > HANDLE_MIN_HEIGHT) handle.geom.dim[1] = a - handle_pad[1];
+   // else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
+
+   if(handle.geom.dim[1] < HANDLE_MIN_HEIGHT) handle.geom.dim[1] = HANDLE_MIN_HEIGHT
 
 
    /* Set handle position */
@@ -192,7 +209,7 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar);
 
 
-   Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
+   // Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
 
 
 } 
@@ -235,38 +252,6 @@ function Scroller_component_update_handle_pos_from_scrolled_section(scrolled_sec
 
 
 
-function Scroller_component_listen_event_construct() {
-
-   const bar = this;
-
-
-   /****************************************************************************/
-   if (bar.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-
-      // Construct for bar
-      if (bar.listeners && bar.listeners.buffer[E.H] === INT_NULL) {
-         Mesh_listener_add(bar, E.H, null, null);
-      }
-      // Construct CLICK_UP/MOVE event
-      if (bar.listeners && bar.listeners.buffer[E.C] === INT_NULL) {
-         const evt_params = { target_mesh: bar, };
-         Mesh_listener_add(bar, E.C, bar.OnClick, evt_params);
-      }
-
-   }
-
-} 
-
-
-
-export function Scroller_component_set_listeners_priority(scroller_component) {
-
-   Listeners_set_priority(E.H, scroller_component.listeners);
-   Listeners_set_priority(E.C, scroller_component.listeners);
-
-}
-
-
 
 
 
@@ -292,7 +277,7 @@ function Scroller_component_on_update_handle(_params) {
    const scrolled_section = bar.scrolled_section;
    Scroller_component_move_handle(bar, handle);
    Scroller_component_update_scrolled_section_pos_from_handle(scrolled_section, bar);
-   Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
+   // Scroller_clip_scrolled_section(scrolled_section, Mesh_get_real_pos_y(bar), bar.geom.dim[1]);
 
 }
 
@@ -351,68 +336,26 @@ function Scroller_component_gfx_uniforms_set_clbk(unif_name, Clbk, clbk_params) 
 
 function Scroller_component_onClick(params) {
 
-
-   
    const bar = params.evt_params.target_mesh;
    const point = Mouse_get_pos();
-   
-   
-   
-   // // Check for Resize
-   // const right = mesh.GetPosX() + mesh.geom.dim[0] * 2;
-   // const bottom = mesh.GetPosY() + mesh.geom.dim[1] * 2;
-   
-   // if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
-      
-   //    // We have Resize
-   
-   //    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
-   
-   //       const OnResizeFn = mesh.OnResize;
-   //       const idx = Time_intervals_create(10, 'ResizeXY Component_scroller', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, { mesh: mesh, mouse_click: point });
-   //       mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
-   //    }
-   //    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
-   //       console.log('X RESIZE');
-   //    }
-   //    else { // Its a height resize
-   //       console.log('Y RESIZE');
-   //    }
-   
-   //    mesh.state.mask |= MESH_STATE_FLAGS.IN_RESIZE | MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS;
-   //    STATE.mesh.SetGrabed(mesh);
-   //    STATE.mesh.SetFocused(mesh);
-   
-   //    return true;
-   // }
-   // else { // Move the scroller handle
-   
    
    // Check if the click happened on bar
    const bar_pos = Mesh_get_real_pos_xy(bar);
    if (point[0] > bar_pos[0] + bar.StylesGetHoverMargin(STYLES.AXIS.X)) { // Check only if click is on the right of the left side of the bar mesh
-      console.log('CLICKED', 'point', point, 'bar_pos', bar_pos)
       
       if (point[1] < bar_pos[1] || point[1] > bar_pos[1] + bar.geom.dim[1] * 2) return
-      
-
       State_mesh_set_clicked(bar);
 
       if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
          const idx = Time_intervals_create(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
          bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
-
          State_mesh_set_grabed(bar);
-         // STATE.mesh.SetFocused(mesh);
-         // mesh.state.mask |= MESH_STATE_FLAGS.IN_FOCUS;
          bar.StateEnable(MESH_STATE_FLAGS.IN_GRAB);
       }
 
       return true;
    }
-
-
 
 }
 
@@ -456,7 +399,6 @@ function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_sec
     */
    const pad_ratio = (pos_dim_ratio * 2 - 1);
    const ydif = (posy - scrolled_posy) + handle.StylesGetPad(STYLES.AXIS.Y) * -pad_ratio;
-   // const ydif = (posy - scrolled_posy) + handle.geom.dim[1] + handle.StylesGetPad(STYLES.AXIS.Y) * -pad_ratio;
  
    // Add the move difference to all vb's root positions.
    Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);

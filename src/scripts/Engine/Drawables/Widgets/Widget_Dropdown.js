@@ -15,6 +15,7 @@ import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
+import { Components_get_scroller_component, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
 
 
 
@@ -504,9 +505,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       /*DEBUG*/if (dp.rootidx === INT_NULL) { alert('Root for dropdown must be set. ', Mesh_get_name(dp)); return; }
 
       const btn = dp.children.buffer[0];
-      // Dropdown_roots_get_root_by_idx(dp.rootidx);
-
-      console.log('9009w8989ufuijshkjfdskjm')
 
       // Check if the button is clicked
       if(params.meshidx === btn.mesh_bufferidx){
@@ -817,7 +815,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       cur_pos[0] = this.geom.pos[0]; 
       cur_pos[1] = this.geom.pos[1]; 
       
-      // Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
 
       Align_nested_sections_pre(widget_root)
 
@@ -826,6 +823,16 @@ export class Widget_Dropdown extends Rect_Mesh {
       Construct_listen_events_from_mesh_tree(widget_root)
       Construct_listen_events_relations_from_mesh_tree(widget_root);
       
+      
+      if(widget_root.has_children_scrollers) {
+
+         for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
+
+            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i])
+            Scroller_component_calculate_handle_pos_dim(widget_root, scroller_comp);
+         }
+         // Scroller_component_calculate_handle_pos_dim(widget_root, widget_root.scroller_comp);
+      }
       
 
       /********************************************************************************************************************/
@@ -920,6 +927,17 @@ export class Widget_Dropdown extends Rect_Mesh {
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
+
+
+      if(widget_root.has_children_scrollers) {
+
+         for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
+
+            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i])
+            Scroller_component_calculate_handle_pos_dim(widget_root, scroller_comp);
+         }
+         // Scroller_component_calculate_handle_pos_dim(widget_root, widget_root.scroller_comp);
+      }
 
 
       /********************************************************************************************************************/

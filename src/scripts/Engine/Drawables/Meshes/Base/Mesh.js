@@ -85,7 +85,6 @@ export class Mesh {
     current_event_callback_idx; // Index: A way to choose between different event callback functions.
     timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
 
-    rel_comp; // A component to position this mesh's children relative to the position of one of 'LEFT-CENTER-RIGHT' and relative all other children's position
     root_posidx; // An index to the root position buffer. 
 
     scroller_comp;  // Pointer to scroller mesh.
@@ -95,9 +94,6 @@ export class Mesh {
     components;     // BitField: Type of 'COMPONENTS'. // TODO: Later implement more components other than scrollers.
 
     debug_info;         // Struct: Debug_info_ui.
-    minimized;          // Pointer: to a minimized version of the mesh.
-    menu_options;       // Struct: A callback and an index. Constructs the options popup menu for the mesh
-    menu_options_idx;   // Value: An index to the menu options handler's buffer
 
     name; // String:
     nameidx; // Index to Str buffer:
@@ -168,9 +164,6 @@ export class Mesh {
         this.children = New_generic_buffer(_, 'Mesh children');
         this.timeIntervalsIdxBuffer = New_int8_buffer(INTERVALS.SIZE, 'Mesh time_intervals');
 
-        this.rel_pos = [0, 0];
-
-        this.rel_comp = null;
         this.root_posidx = INT_NULL;
         this.scroller_comp = null;
         this.scroller_comp_idx = INT_NULL;
@@ -329,7 +322,6 @@ export class Mesh {
         Free_int8_buffer(this.timeIntervalsIdxBuffer);
         Styles_remove_byidx(this.styles);
         this.gfx.Destroy();
-        if (this.rel_comp) this.rel_comp.Destroy();
 
         if (this.mat.char_buffer) Free_generic_char_buffer(this.mat.char_buffer)
 
@@ -360,7 +352,6 @@ export class Mesh {
 
         this.gfx.Destroy();
         Free_int8_buffer(this.shader_ops_idxs);
-        // if (this.rel_comp) this.rel_comp.Destroy();
 
     }
 
