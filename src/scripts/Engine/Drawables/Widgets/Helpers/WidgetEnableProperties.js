@@ -30,11 +30,10 @@ export function Widget_gfx_ready_enable({
    enable_col_per_vertex,
    enable_attr_angle,
    enable_blend_mode,
-   listener={ type:0x0, Clbk:null, params:null},
+   listener={ type:0x0, Clbk:null, params:null },
+   scroller=null,
 }) {
 
-   // mesh.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-   // mesh.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
    if (enable_unif_wpos) mesh.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if (enable_unif_blend) mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
    if (enable_unif_scale) mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
@@ -76,6 +75,15 @@ export function Widget_gfx_ready_enable({
       if(listener.type &  LISTEN_EVENT_TYPES.HOVER) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.HOVER, listener.Clbk, listener.params);
       if(listener.type &  LISTEN_EVENT_TYPES.MOVE) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.MOVE, listener.Clbk, listener.params);
       if(listener.type &  LISTEN_EVENT_TYPES.CLICK_UP) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.CLICK_UP, listener.Clbk, listener.params);
+   }
+
+   if (scroller) {
+      const params = {
+         width:(scroller.width!==undefined) ? scroller.width : 10,
+         max_height:(scroller.max_height!==undefined) ? scroller.max_height : 80,
+      };
+      mesh.EnableScroller(params);
+
    }
 
 

@@ -7,7 +7,7 @@ import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUni
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
@@ -197,7 +197,7 @@ export function Brick_remove_byidx(idx = INT_NULL) {
 
    const mesh = _bricks_buffer.buffer[idx].mesh;
 
-   mesh.SetColorRGBA(TRANSPARENT);
+   Mesh_set_color_rgba(mesh, TRANSPARENT);
 
    _bricks_buffer.buffer[idx].is_active = false;
    _free_brick_idxs_buffer.Add(idx);
@@ -277,8 +277,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
       brick.mesh.geom.pos[1] = brick.mesh.geom.defPos[1] = y;
       Gl_set_wpos_xy(brick.mesh.gfx, brick.mesh.geom.pos[0] + br_dim_x, brick.mesh.geom.pos[1] + brick.mesh.geom.dim[1]);
 
-      brick.mesh.SetColorRGBA(color);
-      console.log(color)
+      Mesh_set_color_rgba(brick.mesh, color);
       Mesh_set_name(brick.mesh, name);
 
       brick.flags = flags;
@@ -861,7 +860,7 @@ function Animation_pull_stop(params) {
    // Set to initial position
    Mesh_update_set_wpos_xy(params.brick.mesh);
 
-   params.brick.mesh.SetColorRGBA(TRANSPARENCY(GREY[2], .3));
+   Mesh_set_color_rgba(params.brick.mesh, TRANSPARENCY(GREY[2], .3));
    params.brick.is_active = false;
    params.brick.lock_squash_anim = false;
 

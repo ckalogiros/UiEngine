@@ -8,7 +8,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Widget_ready_label, Widget_ready_slider } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
-import { Mesh_get_name } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Mesh_get_name, Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 
 
@@ -438,9 +438,7 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
    /********************************************************************************************************************************************************/
    // Create
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, dim: [0, 0], pos: [0, 0, 0], pad: [20, 20], col: TRANSPARENCY(GREY[0], 1.), name: 'MAIN_SECTION' }));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
 
    section.StylesSetPad([10, 10]);
    section.StylesSetMargin([0, 0]);
@@ -1299,9 +1297,7 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
    // Create
    // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, LAYOUT.VERTICAL, [15, 10], pos, [100, 100], TRANSPARENCY(GREY[1], .8), 'Test_alignment');
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, 0, 0], dim:[0, 0], col:TRANSPARENCY(GREY[1], .8), name:'Test_alignment'}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
 
    section.StylesSetPad([10, 10]);
    section.align.flags = LAYOUT.RESIZE_SELF;
@@ -1390,9 +1386,7 @@ function Test_align_float_right(x = 0, y = 0) {
    /********************************************************************************************************************************************************/
    // Create
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, 0, 0], dim:[0, 0], col:TRANSPARENCY(GREY[1], .8), name:'Test_alignment'}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
 
    section.StylesSetPad([10, 10]);
    section.align.flags = LAYOUT.RESIZE_SELF;
@@ -1500,9 +1494,7 @@ function Create_triangle_structure(x = 50, y = 50) {
    /********************************************************************************************************************************************************/
    // Create
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, dim: [0, 0], pos: [0, 0, 0], pad: [20, 20], col: TRANSPARENCY(GREY[0], 1.), name: 'MAIN_SECTION' }));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
 
    section.StylesSetPad([10, 10]);
    section.StylesSetMargin([0, 0]);
@@ -2198,7 +2190,7 @@ function Create_rect_t1(parent, color, name, align=0x0, pad = [10, 10], enable_h
 
    const s = Create_rect_mesh(Style_rect_default_properties({ pad: pad, pos: [0, 0, 1], col: color, name: name, dim: dim, layout:LAYOUT.RESIZE_SELF|align}));
    Widget_gfx_ready_enable({mesh:s, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD})
-   if (enable_hover) s.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   if (enable_hover) Mesh_listener_create(s, LISTEN_EVENT_TYPES.HOVER);
    parent.AddItem(s);
 
    return s;

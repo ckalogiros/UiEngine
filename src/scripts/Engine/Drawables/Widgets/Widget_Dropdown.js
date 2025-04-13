@@ -7,7 +7,7 @@ import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidget.j
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
-import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
@@ -15,7 +15,8 @@ import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
-import { Components_get_scroller_component, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
+import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
+import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -110,11 +111,11 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_DROP_DOWN;
       this.type &= ~MESH_TYPE.SECTION_MESH_ONLY;
       this.rootidx = INT_NULL;
-
+      
       // this.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
       // this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF;
       this.align.flags = properties.dp.layout !== undefined ? properties.dp.layout : LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
-
+      
       properties.dp.pos[2] += 1;
       this.menu = Create_rect_mesh(properties.menu);
       Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10,})
@@ -123,14 +124,16 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
+      this.menu.StylesSetPad(properties.menu.pad);
       
       
       this.dp_symbols = ['+', '-'];
       properties.btn.text = `${this.dp_symbols[0]} ${properties.btn.text}`;
       const btn = Create_widget_button(properties.btn);
-      Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10,})
+      Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP }})
       btn.align.flags = LAYOUT.VERTICAL
-
+      btn.StylesSetPad(properties.btn.pad);
+      
 
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
 
@@ -141,9 +144,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       Mesh_set_name(btn, `Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
       Mesh_set_name(this.menu, `Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
       Mesh_set_name(this, `Dropdown[${this.mesh_bufferidx}]{${properties.btn.text}}`);
-
-      btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-
 
    }
    /** */
@@ -397,7 +397,8 @@ export class Widget_Dropdown extends Rect_Mesh {
       const btn = this.children.buffer[0];
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 
 
-      this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
+      // this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
+      this.menu.GenGfxCtx()
       if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', Mesh_get_name(this))
 
       return this.gfx;
@@ -419,6 +420,24 @@ export class Widget_Dropdown extends Rect_Mesh {
          }
       }
 
+      if(this.menu.scroller_comp) {
+
+         const scrolled_section = this.menu;
+
+         Scoller_component_render(scrolled_section.scroller_comp)
+         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, scrolled_section.scroller_comp.root_posidx)
+         this.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
+
+         if(1) { // TODO: Scroller component should store if it has scissor box enabled
+            // Set scissor box
+            const mx = scrolled_section.mesh_bufferidx;
+            const my = scrolled_section.scroller_comp.mesh_bufferidx;
+            const mw = scrolled_section.mesh_bufferidx;
+            const mh = scrolled_section.scroller_comp.mesh_bufferidx;
+            Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
+         }
+      }
+
    }
    /** */
    Rerender() {
@@ -433,7 +452,13 @@ export class Widget_Dropdown extends Rect_Mesh {
       }
 
    }
+   EnableScroller(scroller) {
 
+      Components_create_scroller_component(scroller.width, scroller.max_height, this.menu, );
+
+      this.menu.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
+      this.menu.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
+   }
 
 
 
@@ -824,14 +849,14 @@ export class Widget_Dropdown extends Rect_Mesh {
       Construct_listen_events_relations_from_mesh_tree(widget_root);
       
       
+
+      // // TODO: deactivate/dontShow scroller
       if(widget_root.has_children_scrollers) {
-
          for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
-
-            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i])
-            Scroller_component_calculate_handle_pos_dim(widget_root, scroller_comp);
+            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
+            Scroller_component_calculate_handle_pos_dim(scroller_comp);
+            Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
          }
-         // Scroller_component_calculate_handle_pos_dim(widget_root, widget_root.scroller_comp);
       }
       
 
@@ -922,23 +947,20 @@ export class Widget_Dropdown extends Rect_Mesh {
       
 
       Align_nested_sections_pre(widget_root)
-
+      
       /********************************************************************************************************************/
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(this.menu)
       Construct_listen_events_relations_from_mesh_tree(this.menu);
-
-
+      
+      
       if(widget_root.has_children_scrollers) {
-
          for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
-
-            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i])
-            Scroller_component_calculate_handle_pos_dim(widget_root, scroller_comp);
+            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
+            Scroller_component_calculate_handle_pos_dim(scroller_comp);
+            Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
          }
-         // Scroller_component_calculate_handle_pos_dim(widget_root, widget_root.scroller_comp);
       }
-
 
       /********************************************************************************************************************/
       // Re-render   

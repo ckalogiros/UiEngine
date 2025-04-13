@@ -206,7 +206,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 /*********************************************************************************************************************************************************************************************/
 /** Glow-Particles. Testing with different shaders */
 // TODO: For attributes we need to implement the controls to control vb attribs
-export function Demo_glow_particles_test_dif_shaders(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame) { // 3 control Sliders 
+export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame) { // 3 control Sliders 
 
    const scale_down = .2;
    const rcorners = 10;
@@ -1361,11 +1361,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:16,})
       panel.AddItem(label);
 
-      const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:18, col:GREY[1], }));
-      Widget_gfx_ready_enable({mesh:colorpicker_switch, enable_sdf_rect:18,})
-      colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-      colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-      colorpicker_switch.SetName('color_picker_switch');
+      const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:18, col:GREY[1], name:'color_picker_switch'}));
+      Widget_gfx_ready_enable({mesh:colorpicker_switch, enable_sdf_rect:18, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.CLICK_UP}})
       panel.AddItem(colorpicker_switch);
 
       const cp_params = {
@@ -2416,11 +2413,10 @@ function Create_color_picker_switch_panel(z, emitter) {
    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:16,})
    panel.AddItem(label);
 
-   const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:18, col:GREY[1], }));
+   const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:18, col:GREY[1], name:'color_picker_switch'}));
    Widget_gfx_ready_enable({mesh:colorpicker_switch, enable_sdf_rect:18,})
    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
    colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
-   colorpicker_switch.SetName('color_picker_switch');
    panel.AddItem(colorpicker_switch);
 
    colorpicker_switch.Bind(

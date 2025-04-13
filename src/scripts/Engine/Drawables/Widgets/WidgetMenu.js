@@ -62,7 +62,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_MENU_BAR;
       
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      // this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       
       // this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.EXPAND;
       this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.FIXED_WIDTH;
@@ -465,8 +464,6 @@ export class Close_Button extends Widget_Button {
       super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
       // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, pos, _, col, _, style,_, texture_id, sub_texture_id, is_debug_mesh);
 
-      this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
       this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);

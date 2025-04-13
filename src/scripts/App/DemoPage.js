@@ -1241,7 +1241,6 @@ function Options_menu_callback(params) {
       : false;
    if (needs_scroller) {
 
-
       const scroller_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
       const scroller_component = Components_create_scroller_component(10, scroller_height, controls_section, 100);
       Scoller_component_gengfx_and_render(scroller_component, controls_section, GFX_CTX_FLAGS.ABSOLUTE_POSITION);
@@ -1249,7 +1248,7 @@ function Options_menu_callback(params) {
       Listeners_set_priority(E.C, scroller_component.listeners);
       menu_panel.AddChildScrollerIdx(controls_section.scroller_comp_idx);
 
-      Scroller_component_calculate_handle_pos_dim(controls_section, scroller_component);
+      Scroller_component_calculate_handle_pos_dim(scroller_component);
 
 
       /**************************************************************************************************************************/

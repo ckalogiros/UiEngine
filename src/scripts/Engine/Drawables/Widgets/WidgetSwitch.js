@@ -11,7 +11,7 @@ import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_listener_add } from "../Operations/MeshPropertiesFunctions.js";
+import { Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
 
 
 /**
@@ -50,7 +50,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.isOn = 0x0;
       this.type |= MESH_TYPE.WIDGET_SWITCH;
-      this.SetName('Switch Widget');
 
       this.evt_params = null;
       
@@ -60,14 +59,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          dim:[properties.size - pad, properties.size - pad], 
          col:properties.handle.col, 
          hover_margin:properties.handle.hover_margin, 
+         name:'switch',
          is_debug_mesh:properties.is_debug_mesh
       }));
       Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:properties.size * (1 - ratio)});
 
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-      switch_handle.SetName('switch');
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
 
       switch_handle.mat.style.rcorners = properties.size - pad;
       switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;

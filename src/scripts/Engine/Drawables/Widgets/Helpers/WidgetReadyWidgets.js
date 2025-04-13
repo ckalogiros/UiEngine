@@ -10,6 +10,7 @@ import { Gl_set_attr_round_corners, Gl_set_dim_xy } from "../../../../Graphics/B
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Max } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
+import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -29,9 +30,7 @@ export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_
       handle_col: handle_col,
    }));
 
-   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, });
-   slider.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
+   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE}, });
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
@@ -94,9 +93,7 @@ export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4],
       hover_margin:hover_margin,
    }));
 
-   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1]});
-   switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
 
    if(on_click_clbk) switch1.Bind(on_click_clbk);
    else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
@@ -130,9 +127,8 @@ export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], f
       text_pad: text_pad, 
    }));
 
-   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: 6});
-   switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: 6, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
+
 
    if(on_click_clbk) switch1.Bind(on_click_clbk);
    else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
@@ -172,8 +168,8 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
 
 
    Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, });
-   if(event_move) label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   if(event_hover) label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   if(event_move) Mesh_listener_create(label, LISTEN_EVENT_TYPES.MOVE)
+   if(event_hover) Mesh_listener_create(label, LISTEN_EVENT_TYPES.HOVER);
 
    // label.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
@@ -227,9 +223,7 @@ export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim
    }));
 
 
-   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 4, });
-   rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   rect.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
 
 
    /********************************************************************************************************************************************************/
@@ -308,15 +302,10 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
       is_debug_mesh: false,
    }));
    Widget_gfx_ready_enable({mesh:msdf_text, enable_sdf_rect:4});
-   // msdf_text.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // msdf_text.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 4);
-   // msdf_text.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   msdf_text.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
-   // msdf_text.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
-   // msdf_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
-   // msdf_text.text_mesh.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(msdf_text, LISTEN_EVENT_TYPES.MOVE);
+   Mesh_listener_create(msdf_text, LISTEN_EVENT_TYPES.HOVER);
+
 
    console.error(msdf_text.text_mesh.text_width)
 

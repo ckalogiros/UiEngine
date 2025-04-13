@@ -11,6 +11,7 @@ import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffe
 import { Program_get_uniform_from_name } from "../../../../Graphics/ShaderPrograms.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_default_properties } from "./WidgetEnableProperties.js";
 import { Align_nested_sections_pre } from "../../Operations/AlignNestedSections.js";
+import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -155,7 +156,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
    // Create Particles Control Panel
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Auto-Controls Panel', }));
    Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Mesh_listener_create(controls_section, LISTEN_EVENT_TYPES.MOVE);
    
 
    const shader_uniforms = Program_get_uniform_from_name(target_mesh.gfx.prog.idx, uniform_name);

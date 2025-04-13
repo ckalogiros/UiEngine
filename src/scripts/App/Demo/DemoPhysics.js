@@ -862,7 +862,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(info_section_panel.root_posidx, scroller_component.root_posidx);
          Listeners_set_priority(E.C, scroller_component.listeners)
          info_section_panel.AddChildScrollerIdx(info_section_panel.scroller_comp_idx);
-         Scroller_component_calculate_handle_pos_dim(info_section_panel, scroller_component);
+         Scroller_component_calculate_handle_pos_dim(scroller_component);
 
 
          // Set scissor box

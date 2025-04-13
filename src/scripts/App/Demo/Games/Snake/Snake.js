@@ -1550,7 +1550,7 @@ function Snake_options_callback(params) {
       Listeners_set_priority(E.C, scroller_component.listeners);
       menu_panel.AddChildScrollerIdx(controls_section.scroller_comp_idx);
 
-      Scroller_component_calculate_handle_pos_dim(controls_section, scroller_component);
+      Scroller_component_calculate_handle_pos_dim(scroller_component);
 
 
       /**************************************************************************************************************************/

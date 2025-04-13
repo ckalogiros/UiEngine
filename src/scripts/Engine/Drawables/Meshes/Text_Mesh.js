@@ -43,9 +43,6 @@ export class Text_Mesh extends Mesh {
       
       super(geom, mat);
 
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.EnableGfxUniforms({ unif:SID.UNIF.BLEND_MODE } , 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
-      
       this.last_charidx = properties.text.length;
       
       this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;

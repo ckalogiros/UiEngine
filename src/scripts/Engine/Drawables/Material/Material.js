@@ -1,10 +1,10 @@
 "use strict";
 
-import * as math from '../../../Helpers/Math/MathOperations.js'
 import { Gl_set_rgb, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../Core/Buffers.js';
 import { Texture_metrics_get_texture_pixel_size, Uv_get_uv_coords } from '../../Loaders/Textures/TextureUvMap.js';
+import { CopyArr2 } from '../../../Helpers/Math/MathOperations.js';
 
 
 
@@ -52,19 +52,19 @@ export class Material {
       }
 
    }
-   SetColorAllRGB(col, gfx, num_faces) {
-      math.CopyArr3(this.col, col);
-      math.CopyArr3(this.defCol, col);
-      Gl_set_rgb(gfx, this.col, num_faces);
-   }
-   SetColorRGB(col, gfx, num_faces) {
-      math.CopyArr3(this.col, col);
-      Gl_set_rgb(gfx, this.col, num_faces);
-   }
-   SetColorRGBA(col, gfx, num_faces) {
-      math.CopyArr4(this.col, col);
-      Gl_set_rgba(gfx, this.col, num_faces);
-   }
+   // SetColorAllRGB(col, gfx, num_faces) {
+   //    math.CopyArr3(this.col, col);
+   //    math.CopyArr3(this.defCol, col);
+   //    Gl_set_rgb(gfx, this.col, num_faces);
+   // }
+   // SetColorRGB(col, gfx, num_faces) {
+   //    math.CopyArr3(this.col, col);
+   //    Gl_set_rgb(gfx, this.col, num_faces);
+   // }
+   // SetColorRGBA(col, gfx, num_faces) {
+   //    math.CopyArr4(this.col, col);
+   //    Gl_set_rgba(gfx, this.col, num_faces);
+   // }
 
 }
 /** */
@@ -84,7 +84,7 @@ export class Material_Font extends Material {
 
       this.text = text;
       this.sdf_params = [0, 0];
-      math.CopyArr2(this.sdf_params, sdf_params);
+      CopyArr2(this.sdf_params, sdf_params);
       this.texture_file_id = texture_file_id;
 
       this.sid.attr |= SID.ATTR.TEX2; // 
@@ -117,7 +117,7 @@ export class Material_Atlas_Texture extends Material {
       super(col, texture_file_id);
 
       this.sdf_params = [0, 0];
-      math.CopyArr2(this.sdf_params, sdf_params);
+      CopyArr2(this.sdf_params, sdf_params);
 
       this.sid.attr |= SID.ATTR.TEX2;
       this.sid.pass |= SID.ATTR.TEX2;
@@ -153,7 +153,7 @@ export class Material_Atlas_Texture_Variant extends Material {
       super(col, texture_file_id);
 
       this.sdf_params = [0, 0];
-      math.CopyArr2(this.sdf_params, sdf_params);
+      CopyArr2(this.sdf_params, sdf_params);
 
       this.sid.attr |= SID.ATTR.TEX2; // 
       this.sid.pass |= SID.ATTR.TEX2; //

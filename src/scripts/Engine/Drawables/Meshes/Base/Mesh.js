@@ -11,7 +11,7 @@ import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
 import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
 import { Sid_check_unif_match_sids, State_mesh_reset } from "../../../../GlobalFunctions.js";
-import { Mesh_get_name } from "../../Operations/MeshPropertiesFunctions.js";
+import { Mesh_get_name, Mesh_listener_remove } from "../../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -213,7 +213,7 @@ export class Mesh {
         /*************************************************************************************/
         // Remove event listeners
         if (this.listeners) {
-            this.RemoveAllListenEvents();
+            Mesh_listener_remove(this);
             Free_generic_buffer(this.listeners);
             // this.listeners = null;
         }
@@ -366,96 +366,44 @@ export class Mesh {
     /*******************************************************************************************************************************************************/
 
     /** */
-    // TODO: Just replace all '.CreateListenEvent()' calls or implement the new way via 'Widget_gfx_
-    CreateListenEvent(etype, is_fake_event = false) {
+    // CreateListenEvent(etype, is_fake_event = false) {
 
-        if (!this.listeners) {
-            this.listeners = New_generic_buffer(_, 'Mesh-Listeners');
-            this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
-        }
-
-        if (etype & LISTEN_EVENT_TYPES.HOVER) {
-
-            this.listeners.AddAtIndex(E.H, INT_NULL);
-
-            this.state.mask |= (MESH_STATE_FLAGS.IS_HOVERABLE | MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
-            this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
-
-            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_HOVERABLE);
-
-        }
-        if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
-
-            this.listeners.AddAtIndex(E.C, INT_NULL)
-
-            this.state.mask |= (MESH_STATE_FLAGS.IS_CLICKABLE);
-            this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
-
-            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
-
-        }
-        if (etype & LISTEN_EVENT_TYPES.MOVE) {
-
-            this.listeners.AddAtIndex(E.C, INT_NULL);
-
-            this.state.mask |= (MESH_STATE_FLAGS.IS_GRABABLE | MESH_STATE_FLAGS.IS_MOVABLE | MESH_STATE_FLAGS.IS_CLICKABLE);
-            this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
-
-            if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
-
-        }
-
-    }
-    // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
-    /** */
-    // AddListenEvent(etypeidx, Clbk = null, params = null) {
-
-    //     if (this.listeners.buffer[etypeidx] !== INT_NULL) return;
-    //     if ((this.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0x0) {
-    //         // console.error('0198815 \nMesh is INACTIVE to add a listen event \n', this.GetName());
-    //         return;
+    //     if (!this.listeners) {
+    //         this.listeners = New_generic_buffer(_, 'Mesh-Listeners');
+    //         this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
     //     }
 
+    //     if (etype & LISTEN_EVENT_TYPES.HOVER) {
 
-    //     const is_fake = (this.state.mask & MESH_STATE_FLAGS.IS_FAKE_EVENT) ? true : false;
-    //     this.listeners.buffer[etypeidx] = Listener_create_child_event(etypeidx, this.mesh_bufferidx, Clbk, params, is_fake);
-    // }
-    // Either the 'parent_event' is legit if we pass it or null, so just check if is NOT INT_NULL
-    /** */
-    // ChangeListenEvent(etypeidx, Clbk = null, params = null) {
+    //         this.listeners.AddAtIndex(E.H, INT_NULL);
 
-    //     if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) { // HERE: see if can remove check
+    //         this.state.mask |= (MESH_STATE_FLAGS.IS_HOVERABLE | MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
+    //         this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
 
-    //         Listener_change_child_event(etypeidx, this.listeners.buffer[etypeidx], Clbk, params);
+    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_HOVERABLE);
+
     //     }
-    // }
-    // /** */
-    // RemoveAllListenEvents() {
+    //     if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
 
-    //     if (!this.listeners) return;
+    //         this.listeners.AddAtIndex(E.C, INT_NULL)
 
-    //     for (let i = 0; i <= this.listeners.boundary; i++) {
+    //         this.state.mask |= (MESH_STATE_FLAGS.IS_CLICKABLE);
+    //         this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
 
-    //         if (this.listeners.buffer[i] !== null && this.listeners.buffer[i] !== INT_NULL) {
-    //             Listener_remove_event_by_idx(i, this.listeners.buffer[i]);
-    //             this.listeners.buffer[i] = INT_NULL;
-    //         }
+    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
+
     //     }
-    // }
-    /** */
-    // CreateEventCallback(params = null, event_clbks_resolve_fn = null) {
+    //     if (etype & LISTEN_EVENT_TYPES.MOVE) {
 
-    //     if (!params) alert('CreateEventCallback(params = null). @ Mesh.js')
-    //     if (this.event_clbks === null) this.event_clbks = New_generic_buffer(_, 'Mesh event_clbks');
+    //         this.listeners.AddAtIndex(E.C, INT_NULL);
 
-    //     // Automaticaly enable event callback if the first event callback is activated. 
-    //     // For the rest of the callback events, the user is responsible to set the current active by setting current_event_callback_idx
-    //     const evt_clbk_idx = this.event_clbks.Add(params);
-    //     if (evt_clbk_idx === 0) this.current_event_callback_idx = evt_clbk_idx;
+    //         this.state.mask |= (MESH_STATE_FLAGS.IS_GRABABLE | MESH_STATE_FLAGS.IS_MOVABLE | MESH_STATE_FLAGS.IS_CLICKABLE);
+    //         this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
 
-    //     // User created function to resolve the event callback
-    //     if (event_clbks_resolve_fn) this.event_clbks_resolve_fn = event_clbks_resolve_fn;
-    //     return evt_clbk_idx;
+    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
+
+    //     }
+
     // }
 
 
@@ -468,12 +416,12 @@ export class Mesh {
     // Transformations   Setters-Getters
     /*******************************************************************************************************************************************************/
 
-    /** */
-    SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
-    /** */
-    SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
-    /** */
-    SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
+    // /** */
+    // SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
 
 
 
@@ -752,7 +700,12 @@ export class Mesh {
                 }
             }
 
-            // this.uniforms[found_idx].vertex_buffer_store_idx = Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx);
+            // HACK: 
+            if(this.uniforms[found_idx].name==='u_wposxy') {
+                clbk_params = this.gfx.vb.groupidx
+            }
+
+            // Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name);
             Vertex_buffer_set_uniform_value_callback(this.gfx.vb.groupidx, Clbk, clbk_params, this.uniforms[found_idx].ubidx, this.uniforms[found_idx].name);
             return;
         }
@@ -793,7 +746,6 @@ export class Mesh {
             }
         }
     }
-
     /** */
     AddChildScrollerIdx(scroller_comp_idx) {
         /**

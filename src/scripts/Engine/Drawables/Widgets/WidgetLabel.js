@@ -61,7 +61,6 @@ export class Widget_Label extends Rect_Mesh {
             is_debug_mesh:properties.is_debug_mesh,
         }));
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        Mesh_set_name(this, properties.text)
         
         this.text_mesh = text_mesh;
         
@@ -72,10 +71,6 @@ export class Widget_Label extends Rect_Mesh {
         text_mesh.sceneidx = this.sceneidx;
 
         this.mesh_bufferidx = mesh_bufferidx;
-
-        // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-        this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
 
         // this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
         this.text_mesh.parent = this; // Use a special case for text meshes that are part of a widget without being in children's buffer.

@@ -2976,7 +2976,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    Listeners_set_priority(E.C, scroller_component.listeners);
    scrolled.AddChildScrollerIdx(scrolled.scroller_comp_idx);
 
-   Scroller_component_calculate_handle_pos_dim(scrolled, scroller_component);
+   Scroller_component_calculate_handle_pos_dim(scroller_component);
 
 
    return scrolled;

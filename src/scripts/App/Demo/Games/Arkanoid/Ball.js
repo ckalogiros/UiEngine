@@ -6,7 +6,7 @@ import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/C
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -241,7 +241,7 @@ export function Ball_create(x, y, color = WHITE) {
       ball.mesh.geom.pos[1] = y;
       Gl_set_wpos_xy(ball.mesh.gfx, ball.mesh.geom.pos[0] + BALL_DIM_X, ball.mesh.geom.pos[1] + BALL_DIM_X);
 
-      ball.mesh.SetColorRGBA(color);
+      Mesh_set_color_rgba(ball.mesh, color);
 
       // Calculate ball velocity vector according to player's position
       const player = Player_get();

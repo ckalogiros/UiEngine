@@ -8,6 +8,7 @@ import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Mater
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_score_calc } from "./Arkanoid.js";
+import { Mesh_set_color_rgba } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 
 
 
@@ -165,7 +166,7 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
       score_mod.mesh.SetWposXY(x, y);
       score_mod.mesh.text_mesh.RenderTextFromString(text);
 
-      score_mod.mesh.text_mesh.SetColorRGBA(text_color)
+      Mesh_set_color_rgba(score_mod.mesh.text_mesh, text_color)
       score_mod.is_active = true;
 
       // Remove from the free idxs buffer

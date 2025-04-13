@@ -6,7 +6,7 @@ import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/C
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_set_color_rgba, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
@@ -192,7 +192,7 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
       powup.geom.dim[1] = h;
       Mesh_update_set_dim_xy(powup);
 
-      powup.SetColorRGBA(color);
+      Mesh_set_color_rgba(powup, color);
 
       _powup_buffer.buffer[idx].is_active = true;
 

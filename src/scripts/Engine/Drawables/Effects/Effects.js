@@ -21,6 +21,7 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { View_add_to_group } from "../../Core/Views/MeshBufferViews.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY } from "../Material/Colors.js";
+import { Mesh_set_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -193,7 +194,7 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       effect.mesh.geom.pos[1] = y-h+h_src; 
       Gl_set_wpos_xy(effect.mesh.gfx, effect.mesh.geom.pos[0]+w, effect.mesh.geom.pos[1]+h);
 
-      effect.mesh.SetColorRGBA(color);
+      Mesh_set_color_rgba(effect.mesh, color);
       // effect.mesh.mat.col = color;
       // Gl_set_rgba(effect.mesh.gfx, color)
       
@@ -410,7 +411,7 @@ export function Effects_create_explosion_glow(x, y, w, h, w_src=0, h_src=0, colo
       // effect.mesh.geom.pos[1] = y; 
       Gl_set_wpos_xy(effect.mesh.gfx, effect.mesh.geom.pos[0]+w, effect.mesh.geom.pos[1]+h);
 
-      effect.mesh.SetColorRGBA(color);
+      Mesh_set_color_rgba(effect.mesh, color);
       // effect.mesh.mat.col = color;
       // Gl_set_rgba(effect.mesh.gfx, color)
       

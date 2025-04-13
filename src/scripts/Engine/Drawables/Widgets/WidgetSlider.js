@@ -9,7 +9,7 @@ import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } fro
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
-import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
+import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_x, Mesh_update_set_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_simple_default_properties } from './Helpers/WidgetEnableProperties.js';
@@ -55,12 +55,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          dim:properties.handle.dim, 
          col:handle_color, 
       }));
-      Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:handle.geom.dim[0],});
+      Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:handle.geom.dim[0], listener:{type:LISTEN_EVENT_TYPES.HOVER},});
 
       handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
       if (properties.col[0] instanceof Float32Array) handle.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, );
-
-
 
 
       // Make the vertical area of the bar larger for hover and handle moving.
@@ -79,12 +77,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       Mesh_set_name(handle, 'Slider handle');
       Mesh_get_name(this, 'Slider Bar');
-
-
-      handle.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-
-      handle.rel_pos[0] = handle.geom.pos[0] - this.geom.pos[0];
-      handle.rel_pos[1] = handle.geom.pos[1] - this.geom.pos[1];
 
    }
    SetLayout(align_flags) {
@@ -692,7 +684,7 @@ export function Slider_simple_set_value(slider_bar, new_value) {
 
       const handle = bar.children.buffer[0];
       handle.geom.pos[1] = (bar.geom.dim[1] * 2) - ((new_value) * (bar.geom.dim[1] * 2)) + bar.geom.pos[1]; // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-      handle.geom.UpdateSetWposY(handle.gfx)
+      Mesh_update_set_wpos_y(handle);
    }
 
    if (bar.parent && bar.parent.SliderSetValueToInfoText !== undefined) bar.parent.SliderSetValueToInfoText(new_value);
@@ -845,9 +837,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
 
-      // If mesh has 'style' in shaders, 'u_screen_res' must be enabled.
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-
 
       /*****************************************************************************************************************/
       // Slider Bar: Bar is child of the slider mesh
@@ -856,7 +845,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       // const bar_color = (col[0] instanceof Float32Array) ? [GREY[8], GREY[8], GREY[8], GREY[8]] : GREY[8];
       // const bar = Create_widget_slider_simple(_, [outer_pad, 0, _pos[2] + 1], [bar_width, bar_height], slider_bar_color, hover_margin, properties.handle.dim, slider_handle_color, 1, is_debug_mesh);
       const bar = Create_widget_slider_simple(Style_slider_simple_default_properties({pos:[outer_pad, 0, _pos[2] + 1], dim:[bar_width, bar_height], col:slider_bar_color, hover_margin:hover_margin, handle_dim:properties.handle.dim, handle_col:slider_handle_color, is_debug_mesh:is_debug_mesh}));
-      Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[1],});
+      Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.CLICK_UP},});
       bar.StylesSetPad([outer_pad, outer_pad]);
       
       
@@ -915,11 +904,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       Mesh_set_name(value_text, Mesh_get_name(this) + ' - value_text');
       Mesh_set_name(this, 'Widget_Slider_XX1');
 
-
-      // this.SetGfxEnable(MESH_ENABLE.GFX.ATTR_DIM2)
-
-      bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
- 
       this.SetLayout(properties.layout);
 
    }

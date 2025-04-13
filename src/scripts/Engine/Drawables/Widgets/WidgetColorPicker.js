@@ -15,7 +15,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, PURPLE, RED, REDL, WHITE, YELLOW } from "../Material/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
 
 
@@ -62,13 +62,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const scale = .6;
 
       if (properties.col !== _ && properties.col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      // super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
-   // super(mesh_bufferidx, { 
-   //    is_root: is_root, pad: [margin[0] * scale, margin[1] * scale], 
-   //    pos, dim: [dim[0] * scale, dim[1] * scale], col: [GREY[1], GREY[3], GREY[1], GREY[3]], 
-   //    name: name, style: style, num_faces: num_faces, 
-   //    layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL, is_debug_mesh: is_debug_mesh,
-   // });
 
       properties.col = COLOR_GRADIENT_VERTICAL(GREY[8], GREY[4]);
       super(mesh_bufferidx, properties);
@@ -77,8 +70,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       // Multi color vertex
       this.options |= SECTION.RESIZE_PARENT;
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.align.flags = LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL;
 
       this.label_r = null;
       this.label_g = null;
@@ -463,7 +454,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const color_present_mesh = panel2.children.buffer[color_present_idx];
 
       { // Color Pick Panel
-         color_pick_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+         Mesh_listener_create(color_pick_mesh, LISTEN_EVENT_TYPES.CLICK_UP)
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
@@ -475,7 +466,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       { // Hue Slider
          // For the hue slider, we create a click event from the Widget Slider class, so that on slider huue click we run the sliders click event.
-         hue_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+         Mesh_listener_create(hue_mesh, LISTEN_EVENT_TYPES.CLICK_UP);
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
@@ -506,7 +497,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       { // Tranparency Slider
          // Create the click event on the slider class
-         transp_slider_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+         Mesh_listener_create(transp_slider_mesh, LISTEN_EVENT_TYPES.CLICK_UP);
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,

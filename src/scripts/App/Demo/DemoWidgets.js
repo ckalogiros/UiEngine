@@ -18,6 +18,7 @@ import { Renderqueue_set_priority_by_vb } from '../../Engine/Renderers/Renderer/
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_color_picker_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from '../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Mesh_set_wpos_relative_x } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Align_nested_sections_pre, Align_expand } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
+import { Mesh_listener_create } from '../../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 
 
 
@@ -223,7 +224,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    Listeners_set_priority(E.C, scroller_component.listeners);
    section.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
 
-   Scroller_component_calculate_handle_pos_dim(scrolled_section, scroller_component);
+   Scroller_component_calculate_handle_pos_dim(scroller_component);
 
    // Set scissor box
    // const mx = scrolled_section.mesh_bufferidx;
@@ -1417,7 +1418,7 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
    // const tarnsparency_handle_rcorners = Min(tarnsparency_handle.geom.dim[0], tarnsparency_handle.geom.dim[1])
    // picker.GfxEnableAttr(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8, 8, 6, 4, 4, 4, tarnsparency_handle_rcorners, 4, 4);
 
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) picker.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(picker, LISTEN_EVENT_TYPES.MOVE);
 
 
    picker.sid.inst = render_instanced_flags;
@@ -1455,7 +1456,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const tr = 1.;
 
       const blu = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(BLUEL[7], tr), [15, 15],);
-      blu.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      Mesh_listener_create(blu, LISTEN_EVENT_TYPES.MOVE);
       blu.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
 
 
@@ -1468,37 +1469,37 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       {
          const black1 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREY[1], tr),);
          black1.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
-         black1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(black1, LISTEN_EVENT_TYPES.HOVER);
          red.AddItem(black1);
 
          const grey11 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREY[4], tr),);
          grey11.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
-         grey11.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(grey11, LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(grey11);
 
          const red111 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(REDL[7], tr),);
          red111.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
-         red111.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(red111, LISTEN_EVENT_TYPES.HOVER);
          grey11.AddItem(red111);
 
          const yel_1 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(YELLOWR[7], tr),);
          yel_1.SetLayout(LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
-         yel_1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(yel_1, LISTEN_EVENT_TYPES.HOVER);
          grey11.AddItem(yel_1);
 
          const purp12 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(PURPLE[7], tr),);
          purp12.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
-         purp12.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(purp12, LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(purp12);
 
          const blue13 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(BLUEL[5], tr),);
          blue13.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
-         blue13.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(blue13, LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(blue13);
 
          const green14 = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(GREEN[5], tr),);
          green14.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
-         green14.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+         Mesh_listener_create(green14, LISTEN_EVENT_TYPES.HOVER);
          black1.AddItem(green14);
       }
       return blu;
@@ -1508,8 +1509,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const colors = [REDL[0], REDL[1], REDL[2], REDL[3], REDL[3], REDL[4], REDL[5], REDL[6], REDL[7], REDL[8], BLUEL[0], BLUEL[1], BLUEL[2], BLUEL[3], BLUEL[4], BLUEL[5], BLUEL[6], BLUEL[7], BLUEL[8],];
 
       const section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], dim: [20, 20], col: TRANSPARENCY(GREY[0], 1.) }));
-      Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15 });
-      section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.MOVE} });
       // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
       // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
@@ -1519,11 +1519,10 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       for (let i = 0; i < num_items; i++) {
 
          const label = Create_widget_label(Style_label_default_properties({ text: `${i}`, font_size: font_size, col: TRANSPARENCY(colors[i], .8), text_pad: [6, 4] }))
-         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
          // label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
          // label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          label.align.flags = LAYOUT.VERTICAL;
-         label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
          section.AddItem(label);
       }
 
@@ -1557,7 +1556,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          section.AddChildScrollerIdx(section.scroller_comp_idx);
          Listeners_set_priority(E.C, scroller_component.listeners)
 
-         Scroller_component_calculate_handle_pos_dim(section, scroller_component);
+         Scroller_component_calculate_handle_pos_dim(scroller_component);
 
 
          //    // Set scissor box
@@ -1648,12 +1647,10 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
 
    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-   Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: 15 });
+   Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE} });
    // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
    // dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
    dp.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-   dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
    Dropdown_roots_set_root(dp, dp);
 
@@ -1670,14 +1667,13 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const align_l1 = (i % 2) ? LAYOUT.HORIZONTAL : LAYOUT.VERTICAL;
 
       const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-      Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+      Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
       // dpsub1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
       // dpsub1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      dpsub1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       dpsub1.align.flags = align_l1 | LAYOUT.RESIZE_SELF
       dp.AddToMenu(dpsub1);
 
-      { const l = Widget_ready_label(_, 'LEVEL 2!', _, _, _, _, ORANGE[5]); dpsub1.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+      { const l = Widget_ready_label(_, 'LEVEL 2!', _, _, _, _, ORANGE[5]); dpsub1.AddToMenu(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); }
 
 
       col = GetSequencedColor(color_intensity)
@@ -1687,32 +1683,28 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          const align_l2 = LAYOUT.VERTICAL;
 
          const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
          // dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
          // dpsub2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-         dpsub2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
          dpsub2.align.flags = align_l2 | LAYOUT.RESIZE_SELF
          dpsub1.AddToMenu(dpsub2);
 
-         { const l = Widget_ready_label(_, 'LEVEL 3!', _, _, _, _, ORANGE[7]); dpsub2.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+         { const l = Widget_ready_label(_, 'LEVEL 3!', _, _, _, _, ORANGE[7]); dpsub2.AddToMenu(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); }
 
          const col2 = GetSequencedColor(color_intensity)
          for (let k = 0; k < sub_dp2_count; k++) {
 
             const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}${k}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-            Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15 });
+            Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
             // dpsub3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
             //    dpsub3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-            dpsub3.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             dpsub2.AddToMenu(dpsub3);
 
-            // { const l = Widget_ready_label(_, 'LEVEL 4!',_,_,_,_,ORANGE[9]); dpsub3.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
 
             { const w = Many_labels(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
             { const w = Many_sections(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
             { const w = Many_switches(GetSequencedColor(color_intensity), LAYOUT.HORIZONTAL); dpsub3.AddToMenu(w); }
             { const w = Many_sliders(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
-            // { const w = Many_scrollers(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dpsub3.AddToMenu(w); }
 
          }
       }

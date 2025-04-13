@@ -1,5 +1,24 @@
 TODO
 
+# For scroller implementation
+{
+   1. Fix the initial position of the scroller.
+      Where and how to set it up
+
+   2. Deal with the VBs of the scrolled mesh's children, must not take any parents gfx
+      especially for text, we need to create new vb
+}
+
+# Deal with many VBs 
+{
+   If it is necessary to create a new vb to group some meshes:
+   * Build groups (cpu side) and even if the vb is one, 
+   we could create group Draw(), update with buffeSubData, and update the u_wposxy before every Draw call
+
+   That means:
+   1. Besides the renderqueue, we would need mesh-groups (possibly from group-view system) with all data (draw count, start-end, etc)
+} 
+
 * The 'Gl_set_dim_xy' maybe should be abstracted to Mesh_update_attr_dimentions
 Also instead of dim for vpos we should use vpos
 

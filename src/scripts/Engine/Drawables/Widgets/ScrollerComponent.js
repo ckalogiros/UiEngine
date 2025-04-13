@@ -6,14 +6,15 @@ import { Gl_set_dim_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Free_generic_buffer, New_generic_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "./Helpers/CreateWidget.js";
-import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wposy, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { GREY } from "../Material/Colors.js";
 import { Clipy_from_group } from "../Operations/Clip.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
-import { Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_x, Mesh_set_dim_y, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_listener_add, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_x, Mesh_set_dim_y, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_xy, Mesh_update_set_wpos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add, Mesh_listener_create, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -25,7 +26,18 @@ const HANDLE_MIN_HEIGHT = 10;
 
 
 const _scrollers_buffer = New_generic_buffer(_, 'Scrollers Buffer');
-
+/** */
+export function Scroller_component_set_pos_xy(bar, x, y){
+   Mesh_unif_set_vb_root_wpos(bar.root_posidx, x, y);
+}
+/** */
+export function Scroller_component_set_pos_x(bar, x){
+   Mesh_unif_set_vb_root_wposx(bar.root_posidx, x);
+}
+/** */
+export function Scroller_component_set_pos_y(bar, y){
+   Mesh_unif_set_vb_root_wposy(bar.root_posidx, y)
+}
 /** */
 export function Components_get_scroller_component(scroller_comp_idx=INT_NULL){
 
@@ -41,21 +53,18 @@ export function Components_scroller_component_destroy(scroller_comp_idx=INT_NULL
    Free_generic_buffer(_scrollers_buffer);
 }
 /** */
-export function Components_create_scroller_component(width = 12, height=100, mesh=null, abs_ypos=0, col_bar=GREY[0], col_handle=GREY[4]){
+export function Components_create_scroller_component(width = 12, height=100, mesh=null, col_bar=GREY[0], col_handle=GREY[4]){
 
-   const pos = [0,0,20];
+   const pos = [0, 0, 20];
 
 
    const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar, name:'ScrollBar'}));
-   Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2,})
-   // bar.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
+   Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}})
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
 
    bar.OnClick = Scroller_component_onClick;
-   bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    bar.ListenEventConstruct = Scroller_component_listen_event_construct;
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
-   bar.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
    
    
    const handle_pad = [3, 3];
@@ -88,7 +97,9 @@ export function Scoller_component_destroy(bar, ){
    bar.Destroy();
 
 }
-/** */
+
+
+/** DEPRICATED */
 export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, parent, ){
    
    // Create absolute position on canvas scrolling
@@ -125,20 +136,51 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags=0x0, pa
    
 }
 /** */
-export function Scroller_component_set_pos(bar, widget_root,  difx, dify){
+export function Scoller_component_gengfx(bar, gfx_flags=0x0, ){
+   
+   // Create absolute position on canvas scrolling
+   if(gfx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION){
 
+      bar.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.SCROLLER_VB;
+      bar.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.SCROLLER_VB, bar.mesh_bufferidx);
+   }
+
+   bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.SCROLLER_VB);
+}
+/** */
+export function Scoller_component_render(bar, parent, ){
+
+   const scrolled_section = bar.scrolled_section;
+
+   // Set positions after 'GenGfxCtx' so that the bar's
+   bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section)+scrolled_section.geom.dim[0]*2
+   bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section)+scrolled_section.geom.dim[0]*2
+   bar.geom.pos[1] = Mesh_get_real_pos_y(scrolled_section);
+   
+   // Set handle pos
    const handle = bar.children.buffer[0];
+   const handle_pad = handle.StylesGetPad();
+   handle.geom.pos[0] = bar.geom.pos[0] + handle_pad[0];
+   handle.geom.pos[1] = bar.geom.pos[1] + handle_pad[1];
 
-   bar.geom.pos[0] += difx
-   bar.geom.pos[1] += dify
-   bar.geom.UpdateSetWposXY(bar.gfx);
-   
-   
-   handle.geom.pos[0] += difx;
-   handle.geom.pos[1] += dify;
-   
-   handle.geom.UpdateSetWposXY(handle.gfx);
+   bar.Render();
 
+   Construct_listen_events_from_mesh_tree(bar);
+   Construct_listen_events_relations_from_mesh_tree(bar, parent);
+
+   bar.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, bar.gfx.vb.groupidx);
+
+   Scroller_component_calculate_handle_pos_dim(bar)
+
+   // if(1) {
+   //    // Set scissor box
+   //    const mx = scrolled_section.mesh_bufferidx;
+   //    const my = bar.mesh_bufferidx;
+   //    const mw = scrolled_section.mesh_bufferidx;
+   //    const mh = bar.mesh_bufferidx;
+   //    Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
+   // }
+   
 }
 /** */
 export function Scroller_component_set_listeners_priority(scroller_component) {
@@ -171,12 +213,17 @@ function Scroller_component_listen_event_construct() {
 } 
 
 
+// export function Scroller_component_set_scissorbox_y(bar,) {
+//    Vertex_buffer_group_set_scissorbox(bar.vb_groupidx, _, bar.scrolled_section.geom.pos[1], _, bar.scrolled_section.geom.dim[1]*2);
+// }
 /** */
-export function Scroller_component_calculate_handle_pos_dim(scrolled_section, bar) {
+export function Scroller_component_calculate_handle_pos_dim(bar) {
 
 
+   const scrolled_section = bar.scrolled_section
    const handle = bar.children.buffer[0];
    const handle_pad = handle.StylesGetPad();
+
 
 
    /* Set bar position */
@@ -189,8 +236,6 @@ export function Scroller_component_calculate_handle_pos_dim(scrolled_section, ba
    const a = (clean_size * clean_size) / scrolled_section.geom.dim[1];
    if (a < bar.geom.dim[1]) handle.geom.dim[1] = a - handle_pad[1];
    else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
-   // if (a < bar.geom.dim[1] && a > HANDLE_MIN_HEIGHT) handle.geom.dim[1] = a - handle_pad[1];
-   // else handle.geom.dim[1] = clean_bar_height - handle_pad[1];
 
    if(handle.geom.dim[1] < HANDLE_MIN_HEIGHT) handle.geom.dim[1] = HANDLE_MIN_HEIGHT
 

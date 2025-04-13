@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -13,9 +13,9 @@ import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
-import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
-import { Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
@@ -44,7 +44,6 @@ export class Rect_Mesh extends Mesh {
       this.StylesSetPad(properties.pad);
       Mesh_set_name(this, `${properties.name}`);
 
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -173,6 +172,7 @@ export class Rect_Mesh extends Mesh {
    /** */
    GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
+      // FIXME: The clbk_params for unif_wpos is the vb_groupidx, BUT instead is passed recursively from the 'section.GfxUniformsSetClbk()'
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
       for (let i = 0; i <= this.children.boundary; i++) {
@@ -193,15 +193,20 @@ export class Rect_Mesh extends Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      // const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
+         // if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
+
+      if(this.scroller_comp) {
+
+         Scoller_component_gengfx(this.scroller_comp,);
+      }
+
 
    }
    Render(run_for_children = true) {
@@ -214,6 +219,22 @@ export class Rect_Mesh extends Mesh {
          for (let i = 0; i <= this.children.boundary; i++) {
             const child = this.children.buffer[i];
             if (child) child.Render();
+         }
+      }
+
+      if(this.scroller_comp) {
+
+         Scoller_component_render(this.scroller_comp)
+         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
+         this.AddChildScrollerIdx(this.scroller_comp_idx);
+
+         if(1) { // TODO: Scroller component should store if it has scissor box enabled
+            // Set scissor box
+            const mx = this.mesh_bufferidx;
+            const my = this.scroller_comp.mesh_bufferidx;
+            const mw = this.mesh_bufferidx;
+            const mh = this.scroller_comp.mesh_bufferidx;
+            Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
          }
       }
 
@@ -239,6 +260,14 @@ export class Rect_Mesh extends Mesh {
       // Add entry to Gfx Buffer
       this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
+   }
+
+   EnableScroller(scroller) {
+
+      Components_create_scroller_component(scroller.width, scroller.max_height, this);
+
+      this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
+      this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
    }
 
 

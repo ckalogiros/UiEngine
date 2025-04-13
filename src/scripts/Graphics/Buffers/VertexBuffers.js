@@ -405,11 +405,11 @@ class Vertex_Buffer_Group {
         this.has_scissorbox = true;
     }
     
-    SetScissorBox(x, y, w, h) {
-        this.scissorbox[0] = x;
-        this.scissorbox[1] = y;
-        this.scissorbox[2] = w;
-        this.scissorbox[3] = h;
+    SetScissorBox(x=null, y=null, w=null, h=null) {
+        if(x !== null) this.scissorbox[0] = x;
+        if(x !== null) this.scissorbox[1] = y;
+        if(x !== null) this.scissorbox[2] = w;
+        if(x !== null) this.scissorbox[3] = h;
         this.has_scissorbox = true;
     }
     
@@ -521,45 +521,18 @@ export function Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, m
     _vertex_buffer_groups.buffer[vb_groupidx].CreateScissorBoxByMeshIdx(mx, my, mw, mh);
     Vertex_buffer_group_update_scissorbox(vb_groupidx);
 }
-
-
-
-// export function Vertex_buffer_group_update_scissorbox_all_vb(vb_groupidx) {
-
-//     /**
-//      * 1. Get the meshes for scissor box x, y, width and height values.
-//      * 2. Extract these values
-//      * 3. Run a loop for all vertex buffers that belong to the same root widget
-//      * 4. Update the scissor box values of the group   
-//      */
-
-//     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-
-
-//     const mx = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[0]);
-//     const my = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[1]);
-//     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
-//     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
-
-//     const x = mx.GetPosX();
-//     const y = my.GetPosY();
-//     const w = mw.geom.dim[0] * 2;
-//     const h = mh.geom.dim[1] * 2;
-
-//     const root_vb_groupidxs = Root_group_vbidx_view_get(mx.root_bufferidx);
-
-//     // Run for all vertex buffer groups that belong to the root widget
-//     const H = VIEWPORT.HEIGHT;
-//     for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
-
-//         const vb_group_ = _vertex_buffer_groups.buffer[root_vb_groupidxs.buffer[i]];
-//         if (vb_group_.has_scissorbox)
-//             vb_group_.SetScissorBox(x, (H - y) - h, w, h);
-//     }
-// }
-
-
-
+/**
+ * 
+ * @param {index} vb_groupidx 
+ * @param {index} mx : start x pos 
+ * @param {index} my : start y pos
+ * @param {index} mw : width 
+ * @param {index} mh : height
+ */
+export function Vertex_buffer_group_set_scissorbox(vb_groupidx, mx, my, mw, mh) {
+    _vertex_buffer_groups.buffer[vb_groupidx].SetScissorBox(mx, my, mw, mh);
+}
+/** */
 export function Vertex_buffer_group_update_scissorbox_all_vb() {
 
     // Run for all vertex buffer groups that belong to the root widget
@@ -572,9 +545,7 @@ export function Vertex_buffer_group_update_scissorbox_all_vb() {
         }
     }
 }
-
-
-let a = 1;
+/** */
 export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
 
     /**
@@ -594,28 +565,24 @@ export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
 
-    // if(a==1 && mx.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) {a=0;return;}
+    const pad_offset = 4;
 
+    // const x = Mesh_get_real_pos_x(mx)-pad_offset;
+    // const y = Mesh_get_real_pos_y(my)-pad_offset;
     const x = Mesh_get_real_pos_x(mx);
     const y = Mesh_get_real_pos_y(my);
-    const w = mw.geom.dim[0] * 2;
-    const h = mh.geom.dim[1] * 2;
+    const w = mw.geom.dim[0] * 2-pad_offset;
+    const h = mh.geom.dim[1] * 2-pad_offset;
     const H = VIEWPORT.HEIGHT;
-
-    // console.log(H, y, x, (H - y) - h, w, h, my.GetName(), my.GetPosY())
 
     vb_group.SetScissorBox(x, (H - y) - h, w, h);
 
 }
-
-
-
+/** */
 export function Vertex_buffer_group_has_scissorbox(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_remove_scissorbox(vb_groupidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].ResetScissorBox();
     // _vertex_buffer_groups.buffer[vb_groupidx].has_scissorbox = false;
@@ -676,6 +643,9 @@ export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx
 
         Uniforms_buffer_set_uniform_val_from_index(ubidx, val, params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);
+
+        // if(vb_groupidx===1)
+        //     console.log(val)
 
         // if(vb_groupidx===10)
         // if(debug_progidx===5)

@@ -301,12 +301,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       vb_groupidx = GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX;
       Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE);
       Renderqueue_set_active(vb_groupidx, true);
-
-      // TODO: Update the vertex buffer info. Needs to have access to the vbidxs of the mesh.gfx.vb.?????
-      // for() {
-
-      //    Vertex_buffer_state_enable(vb_groupidx, vbidx, true);
-      // }
    }
    else if ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) {
       // Check buffers validity, or find buffers based on Flags
@@ -342,7 +336,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
             }
          }
          // Here we must check for all vb's that are stored globaly(like scrollers, but not for scrollers!) 
-         else if ((flags & GFX_CTX_FLAGS.PRIVATE) === 0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0) {
+         else if (((flags & GFX_CTX_FLAGS.PRIVATE) === 0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0) && (flags & GFX_CTX_FLAGS.NEW)===0 ) {
             vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
          }
       }
@@ -406,6 +400,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   const COPY_MESH_POS = (flags) ? true : false;
                   // Create the uniform position that will update the vertexbuffer's uniform
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+                  // mesh.geom.pos[0] = 0;
+                  // mesh.geom.pos[1] = 0;
 
                   if (mesh.root_posidx !== vb_groupidx)
                      alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
@@ -606,7 +602,6 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
                // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set uup the callback here
                if (uniforms[i].name === 'u_wposxy') {
 
-                  // const root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.geom.pos, emitter.type, emitter.nameidx, emitter.parent, vb_groupidx, ubidx);
                   const HAS_ABSOLUTE_POS = 0x0, HAS_STICKY_POS = 0x0, COPY_MESH_POS = false;
                   emitter.root_posidx = Mesh_unif_create_vb_root_wpos(INT_NULL, emitter.geom.pos, emitter.type, emitter.nameidx, emitter.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
                   if (emitter.root_posidx !== vb_groupidx) 

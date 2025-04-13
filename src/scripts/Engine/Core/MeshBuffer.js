@@ -248,11 +248,6 @@ export function Mesh_per_vb_create_vb(vb_groupidx) {
 
 export function Mesh_per_vb_store_mesh(vb_groupidx, mesh_bufferidx) {
    const idx = _mesh_per_vertex_buffer.buffer[vb_groupidx].Add(mesh_bufferidx);
-   
-   // /*only for debug*/const mesh_buffer = Mesh_buffer_get(); 
-   // /*only for debug*/const mesh = Mesh_buffer_get_mesh_byidx(mesh_bufferidx)
-   // console.log('Store', mesh.GetName(), mesh_bufferidx, idx)
-   
    return idx;
 }
 
@@ -448,7 +443,7 @@ export function Mesh_buffer_print_loop() {
             'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE_FLAGS.ACTIVE,
             'nameidx:', _mesh_buffer.buffer[i].nameidx,
             'pos:', _mesh_buffer.buffer[i].geom.pos,
-            'name:', _mesh_buffer.buffer[i].GetName(),
+            'name:', Mesh_get_name(_mesh_buffer.buffer[i]),
          );
       }
       else console.log(i, 'NULL')

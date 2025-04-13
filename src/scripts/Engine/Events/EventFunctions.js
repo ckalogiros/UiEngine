@@ -3,7 +3,7 @@
 import { Listen_event_types_get_type_from_index } from "../../GlobalFunctions.js";
 import { Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
 import { Root_group_view_buffer_get_root_meshidx } from "../Core/Views/RootView.js";
-import { Mesh_get_name, Mesh_listener_add } from "../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Listener_assign_parent_event, Listener_create_root_view } from "./EventListeners.js";
 
 
@@ -35,7 +35,7 @@ function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
             const etype = Listen_event_types_get_type_from_index(EVENT_TYPE_IDX);
             
             // Create FAKE event
-            current.CreateListenEvent(etype, true); 
+            Mesh_listener_create(current, etype, true); 
             // Construct
             Mesh_listener_add(current, EVENT_TYPE_IDX, null, null); 
 

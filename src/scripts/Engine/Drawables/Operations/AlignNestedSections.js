@@ -1,11 +1,5 @@
 "use strict";
 
-import { Mesh_get_name } from "./MeshPropertiesFunctions.js";
-
-// import { Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
-// import { Mesh_set_dim_x } from "./MeshAttributesFunctions.js";
-
-
 
 /** */
 export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
@@ -159,13 +153,14 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
    cur_pos_x += pad_x;
    cur_pos_y += pad_y;
 
-   let total_size_x = 0;
    let total_size_y = 0;
 
    let accum_row_size_x = 0
    let accum_row_max_size_x = 0
    let row_max_size_y = 0
    let max_size_y = 0
+
+   let skip = false;
 
 
 
@@ -177,53 +172,72 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
 
-
       if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
-
+         
          cur_mesh.geom.pos[0] = cur_pos_x;
          cur_mesh.geom.pos[1] = cur_pos_y;
 
+         const ret = Align_pre_simple___with_scroller(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
+         
+         /** Scroller resize based on scrolled section height or scollers max_height */
+         if(cur_mesh.scroller_comp) {
+            // Scroller_component_set_pos_xy(cur_mesh.scroller_comp, cur_pos_x-cur_pad_x, cur_pos_y-cur_pad_y);
 
+            total_size_y += cur_mesh.scroller_comp.geom.dim[1];
+            
+            if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+               cur_pos_y += cur_mesh.scroller_comp.geom.dim[1]*2;
+               
+               accum_row_size_x = 0;
+               // accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0] + cur_pad_x; // Add scroller's width to the total size
+               accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0]; // Add scroller's width to the total size
+            }
+            
+            skip = true;
 
-         const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
+         }
+         
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+         
+         if(!skip) {
+            if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+               total_size_y += ret.dim_y + cur_pad_y;
+               accum_row_size_x = 0;
+            }
+            else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
+               if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+            }
 
-         if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-            total_size_y += ret.dim_y + cur_pad_y;
-            accum_row_size_x = 0;
          }
-         else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-            total_size_x += ret.dim_x;
-            if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-         }
-
+         
+         
          accum_row_size_x += ret.dim_x + cur_pad_x;
-
+         
          cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
          cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
-
-         /**
-          * Scroller resize based on scrolled section height or scollers max_height
-          */
-         // if(cur_mesh.scroller_comp) 
-            console.error('++', Mesh_get_name(cur_mesh), cur_mesh.scroller_comp)
-
-
-         const next_mesh = mesh.children.buffer[i + 1];
-         if (next_mesh) {
-            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
-               cur_pos_x = mesh.geom.pos[0] + pad_x;
-               if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
-               else cur_pos_y += cur_mesh.geom.dim[1] * 2;
-               max_size_y += row_max_size_y / 2
-               row_max_size_y = 0; // Reset current row max size
+         
+         
+         
+         
+         if(!skip) {
+            const next_mesh = mesh.children.buffer[i + 1];
+            if (next_mesh) {
+               if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+                  cur_pos_x = mesh.geom.pos[0] + pad_x;
+                  if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
+                  else cur_pos_y += cur_mesh.geom.dim[1] * 2;
+                  max_size_y += row_max_size_y / 2
+                  row_max_size_y = 0; // Reset current row max size
+               }
+               else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
             }
-            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
+            else { // If this is the last child
+               max_size_y += row_max_size_y / 2;
+            }
          }
-         else { // If this is the last child
-            max_size_y += row_max_size_y / 2;
-         }
+
+
       }
       else {
 
@@ -235,20 +249,12 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
 
          // Update the total size accumulator according to widget's align flags
          if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-            total_size_x += ret.dim_x;
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
          }
          else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
             total_size_y += ret.dim_y;
-            total_size_x = ret.dim_x;
             accum_row_size_x = 0;
          }
-
-                  /**
-          * Scroller resize based on scrolled section height or scollers max_height
-          */
-         // if(cur_mesh.scroller_comp) 
-            console.error(Mesh_get_name(cur_mesh), cur_mesh.scroller_comp)
 
          // Calculate the next position, based on the next mesh's align flags
          const next_mesh = mesh.children.buffer[i + 1];
@@ -266,7 +272,6 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
             max_size_y += row_max_size_y / 2;
          }
          accum_row_size_x += ret.dim_x + (cur_pad_x/2);
-         // accum_row_size_x += ret.dim_x ;
          
       }
 

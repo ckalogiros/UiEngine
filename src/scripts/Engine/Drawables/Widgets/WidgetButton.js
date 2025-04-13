@@ -3,7 +3,7 @@
 import { State_mesh_set_clicked, State_mesh_set_clickhold } from '../../../GlobalFunctions.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { GREY, WHITE } from '../Material/Colors.js';
-import { Mesh_listener_add, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
+import { Mesh_listener_add, Mesh_listener_create, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
 import { Style_button_default_properties } from './Helpers/WidgetEnableProperties.js';
 import { Widget_Label } from './WidgetLabel.js';
 
@@ -146,7 +146,7 @@ export class Widget_Button extends Widget_Label {
 
       if (click_flags) this.state.mask |= click_flags;
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
 
       // If there is a click event already created
    }
@@ -172,7 +172,7 @@ export class Widget_Switch extends Widget_Button {
       this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Switch');
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.HOVER)
 
    }
 
@@ -246,7 +246,6 @@ export class Widget_Switch extends Widget_Button {
 
       if (!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
 
-      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,

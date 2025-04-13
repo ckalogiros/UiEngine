@@ -218,7 +218,7 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
 
 
-   Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_wpos.wpos, null)
+   // Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_wpos.wpos, null)
 
    return vb_groupidx; // Return this unif wpos index(which matches the vb_groupidx)
 }
@@ -457,8 +457,6 @@ export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
 export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
    
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
-   for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
-   }
 
 }
 
