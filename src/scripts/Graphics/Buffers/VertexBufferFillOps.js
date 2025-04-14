@@ -234,7 +234,6 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
       if (attr & SID.ATTR.ANGLE) clean_attr |= SID.ATTR.ANGLE;
       if (attr & SID.ATTR.BORDER) clean_attr |= SID.ATTR.BORDER;
       if (attr & SID.ATTR.TEX2) clean_attr |= SID.ATTR.TEX2;
-      // if (attr & SID.ATTR.GLOW_INTENSITY) clean_attr |= SID.ATTR.GLOW_INTENSITY;
       if (attr & SID.ATTR.GENERIC2) clean_attr |= SID.ATTR.GENERIC2;
 
       if (clean_attr === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS | SID.ATTR.FEATHER | SID.ATTR.BORDER | SID.ATTR.TIME)) return FUNCTION_TABLE_IDXS.COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER;
@@ -381,33 +380,6 @@ export function Set_vertex_position_VPOS2(vb_data, start, stride, dimx, dimy, nu
       l += width;
 
    }
-   // for(let i=0; i<num_faces; i++){
-   // // for(let i=0; i<(len/num_faces)+1; i++){
-   // // for(let i=0; i<len+(len-(num_faces*2)); i++){
-
-   //    // VERTEX POSITION
-   //    vb_data[index++] = l;
-   //    vb_data[index++] = t;
-   //    index += stride;
-
-   //    vb_data[index++] = l;
-   //    vb_data[index++] = b;
-   //    index += stride;
-
-   //    vb_data[index++] = r;
-   //    vb_data[index++] = t;
-   //    index += stride;
-
-   //    vb_data[index++] = r;
-   //    vb_data[index++] = b;
-   //    index += stride;
-
-   //    l = r+width;
-   //    r = l+width;
-   //    // t -= 20;
-   //    // b += 20;
-   // }
-
 }
 function Set_vertex_uv_coordinates_TEX2(vb_data, start, stride, uv) {
 

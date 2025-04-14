@@ -129,8 +129,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    // Create Particles Control Panel
 
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
 
 
@@ -277,8 +276,7 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
    // Create Particles Control Panel
 
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
 
    /****************************************************************************************************************/
@@ -398,8 +396,7 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
    // Create Particles Control Panel
 
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
 
    /****************************************************************************************************************/
@@ -525,10 +522,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    // Create Particles Control Panel
    
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
 
    /****************************************************************************************************************/
@@ -543,7 +537,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    const zpos = -1
 
-   const switch_panel = Create_emitt_switch_panel({z:zpos, emitter:emitter, emitt_options:{continuous_emitt:false,button_pres_emitt:true}});
+   const switch_panel = Create_emitt_switch_panel({z:zpos, emitter:emitter, emitt_options:{continuous_emitt:true,button_pres_emitt:true}});
    controls_section.AddItem(switch_panel);
 
    const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
@@ -694,10 +688,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    // Create Particles Control Panel
 
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-
-
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
 
 
@@ -1242,8 +1233,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       const pos = [100, 100]
 
       const ball = Create_rect_mesh(Style_rect_default_properties({pos:[pos[0], pos[1], 2], dim:dim, col:WHITE, name:'Ball', }));
-      Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0], })
-      ball.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0], listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
       particles_panel.AddItem(ball);
 
@@ -1346,8 +1336,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
 
 
    const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x+particles_panel.geom.dim[0]*2, y, 1], col:TRANSPARENCY(GREY[1], .5), name:'Emitter Window Panel', }));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners,})
-   controls_section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}})
 
    const zpos = -1
 
@@ -2254,7 +2243,6 @@ export function Test_noise_shader() {
          slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
 
-            // const slider_val = Slider_get_slider_val({slider:slider});
             let max = 2, start = -1;
             const y = (slider_val * max) + start;
             emitters[0].variation_emission.xdir_pos = y;
@@ -2381,8 +2369,7 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
       panel.AddItem(label);
 
       const emitt_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, z + 2], size:18, col:YELLOWR[8], layout:LAYOUT.HORIZONTAL, name:`${emitter.name}_emitt_switch`}));
-      Widget_gfx_ready_enable({mesh:emitt_switch, enable_sdf_rect:emitt_switch.geom.dim[1],})
-      emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); emitt_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      Widget_gfx_ready_enable({mesh:emitt_switch, enable_sdf_rect:emitt_switch.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.CLICK_UP}})
       panel.AddItem(emitt_switch);
 
       const evt_params = { target_params: [emitter.idx] };
@@ -2391,8 +2378,7 @@ function Create_emitt_switch_panel({ z=0, emitter=null, emitt_options={continuou
    if(emitt_options.button_pres_emitt) {
 
       const emitt_btn = Create_widget_button(Style_button_default_properties({text:'Emitt', pos:[0, 0, z + 2], col:YELLOWR[8], text_pad:text_pad, texture_id:default_font , layout:LAYOUT.VERTICAL, name:`${emitter.name}_emitt_button`}));
-      Widget_gfx_ready_enable({mesh:emitt_btn, enable_sdf_rect:emitt_btn.geom.dim[1],})
-      emitt_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+      Widget_gfx_ready_enable({mesh:emitt_btn, enable_sdf_rect:emitt_btn.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.HOVER}})
       panel.AddItem(emitt_btn);
 
       const evt_params = { target_params: [emitter.idx] };
@@ -2414,9 +2400,7 @@ function Create_color_picker_switch_panel(z, emitter) {
    panel.AddItem(label);
 
    const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:18, col:GREY[1], name:'color_picker_switch'}));
-   Widget_gfx_ready_enable({mesh:colorpicker_switch, enable_sdf_rect:18,})
-   colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
-   colorpicker_switch.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+   Widget_gfx_ready_enable({mesh:colorpicker_switch, enable_sdf_rect:18, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.CLICK_UP}})
    panel.AddItem(colorpicker_switch);
 
    colorpicker_switch.Bind(

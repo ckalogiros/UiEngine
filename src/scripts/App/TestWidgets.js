@@ -35,6 +35,7 @@ import { Arkanoid_initialize } from './Demo/Games/Arkanoid/Arkanoid.js';
 import { Mesh_get_real_pos_y, Mesh_rotate_z } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Mesh_get_name, Mesh_listener_create } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 import { Align_nested_sections_pre, Align_expand } from '../Engine/Drawables/Operations/AlignNestedSections.js';
+import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
 
 
 
@@ -76,7 +77,7 @@ export function TestWidgetsGeneric() {
     // Demos_welcome_menu();
 
     { // Games
-        Arkanoid_initialize();
+        // Arkanoid_initialize();
         // Arkanoid_test_game_options();
 
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -293,7 +294,7 @@ export function TestWidgetsGeneric() {
 
             // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
 
-            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 256)
+            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
 
             // Create_smoke_particles();
 
@@ -303,7 +304,7 @@ export function TestWidgetsGeneric() {
 
         { // Demos Physics
 
-            // const total_height = Elastic_collisions(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
+            // const total_height = Elastic_collisions(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, true);
 
             // Sattelite_rotation([0, 100]);
 
@@ -323,8 +324,8 @@ export function TestWidgetsGeneric() {
             // const btn = Demo_widgets(_, [0, y]);
             // y += btn.geom.dim[1]*2 + pad;
 
-            // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
-            // y += scroller.geom.dim[1]*2 + pad;
+            const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
+            y += scroller.geom.dim[1]*2 + pad;
 
             // const dp = Demo_widgets_dropdown(_, [0, y], )
             // y += dp.geom.dim[1]*2 + pad;

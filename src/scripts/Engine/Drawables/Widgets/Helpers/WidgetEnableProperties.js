@@ -18,17 +18,17 @@ import { BLUEL, GREY, WHITE, YELLOWL } from "../../Material/Colors.js";
  */
 export function Widget_gfx_ready_enable({
    mesh = null,
-   enable_sdf_rect,
    enable_unif_wpos = true,
    enable_unif_blend = true,
    enable_unif_scale = false,
    enable_unif_time = false,
    enable_src_color_in_main = true,
+   enable_sdf_rect,
+   enable_col_per_vertex,
    enable_attr_dim = false,
+   enable_attr_angle,
    enable_pass_vpos = false,
    enable_pass_wpos = false,
-   enable_col_per_vertex,
-   enable_attr_angle,
    enable_blend_mode,
    listener={ type:0x0, Clbk:null, params:null },
    scroller=null,
@@ -81,6 +81,7 @@ export function Widget_gfx_ready_enable({
       const params = {
          width:(scroller.width!==undefined) ? scroller.width : 10,
          max_height:(scroller.max_height!==undefined) ? scroller.max_height : 80,
+         parent:scroller.parent!==undefined ? scroller.parent : null,
       };
       mesh.EnableScroller(params);
 

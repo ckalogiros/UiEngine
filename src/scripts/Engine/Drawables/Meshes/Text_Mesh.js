@@ -12,6 +12,7 @@ import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } 
 import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Msdf_Uv_get_sub_tex_bounds, Texture_metrics_get_sub_tex_height, Texture_metrics_get_texture, Texture_metrics_get_sub_tex_yoffset, Texture_metrics_get_calc_dim_from_string } from "../../Loaders/Textures/TextureUvMap.js";
 import { Geometry2D_Text } from "../Geometry/Geometry.js";
 import { Mesh_get_name } from "../Operations/MeshPropertiesFunctions.js";
+import { Set_color_rgb } from "../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -330,7 +331,7 @@ export class Text_Mesh extends Mesh {
 
    SetColorRGB(col, char_len = 0) {
       const num_face = (char_len) ? char_len : this.geom.num_faces;
-      this.mat.SetColorRGB(col, this.gfx, num_face)
+      Set_color_rgb(this, col);
    }
 
 

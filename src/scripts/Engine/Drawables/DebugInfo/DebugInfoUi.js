@@ -159,9 +159,8 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'InfoUi-static');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 7.5;
@@ -310,9 +309,8 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'InfoUi-static');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 7.5;
@@ -383,9 +381,8 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'MorePerformanceTimers');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 18.5;
@@ -447,9 +444,8 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'ApplicationBuffers');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 7.5;
@@ -520,10 +516,8 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'ApplicationBuffers');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 7.5;
@@ -593,10 +587,8 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int16_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'ApplicationBuffers');
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
    const fontsizedynamic = 7.5;
@@ -666,8 +658,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    const transp = .9;
    const zpos = 0;
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance:int8_buffers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
    const fontsizedynamic = 7.5;
@@ -777,9 +768,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
    
    // const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:TRANSPARENCY(GREY[0], .1), pad:dp_margin, text_pad:[10, 3], is_debug_mesh:true}));
    const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:_, pad:dp_margin, text_pad:[10, 3], is_debug_mesh:true}));
-   Widget_gfx_ready_enable({mesh:dp, enable_sdf_rect:rcorners,})
-   dp.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   dp.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:dp, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}})
    Dropdown_roots_set_root(dp, dp);
 
    // dp.GfxUniformsEnable({unif:SID.UNIF.ROOT_WPOS2}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
@@ -937,8 +926,7 @@ function Debug_info_create_ui_stats() {
 
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui stats timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
    const fontsize = 8;
@@ -1253,8 +1241,7 @@ function Debug_info_create_ui_performance_timers() {
 
    const zpos = DEBUG_INFO.UI_TIMERS.POS[2];
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
    const fontsize = 7;
@@ -1779,7 +1766,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    }
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_MOUSE.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    section.align.flags = LAYOUT.RESIZE_SELF;
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    
@@ -1908,7 +1895,7 @@ export function Debug_info_create_ui_focused() {
    const fontsize = _font_size;
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui focused info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_FOCUSED.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
@@ -2404,9 +2391,8 @@ function Debug_info_create_mesh_info(params) {
    const tr = 1.45;
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'MeshInfo DebugUi', pad:[10, 10], pos:DEBUG_INFO.UI_MESH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER, FAKE_LISTEN_EVENT);
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, FAKE_LISTEN_EVENT);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}});
+
 
    const dp = Create_widget_dropdown(_, `InfoUi Mesh DP`, [0, 0, DEBUG_INFO.UI_MESH.POS[2]], GREY[1], TRANSPARENCY(GREY[1], tr), WHITE, temp_btnpad);
    
@@ -2935,9 +2921,8 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    // Create the scolled section where a dropdown is going to exist 
    const scrolled = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[6, 6], pos:[0, 0, pos[2] + 1], col:TRANSPARENCY(GREY[0], .4), name:'DBG UI Scrolled section', is_debug_mesh:MESH_TYPE.DEBUG_MESH}));
-   Widget_gfx_ready_enable({mesh:scrolled, enable_sdf_rect:10,});
-   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-   scrolled.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:scrolled, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}});
+
 
    // Create the dropdown where all entries for the info will be stored
    const dp = Create_widget_dropdown(Style_dropdown_default_properties({text:name, pos:[0, 0, pos[2] + 2], col:col_dp, menu_col:col_menu, text_pad:[4, 4], pad:pad, is_debug_mesh:MESH_TYPE.DEBUG_MESH}));
@@ -3341,8 +3326,7 @@ function Helper_mesh_tree_info_create_more_info(parent, info_data, zindex, col_m
 
    { // Views indexes info
       const view = Create_widget_dropdown(Style_dropdown_default_properties({text:`view`, pos:[100, 100, zindex], col:col_dp, menu_col:col_menu, pad:[2, 1], pad:margin, is_debug_mesh:MESH_TYPE.DEBUG_MESH}));
-      Widget_gfx_ready_enable({mesh:view, enable_sdf_rect:10});
-      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      Widget_gfx_ready_enable({mesh:view, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
       view.SetTypeDebug();
       view.Deactivate();
       parent.AddToMenu(view)
@@ -3355,8 +3339,7 @@ function Helper_mesh_tree_info_create_more_info(parent, info_data, zindex, col_m
 
    { // Geometry info
       const view = Create_widget_dropdown(Style_dropdown_default_properties({text:`geometry`, pos:[100, 100, zindex], col:col_dp, menu_col:col_menu, pad:[2, 1], pad:margin, is_debug_mesh:MESH_TYPE.DEBUG_MESH}));
-      Widget_gfx_ready_enable({mesh:view, enable_sdf_rect:10});
-      view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
+      Widget_gfx_ready_enable({mesh:view, enable_sdf_rect:10,  listener:{type:LISTEN_EVENT_TYPES.MOVE}});
       view.SetTypeDebug();
       view.Deactivate();
       parent.AddToMenu(view)
@@ -3572,7 +3555,7 @@ function Helper_mesh_buffer_info_create_more_info(parent, info_data, zindex, col
    { // Views indexes info
       const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, btn_pad, _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       view.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, style.feather);
-      view.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.r_corners);
+      view.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, style.r_corners,);
       view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       view.Deactivate();

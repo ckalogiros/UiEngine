@@ -1562,7 +1562,7 @@ export function Gl_rotate_y_2d(gfxInfo, dim, angle, num_faces = 1) {
 /**************************************************************************************************************************************/
 // Set Specific Attributes - Vertex Buffer Functions
 /**************************************************************************************************************************************/
-/** 'starts' and 'color_indices' should be of the same element couunt arrays */
+/** 'starts' and 'color_indices' should be of the same element count arrays */
 export function Gl_batch_set_RGBA(vb_groupidx, starts, colors, color_indices, colors_len, attribsidx, num_faces, color_offsets, which_attr_vb = null, counts, vertices_per_rect = 4) {
 
    // const vertices_per_rect = VERTS_PER_RECT_INDEXED; // HACK: Get or pass the vertices per rect
@@ -1640,6 +1640,43 @@ export function Gl_batch_set_pos_xy(vb_groupidx, starts, pos, pos_indices, pos_l
 // Particle System: Batch Update Particles
 
 // TODO: Implement correctly all fill functions for particles
+/** Attampt to insert from an attributes float32 buffer */
+// export function Gl_particles_batch_set_attributes(vbidx, attributes) {
+
+//    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+
+//    let index = start;
+//    let attridx = 0;
+
+
+//    // V1
+//    vb_data[index++] = attributes[attridx++];vb_data[index++] = attributes[attridx++];vb_data[index++] = attributes[attridx++];vb_data[index++] = attributes[attridx++];
+//    vb_data[index++] = attributes[attridx++];vb_data[index++] = attributes[attridx++];vb_data[index++] = attributes[attridx++];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    index += 1; // FOR STYLE
+
+//    // V2
+//    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+//    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    index += 1; // FOR STYLE
+
+//    // V3
+//    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+//    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    index += 1; // FOR STYLE
+
+//    // V4
+//    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
+//    vb_data[index++] = pos[0];vb_data[index++] = pos[1];   vb_data[index++] = pos[2];
+//    index += V_POS_COUNT;
+//    index += 2; // FOR DIM2
+//    index += 1; // FOR STYLE
+// }
 /** */
 export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners(vbidx, start, colors, positions,) {
    // console.error('CALCULATE THE STRIDE CORRECTLY')

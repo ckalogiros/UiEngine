@@ -517,6 +517,294 @@ function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, a
 
 
 
+export function Shader_builder_create_attribs_info(sid) {
+
+   const assign_new_loc = (loc, loc_idx)=>   {
+      if (loc_idx > 4)
+         console.error('8144325 \nloc_idx excceding max')
+   
+      loc_idx++;
+      loc[loc_idx].name = `a_generic_${loc_idx}`;
+      loc[loc_idx].is_active = true;
+   
+      return loc_idx;
+   }
+
+   const create_attribute = (name, extension, location_name, attr_idx, sid = 0x0, attrib_flag=0x0)=> {
+
+      const pass_to_fs = sid.pass & attrib_flag;
+   
+      const a = {
+         is_occupied: true,
+         is_passing: pass_to_fs, // Is this attrib passing to the fragment shader 
+         name: name,
+         out_name: `v_${name}${extension}`,
+         in_name: `${location_name}.${attribs_xyzw[attr_idx]}`,
+         // extra: '',
+      };
+   
+      return a;
+   }
+
+   const loc = [
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+   ];
+
+
+   const attribs_info_m = { mesh_attribs: [], attribs_loc: [] };
+
+
+   const prog_attribs_indexing = new Shader_Attributes(true, INT_NULL); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
+   let attribs_idx = 0;
+   let loc_idx = -1;
+   let vec_idx = 0;
+
+   
+   loc_idx = assign_new_loc(loc, loc_idx, sid.inst); vec_idx = 0;
+
+   
+   loc[loc_idx].attrib_data_on_different_vb = false;
+   loc[loc_idx].is_instanced_buffer = true;
+
+
+   //
+   const attributes_len = Shader_bit_flags_get_attr_size();
+   for (let i = 0; i < attributes_len; i++) {
+
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      if ((sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) && (attr_info.FLAG & SID.ATTR.MSDF)===0) {
+
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.ATTR_NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+
+
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         mesh_attribute.name = attr_name;
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc)
+         
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+            
+            const vshader_attr_name = attr_name
+            
+            if (vec_idx >= max_val_in_loc) {
+               loc_idx = Create_new_attrib_location(loc, loc_idx, sid.inst); vec_idx = 0;
+               loc[loc_idx].is_instanced_buffer = true;
+            }
+
+            
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            loc[loc_idx].attr[vec_idx] = create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
+            
+            vec_idx++;
+            mesh_attribute.size++;
+            
+         }
+         
+         mesh_attribute.loc = loc_idx;
+         attribs_info_m.mesh_attribs.push(mesh_attribute);
+
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
+
+      }
+   }
+
+   // Case there is no Instanced buffer, we have already created the first attribute location 
+   if (loc_idx !== 0) {
+      loc_idx = assign_new_loc(loc, loc_idx, false);
+      vec_idx = 0;
+   }
+   loc[loc_idx].attrib_data_on_different_vb = true;
+   loc[loc_idx].is_instanced_buffer = false;
+
+
+
+   for (let i = 0; i < attributes_len; i++) {
+
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      
+      // if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0) {
+      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 
+         && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0
+         && (attr_info.FLAG & SID.ATTR.MSDF)===0
+      ) {
+
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.ATTR_NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         mesh_attribute.name = attr_name; // console.log(attr_name)
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
+
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+
+            const vshader_attr_name = attr_name;
+
+            // Check for full attrib location
+            if (vec_idx >= max_val_in_loc) {
+               loc_idx = assign_new_loc(loc, loc_idx, sid.inst); vec_idx = 0;
+               loc[loc_idx].is_instanced_buffer = false;
+            }
+
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            loc[loc_idx].attr[vec_idx] = loc[loc_idx].attr[vec_idx] = create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
+
+            
+            vec_idx++;
+            mesh_attribute.size++;
+            
+         }
+         
+         mesh_attribute.loc = loc_idx;
+         attribs_info_m.mesh_attribs.push(mesh_attribute);
+         
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
+         
+      }
+   }
+
+   // console.log('{{{{{{{{{{ PROGRAMS LOC INDEXING }}}}}}}}}}\n  prog_attribs_indexing', prog_attribs_indexing);
+
+   locations = loc;
+
+   if (vec_idx === 1) {
+      loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
+   }
+
+
+   // Create the generic attribute locations info
+   let offset = 0;
+   let devisor = 0;
+   let size = 0;
+   for (let i = 0; i < locations.length; i++) {
+
+      if (locations[i].is_active) {
+
+         offset += size;
+         size = 0;
+
+         // FIX HERE: For the generic location where the instanced buffer begins, we need to reset the offset to 0.
+         for (let j = 0; j < locations[i].attr.length; j++) {
+            if (locations[i].attr[j].is_occupied) size++;
+         }
+
+         if (loc[i].is_instanced_buffer === true) devisor = 1;
+         else devisor = 0;
+         if (loc[i].attrib_data_on_different_vb === true)
+            offset = 0;
+
+         attribs_info_m.attribs_loc.push({
+            locs: i,
+            sizes: size,
+            offsets: offset,
+            devisor: devisor,
+         });
+      }
+   }
+
+
+
+   // DEBUG-PRINT
+   if(DEBUG.SHADERS) console.log('{{{{{{{{{{ PROGRAMS ATTRIBUTES }}}}}}}}}}', '\n attribs_info_m', attribs_info_m, '\n attribs_indexing', prog_attribs_indexing.PrintEnabled())
+   // console.log('{{{{{{{{{{ PROGRAMS LOC INDEXING }}}}}}}}}}\n  prog_attribs_indexing', prog_attribs_indexing);
+
+   return {
+      attribs_info_m: attribs_info_m,
+      attribs_indexing: prog_attribs_indexing,
+   }
+
+
+}
 function Vertex_shader_resolve_attributes_in(sid) {
 
    attributes_in_code += ''

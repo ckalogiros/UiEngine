@@ -5,6 +5,7 @@ import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/Uni
 import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
+import { Shader_builder_create_attribs_info } from "../../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
@@ -12,6 +13,7 @@ import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/B
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Material, Material_Texture } from "../Drawables/Material/Material.js";
+import { Mesh_create_attributes } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
@@ -233,6 +235,8 @@ class Emitter {
       this.sid.pass |= mat.sid.pass;
       // this.sid.fx |= mat.sid.fx;
 
+
+
       // this.pos = [pos[0], pos[1], pos[2]];
       // this.prev_pos = [pos[0], pos[1]];
       // this.dim = [dim[0], dim[1]];
@@ -262,6 +266,7 @@ class Emitter {
       //    blend_options: 0x0,
       // ;
 
+      this.attributes = null;
 
       this.uniforms = [];
       this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
@@ -281,6 +286,7 @@ class Emitter {
       this.Particle_update_rotation = Particle_update_rotation_empty;
       this.Particle_update_scale = Particle_update_scale_empty;
       this.Particle_update_fade = Particle_update_fade_empty;
+
    }
 
 
@@ -439,49 +445,49 @@ class Emitter {
 
       // Enable shader function calls (from shader main())
       if (flags === SID.SHAD.FN_GLOW) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       // TODO: See if attr enable and passes are required, It seems NOT
       if (flags === SID.SHAD.FN_INNER_SHADOW) {
-          this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_NOISE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_NOISE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
@@ -491,9 +497,9 @@ class Emitter {
       if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
 
       if (params !== undefined) {
-          if (params.blend_mode !== undefined) {
-              this.sid.blend_options |= params.blend_mode;
-          }
+         if (params.blend_mode !== undefined) {
+            this.sid.blend_options |= params.blend_mode;
+         }
       }
 
       // TODO
@@ -502,73 +508,7 @@ class Emitter {
       // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-  }
-   // GfxEnableFn(flags, params) {
-
-   //    // Enable shader function calls (from shader main())
-   //    if (flags === SID.SHAD.FN_GLOW) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_GLOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       // this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS2 | SID.ATTR.DIM2 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === MESH_ENABLE.GFX.FN_INNER_SHADOW) {
-   //       this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-   //       this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_NOISE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3_TYPES) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3D) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3D; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
-
-   //    if (params !== undefined) {
-   //       if (params.blend_mode !== undefined) {
-   //          this.sid.blend_options |= params.blend_mode;
-   //       }
-   //    }
-
-   //    // TODO
-   //    // case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-   // }
+   }
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
@@ -839,7 +779,12 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4;
    else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
    // else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR._R_CORNERS)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
-   else alert('Particles-System: No VertexBufferFillOperation function selected.')
+   else alert('Particles-System: No VertexBufferFillOperation function selected.');
+
+
+
+   // This is to auto-create attributes float32 buffer
+   // emitter.attributes = Mesh_create_attributes(emitter);
 
 
    return emitter.gfx.vb.groupidx;
@@ -938,7 +883,6 @@ export function Particle_system_emitt(params) {
 
 
       for (let j = 0; j < num_particles; j++) {
-         // for (let j = 0; j < 1; j++) {
 
 
          if (has_intermidiate_emission) {
@@ -1061,7 +1005,6 @@ export function Particle_system_update() {
    for (let i = 0; i <= _emitters.boundary; i++) {
 
       const emitter = _emitters.buffer[i];
-      const vb_data = Vertex_buffer_get_by_vbidx(emitter.gfx.vb.groupidx);
 
       if (!emitter.is_active) continue;
 
@@ -1178,50 +1121,7 @@ export function Particle_system_update() {
 
 
             // Render Particles
-            // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
             emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv, particle.generic);
-            // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
-
-            // { // Update vertex buffer directly
-            //    let index = particle.start;
-            //    const col = particle.col;
-            //    const pos = particle.pos;
-            //    const t = particle.time;
-            //    const generic = particle.generic;
-
-            //    // V1
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V2
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V3
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V4
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            // }
 
 
             particle.time += emitter.t_step;
@@ -1230,19 +1130,12 @@ export function Particle_system_update() {
 
                // Reset particle for reuse
                particle.is_alive = false;
-               // particle.time = 0;
                particle.time = emitter.geom.time;
-
                emitter.free_particles_idxs_buffer.Add(j);
-
                if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
-
                   emitter.is_active = false;
                   Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-                  // console.error('Renderqueue DEACTIVATED')
                }
-
-               // rotation_speed = initial_rotation_speed;
 
             }
 

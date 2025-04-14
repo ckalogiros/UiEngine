@@ -264,7 +264,7 @@ export class Rect_Mesh extends Mesh {
 
    EnableScroller(scroller) {
 
-      Components_create_scroller_component(scroller.width, scroller.max_height, this);
+      Components_create_scroller_component(scroller.width, scroller.max_height, this, scroller.bar_col, scroller.handle_col, scroller.parent);
 
       this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
       this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;

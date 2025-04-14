@@ -53,10 +53,9 @@ export function Components_scroller_component_destroy(scroller_comp_idx=INT_NULL
    Free_generic_buffer(_scrollers_buffer);
 }
 /** */
-export function Components_create_scroller_component(width = 12, height=100, mesh=null, col_bar=GREY[0], col_handle=GREY[4]){
+export function Components_create_scroller_component(width = 12, height=100, mesh=null, col_bar=GREY[0], col_handle=GREY[4], parent){
 
    const pos = [0, 0, 20];
-
 
    const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar, name:'ScrollBar'}));
    Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}})
@@ -65,6 +64,8 @@ export function Components_create_scroller_component(width = 12, height=100, mes
    bar.OnClick = Scroller_component_onClick;
    bar.ListenEventConstruct = Scroller_component_listen_event_construct;
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
+
+   bar.parent = parent;
    
    
    const handle_pad = [3, 3];
@@ -166,7 +167,8 @@ export function Scoller_component_render(bar, parent, ){
    bar.Render();
 
    Construct_listen_events_from_mesh_tree(bar);
-   Construct_listen_events_relations_from_mesh_tree(bar, parent);
+   // Construct_listen_events_relations_from_mesh_tree(bar, parent);
+   Construct_listen_events_relations_from_mesh_tree(bar);
 
    bar.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, bar.gfx.vb.groupidx);
 
