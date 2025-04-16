@@ -18,7 +18,7 @@ import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Gl_set_angle, Gl_set_generic2, Gl_set_time } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer } from '../Engine/Timers/Timers.js';
-import { Demo_animations, Demo_animations_ready_button_anim, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
+import { Demo_animations, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders } from './Demo/DemoParticles.js';
@@ -74,7 +74,7 @@ export function TestWidgetsGeneric() {
 
 
 
-    // Demo_page();
+    Demo_page();
     // Demos_welcome_menu();
 
     { // Games
@@ -388,8 +388,10 @@ export function TestWidgetsGeneric() {
 
             {
                 // Demo_animations();
-                Demo_animations_with_slider_slope();
+                // Demo_animations_with_slider_slope();
                 // Demo_animations_text();
+                // Demo_animations_ready_button_with_panel(ROOT_WIDGETS.CREATE_ROOT);
+
 
                 { // Text Animations Testing
                     { // All
@@ -1832,123 +1834,123 @@ function Render_font_symbols_atlas_texture(x, y) {
     section.StylesSetPad([10, 10]);
 
     let size = 40;
-    // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_left); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_up); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_right); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_down); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lr); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ud); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lu); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ru); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise_2); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_anti_clockwise); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_left); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_up); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_right); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_down); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_1); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_2); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_3); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_4); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.tie); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.under_tie); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_boxed); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_r); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_l); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_2); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._8); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._9); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._10); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._11); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._12); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._13); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._14); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._15); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._16); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._17); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._18); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._22); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._23); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._24); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._26); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._27); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._29); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._30); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._31); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._32); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._33); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._34); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._35); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._36); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
-    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._37); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.original); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.original); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_1); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_left); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_up); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_right); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_down); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_lr); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_ud); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_lu); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_ru); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise_2); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_left); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_up); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_right); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_down); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_1); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_2); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_3); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_4); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.tie); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.under_tie); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_boxed); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.diagonal_r); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.diagonal_l); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_2); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._8); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._9); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._10); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._11); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._12); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._13); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._14); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._15); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._16); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._17); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._18); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._19); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._20); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._21); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._22); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._23); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._24); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._25); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._26); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._27); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._28); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._29); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._30); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._31); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._32); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._33); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_left); s.align.flags = LAYOUT.VERTICAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_up); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_right); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
+    { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_down); s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s); }
 
     { /// SAVE
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.original);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);             s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_left);          s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_up);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_right);         s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_down);          s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lr);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ud);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_lu);            s.align.flags = LAYOUT.VERTICAL; section.AddItem(s);}
-        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_ru);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise_2);    y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_clockwise);      y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_anti_clockwise); y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_left);     y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_up);       y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_right);    y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.arrow_thick_down);     y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_1);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_2);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_3);             y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.circle_4);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.tie);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.under_tie);            y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_boxed);          y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_r);           y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.diagonal_l);           y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_2);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._8);                   y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._9);                   y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._10);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._11);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._12);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._13);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._14);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._15);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._16);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._17);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._18);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._19);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._20);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._21);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._22);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._23);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._24);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._26);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._27);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._29);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._30);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._31);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._32);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._33);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._34);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._35);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._36);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
-        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._37);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.original);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_1);             s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_left);          s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_up);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_right);         s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_down);          s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_lr);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_ud);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_lu);            s.align.flags = LAYOUT.VERTICAL; section.AddItem(s);}
+        // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_ru);            s.align.flags = LAYOUT.HORIZONTAL; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise_2);    y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise);      y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise); y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_left);     y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_up);       y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_right);    y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_thick_down);     y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_1);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_2);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_3);             y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_4);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.tie);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.under_tie);            y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_boxed);          y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.diagonal_r);           y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.diagonal_l);           y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_2);             y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._8);                   y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._9);                   y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._10);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._11);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._12);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._13);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._14);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._15);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._16);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._17);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._18);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._19);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._20);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._21);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._22);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._23);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._24);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._25);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._26);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._27);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._28);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._29);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._30);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._31);                  y = 0;  x += 150;      s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._32);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._33);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._34);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._35);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._36);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
+        // // { const s = TexturedRect(0x0, _, x, y, [size, size], WHITE, [0,0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._37);                  y += s.geom.dim[1]*2;  s.align.flags = LAYOUT.VERTICAL|LAYOUT.PRESERVE_SELF_POS|LAYOUT.RESIZE_SELF; section.AddItem(s);}
     }
 
 
@@ -4469,13 +4471,13 @@ function Window_menu() {
 
 
     // menu.AddCloseButton(_, section, 'close', 0, GREY[1], WHITE, [4, 2], _, _, TEXTURES.DEFAULT_FONT);
-    // menu.AddCloseButton(_, section, 'close', 0, GREY[1], WHITE, [4, 2], _, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);
+    // menu.AddCloseButton(_, section, 'close', 0, GREY[1], WHITE, [4, 2], _, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_1);
 
     const size = menu.children.buffer[0].text_mesh.geom.dim[1] * 2 + 12 / 2
     // const size = 90
     {
-        // const close_btn = Create_rect_mesh(0x0, _, [5, 5], [0, 0, 0], [size, size], WHITE, 'close btn', _, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1);
-        const close_btn = Create_rect_mesh(Style_rect_default_properties({ is_root: 0x0, pad: [10, 10], pos: [0, 0, 3], dim: [size, size], col: TRANSPARENCY(GREY[9], .2), texture_id: TEXTURES.MSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MSDF_SYMBOLS.close_1, name: 'CloseBtn' }));
+        // const close_btn = Create_rect_mesh(0x0, _, [5, 5], [0, 0, 0], [size, size], WHITE, 'close btn', _, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_1);
+        const close_btn = Create_rect_mesh(Style_rect_default_properties({ is_root: 0x0, pad: [10, 10], pos: [0, 0, 3], dim: [size, size], col: TRANSPARENCY(GREY[9], .2), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.close_1, name: 'CloseBtn' }));
         Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
         close_btn.align.flags = LAYOUT.HORIZONTAL | LAYOUT.FLOAT_RIGHT;
 
@@ -4486,14 +4488,14 @@ function Window_menu() {
 
 
         // {
-        //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._28);
+        //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._28);
         //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //     btn1.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT; 
         //     menu.AddItem(btn1); 
         // }
         // {
-        //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MSDF_SYMBOLS._25);
+        //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._25);
         //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //     btn1.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT; 

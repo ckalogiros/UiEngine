@@ -462,7 +462,7 @@ export class Mesh {
         // console.log(this.shader_ops_idxs)
         // console.log(function_operation)
         this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
-        console.log(this.shader_ops_idxs)
+        // console.log(this.shader_ops_idxs);
 
         if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
             console.error('Shader Operation detected: Need SDF_RECT to function.');

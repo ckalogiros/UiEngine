@@ -680,7 +680,21 @@ export function Demo_page(create_demo_id = category_widgets.id) {
    /****************************************************************************************************************************************************/
    { // Create the button for going to the top
 
-      const btn = Create_widget_button(Style_button_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, text:'^', pos:[VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], text_col:GREY[4], col:GREEN[9], text_pad:[12, 7], }));
+      // const btn = Create_widget_button(Style_button_default_properties({
+      //    is_root:ROOT_WIDGETS.CREATE_ROOT, 
+      //    text:'^', 
+      //    pos:[VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], 
+      //    text_col:GREY[4], col:GREEN[9], text_pad:[12, 7], 
+      //    // texture_id:TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_up, 
+      // }));
+      const size = 40;
+      const btn = Create_rect_mesh(Style_rect_default_properties({
+         is_root:ROOT_WIDGETS.CREATE_ROOT, 
+         name:'^', 
+         pos:[VIEWPORT.RIGHT - size*2, VIEWPORT.BOTTOM - size*2, 10], dim:[size,size],
+         text_col:GREY[4], col:GREEN[6], text_pad:[12, 7], 
+         texture_id:TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_up, fonts_size:30,
+      }));
       Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect: btn.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.HOVER}});
 
       btn.Bind(

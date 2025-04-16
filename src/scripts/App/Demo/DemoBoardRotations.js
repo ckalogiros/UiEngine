@@ -93,18 +93,14 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
 
 
    const pad = 10;
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: GREY[1] }));
-   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners })
-   section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: GREY[1], name:'BoardRotationsPanel' }));
+   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE} })
    section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
-   section.SetName('BoardRotationsPanel');
 
 
 
    const dim = [size, size]
    let color_arr = [RED[8], BLUE[9], YELLOW[7], GREEN[6],];
-   // let color_arr = [GREY[2], GREY[4], GREY[8], GREY[6],];
    const color = [color_arr[0], color_arr[1], color_arr[2], color_arr[3],]
    let k = 0;
    const cols = 5, rows = 12;
@@ -124,9 +120,8 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
       // console.log(i, inner_pad)
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pad: inner_pad, dim: dim, col: color }));
-      Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color });
+      Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
       mesh.align.flags = (i % cols === 0) ? LAYOUT.VERTICAL : align;
-      mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       section.AddItem(mesh);
 
       const equalize = 4;

@@ -17,7 +17,7 @@ import { GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Widget_ready_label } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
-import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 
 
@@ -47,103 +47,140 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
    let total_height = 0;
 
 
-   const pad2 = 10;
 
    // Scale Animations
    {
 
-      let ypos = y, xpos = x;
       let slope = 0.05;
 
-      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'Animations-Scale'}));
-      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[6]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'Animations-Scale'}));
+      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
-      ypos = 0;
-      ypos += pad2;
-
-
-      // const text = 'Scale Animations\nEach rectangle uses different value\nto shape the slope\nof a logarithmic function.\nSmaller values constitute steeper slope.';
-      const text = 'Scale Animations';
-      const label = Create_widget_label(Style_label_default_properties({text:text, pos:[10, 10, 1], col:GREENL[5]}));
-      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[6], GREY[4]), layout:LAYOUT.HORIZONTAL});
+      const text = 'Scale Animations\nEach rectangle uses different value\nto shape the slope\nof a logarithmic function.\nSmaller values constitute steeper slope.';
+      const label = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 1], col:GREENL[5], layout:LAYOUT.HORIZONTAL}));
+      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners});
       panel.AddItem(label);
 
-      xpos += pad2;
-      ypos += label.geom.dim[1] * 2 + pad2;
-
-      const panel_scale = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[3]}));
-      Widget_gfx_ready_enable({mesh:panel_scale, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[3], GREY[2]), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF});
+      const panel_scale = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:GREY[3], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+      Widget_gfx_ready_enable({mesh:panel_scale, enable_sdf_rect: rcorners, });
       panel.AddItem(panel_scale);
 
-      xpos += pad2;
-
-      let s_height = 0;
-      let inner_panel_width = 0;
-
-      num_meshes = 10
-      let next_pad = [0, 10]
+      const space_between = 20;
+      let next_pad = [0, 10];
 
       for (let i = 0; i < num_meshes; i++) {
 
-         // const xxx = (size * 2 + scale * 2 + pad * 2) * i;
+         const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pad:next_pad, pos:[0, 0, 1], col:_, text_pad:[14, 3], layout:LAYOUT.HORIZONTAL}));// [2, 3]);
+         Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, });
+         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         panel_scale.AddItem(l);
 
-         // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3], }));// [2, 3]);
-         // Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
-         // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // const padding = next_pad;
-         // l.StylesSetPad(padding);
-         // panel_scale.AddItem(l);
-
-         // next_pad = [(size+scale)*2 - l.geom.dim[0]*2, 10]
-
-         // // let color = Get_fasma_color(i, color_width, num_colors);
-         // // const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size + l.geom.dim[1] * 2 + 4, size, 0.01, slope, scale, color).target_mesh;
-         // // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // // panel_scale.AddItem(anim_mesh);
-
-         // // const anim_mesh_width = (size + scale + pad);
-         // // inner_panel_width += anim_mesh_width;
-         // // s_height = l.geom.dim[1] + size + scale + pad;
-
-         // // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         
+         next_pad = [(size+scale)*2 - l.geom.dim[0]*2 + space_between, 10]
+         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
       }
+
+      let pad_x = 0;
+      slope = 0.05;
+      let temp_buffer_animated = [];
       for (let i = 0; i < num_meshes; i++) {
 
-         // const xxx = (size * 2 + scale * 2 + pad * 2) * i;
+         let color = Get_fasma_color(i, color_width, num_colors);
+         const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
+         const anim_mesh = Demo_clbk_animations_scale(0x0, true, 0, 0, size, 0.01, slope, scale, color, layout, pad_x).target_mesh;
+         anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         panel_scale.AddItem(anim_mesh);
+         temp_buffer_animated.push(anim_mesh); // HACK: We need to Align the meshes scaled, and before Render to scale them down
 
-         // // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3]}));// [2, 3]);
-         // // Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
-         // // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // // panel_scale.AddItem(l);
-
-         // let color = Get_fasma_color(i, color_width, num_colors);
-         // const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
-         // const padding = i===0 ? [20, 25] : [size*2, 25];
-         // // const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size, size, 0.01, slope, scale, color, layout, padding).target_mesh;
-         // const anim_mesh = Demo_clbk_animations_scale(0x0, true, xpos + xxx + size, ypos + pad2 + size, size, 0.01, slope, scale, color, layout, padding).target_mesh;
-         // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // panel_scale.AddItem(anim_mesh);
-
-         // // const anim_mesh_width = (size + scale + pad);
-         // // inner_panel_width += anim_mesh_width;
-         // // s_height = l.geom.dim[1] + size + scale + pad;
-
-         // // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         pad_x = space_between;
+         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
       }
 
-      Align_nested_sections_pre(panel);
-      // panel_scale.geom.dim[0] = inner_panel_width + pad;
-      // panel_scale.geom.dim[1] = s_height + pad;
-      // panel.geom.dim[0] = ((panel_scale.geom.dim[0] > label.geom.dim[0]) ? panel_scale.geom.dim[0] : label.geom.dim[0]) + 10;
-      // panel.geom.dim[1] = label.geom.dim[1] + panel_scale.geom.dim[1] + 20;
-
-
+      
       // Render
       panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       // panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
       panel.GenGfxCtx();
+      for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size+scale; temp_buffer_animated[i].geom.dim[1] = size+scale; }
+      Align_nested_sections_pre(panel);
+      // HACK: Scale down before render
+      for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
+      panel.Render();
+
+
+      Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+      Construct_listen_events_from_mesh_tree(panel);
+      Construct_listen_events_relations_from_mesh_tree(panel);
+      panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
+
+
+      total_height += panel.geom.dim[1] * 2;
+   }
+
+   
+   // Rotation Animations
+   {
+
+      let slope = 0.05;
+      const angle = Math.PI*2;
+      size *= 2; // Make rotated meshe bigger
+
+      const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'Animations-Scale'}));
+      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+
+      const text = 'Rotation Animations\nEach rectangle uses different value\nto shape the slope\nof a logarithmic function.\nSmaller values constitute steeper slope.';
+      const label = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 1], col:GREENL[5], layout:LAYOUT.HORIZONTAL}));
+      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners});
+      panel.AddItem(label);
+
+      const panel_scale = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:GREY[3], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+      Widget_gfx_ready_enable({mesh:panel_scale, enable_sdf_rect: rcorners, });
+      panel.AddItem(panel_scale);
+
+
+      const space_between = 20;
+      let next_pad = [0, 10];
+
+      for (let i = 0; i < num_meshes; i++) {
+
+         const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pad:next_pad, pos:[0, 0, 1], col:_, text_pad:[14, 3], layout:LAYOUT.HORIZONTAL}));// [2, 3]);
+         Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, });
+         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         panel_scale.AddItem(l);
+
+         
+         next_pad = [(size)*2 - l.geom.dim[0]*2 + space_between, 10]
+         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         slope *= 2;
+      }
+
+      slope = 0.05;
+      let temp_buffer_animated = [];
+      let pad_x = 0;
+      for (let i = 0; i < num_meshes; i++) {
+
+         let color = Get_fasma_color(i, color_width, num_colors);
+         const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
+         const anim_mesh = Demo_clbk_animations_rotate(0x0, true, 0, 0, size, 0.01, slope, angle, color, layout, pad_x).target_mesh;
+         anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         panel_scale.AddItem(anim_mesh);
+         temp_buffer_animated.push(anim_mesh); // HACK: We need to Align the meshes scaled, and before Render to scale them down
+
+         pad_x = space_between;
+         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         slope *= 2;
+      }
+
+      
+      // Render
+      panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      panel.GenGfxCtx();
+      // for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size+scale; temp_buffer_animated[i].geom.dim[1] = size+scale; }
+      Align_nested_sections_pre(panel);
+      // HACK: Scale down before render
+      // for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
       panel.Render();
 
 
@@ -251,7 +288,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    let total_height = 0;
    const rcorners = 10
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope', layouut:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
    // Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    
@@ -260,8 +297,8 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    // Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4])});
    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners});
    panel.AddItem(label);
-
    total_height += label.geom.dim[1];
+
 
 
 
@@ -273,35 +310,29 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    let offset = 0;
 
    let color = Get_fasma_color(offset, num_items, 2);
+
    const ret1 = Demo_clbk_animations_scale(0x0, true, 0, 0, size, 0.01, 0.05, scale, color);
-   // ret1.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret1.target_mesh.gfx_ctx_parent, true);
-   // ret1.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
    ret1.slider_mesh.align.flags = LAYOUT.VERTICAL;
    ret1.target_mesh.align.flags = LAYOUT.VERTICAL
    panel.AddItem(ret1.slider_mesh);
    panel.AddItem(ret1.target_mesh);
-   
-   
    ypos += size * 2 + pad * 3;
+
+
+  
    
    
-   
-   // /**********************************************************************************************************/
-   // // Rotation
-   // const anim_mesh_size = size * 2;
-   // const angle = Math.PI;
-   // color = Get_fasma_color(offset, num_items, 2);
-   // const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
-   // ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
-   // ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
-   // ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
-   
-   // // ret2.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
-   // // ypos += label.geom.dim[1] * 2 + pad
-   // // ret2.target_mesh.geom.pos[0] += pad;
-   // // ret2.target_mesh.geom.pos[1] = ypos + size + pad + 20;
-   // panel.AddItem(ret2.slider_mesh);
-   // panel.AddItem(ret2.target_mesh);
+   /**********************************************************************************************************/
+   // Rotation
+   const anim_mesh_size = size * 2;
+   const angle = Math.PI;
+   color = Get_fasma_color(offset, num_items, 2);
+   const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
+   ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
+   ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
+   ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
+   panel.AddItem(ret2.slider_mesh);
+   panel.AddItem(ret2.target_mesh);
 
 
 
@@ -309,17 +340,12 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    /**********************************************************************************************************/
    // Render
 
-   Align_nested_sections_pre(panel);
-
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
-
-
-   // panel.geom.dim[0] = ret2.slider_mesh.geom.dim[0] + pad;
-   // panel.geom.dim[1] = ypos;
-
+   ret1.target_mesh.geom.dim[1] = size+scale; // HACK: We need that the scaled size is calculated for the panel's dimentions
+   Align_nested_sections_pre(panel);
+   ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
    panel.Render();
-
 
    Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(panel);
@@ -333,25 +359,23 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
 
    const rcorners = 10;
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope'}));
-   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-   panel.SetLayout(LAYOUT.VERTICAL| SECTION.RESIZE_SELF);
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   // Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
    const text = 'Use the "Options" menu to change properties.';
    const label = Widget_ready_label(Style_label_default_properties({text:text, font_size:10, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
-   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-   panel.SetLayout(LAYOUT.VERTICAL| SECTION.RESIZE_SELF);
+   // Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, });
    panel.AddItem(label);
 
 
    /**********************************************************************************************************/
    // Scale
-   const anim_ret = Demo_clbk_animations_text_counter(0x0, create_controls, 0, 0);
-   anim_ret.target_mesh.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
+   const anim_ret = Demo_clbk_animations_text_counter(0x0, create_controls, 0, 0, );
    panel.AddItem(anim_ret.target_mesh);
    if (create_controls) {
       panel.AddItem(anim_ret.controls_section);
-      anim_ret.controls_section.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
    }
 
 
@@ -382,24 +406,15 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
 /** */
 export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0, y = 0) {
 
-   // Create panel to hold button panels
-   const u_wpos_flags = {
-      unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.ATTR.WPOS3,
-   }
-
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_rrot:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_ready_button_with_panel'}));
-   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:true,});
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_ready_button_with_panel'}));
+   // Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, enable_col_per_vertex:true,});
+   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect:10, });
 
 
 
 
    /***************************************************************************************************/
-   // Create 3 different animations of buttons with panel
-   // const anim2 = Demo_animations_ready_button_anim(0x0, 0, 0, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY, 'Move X-Y');
-   
-   // const anim0 = Demo_animations_ready_button_anim(0x0, 0, 0, CALLBACK_ANIMATION_TYPE_FLAGS.RCORNERS, 'RCORNERS Animation');
-   // panel.AddItem(anim0);
+   // Create different animations of buttons with panel
    
    const anim1 = Demo_animations_ready_button_anim(0x0, 0, 0, CALLBACK_ANIMATION_TYPE_FLAGS.SCALE, 'Scale Animation');
    panel.AddItem(anim1);
@@ -421,15 +436,13 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
    // Render
    if(root_widget) {
 
+
+      Align_nested_sections_pre(panel);
+
       panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       panel.GenGfxCtx();
    
-   
-      // panel.geom.dim[0] = ret2.slider_mesh.geom.dim[0] + pad;
-      // panel.geom.dim[1] = ypos;
-   
       panel.Render();
-   
    
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
@@ -503,17 +516,15 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    // const menu_panel = Create_rect_mesh(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
    const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'MenuLoadPanel',}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.CLICK_UP}}); //, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[2])});
-   menu_panel.SetLayout(LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF);
    
    zpos++;
    
    
-   if(create_label!=='') {
-      const label = Create_widget_label(Style_label_default_properties({text:create_label, pos:[0, 0, 1], col:GREENL[5]}));
-      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: 7, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4])});
-      label.SetLayout(LAYOUT.HORIZONTAL);
-      menu_panel.AddItem(label);
-   }
+   // if(create_label!=='') {
+   //    const label = Create_widget_label(Style_label_default_properties({text:create_label, pos:[0, 0, 1], col:GREENL[5], layout:LAYOUT.VERTICAL}));
+   //    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: 7, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4])});
+   //    menu_panel.AddItem(label);
+   // }
    /*************************************************************************************************/
    // Menu Items
    const menu_items = Create_menu_items_buttons();
@@ -583,9 +594,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 1
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
 
@@ -593,9 +603,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 2
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
 
@@ -603,9 +612,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 3
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
 
@@ -613,9 +621,8 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 4
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
 
@@ -623,36 +630,32 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
       // Button 6
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
       // Button 7
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
    {
       /*******************************************************************************************/
       // Button 8
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
+      const button = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
 
@@ -673,7 +676,7 @@ function Create_menu_items_buttons() {
 /**************************************************************************************************************************************************************/
 // Circle scale animation
 
-export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = false, x = 100, y = 100, size = 20, time_step = 0.01, slope_const = 0.4, scale = 100, color = GREY[2], layout = LAYOUT.HORIZONTAL, pad=[10, 10]) {
+export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = false, x = 100, y = 100, size = 20, time_step = 0.01, slope_const = 0.4, scale = 100, color = GREY[2], layout = LAYOUT.HORIZONTAL, pad_x=0) {
 
    // const rcorners = size;
    const rcorners = 10;
@@ -686,9 +689,10 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
    if (create_slider) {
 
       const slider_dim = (200 * 2 < VIEWPORT.WIDTH) ? [200, 10] : [VIEWPORT.WIDTH / 2 - 10, 10];
-      slider = Create_widget_slider(Style_slider_default_properties({pos:[x, y, 0], dim:slider_dim, name:'Log Function Slope', layout:LAYOUT.VERTICAL}));
+      slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 2], dim:slider_dim, col:GREY[5], name:'Log Function Slope', layout:LAYOUT.VERTICAL}));
       // Widget_gfx_ready_enable({mesh:slider, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), });
-      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:10 });
+      // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), });
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:rcorners });
       slider.SetInitialValue(slope_const);
 
       total_height += slider.geom.dim[1] * 2;
@@ -705,9 +709,9 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
       total_height += slider.geom.dim[1] * 2 + 10;
    }
 
-   // const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:pad, pos:[x, y, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
-   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:pad, pos:[0, 0, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
+   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[pad_x, 10], pos:[0, 0, 2], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect: rcorners, enable_col_per_vertex:MULTI_COLOR, enable_attr_angle:true, });
+   // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect: rcorners, enable_attr_angle:true, });
 
 
    total_height += mesh.geom.dim[1] * 2;
@@ -856,9 +860,8 @@ function Animation_scale_down_stop(params) {
 
 let rotation = 0;
 
-export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = false, x = 0, y = 0, size = 20, time_step = 0.01, slope_const = 0.4, angle = 0, color = GREY[2]) {
+export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = false, x = 0, y = 0, size = 20, time_step = 0.01, slope_const = 0.4, angle = 0, color = GREY[2], layout=LAYOUT.VERTICAL, pad_x=0) {
 
-   const feather = 2;
    const rcorners = 10;
    let total_height = 0;
 
@@ -870,9 +873,9 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
    if (create_slider) {
 
       const slider_dim = (200 * 2 < VIEWPORT.WIDTH) ? [200, 10] : [VIEWPORT.WIDTH / 2 - 10, 10];
-      slider = Create_widget_slider(Style_slider_default_properties({pos:[x, y, 0], dim:slider_dim, col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), name:'Log Function Slope'}));
-      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), });
-      slider.SetLayout(LAYOUT.VERTICAL);
+      slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 2], dim:slider_dim, col:GREY[5], name:'Log Function Slope'}));
+      // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]), });
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: rcorners });
       slider.SetInitialValue(slope_const);
 
       total_height += slider.geom.dim[1] * 2;
@@ -882,9 +885,8 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
    /*************************************************************************************************/
    // Rotated mesh
-   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pos:[x, y, 0], dim:[size, size], col:color, name:'mesh_anim_rotate_rect',}));
+   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[pad_x, 30], pos:[0, 0, 0], dim:[size, size], col:color, layout:layout, name:'mesh_anim_rotate_rect',}));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect: rcorners, enable_col_per_vertex:MULTI_COLOR, enable_attr_angle:true, });
-   mesh.SetLayout(LAYOUT.VERTICAL);
 
 
    total_height += mesh.geom.dim[1] * 2;
@@ -1015,7 +1017,7 @@ function Animation_rotate_back_stop(params) {
 /**************************************************************************************************************************************************************/
 /**************************************************************************************************************************************************************/
 
-export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20,) {
+export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20, layout=LAYOUT.VERTICAL) {
 
    let total_height = 0;
 
@@ -1033,8 +1035,9 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    /*************************************************************************************************/
    // Create controls
-   const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:BLACK, name:'Controls Section', style:[0, 10, 2],}));
-   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3])});
+   const controls_section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:BLACK, name:'Controls Section', style:[0, 10, 2], layout:LAYOUT.RESIZE_SELF|layout}));
+   // Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3])});
+   Widget_gfx_ready_enable({mesh:controls_section, enable_sdf_rect: 10, });
 
    if (create_contols) { // Create slider controls only if this is to be rendered from this function
 
@@ -1074,8 +1077,9 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Create animated meshes
 
    // Create panel
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 100, 0], col:GREY[2]}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 100, 0], col:GREY[2], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   // Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
    // ISSUE: Somehow the text on update shifts to the rigth in x-axis, but the first characters ar aligned correctly
@@ -1083,11 +1087,13 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    // Create animated meshes
    const text_pad_x = 10, text_pad_y = 6;
-   const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-   Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0])});
+   const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10, layout:LAYOUT.HORIZONTAL}));
+   // Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0])});
+   Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6});
    section.AddItem(mesh2)
-   const mesh1 = Create_widget_label(Style_label_default_properties({text:'.', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-   Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0])});
+   const mesh1 = Create_widget_label(Style_label_default_properties({text:'.', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10, layout:LAYOUT.HORIZONTAL}));
+   // Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0])});
+   Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6});
    section.AddItem(mesh1)
 
    section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -1100,8 +1106,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render animated meshes
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_nested_sections_pre(section);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
       section.Render()
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       Construct_listen_events_from_mesh_tree(section);
@@ -1184,8 +1190,9 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
 
-      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, name:'Animation Slope', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, col:GREY[5], name:'Animation Slope', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
+      // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8});
       
       slider.SetInitialValue(slope_params_pointer.GetSlope());
       slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
@@ -1205,8 +1212,9 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    {
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
       
-      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], dim:slider_dim, name:'Animation Speed', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
-      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
+      const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, zpos + 1], col:GREY[5], dim:slider_dim, name:'Animation Speed', texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10}));
+      // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8});
       slider.SetInitialValue(slope_params_pointer.GetSlope());
       slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       slider.SetLayout(LAYOUT.VERTICAL);
@@ -1380,7 +1388,8 @@ function Animation_text_run_squeeze_x(params) {
 
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
-      text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
+      // text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
+      Mesh_set_wpos_x(text);
 
       text_animation_gfx_vertex_set_sqeeze_x_axis(text, -limit);
 
@@ -1463,7 +1472,7 @@ function Animation_text_run_squeeze_y(params) {
       text.RenderTextFromString(text_substitution);
 
       vertex_y_set(text, -limit);
-      text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
+      Mesh_set_wpos_x(text);
 
 
       return false;
@@ -1628,7 +1637,8 @@ function Animation_text_run_translation_y(params) {
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
       pos_y_set(text, center - (mesh.geom.dim[1]) + text.geom.dim[1]);
-      text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
+      // text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
+      Mesh_set_wpos_x(text);
 
       return false;
    }

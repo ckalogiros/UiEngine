@@ -2,7 +2,7 @@
 
 import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Mesh_set_dim_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_set_dim_xy, Mesh_update_set_dim_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_event_callback_create } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
 
@@ -59,7 +59,7 @@ export function Callback_animations_create_specific(target_mesh, animation_type_
    const slope_params_pointer = new Function_Slope(slope_constant, time_step, ammount,);
    /**
     * TODO:
-    * Abstractthe geom pos as an int_value
+    * Abstract the geom pos as an int_value
     */
    const animation_params = {
       target_mesh: target_mesh,
@@ -335,6 +335,8 @@ function Animation_scale_inflate_run(params) {
    // const sizex = target_mesh.geom.dim[0] + amt;
    // const sizey = target_mesh.geom.dim[1] + amt;
 
+   target_mesh.geom.dim[0] = sizex;
+   target_mesh.geom.dim[1] = sizey;
    Mesh_update_set_dim_xy(target_mesh);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
@@ -346,10 +348,13 @@ function Animation_scale_inflate_run(params) {
    // const diffy = target_mesh.geom.pos[1] + sizey;
    // Gl_set_wpos_xy(target_mesh.gfx, diffx, diffy);
 
-   // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-   //    // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * (slope + .0));
-   //    Gl_set_attr_round_corners(target_mesh.gfx, slope * amt);
-   // }
+   if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
+      // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * amt);
+      // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * (slope + 1.0));
+      // Gl_set_attr_round_corners(target_mesh.gfx, slope * amt);
+      Gl_set_attr_round_corners(target_mesh.gfx, amt);
+      // Gl_set_attr_round_corners(target_mesh.gfx, slope);
+   }
 
 
    /**
@@ -396,7 +401,7 @@ function Animation_scale_deflate_run(params) {
    const sizex = params.start_dimx + amt;
    const sizey = params.start_dimy + amt * .3;
 
-   Mesh_set_dim_xy(target_mesh.gfx, sizex, sizey);
+   Mesh_set_dim_xy(target_mesh, sizex, sizey);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
    // target_mesh.geom.dim[0] = sizex;
@@ -407,11 +412,12 @@ function Animation_scale_deflate_run(params) {
    // const diffy = target_mesh.geom.pos[1] + sizey;
    // Gl_set_wpos_xy(target_mesh.gfx, diffx, diffy);
 
-   // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-   //    // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * (slope + 1));
-   //    Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners);
+   if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
+      // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * (slope + 1));
+      Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners);
+      
    
-   // }
+   }
 
 
    if (slope < 1.) return true;
@@ -505,9 +511,9 @@ function Animation_rcorners_deflate_run(params) {
 
    // console.log(amt)
 
-   if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      Gl_set_attr_round_corners(target_mesh.gfx, (target_mesh.mat.style.rcorners * amt)+target_mesh.mat.style.rcorners);
-   }
+   // if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
+   //    Gl_set_attr_round_corners(target_mesh.gfx, (target_mesh.mat.style.rcorners * amt)+target_mesh.mat.style.rcorners);
+   // }
 
 
    if (slope < .99) return true;

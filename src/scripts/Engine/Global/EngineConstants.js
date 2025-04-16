@@ -559,7 +559,7 @@ const TEXTURES = {
 
 	TEXTURE_FONTS_COUNT: g_cnt,
 	
-	MSDF_SYMBOLS:g_cnt++, // index[16]
+	MTSDF_SYMBOLS:g_cnt++, // index[16]
 
 	TEXTURE_ATLASES_COUNT: g_cnt,
 	
@@ -577,7 +577,7 @@ const TEXTURES = {
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLA_VARIANT_FONT;
 
 const ATLASES_SUB_TEXTURES = { // 58 total
-	MSDF_SYMBOLS: {
+	MTSDF_SYMBOLS: {
 		original 	: 0,
 		close_1 		: 1,
 		arrow_left 	: 2,
@@ -631,10 +631,10 @@ const ATLASES_SUB_TEXTURES = { // 58 total
 		_31: 51,
 		_32: 52,
 		_33: 53,
-		_34: 54,
-		_35: 55,
-		_36: 56,
-		_37: 57,
+		arrow2_left : 54,
+		arrow2_up 	: 55,
+		arrow2_right: 56,
+		arrow2_down : 57,
 	}
 }
 
@@ -643,7 +643,7 @@ function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MTSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MTSDF_CONSOLAS_1024 ||
-		texture_file_id === TEXTURES.MSDF_SYMBOLS
+		texture_file_id === TEXTURES.MTSDF_SYMBOLS
 	) return true;
 
 	return false;

@@ -17,7 +17,7 @@ import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollb
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_get_name, Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -205,7 +205,6 @@ export class Rect_Mesh extends Mesh {
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
-         // if (child.gfx_ctx_flags) FLAGS = child.gfx_ctx_flags;
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
 
@@ -299,6 +298,7 @@ export class Rect_Mesh extends Mesh {
          pad_x: pad_x / 2,
          pad_y: pad_y / 2,
       };
+
    }
 
 
@@ -488,6 +488,24 @@ export class Rect_Mesh extends Mesh {
          Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
          // Root_group_resize_and_rerender(root.root_bufferidx, root.geom.dim[0], root.geom.dim[1]);
       }
+   }
+
+   Bind(EventClbk = null, targetBindingFunctions = _, params, click_flags) {
+
+      if (!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
+
+      this.evt_params = { // Create the parameters to pass for the button's click event. 
+         EventClbk: EventClbk,
+         targetBindingFunctions: targetBindingFunctions,
+         target_mesh: this,
+         params: params,
+      };
+
+      if (click_flags) this.state.mask |= click_flags;
+
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
+
+      // If there is a click event already created
    }
 
 }
