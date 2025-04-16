@@ -8,11 +8,11 @@ import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
-import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_button_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_event_callback_create, Mesh_listener_add } from "../Operations/MeshPropertiesFunctions.js";
+import { Mesh_event_callback_create, Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -457,25 +457,22 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 export class Close_Button extends Widget_Button {
 // export class Close_Button extends Section {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
-      // pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, texture_id=INT_NULL, sub_texture_id=INT_NULL, is_debug_mesh) {
-      pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, _, is_debug_mesh) {
+   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
+   // pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, _, is_debug_mesh) {
+   constructor(mesh_bufferidx, properties) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
-      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, pos, _, col, _, style,_, texture_id, sub_texture_id, is_debug_mesh);
+      // super(Style_button_default_properties({mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh}));
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
+      super(mesh_bufferidx, properties);
 
-      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT;
+      // Mesh_listener_create(this, LISTEN_EVENT_TYPES.HOVER);
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
+      // this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT;
       
-      this.SetName('close_btn');
-
       // Set a callback function for the destruction of the menu and its window on clicking the close button.
       const params = {
          source_params: this,
-         evt_params: root, // root should be the root widget from which the recursive destruction should start.
+         evt_params: properties.target_mesh, // root should be the root widget from which the recursive destruction should start.
       }
 
       // Pass the root and the callback for destroying the parent widget

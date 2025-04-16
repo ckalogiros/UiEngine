@@ -98,8 +98,15 @@ export class Rect_Mesh extends Mesh {
    /** */
    Destroy() {
 
+      let is_child_shifted = false;
       for (let i = 0; i <= this.children.boundary; i++) {
-         if (this.children.buffer[i]) this.children.buffer[i].Destroy();
+
+         if (this.children.buffer[i]) is_child_shifted = this.children.buffer[i].Destroy();
+         // IMPORTANT: Because of the (childrens) buffer shifts remaining children, the buffer is getting smaller, and we need to reduce the index too.           
+         if(is_child_shifted) {
+            i -= 1;
+            is_child_shifted = false;
+         }
       }
       return super.Destroy();
    }
@@ -224,18 +231,20 @@ export class Rect_Mesh extends Mesh {
 
       if(this.scroller_comp) {
 
-         Scoller_component_render(this.scroller_comp)
-         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
+         Scoller_component_render(this.scroller_comp);
+         // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
+         const aaa = this.scroller_comp.base_unif_wpos ? this.scroller_comp.base_unif_wpos : this
+         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
          this.AddChildScrollerIdx(this.scroller_comp_idx);
 
-         if(1) { // TODO: Scroller component should store if it has scissor box enabled
-            // Set scissor box
-            const mx = this.mesh_bufferidx;
-            const my = this.scroller_comp.mesh_bufferidx;
-            const mw = this.mesh_bufferidx;
-            const mh = this.scroller_comp.mesh_bufferidx;
-            Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
-         }
+         // if(1) { // TODO: Scroller component should store if it has scissor box enabled
+         //    // Set scissor box
+         //    const mx = this.mesh_bufferidx;
+         //    const my = this.scroller_comp.mesh_bufferidx;
+         //    const mw = this.mesh_bufferidx;
+         //    const mh = this.scroller_comp.mesh_bufferidx;
+         //    Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
+         // }
       }
 
    }
@@ -262,12 +271,15 @@ export class Rect_Mesh extends Mesh {
 
    }
 
-   EnableScroller(scroller) {
+   EnableScroller(scroller_params) {
 
-      Components_create_scroller_component(scroller.width, scroller.max_height, this, scroller.bar_col, scroller.handle_col, scroller.parent);
+      const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
 
       this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
       this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
+
+      // this.AddChild(scroller);
+      // this.AddItem(scroller);
    }
 
 

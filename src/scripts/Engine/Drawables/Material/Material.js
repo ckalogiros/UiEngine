@@ -15,7 +15,7 @@ import { CopyArr2 } from '../../../Helpers/Math/MathOperations.js';
 /** */
 export class Material {
 
-   constructor(col = [1, 1, 1, 1]) {
+   constructor(col = [.5, .3, .0, .5]) {
 
       this.sid = {
          shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,

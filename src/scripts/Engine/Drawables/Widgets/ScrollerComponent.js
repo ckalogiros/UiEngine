@@ -59,13 +59,21 @@ export function Components_create_scroller_component(width = 12, height=100, mes
 
    const bar = Create_rect_mesh(Style_rect_default_properties({pos:pos, dim:[width, height], col:col_bar, name:'ScrollBar'}));
    Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}})
+   // Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP, Clbk:bar.OnClick}})
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
+
+   bar.align.flags = LAYOUT.FIXED_WIDTH|LAYOUT.FIXED_HEIGHT; 
+
+   // bar.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
+   // bar.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
 
    bar.OnClick = Scroller_component_onClick;
    bar.ListenEventConstruct = Scroller_component_listen_event_construct;
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
 
-   bar.parent = parent;
+   // bar.parent = parent;
+
+   bar.base_unif_wpos = parent
    
    
    const handle_pad = [3, 3];
@@ -149,9 +157,11 @@ export function Scoller_component_gengfx(bar, gfx_flags=0x0, ){
    bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC|GFX_CTX_FLAGS.SCROLLER_VB);
 }
 /** */
-export function Scoller_component_render(bar, parent, ){
+export function Scoller_component_render(bar, parent=null, ){
 
    const scrolled_section = bar.scrolled_section;
+
+   const parent_ = (parent !== null) ? parent : bar.parent 
 
    // Set positions after 'GenGfxCtx' so that the bar's
    bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section)+scrolled_section.geom.dim[0]*2
@@ -167,21 +177,12 @@ export function Scoller_component_render(bar, parent, ){
    bar.Render();
 
    Construct_listen_events_from_mesh_tree(bar);
-   // Construct_listen_events_relations_from_mesh_tree(bar, parent);
+   // Construct_listen_events_relations_from_mesh_tree(bar, parent_);
    Construct_listen_events_relations_from_mesh_tree(bar);
 
    bar.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, bar.gfx.vb.groupidx);
 
    Scroller_component_calculate_handle_pos_dim(bar)
-
-   // if(1) {
-   //    // Set scissor box
-   //    const mx = scrolled_section.mesh_bufferidx;
-   //    const my = bar.mesh_bufferidx;
-   //    const mw = scrolled_section.mesh_bufferidx;
-   //    const mh = bar.mesh_bufferidx;
-   //    Vertex_buffer_group_create_scissorbox(scrolled_section.gfx.vb.groupidx, mx, my, mw, mh);
-   // }
    
 }
 /** */

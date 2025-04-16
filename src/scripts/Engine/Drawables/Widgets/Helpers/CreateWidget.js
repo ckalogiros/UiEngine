@@ -251,13 +251,15 @@ export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, te
 
 
 
-export function Create_widget_close_btn(is_root = 0x0, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+// export function Create_widget_close_btn(is_root = 0x0, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+export function Create_widget_close_btn(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, is_root, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, is_root, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, properties));
 
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];

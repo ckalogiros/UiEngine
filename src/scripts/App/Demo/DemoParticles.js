@@ -309,8 +309,8 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
 
       const parameters = [0.2, .48, .5, .47, .08, .4, .04, .04, .55];
       const generic_controls_parameters = [.7, 1., .12];
-      // const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, 'u_generic_controls');
-      const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, );
+      const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, 'u_generic_controls');
+      // const controls_buffer = Create_particles_controls(emitter, scale_down, YELLOWL[4], parameters, true, generic_controls_parameters, );
 
 
 
@@ -762,6 +762,7 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
       const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:LAYOUT.VERTICAL, texture_id:texture_id}));
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
+      // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:rcorners,})
       return slider;
    }
 
@@ -1658,18 +1659,13 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
 
       const emitter = particles_buffer[i]
 
-      const slider_feather = 2;
       const slider_rcorners = 10;
 
       { // SHADER UNIFORMS: Particle Glow Distance
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Distance');
-         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
-         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:color, name:'Distance'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          controls_buffer.push(slider);
          slider.SetInitialValue(parameters ? parameters[0] : 1.);
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -1685,14 +1681,10 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
 
       }
       { // SHADER UNIFORMS: Particle Glow Brightness
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Brighter');
-         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
-         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:color, name:'Brighter'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          controls_buffer.push(slider);
          slider.SetInitialValue(parameters ? parameters[1] : 0);
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -1708,14 +1700,10 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
 
       }
       { // SHADER UNIFORMS: Particle Glow Intensity
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Intensity');
-         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
-         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:color, name:'Intensity'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          controls_buffer.push(slider);
          slider.SetInitialValue(parameters ? parameters[2] : .13);
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -1731,13 +1719,10 @@ export function Create_comet_glow_contols(glow_particles_buffer, color = GREY[2]
 
       }
       { // SHADER UNIFORMS: Particle Scale
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, color, _, 'Particle Scale');
-         // slider.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, slider_feather);
-         slider.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, slider_rcorners);
-         slider.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:color, name:'Particle Scale'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          controls_buffer.push(slider);
          slider.SetInitialValue(parameters ? parameters[4] : scale_down);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          // Connect sliders to gfx program uniforms 
          Slider_connect(slider, (params, slider_val) => {
@@ -2131,17 +2116,16 @@ export function Test_noise_shader() {
    { // Contol Params for tarnsform and physics
 
       const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
+      const slider_rcorners = 10;
       const glow_controls_dp2 = Create_widget_dropdown(_, 'Transform Params', [0, 0, zpos], C1, CGREY, WHITE, [10, 4], _, _, regular_font_size, [6, 0, 2], [4, 4],);
       glow_controls_dp2.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       controls_dp.AddToMenu(glow_controls_dp2)
 
       { // Gravity
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Gravity');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Gravity'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.50);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -2151,12 +2135,10 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Acceleration
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Acceleration');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Acceleration'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.29);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -2171,12 +2153,10 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Deccelerarion
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Deccelerarion');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Deccelerarion'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.58);
-
-
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
          Slider_connect(slider, (params, slider_val) => {
 
@@ -2190,20 +2170,20 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Set Emitter X Position
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position X');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Emitter Position X'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.05);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
             const y = slider_val * VIEWPORT.WIDTH - emitters[0].dim[0];
             emitters[0].pos[0] = y;
          }, _);
       }
       { // Set Emitter Y Position
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Emitter Position Y');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Emitter Position Y'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.29);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
 
             const y = slider_val * VIEWPORT.HEIGHT - emitters[0].dim[1];
@@ -2211,10 +2191,10 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Set Emitter Y Direction Up
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Up ');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Direction Y Up'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.02);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
 
             // const slider_val = Slider_get_slider_val({slider:slider});
@@ -2224,10 +2204,10 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Set Emitter Y Direction Down
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction Y Down');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Direction Y Down'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.02);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
 
             // const slider_val = Slider_get_slider_val({slider:slider});
@@ -2237,10 +2217,10 @@ export function Test_noise_shader() {
          }, _);
       }
       { // Set Emitter Direction X Left
-         const slider = Create_widget_slider(_, [0, 0, 0], slider_dim, slider_col, _, 'Direction X Left');
+         const slider = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 0], dim:slider_dim, col:slider_col, name:'Direction X Left'}));
+         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners, });
          glow_controls_dp2.AddToMenu(slider);
          slider.SetInitialValue(.60);
-         slider.GfxUniformsEnable(u_wpos_flags, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
          Slider_connect(slider, (params, slider_val) => {
 
             let max = 2, start = -1;

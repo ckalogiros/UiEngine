@@ -209,6 +209,8 @@ export class Mesh {
     /** */
     Destroy() {
         // console.log('DSTROY-Mesh class:', this.GetName())
+        console.log('DESTROY:', Mesh_get_name(this));
+
 
         /*************************************************************************************/
         // Remove event listeners
@@ -281,10 +283,10 @@ export class Mesh {
         if (this.is_gfx_inserted && this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
 
-            /* DO NOT DELETE: dealing with text meshes */
+            // /* DO NOT DELETE: dealing with text meshes */
             // if (this.type & (MESH_TYPE.WIDGET_TEXT | MESH_TYPE.WIDGET_TEXT_DYNAMIC | MESH_TYPE.TEXT_MESH)) { // Case it is a text mesh, for destroy we must pass the whole string length, not just the renderable
-            //     // Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
-            //     Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
+            //     Gfx_pool_remove_geometry(this.gfx, this.mat.temp_max_chars_inserted_in_gfx, _, this);
+            //     // Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
             // }
             // else {
             //     Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
@@ -460,6 +462,7 @@ export class Mesh {
         // console.log(this.shader_ops_idxs)
         // console.log(function_operation)
         this.shader_ops_idxs.Add(Program_store_shader_operations(function_operation, blend_mode));
+        console.log(this.shader_ops_idxs)
 
         if ((function_operation & SID.SHADER_OPERATIONS.GROUP_SDF_RECT) && (this.sid.shad_ops & SID.SHADER_OPERATIONS.SDF_RECT) === 0) {
             console.error('Shader Operation detected: Need SDF_RECT to function.');

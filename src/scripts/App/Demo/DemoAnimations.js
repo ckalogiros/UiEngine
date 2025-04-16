@@ -56,8 +56,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       let slope = 0.05;
 
       const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[1], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'Animations-Scale'}));
-      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[6])});
-      panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+      Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[6]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
       ypos = 0;
       ypos += pad2;
@@ -86,52 +85,51 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
       for (let i = 0; i < num_meshes; i++) {
 
-         const xxx = (size * 2 + scale * 2 + pad * 2) * i;
+         // const xxx = (size * 2 + scale * 2 + pad * 2) * i;
 
-         // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3], pad:padding}));// [2, 3]);
-         const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3], }));// [2, 3]);
-         // const l = Create_widget_label(Style_label_default_properties({text:`0`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3], }));// [2, 3]);
-         Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
-         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         const padding = next_pad;
-         l.StylesSetPad(padding);
-         panel_scale.AddItem(l);
+         // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3], }));// [2, 3]);
+         // Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
+         // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         // const padding = next_pad;
+         // l.StylesSetPad(padding);
+         // panel_scale.AddItem(l);
 
-         next_pad = [(size+scale)*2 - l.geom.dim[0]*2, 10]
+         // next_pad = [(size+scale)*2 - l.geom.dim[0]*2, 10]
 
-         // let color = Get_fasma_color(i, color_width, num_colors);
-         // const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size + l.geom.dim[1] * 2 + 4, size, 0.01, slope, scale, color).target_mesh;
-         // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // panel_scale.AddItem(anim_mesh);
+         // // let color = Get_fasma_color(i, color_width, num_colors);
+         // // const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size + l.geom.dim[1] * 2 + 4, size, 0.01, slope, scale, color).target_mesh;
+         // // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         // // panel_scale.AddItem(anim_mesh);
 
-         // const anim_mesh_width = (size + scale + pad);
-         // inner_panel_width += anim_mesh_width;
-         // s_height = l.geom.dim[1] + size + scale + pad;
+         // // const anim_mesh_width = (size + scale + pad);
+         // // inner_panel_width += anim_mesh_width;
+         // // s_height = l.geom.dim[1] + size + scale + pad;
 
-         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         // // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
       }
       for (let i = 0; i < num_meshes; i++) {
 
-         const xxx = (size * 2 + scale * 2 + pad * 2) * i;
+         // const xxx = (size * 2 + scale * 2 + pad * 2) * i;
 
-         // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3]}));// [2, 3]);
-         // Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
-         // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         // panel_scale.AddItem(l);
+         // // const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad2, 1], col:_, text_pad:[2, 3]}));// [2, 3]);
+         // // Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), layout:LAYOUT.HORIZONTAL});
+         // // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         // // panel_scale.AddItem(l);
 
-         let color = Get_fasma_color(i, color_width, num_colors);
-         const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
-         const padding = i===0 ? [20, 25] : [size*2, 25];
-         const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size, size, 0.01, slope, scale, color, layout, padding).target_mesh;
-         anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
-         panel_scale.AddItem(anim_mesh);
+         // let color = Get_fasma_color(i, color_width, num_colors);
+         // const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
+         // const padding = i===0 ? [20, 25] : [size*2, 25];
+         // // const anim_mesh = Demo_clbk_animations_scale(0x0, _, xpos + xxx + size, ypos + pad2 + size, size, 0.01, slope, scale, color, layout, padding).target_mesh;
+         // const anim_mesh = Demo_clbk_animations_scale(0x0, true, xpos + xxx + size, ypos + pad2 + size, size, 0.01, slope, scale, color, layout, padding).target_mesh;
+         // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         // panel_scale.AddItem(anim_mesh);
 
-         // const anim_mesh_width = (size + scale + pad);
-         // inner_panel_width += anim_mesh_width;
-         // s_height = l.geom.dim[1] + size + scale + pad;
+         // // const anim_mesh_width = (size + scale + pad);
+         // // inner_panel_width += anim_mesh_width;
+         // // s_height = l.geom.dim[1] + size + scale + pad;
 
-         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
+         // // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
       }
 
@@ -251,24 +249,16 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 export function Demo_animations_with_slider_slope(x = 0, y = 0) {
 
    let total_height = 0;
-
-   // const u_wpos_flags = {
-   //    unif: SID.UNIF.ROOT_WPOS2,
-   //    pass: SID.ATTR.WPOS3,
-   // }
-
    const rcorners = 10
 
-   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope'}));
-   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2])});
-   panel.align.flags = (LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF);
-   panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope', layouut:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   // Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    
    const text = 'Use the slider to change the slope\nof the logarithmic function.';
-   const label = Widget_ready_label(_, text, _, _, _, 10, _, _, _, false);
-   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4])});
-   label.align.flags = (LAYOUT.VERTICAL);
-
+   const label = Widget_ready_label(Style_label_default_properties({text:text, font_size:10, texture_id:TEXTURES.MTSDF_CONSOLAS_1024, layout:LAYOUT.VERTICAL}));
+   // Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4])});
+   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners});
    panel.AddItem(label);
 
    total_height += label.geom.dim[1];
@@ -284,16 +274,10 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
 
    let color = Get_fasma_color(offset, num_items, 2);
    const ret1 = Demo_clbk_animations_scale(0x0, true, 0, 0, size, 0.01, 0.05, scale, color);
-   // ret1.slider_mesh.MoveNoGfxUpdate(pad, label.geom.dim[1] * 2 + pad);
-   // ret1.slider_mesh.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
-   // ret1.target_mesh.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
-   // ypos += label.geom.dim[1] * 2 + ret1.slider_mesh.geom.dim[1] * 2 + pad;
-   // ret1.target_mesh.geom.pos[0] += size + pad;
-   // ret1.target_mesh.geom.pos[1] = ypos + size + pad;
-   ret1.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret1.target_mesh.gfx_ctx_parent, true);
-   ret1.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
-   ret1.target_mesh.align.flags = LAYOUT.VERTICAL
+   // ret1.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret1.target_mesh.gfx_ctx_parent, true);
+   // ret1.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
    ret1.slider_mesh.align.flags = LAYOUT.VERTICAL;
+   ret1.target_mesh.align.flags = LAYOUT.VERTICAL
    panel.AddItem(ret1.slider_mesh);
    panel.AddItem(ret1.target_mesh);
    
@@ -302,22 +286,22 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    
    
    
-   /**********************************************************************************************************/
-   // Rotation
-   const anim_mesh_size = size * 2;
-   const angle = Math.PI;
-   color = Get_fasma_color(offset, num_items, 2);
-   const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
-   ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
-   ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
-   ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
+   // /**********************************************************************************************************/
+   // // Rotation
+   // const anim_mesh_size = size * 2;
+   // const angle = Math.PI;
+   // color = Get_fasma_color(offset, num_items, 2);
+   // const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
+   // ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
+   // ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
+   // ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
    
-   // ret2.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
-   // ypos += label.geom.dim[1] * 2 + pad
-   // ret2.target_mesh.geom.pos[0] += pad;
-   // ret2.target_mesh.geom.pos[1] = ypos + size + pad + 20;
-   panel.AddItem(ret2.slider_mesh);
-   panel.AddItem(ret2.target_mesh);
+   // // ret2.slider_mesh.MoveNoGfxUpdate(pad, ypos + label.geom.dim[1] * 2 + pad);
+   // // ypos += label.geom.dim[1] * 2 + pad
+   // // ret2.target_mesh.geom.pos[0] += pad;
+   // // ret2.target_mesh.geom.pos[1] = ypos + size + pad + 20;
+   // panel.AddItem(ret2.slider_mesh);
+   // panel.AddItem(ret2.target_mesh);
 
 
 
@@ -350,15 +334,13 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
    const rcorners = 10;
 
    const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], col:GREY[1], name:'Demo_animations_with_slider_slope'}));
-   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2])});
+   Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[4], GREY[2]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    panel.SetLayout(LAYOUT.VERTICAL| SECTION.RESIZE_SELF);
-   panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
    const text = 'Use the "Options" menu to change properties.';
-   const label = Widget_ready_label(_, text, _, _, _, 10, _, _, _, false);
-   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4])});
+   const label = Widget_ready_label(Style_label_default_properties({text:text, font_size:10, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+   Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[4]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    panel.SetLayout(LAYOUT.VERTICAL| SECTION.RESIZE_SELF);
-   panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    panel.AddItem(label);
 
 
@@ -520,17 +502,15 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
 
    // const menu_panel = Create_rect_mesh(Style_section_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'section',}));
    const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[x, y, 0], dim:dim, col:TRANSPARENCY(GREY[1], .9), name:'MenuLoadPanel',}));
-   Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10}); //, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[2])});
-   menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+   Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.CLICK_UP}}); //, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[2])});
    menu_panel.SetLayout(LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF);
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) menu_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    
    zpos++;
    
    
    if(create_label!=='') {
       const label = Create_widget_label(Style_label_default_properties({text:create_label, pos:[0, 0, 1], col:GREENL[5]}));
-      Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: 7, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4])});
+      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: 7, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[2], GREY[4])});
       label.SetLayout(LAYOUT.HORIZONTAL);
       menu_panel.AddItem(label);
    }
@@ -604,8 +584,7 @@ function Create_menu_items_buttons() {
       // Button 1
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -615,8 +594,7 @@ function Create_menu_items_buttons() {
       // Button 2
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Mathematics      ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -626,9 +604,8 @@ function Create_menu_items_buttons() {
       // Button 3
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Molecular Biology', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
       menu_items_array.push(button);
    }
 
@@ -637,8 +614,7 @@ function Create_menu_items_buttons() {
       // Button 4
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Chemistry        ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -648,8 +624,7 @@ function Create_menu_items_buttons() {
       // Button 5
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Neuroscience     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -658,8 +633,7 @@ function Create_menu_items_buttons() {
       // Button 6
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Physics          ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -668,8 +642,7 @@ function Create_menu_items_buttons() {
       // Button 7
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Biochemistry     ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -678,8 +651,7 @@ function Create_menu_items_buttons() {
       // Button 8
       btn_col = GetSequencedColor(7);
       const button = Create_widget_button(Style_button_default_properties({text:'Genetics         ', align:TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font}));
-      button.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+      Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       button.SetLayout(LAYOUT.VERTICAL);
       menu_items_array.push(button);
    }
@@ -714,9 +686,9 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
    if (create_slider) {
 
       const slider_dim = (200 * 2 < VIEWPORT.WIDTH) ? [200, 10] : [VIEWPORT.WIDTH / 2 - 10, 10];
-      slider = Create_widget_slider(Style_slider_default_properties({pos:[x, y, 0], dim:slider_dim, name:'Log Function Slope'}));
-      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), });
-      slider.SetLayout(LAYOUT.VERTICAL);
+      slider = Create_widget_slider(Style_slider_default_properties({pos:[x, y, 0], dim:slider_dim, name:'Log Function Slope', layout:LAYOUT.VERTICAL}));
+      // Widget_gfx_ready_enable({mesh:slider, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), });
+      Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:10 });
       slider.SetInitialValue(slope_const);
 
       total_height += slider.geom.dim[1] * 2;
@@ -733,8 +705,8 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
       total_height += slider.geom.dim[1] * 2 + 10;
    }
 
-   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:pad, pos:[x, y, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
-   // const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[size*2, 10], pos:[x, y, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
+   // const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:pad, pos:[x, y, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
+   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:pad, pos:[0, 0, 0], dim:[size, size], col:color, name:'mesh_anim_scale_rect', layout:layout,}));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect: rcorners, enable_col_per_vertex:MULTI_COLOR, enable_attr_angle:true, });
 
 
@@ -744,13 +716,13 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
 
       if (create_slider) {
 
-         // slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-         // slider.Render();
+         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+         slider.Render();
          // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-         // slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
-         // Construct_listen_events_from_mesh_tree(slider)
-         // Construct_listen_events_relations_from_mesh_tree(slider);
+         Construct_listen_events_from_mesh_tree(slider)
+         Construct_listen_events_relations_from_mesh_tree(slider);
       }
 
       Align_nested_sections_pre(mesh);
@@ -807,14 +779,13 @@ function Animation_scale_up_run(params) {
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const size = mesh.geom.dim[0] + (slope * scale);
 
-   // mesh.geom.SetDimXY(mesh.gfx, size, size);
    Mesh_set_dim_xy(mesh, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
    const diffx = mesh.geom.pos[0] + (slope * scale);
    const diffy = mesh.geom.pos[1] + (slope * scale);
-   // mesh.geom.SetWposXY(mesh.gfx, diffx, diffy);
-   Mesh_set_wpos_xy(mesh, diffx, diffy);
+   Mesh_set_wpos_xy(mesh, diffx, diffy/2);
+   // Mesh_set_wpos_xy(mesh, mesh.geom.pos[0] + size, mesh.geom.pos[0] + size/2);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * (slope + 1));
@@ -842,13 +813,13 @@ function Animation_scale_down_run(params) {
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const size = mesh.geom.dim[0] + ((1. - slope) * scale);
-   // mesh.geom.SetDimXY(mesh.gfx, size, size);
    Mesh_set_dim_xy(mesh, size, size);
    Gl_set_dim_xy(mesh.gfx, size, size);
 
    const diffx = mesh.geom.pos[0] + ((1. - slope) * scale);
    const diffy = mesh.geom.pos[1] + ((1. - slope) * scale);
-   Mesh_set_wpos_xy(mesh, diffx, diffy);
+   Mesh_set_wpos_xy(mesh, diffx, diffy/2);
+   // Mesh_set_wpos_xy(mesh, size, size/2);
 
    if (mesh.sid.attr & SID.ATTR.R_CORNERS) {
       Gl_set_attr_round_corners(mesh.gfx, mesh.mat.style.rcorners * ((1. - slope) + 1));
@@ -1104,8 +1075,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    // Create panel
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[20, 20], pos:[0, 100, 0], col:GREY[2]}));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3])});
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[1], GREY[3]), listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
    // ISSUE: Somehow the text on update shifts to the rigth in x-axis, but the first characters ar aligned correctly

@@ -1178,7 +1178,8 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
         }
         
         vb_info.count -= removed_attribs;
-        const vCount = removed_attribs / gfx.vb.counts.buffer[i];
+        // const vCount = removed_attribs / gfx.vb.counts.buffer[i];
+        const vCount = removed_attribs / attribs_per_vertex;
         vb_info.vCount -= vCount;
         
         // if(gfx.vb.groupidx===12) console.log('    vb_info.count', vb_info.count, 'removed_attribs', removed_attribs)

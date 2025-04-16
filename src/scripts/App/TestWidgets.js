@@ -36,6 +36,7 @@ import { Mesh_get_real_pos_y, Mesh_rotate_z } from '../Engine/Drawables/Operatio
 import { Mesh_get_name, Mesh_listener_create } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 import { Align_nested_sections_pre, Align_expand } from '../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
+import { Demo_page } from './DemoPage.js';
 
 
 
@@ -324,8 +325,8 @@ export function TestWidgetsGeneric() {
             // const btn = Demo_widgets(_, [0, y]);
             // y += btn.geom.dim[1]*2 + pad;
 
-            const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
-            y += scroller.geom.dim[1]*2 + pad;
+            // const scroller = Demo_widgets_scrolled_labels(_, [0, y]);
+            // y += scroller.geom.dim[1]*2 + pad;
 
             // const dp = Demo_widgets_dropdown(_, [0, y], )
             // y += dp.geom.dim[1]*2 + pad;
@@ -387,7 +388,7 @@ export function TestWidgetsGeneric() {
 
             {
                 // Demo_animations();
-                // Demo_animations_with_slider_slope();
+                Demo_animations_with_slider_slope();
                 // Demo_animations_text();
 
                 { // Text Animations Testing

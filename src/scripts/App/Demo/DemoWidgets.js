@@ -153,7 +153,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    const text_pad = [20, 0];
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .8), name:'Demo_widgets_scrolled_labels', listener:{type:LISTEN_EVENT_TYPES.MOVE}}));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .2), name:'Demo_widgets_scrolled_labels', listener:{type:LISTEN_EVENT_TYPES.MOVE}}));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE} });
    section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL | LAYOUT.FIXED_HEIGHT;
    // section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
@@ -169,16 +169,17 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], col: TRANSPARENCY(GREY[1], .8), name:'scrolled_section' }));
    Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, scroller:{width:10, max_height:100, parent:section}, });
+   // Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, scroller:{width:10, max_height:100, }, });
    scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
 
-   scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
+   // scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
    scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
    scrolled_section.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
    section.AddItem(scrolled_section);
 
 
    // const color_array = [RED[9], YELLOW[9], GREEN[9], CYAN[9], BLUEL[9], PURPLE[9]]
-   const count = 50;
+   const count = 20;
 
    for (let i = 0; i < count; i++) {
 
@@ -567,30 +568,37 @@ ensuring they remain accessible when reopening a parent dropdown.\
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(BLUEL[9], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF ,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOWR[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLEB[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLER[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(ORANGEL[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
       {
          const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOW[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
+         s.AddItem(s1);
       }
 
       return s;
@@ -688,7 +696,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                      const col = YELLOWR[7];
                      for (let i = 0; i < sub_dp1_count; i++) {
 
-                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                         Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                         dpsub4.AddToMenu(dp_1);
 
@@ -703,14 +711,14 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
                            for (let k = 0; k < sub_dp2_count; k++) {
 
-                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                               Widget_gfx_ready_enable({ mesh: dp_3, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                               dp_2.AddToMenu(dp_3);
 
                               const col3 = TRANSPARENCY(YELLOW[6], 1.)
                               for (let n = 0; n < 6; n++) {
 
-                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                                  Widget_gfx_ready_enable({ mesh: dp_4, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                                  dp_3.AddToMenu(dp_4);
 
@@ -761,7 +769,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                      const col = YELLOWR[7];
                      for (let i = 0; i < sub_dp1_count; i++) {
 
-                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL }));
+                        const dp_1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                         Widget_gfx_ready_enable({ mesh: dp_1, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                         dpsub4.AddToMenu(dp_1);
 
@@ -776,14 +784,14 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
                            for (let k = 0; k < sub_dp2_count; k++) {
 
-                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                              const dp_3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                               Widget_gfx_ready_enable({ mesh: dp_3, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                               dp_2.AddToMenu(dp_3);
 
                               const col3 = TRANSPARENCY(YELLOW[6], 1.)
                               for (let n = 0; n < 6; n++) {
 
-                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size }));
+                                 const dp_4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL }));
                                  Widget_gfx_ready_enable({ mesh: dp_4, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, })
                                  dp_3.AddToMenu(dp_4);
 
@@ -1052,7 +1060,7 @@ WIDGET: COLOR-PICKER\
 
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [20, 20], pos: [l_pad, y + t_pad, 0], col: TRANSPARENCY(GREY[3], .8), name:'Demo_widgets_colorpicker'}));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, });
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(section, LISTEN_EVENT_TYPES.MOVE);
 
 
 

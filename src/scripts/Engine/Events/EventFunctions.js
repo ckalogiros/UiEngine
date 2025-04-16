@@ -83,8 +83,6 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
     if(parent!==null) parent_events = parent.listeners;
     else if (mesh.parent) parent_events = mesh.parent.listeners; 
 
-    // console.log(mesh.GetName())
-
     if (mesh.listeners !== null && (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
 
         for (let etype = 0; etype <= mesh.listeners.boundary; etype++) {
@@ -98,7 +96,8 @@ export function Construct_listen_events_relations_from_mesh_tree(mesh, parent=nu
                 }
 
                 
-                if (parent_events === null || parent_events.buffer[etype] === null) {
+                // if (parent_events === null || parent_events.buffer[etype] === null) {
+                if (parent_events === null || parent_events.buffer[etype] === null || parent_events.buffer[etype] === INT_NULL) {
                     // Find from widget root tree any parent events
                     const parent_eventidx = Find_parent_listen_event(etype, mesh);
     

@@ -58,8 +58,7 @@ export function Widget_gfx_ready_enable({
    }
 
    if (enable_col_per_vertex !== undefined) {
-      // mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, enable_col_per_vertex);
-      mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX,);
+      mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, {col4_per_vertex:enable_col_per_vertex});
    }
 
    if (enable_attr_angle !== undefined) {
@@ -280,7 +279,7 @@ export function Style_slider_default_properties(user_properties) {
          col: user_properties.value_text_col !== undefined ? user_properties.value_text_col : WHITE,
          text: user_properties.name !== undefined ? user_properties.name : 'Slider UNAMED',
          font_size: user_properties.font_size !== undefined ? user_properties.font_size : 8,
-         texture_id: user_properties.value_text_texture_id !== undefined ? user_properties.value_text_texture_id : user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? user_properties.texture_id : TEXTURES.MTSDF_COMIC_1024,
+         texture_id: user_properties.value_text_texture_id !== undefined ? user_properties.value_text_texture_id : user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024,
          sub_texture_id: user_properties.value_text_sub_texture_id !== undefined ? user_properties.value_text_sub_texture_id : _,
          variant_idx: user_properties.value_text_variant_idx !== undefined ? user_properties.value_text_variant_idx : _,
       },
@@ -289,7 +288,7 @@ export function Style_slider_default_properties(user_properties) {
 
          col: user_properties.value_text_col !== undefined ? user_properties.value_text_col : WHITE,
          font_size: user_properties.font_size !== undefined ? user_properties.font_size : 8,
-         texture_id: user_properties.value_text_texture_id !== undefined ? user_properties.value_text_texture_id : user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? user_properties.texture_id : TEXTURES.MTSDF_COMIC_1024,
+         texture_id: user_properties.value_text_texture_id !== undefined ? user_properties.value_text_texture_id : user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024,
          sub_texture_id: user_properties.value_text_sub_texture_id !== undefined ? user_properties.value_text_sub_texture_id : _,
          variant_idx: user_properties.value_text_variant_idx !== undefined ? user_properties.value_text_variant_idx : _,
       },
@@ -379,6 +378,8 @@ export function Style_button_default_properties(user_properties) {
       text:user_properties.text, 
       text_pad:user_properties.text_pad, 
       style:style, 
+
+      target_mesh:user_properties.target_mesh !== undefined ? user_properties.target_mesh : null,
       
       font_size:user_properties.font_size !== undefined ? user_properties.font_size : 8, 
       texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 

@@ -55,8 +55,7 @@ export class Widget_Label extends Rect_Mesh {
             dim:properties.dim,
             col:properties.col,
             pad:properties.pad,
-            name:properties.pad,
-            style:properties.pad,
+            name:properties.text,
             num_faces:properties.num_faces,
             is_debug_mesh:properties.is_debug_mesh,
         }));

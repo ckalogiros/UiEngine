@@ -80,7 +80,6 @@ export class Widget_Button extends Widget_Label {
 
 
    OnClick(params) {
-      console.log('9009w8989ufuijshkjfdskjm')
       const mesh = params.evt_params.target_mesh;
 
       // Case the mesh has a chain callback function to call. (For now the button's chain callbacks are not chained)

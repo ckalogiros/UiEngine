@@ -486,7 +486,7 @@ export function Mesh_per_vb_print_loop() {
                ' mbidx:', mesh.mesh_bufferidx,
                ' prog:', mesh.gfx.prog.idx,
                'start:', mesh.gfx.vb.starts.buffer,
-               'name:', mesh.GetName(),
+               'name:', Mesh_get_name(mesh),
             );
             else console.log(mesh)
          }
