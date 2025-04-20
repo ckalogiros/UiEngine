@@ -761,7 +761,7 @@ export function Root_group_set_render_queue_priority(root_bufferidx) {
 // Activate render queue vertex buffers.
 export function Root_group_activate_all_vbs_in_renderqueue(root_bufferidx) {
    /**DEBUG */ if (root_bufferidx === INT_NULL)
-      alert('560199235 \nroot_bufferidx is INT_NULL');
+      alert('560199235 \nroot_bufferidx is INT_NULL\nSee if you forgot to set a ROOT_WIDGET.');
 
 
    // Get all vbs of the the root mesh and all its children

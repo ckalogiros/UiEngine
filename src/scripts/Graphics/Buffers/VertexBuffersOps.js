@@ -2306,7 +2306,6 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic
 }
 /** */
 export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx, start, colors, positions, time, dim, rot, uv, generic) {
-   // console.error('CALCULATE THE STRIDE CORRECTLY')
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
 
@@ -2328,7 +2327,6 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   // index += 2; // FOR GENERIC2  ATTR
    vb_data[index++] = generic.a;
    vb_data[index++] = generic.b;
 
@@ -2346,7 +2344,6 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   // index += 2; // FOR GENERIC2  ATTR
    vb_data[index++] = generic.a;
    vb_data[index++] = generic.b;
 
@@ -2363,7 +2360,6 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   // index += 2; // FOR GENERIC2  ATTR
    vb_data[index++] = generic.a;
    vb_data[index++] = generic.b;
 
@@ -2380,7 +2376,6 @@ export function Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2(vbidx
    index += V_POS_COUNT;
    index += 2; // FOR DIM2
    vb_data[index++] = t;
-   // index += 2; // FOR GENERIC2  ATTR
    vb_data[index++] = generic.a;
    vb_data[index++] = generic.b;
 

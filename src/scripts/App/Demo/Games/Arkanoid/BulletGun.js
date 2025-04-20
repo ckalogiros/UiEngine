@@ -117,7 +117,7 @@ function Gun_create(x, y, vb_groupidx) {
    _gun.timer_limit = 0;
    _gun.timer_step = 0;
 
-   const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w, _gun.h], col:YELLOWR, name:'Bullet', }));
+   const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w, _gun.h], col:YELLOWR[9], name:'Bullet', }));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
@@ -133,7 +133,7 @@ function Gun_create(x, y, vb_groupidx) {
 
    // Create gun's mesh part 2
    y -= _gun.h + _gun.h * .7;
-   const mesh2 = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w * .5, _gun.h * .7], col:YELLOWR, name:'GunMeshn2', }));
+   const mesh2 = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w * .5, _gun.h * .7], col:YELLOWR[9], name:'GunMeshn2', }));
    Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
@@ -176,7 +176,7 @@ export class Bullet {
       this.timer_step = 0;
 
       // const mesh = Create_rect_mesh(_, [x, y, 1], [w, h], YELLOWR[9], 'Bullet',);
-      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR, name:'Bullet', }));
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR[9], name:'Bullet', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
       // mesh.EnableGfx(SID.SHAD.FN_EXPLOSION_GLOW);

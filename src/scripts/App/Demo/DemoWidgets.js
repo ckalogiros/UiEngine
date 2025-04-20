@@ -141,7 +141,7 @@ pressing the \"p\" key on the keyboard.\
 
 
 
-export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], scroller_height = 150, control_slider_distance = null, control_slider_smoothness = null, control_slider_intensity = null) {
+export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], scroller_height = 150) {
 
    const text_sample_scroller = 'WIDGET SCROLLER';
 
@@ -249,7 +249,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
 
 
-export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], control_slider_distance = null, control_slider_smoothness = null, control_slider_intensity = null) {
+export function Demo_widgets_sections(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0]) {
 
    const text_sample_sections = `\
 WIDGET: SECTION
@@ -551,7 +551,7 @@ nested layouts with well-aligned items.\
 
 
 
-export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], control_slider_distance = null, control_slider_smoothness = null, control_slider_intensity = null) {
+export function Demo_widgets_dropdown(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0]) {
 
    const text_sample_dropdown = `\
 WIDGET: DROPDOWN MENU  
@@ -838,11 +838,9 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
 
 
-export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0], control_slider_distance = null, control_slider_smoothness = null, control_slider_intensity = null) {
+export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0]) {
 
-   const text_sample_widgets = `\
-GENERIC WIDGETS\
-   `;
+   const text_sample_widgets = `GENERIC WIDGETS`;
 
    const rcorners = 10;
    const switch_size = 18;
@@ -1176,8 +1174,7 @@ Adjust the font size using the slider.
 
 
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [20, 20], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[3], .9), name:'Msdf_text_info' }));
-   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 4, });
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
 
 
@@ -1357,7 +1354,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
 
       const red = Widget_ready_rect(_, _, _, _, _, TRANSPARENCY(REDL[7], tr));
       red.SetLayout(LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF);
-      red.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Mesh_listener_create(red, LISTEN_EVENT_TYPES.HOVER);
       blu.AddItem(red);
 
 
@@ -1554,7 +1551,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    const sub_dp2_count = 2;
    let zpos = 1
 
-   { const l = Widget_ready_label(_, 'LEVEL 1!', _, _, _, _, ORANGE[3]); dp.AddToMenu(l); l.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER); }
+   { const l = Widget_ready_label(_, 'LEVEL 1!', _, _, _, _, ORANGE[3]); dp.AddToMenu(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); }
 
    let col = GetSequencedColor(color_intensity)
    for (let i = 0; i < sub_dp1_count; i++) {

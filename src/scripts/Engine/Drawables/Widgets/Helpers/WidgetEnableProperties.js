@@ -58,7 +58,20 @@ export function Widget_gfx_ready_enable({
    }
 
    if (enable_col_per_vertex !== undefined) {
-      mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, {col4_per_vertex:enable_col_per_vertex});
+      if (enable_col_per_vertex[0] !== undefined) {
+         if(enable_col_per_vertex[0].constructor === Float32Array &&
+            enable_col_per_vertex[1].constructor === Float32Array &&
+            enable_col_per_vertex[2].constructor === Float32Array &&
+            enable_col_per_vertex[3].constructor === Float32Array
+         ) {
+
+            mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, {col4_per_vertex:enable_col_per_vertex});
+         }
+      }
+      else {
+         
+         mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX,);
+      }
    }
 
    if (enable_attr_angle !== undefined) {

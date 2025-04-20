@@ -421,7 +421,7 @@ export const COLOR_ARRAY = [
 	RED[9],
 ]
 
-export function Get_fasma_color(index, max_count, num_colors = 4) {
+export function Get_fasma_color(index, max_count, num_colors = 4, brightness=1, alpha=1) {
 
 	let color_wide = max_count / num_colors;
 	const overlap = 0;
@@ -454,15 +454,15 @@ export function Get_fasma_color(index, max_count, num_colors = 4) {
 
 	// console.log(info_msg);
 
-	const color = new Float32Array([0, 0, 0, 1]);
+	const color = new Float32Array([0, 0, 0, alpha]);
 
 	for (let i = 0; i < num_colors; i++) {
 
 		const c = COLOR_ARRAY[i];
 
-		color[0] += c[0] * r[i];
-		color[1] += c[1] * r[i];
-		color[2] += c[2] * r[i];
+		color[0] += c[0] * r[i] * brightness;
+		color[1] += c[1] * r[i] * brightness;
+		color[2] += c[2] * r[i] * brightness;
 	}
 
 	color[0] = Clamp(color[0], 0, 1);

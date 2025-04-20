@@ -3,6 +3,7 @@
 import { State_mesh_set_clickhold, State_mesh_set_grabed, State_mesh_set_hovered } from "../../GlobalFunctions.js";
 import { MOUSE } from "../Controls/Input/Mouse.js";
 import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_remove_time_interval } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { Mesh_state_check } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Listener_dispatch_check_hover_event, Listener_dispatch_event, LISTENERS_FLAGS } from "./EventListeners.js";
 
@@ -77,7 +78,9 @@ export function HandleEvents() {
                      * Else we should call the ListenEvents, which would not find any 
                      * intersection between the mouse and the button
                      */
-                    STATE.mesh.click_hold.RemoveTimeInterval(INTERVALS.UPDATE);
+
+                    Mesh_remove_time_interval(STATE.mesh.click_hold, INTERVALS.UPDATE);
+                    // STATE.mesh.click_hold.RemoveTimeInterval(INTERVALS.UPDATE);
                     
                     // if (LISTENERS_FLAGS[E.C] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
                     //     Listener_dispatch_event(E.C, e.params.mouseButton);

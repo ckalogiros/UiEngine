@@ -577,8 +577,6 @@ export function Gfx_generate_context_for_particle_system(FLAGS, emitter, gfx_poo
          Vertex_buffer_set_name_for_debuging(vb_group.idx, Mesh_get_name(emitter));
 
          Vertex_buffer_group_set_texidx(vb_groupidx, emitter.mat.texidx); // Update the vertex buffer to store the texture index
-         console.log('texidx', emitter.mat.texidx)
-
 
          // Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_PRIVATE);
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);

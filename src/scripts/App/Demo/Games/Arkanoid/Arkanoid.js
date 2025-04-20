@@ -220,7 +220,8 @@ function Arkanoid_initialize_start_menu(x, y) {
    View_build_group_from_root_mesh(section);
    _arkanoid_struct.start_menu.panel.view_group = section.group_bufferidxs;
 
-   Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1,)
+   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, 0.5, .0, true)
+   Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, )
 
 
 
@@ -234,12 +235,8 @@ function Arkanoid_initialize_game(x, y) {
    /***************************************************************************************************************/
    // Create score panel
 
-   const menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y], col:GREY[2], layout:LAYOUT.HORIZONTAL}));
+   const menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, ypos, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y], col:GREY[2], layout:LAYOUT.HORIZONTAL, name:'Arkanoid-Menu'}));
    Widget_gfx_ready_enable({mesh:menu, enable_sdf_rect:10, enable_pass_vpos:true, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-   Mesh_set_name(menu, 'Arkanoid-Menu');
-   // const control_values = [.7, .26, .4, .0];
-   // const control_values = [.7, .6, .4, .0];
-   // const control_values = [.7, .8, .4, .0];
    const control_values = [.7, .6, .8, 1.];
    menu.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
    menu.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
@@ -319,8 +316,8 @@ function Arkanoid_initialize_game(x, y) {
    Root_group_activate_all_vbs_in_renderqueue(menu.root_bufferidx);
    
    menu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu.gfx.vb.groupidx)
-   // menu.GfxUniformSetAndUpdate('u_generic_controls', control_values); // Sdf-InnerShadow-Glow
-   menu.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, menu.gfx.vb.groupidx);
+   menu.GfxUniformSetAndUpdate('u_generic_controls', control_values); // Sdf-InnerShadow-Glow
+   // menu.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, menu.gfx.vb.groupidx);
 
 
    score_num_text.text_mesh.RenderTextFromNumber(0);
@@ -334,12 +331,12 @@ function Arkanoid_initialize_game(x, y) {
    View_build_group_from_root_mesh(menu);
    const group_idx = menu.group_bufferidxs[0];
 
-   View_add_to_group(score_text, group_idx);
-   View_add_to_group(score_num_text, group_idx);
-   View_add_to_group(score_mod_text, group_idx);
-   View_add_to_group(score_mod_num_text, group_idx);
-   View_add_to_group(combo_text, group_idx);
-   View_add_to_group(combo_num_text, group_idx);
+   // View_add_to_group(score_text, group_idx);
+   // View_add_to_group(score_num_text, group_idx);
+   // View_add_to_group(score_mod_text, group_idx);
+   // View_add_to_group(score_mod_num_text, group_idx);
+   // View_add_to_group(combo_text, group_idx);
+   // View_add_to_group(combo_num_text, group_idx);
 
    ypos += ARKANOID_MENU_DIM_Y * 2;
 

@@ -168,8 +168,6 @@ class Index_Buffer_Info {
       if (sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X)
          this.connect_offset = 2 // Connect to the second previous index 
 
-      console.log('##### INDEX BUFFER:', ibidx, 'connect_offset:', this.connect_offset)
-
       this.indices_per_face = INDICES_PER_RECT; // HACK: In the future this must be set acording to vertex buffer architecture (???????)
 
    }

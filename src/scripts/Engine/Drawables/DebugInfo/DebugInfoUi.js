@@ -1768,7 +1768,6 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui mouse info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_MOUSE.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    section.align.flags = LAYOUT.RESIZE_SELF;
-   section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    
    
    const fontsize = _font_size;
@@ -2955,7 +2954,7 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    View_build_group_from_root_mesh(scrolled);
 
-   const scroller_component = Components_create_scroller_component(_, 200, scrolled, 100);
+   const scroller_component = Components_create_scroller_component(_, 200, scrolled);
    Scoller_component_gengfx_and_render(scroller_component, scrolled, _);
    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(scrolled.root_posidx, scroller_component.root_posidx);
    Listeners_set_priority(E.C, scroller_component.listeners);

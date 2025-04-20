@@ -145,6 +145,11 @@ export class Mesh {
         this.nameidx = INT_NULL;
 
         this.align = {
+            proportion:{x:1, y:1}, // The proportion (in percentage) of current mesh to it's parent's dimentions
+            hor_grow_count: 0,
+            vert_grow_count: 0,
+            TEMP_children_hor:0,
+            TEMP_children_vert:0,
             flags: LAYOUT.HORIZONTAL, // SEE: LAYOUT constant
             pad_x: 0,
             pad_y: 0,

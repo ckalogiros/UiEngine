@@ -12,7 +12,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
-import { Scene_camera_scroll_add, Scene_camera_scroll_set } from "../Engine/Scenes.js";
+import { Scene_camera_scroll_add, Scene_camera_scroll_set, Scene_store_window_resized_meshes } from "../Engine/Scenes.js";
 import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
@@ -256,14 +256,14 @@ Explore the demos and discover the possibilities!`;
 
 }
 
-export function Demo_page(create_demo_id = category_widgets.id) {
+// export function Demo_page(create_demo_id = category_widgets.id) {
 // export function Demo_page(create_demo_id = subcategory_glow.id) {
 // export function Demo_page(create_demo_id = subcategory_animations1.id) {
 // export function Demo_page(create_demo_id = subcategory_animations_button.id) {
 // export function Demo_page(create_demo_id = subcategory_animations_text.id) {
 // export function Demo_page(create_demo_id = subcategory_snake.id) {
 // export function Demo_page(create_demo_id = subcategory_comet.id) {
-// export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
+export function Demo_page(create_demo_id = subcategory_arkanoid.id) {
 
    let comet_particles_struct = null;
    let glow_particles_struct = null;
@@ -275,34 +275,17 @@ export function Demo_page(create_demo_id = category_widgets.id) {
 
 
 
-   const slider_dim = [100, 12];
-   // Create Slider for controling the uniform 'Distance'
-   const slider_distance = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Distance'}));
-   Widget_gfx_ready_enable({mesh:slider_distance, enable_sdf_rect:12, });
-   // Create Slider for controling the uniform 'Smoothness'
-   const slider_smoothness = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Smoothness'}));
-   Widget_gfx_ready_enable({mesh:slider_smoothness, enable_sdf_rect:12, });
-   // Create Slider for controling the uniform 'Intensity'
-   const slider_intensity = Create_widget_slider(Style_slider_default_properties({pos:[0, 0, 10], dim:slider_dim, col:GREY[3], name:'Intensity'}));
-   Widget_gfx_ready_enable({mesh:slider_intensity, enable_sdf_rect:12, });
-
-
-
-
-
-
-
-
 
    const pad = 10;
    const rcorners = 10;
 
    /****************************************************************************************************************************************************/
    // Create the load demo button
+   const menu_layout = LAYOUT.FIXED_WIDTH|LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF|LAYOUT.GROW_HORIZONTAL;
+   const window_menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[pad, pad], dim:[VIEWPORT.WIDTH / 2 - pad - 1, 0], col:TRANSPARENCY(GREY[5], .94), layout:menu_layout, name:'window_menu'}));
+   Widget_gfx_ready_enable({mesh:window_menu, enable_sdf_rect:4, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
 
-   const window_menu = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[pad, pad], dim:[VIEWPORT.WIDTH / 2 - pad - 1, 0], col:TRANSPARENCY(GREY[5], .94), name:'window_menu'}));
-   Widget_gfx_ready_enable({mesh:window_menu, enable_sdf_rect:4, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}})
-   // window_menu.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP, true); // Create fake event so we can set the focus on any window_menu child.
+   Scene_store_window_resized_meshes(window_menu.mesh_bufferidx);
 
 
 
@@ -365,12 +348,12 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       const pad = 50;
 
       /* section/rect move */
-      // const explainer = Demo_widgets_explainer_info([0, total_height]);
-      // total_height += explainer.geom.dim[1] * 2 + pad;
+      const explainer = Demo_widgets_explainer_info([0, total_height]);
+      total_height += explainer.geom.dim[1] * 2 + pad;
 
-      // /* section/rect move */
-      // const sections = Demo_widgets_sections(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity);
-      // total_height += sections.geom.dim[1] * 2 + pad;
+      /* section/rect move */
+      const sections = Demo_widgets_sections(_, [0, total_height]);
+      total_height += sections.geom.dim[1] * 2 + pad;
 
 
       // /* Button Switces  Slider */
@@ -379,19 +362,19 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       total_height += widgets.geom.dim[1] * 2 + pad;
 
 
-      // /* scrolling */
-      // const scroller = Demo_widgets_scrolled_labels(_, [0, total_height], _, slider_distance, slider_smoothness, slider_intensity);
-      // total_height += scroller.geom.dim[1] * 2 + pad;
+      /* scrolling */
+      const scroller = Demo_widgets_scrolled_labels(_, [0, total_height]);
+      total_height += scroller.geom.dim[1] * 2 + pad;
 
 
-      // /* Colorpicker */
-      // const colorpicker = Demo_widgets_colorpicker_demo_with_info(_, total_height);
-      // total_height += colorpicker.geom.dim[1] * 2 + pad;
+      /* Colorpicker */
+      const colorpicker = Demo_widgets_colorpicker_demo_with_info(_, total_height);
+      total_height += colorpicker.geom.dim[1] * 2 + pad;
 
 
-      // /* dropdown - move - hover */
-      // const dp = Demo_widgets_dropdown(_, [0, total_height], slider_distance, slider_smoothness, slider_intensity)
-      // total_height += dp.geom.dim[1] * 2 + pad;
+      /* dropdown - move - hover */
+      const dp = Demo_widgets_dropdown(_, [0, total_height])
+      total_height += dp.geom.dim[1] * 2 + pad;
 
 
       /* Coloring per vertex */
@@ -645,8 +628,7 @@ export function Demo_page(create_demo_id = category_widgets.id) {
       _, options_clbk_params, _,
    );
 
-   // window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
-   window_menu.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+   window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, _, true);
 
 
    /*******************************************************************************************/
@@ -1202,7 +1184,7 @@ function Options_menu_callback(params) {
    if (needs_scroller) {
 
       const scroller_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
-      const scroller_component = Components_create_scroller_component(10, scroller_height, controls_section, 100);
+      const scroller_component = Components_create_scroller_component(10, scroller_height, controls_section, );
       Scoller_component_gengfx_and_render(scroller_component, controls_section, GFX_CTX_FLAGS.ABSOLUTE_POSITION);
       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(controls_section.root_posidx, scroller_component.root_posidx);
       Listeners_set_priority(E.C, scroller_component.listeners);

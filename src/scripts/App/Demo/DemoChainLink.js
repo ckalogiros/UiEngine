@@ -6,7 +6,9 @@ import { Mouse_get_pos } from "../../Engine/Controls/Input/Mouse.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Get_fasma_color, WHITE } from "../../Engine/Drawables/Material/Colors.js";
-import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Style_rect_default_properties, Widget_gfx_ready_enable } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -39,29 +41,21 @@ export function Demo_chain_link(x=0, y=0) {
    
    let next_posx = 300;
    
-   const head = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0, 0], [next_posx, y, 1], [size,size], TRANSPARENCY(color,tr), 'head', _);
-   head.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
-   head.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   head.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-   head.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
-   head.SetName('head');
+   const head = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[next_posx, y, 1], dim:[size,size], col:TRANSPARENCY(color,tr), name:'head',}));
+   Widget_gfx_ready_enable({mesh:head, enable_sdf_rect:size, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    
    head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
-   head.options = SECTION.INHERIT|SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
+   // head.options = SECTION.INHERIT|SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
    
-
+   
    
    for(let i=0; i < count; i++){
       
       next_posx -= size*2 + next_posx;
       
       const c = Get_fasma_color(i, count, 2);
-      const body_child = Create_rect_mesh(_, _, [0,0], [next_posx, 0, 1], [size,size], TRANSPARENCY(c,tr), 'head', style);
-      body_child.GfxUniformsEnable({unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3,}, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      body_child.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, feather);
-      body_child.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, size);
-      body_child.SetName(`body${i}`);
-      
+      const body_child = Create_rect_mesh(Style_rect_default_properties({pos:[next_posx, 0, 1], dim:[size,size], col:TRANSPARENCY(c,tr), name:'body',}));
+      Widget_gfx_ready_enable({mesh:body_child, enable_sdf_rect:size, });
       head.AddItem(body_child);
    }
    

@@ -11,6 +11,7 @@ import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/M
 import { Max } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
+import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../Operations/MeshAttributesFunctions.js";
 
 
 
@@ -376,7 +377,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
          params.clbk_params.function_slope.IncrementTimer();
          const timer = params.clbk_params.function_slope.GetTimer();
          // const slope = Logarithmic_interpolation(timer, slope_constant);
-         const val = (.1 / Logarithmic_interpolation(1 - slider_val, slope_constant));
+         const val = (.3 / Logarithmic_interpolation(1 - slider_val, slope_constant));
          const max = val !== Infinity ? val >= 0 ? val : .01 : 23
 
          // console.log(slope)

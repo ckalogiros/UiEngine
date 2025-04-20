@@ -120,7 +120,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu = Create_rect_mesh(properties.menu);
       Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10,})
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
-      this.menu.options = SECTION.VERTICAL|SECTION.RESIZE_PARENT|SECTION.TOP_DOWN;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;

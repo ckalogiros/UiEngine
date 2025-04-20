@@ -336,6 +336,10 @@ const LAYOUT = {
 	FLOAT_RIGHT: _CNT <<= 0x1,
 	EXPAND: _CNT <<= 0x1,
 	PRESERVE_SELF_POS: _CNT <<= 0x1,
+
+
+	GROW_HORIZONTAL: _CNT <<= 0x1, // Takes up any space from parent's fixed width
+	GROW_VERTICAL: _CNT <<= 0x1, // Takes up any space from parent's fixed height
 }
 
 

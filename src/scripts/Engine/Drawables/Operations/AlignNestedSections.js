@@ -1,11 +1,13 @@
 "use strict";
 
+import { Mesh_get_name } from "./MeshPropertiesFunctions.js";
+
 
 /** */
 export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
-   // const ret = Align_pre_simple___(mesh, pos_x, pos_y, pad);
-   const ret = Align_pre_simple___with_scroller(mesh, pos_x, pos_y, pad);
+   const ret = Align_pre_simple___(mesh, pos_x, pos_y, pad);
+   // const ret = Align_pre_simple___with_scroller(mesh, pos_x, pos_y, pad);
    if(mesh.align.flags & LAYOUT.RESIZE_SELF) {
 
       const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
@@ -38,8 +40,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
    let max_size_y = 0
 
 
-
-
    for (let i = 0; i <= mesh.children.boundary; i++) {
 
       const cur_mesh = mesh.children.buffer[i];
@@ -54,7 +54,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          cur_mesh.geom.pos[1] = cur_pos_y;
 
 
-         const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
+         const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad);
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
 
@@ -142,6 +142,133 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
 }
 /** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
+let _temp_meshes_with_grow_buffer = [];
+export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y = 0) {
+
+   const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
+   const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
+
+   // TODO: Pad for RESIZE_SELF should resize for children, margin should set self outside padding
+
+   let cur_pos_x = pos_x;
+   let cur_pos_y = pos_y;
+
+   cur_pos_x += pad_x;
+   cur_pos_y += pad_y;
+
+   let total_size_x = 0;
+   let total_size_y = 0;
+
+   let accum_row_size_x = 0
+   let max_size_x = 0
+   let accum_row_size_y = 0
+   let max_size_y = 0
+
+   
+   for (let i = 0; i <= mesh.children.boundary; i++) {
+      
+      const cur_mesh = mesh.children.buffer[i];
+      
+      const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
+      const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
+      
+      if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
+         
+         cur_mesh.geom.pos[0] = cur_pos_x + cur_pad_x;
+         cur_mesh.geom.pos[1] = cur_pos_y + cur_pad_y;
+         
+         if (cur_mesh.align.flags & LAYOUT.GROW_HORIZONTAL) {
+            cur_mesh.geom.dim[0] = (((mesh.geom.dim[0] - accum_row_size_x)/cur_mesh.align.hor_grow_count) * cur_mesh.align.proportion.x)  ;
+            cur_mesh.geom.dim[0] -= cur_pad_x;
+         }
+         if (cur_mesh.align.flags & LAYOUT.GROW_VERTICAL) {
+            cur_mesh.geom.dim[1] = (((mesh.geom.dim[1] - max_size_y)/cur_mesh.align.vert_grow_count) * cur_mesh.align.proportion.y)  ;
+            cur_mesh.geom.dim[1] -= cur_pad_y;
+         }
+         // console.error(Mesh_get_name(cur_mesh), 'dim[0]', cur_mesh.geom.dim[0], 'accum_x', accum_row_size_x, 'hor', cur_mesh.align.hor_grow_count, 'dim[1]', cur_mesh.geom.dim[1], 'accum_y', max_size_y, 'vert', cur_mesh.align.vert_grow_count)
+
+         accum_row_size_x += cur_mesh.geom.dim[0] + cur_pad_x;
+         if(accum_row_size_y < cur_mesh.geom.dim[1] + cur_pad_y) {
+            accum_row_size_y = cur_mesh.geom.dim[1] + cur_pad_y;
+         }
+
+         const ret = Align_pre_simple___with_grow_containers(cur_mesh, cur_pos_x, cur_pos_y);
+
+         const next_mesh = mesh.children.buffer[i + 1];
+         if (next_mesh) {
+            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+               
+               cur_pos_x = mesh.geom.pos[0] ;
+
+               if (accum_row_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += accum_row_size_y*2;
+               else cur_pos_y += cur_mesh.geom.dim[1] * 2+ cur_pad_y * 2;
+               // cur_pos_y += cur_mesh.geom.dim[1] * 2 + cur_pad_y * 2;
+               max_size_y += accum_row_size_y;
+               accum_row_size_x = 0;
+            }
+            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x*2;
+         }
+         else { // If this is the last child
+            max_size_y += accum_row_size_y;
+         }
+      }
+      else {
+
+         const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
+
+         if (accum_row_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
+            accum_row_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+         }
+
+         // Update the total size accumulator according to widget's align flags
+         if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
+            total_size_x += ret.dim_x;
+            if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+         }
+         else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+            total_size_y += ret.dim_y;
+            total_size_x = ret.dim_x;
+            accum_row_size_x = 0;
+         }
+
+         // Calculate the next position, based on the next mesh's align flags
+         const next_mesh = mesh.children.buffer[i + 1];
+         if (next_mesh) {
+            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+               if (accum_row_size_y > ret.dim_y) cur_pos_y += accum_row_size_y;
+               else cur_pos_y += ret.dim_y * 2;
+               cur_pos_x = mesh.geom.pos[0];
+               max_size_y += accum_row_size_y / 2
+               accum_row_size_y = 0; // Reset current row max size
+            }
+            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2+cur_pad_x;
+         }
+         else { // If this is the last child
+            max_size_y += accum_row_size_y / 2;
+         }
+         accum_row_size_x += ret.dim_x + (cur_pad_x/2);
+         // accum_row_size_x += ret.dim_x ;
+         
+      }
+
+      if (max_size_x < accum_row_size_x) max_size_x = accum_row_size_x
+
+   }
+
+
+   _temp_meshes_with_grow_buffer = [];
+
+   const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : max_size_x;
+   const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
+
+   return {
+      dim_x: size_x,
+      dim_y: size_y,
+   }
+
+
+}
+/** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
 function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
    const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
@@ -177,7 +304,7 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
          cur_mesh.geom.pos[0] = cur_pos_x;
          cur_mesh.geom.pos[1] = cur_pos_y;
 
-         const ret = Align_pre_simple___with_scroller(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
+         const ret = Align_pre_simple___with_scroller(cur_mesh, cur_pos_x, cur_pos_y, pad);
          
          /** Scroller resize based on scrolled section height or scollers max_height */
          if(cur_mesh.scroller_comp) {

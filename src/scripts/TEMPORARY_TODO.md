@@ -1,5 +1,12 @@
 TODO
 
+# Resizable containers
+   1. Must be set as resizable OR resize self
+   2. Ισος καταμερισμος χωρου
+   3. Fixed width/height
+   4. Proportional %
+   5. Has minimum, according to its items(The use scrolled area)
+
 # For scroller implementation
 {
    1. Fix the initial position of the scroller.
@@ -46,8 +53,6 @@ Also instead of dim for vpos we should use vpos
 
 
 
-* Render dp with scrolller
-
 * Currently we render a 4 color vertex buffers support.
    So it is free to create color gradiants for all meshes.
    IS MULTICOLOR VERTEX BUFFER USE SAME VB OPERATIONS AS THE 1 COLOR????????
@@ -59,22 +64,12 @@ Also instead of dim for vpos we should use vpos
 * Rename the align var in the button-label class.
 Also see if the align for text in buttons-labels is needed
 
-* Set the .align.flags in classes: 
-Example
-   const infomesh = Create_widget_multi_text({
-      align:TEXT_ALIGN.HORIZONTAL, // DOES NOT STORE THE TEXT_ALIGN IN THE CONSTRUCTOR
-   });
-   infomesh.align.flags = LAYOUT.HORIZONTAL;
-
 
 * Implement NEW positioning architecture based on root widgets.
    All children should have their position relative to the parent mesh
 
 * Currently we combined the msdf with regular texture font for text rendering
 and we use geom.font_size for a consice size. See if we can draw the size from the dim or implement correctly
-
-* REMOVE UNECESSARY:
-   export function Create_widget_multi_text({{{ROOT_WIDGET_FLAGS}}}} = 0x0,
 
 * RenderText() needs clean up
    Needs // TODO: For efficiency, create a dedicated Gl_ function to update all values
@@ -83,9 +78,6 @@ and we use geom.font_size for a consice size. See if we can draw the size from t
 * DEEP CLEANUP: Use debug to look into classes objects and remove any anecessary fiels
 
 * The char_buffer should be implemented as an Int8Array of code points
-
-* Remove all words 'font' and replace them with the word texture_id
-   All font loadings happen in the same procedure as any texture loading
 
 * Correct the parameters:style in widgets-meshes constructor
    Re-think the style set architecture

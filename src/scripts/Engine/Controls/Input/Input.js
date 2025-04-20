@@ -7,6 +7,7 @@ import { Mouse_on_move, Mouse_on_down, Mouse_on_up, Mouse_on_out, Mouse_on_wheel
 import { OnKeyDown, OnKeyUp } from "./Keyboard.js";
 import { Renderer_set_canvas_size } from "../../Renderers/Renderer.js";
 import { Mesh_unif_update_sticky_pos } from "../../Core/MeshUniformsBuffer.js";
+import { Scene_window_resized_meshes_calculate_layout } from "../../Scenes.js";
 
 
 
@@ -21,14 +22,14 @@ export function Input_reset() {  // HOT-PATH
 
 
 
-function OnWindowResize(e) {
+// function OnWindowResize(e) {
 
-  On_window_resize();
-}
+//   On_window_resize();
+// }
 
 
 
-export function On_window_resize() {
+function On_window_resize() {
 
   
   DEVICE.width = window.innerWidth;
@@ -65,7 +66,10 @@ export function On_window_resize() {
 
   // Move any meshes that suppose to be stick on the right hand side
   // The position update is happening through the update of the wpos uniform of the root parent  
-  Mesh_unif_update_sticky_pos(xdif, ydif)
+  Mesh_unif_update_sticky_pos(xdif, ydif);
+
+  // TODO: Run a function that hass all root meshes that will resize onWindowResize
+  Scene_window_resized_meshes_calculate_layout();
 }
 
 
@@ -121,7 +125,7 @@ export function Input_create_user_input_listeners() {
 
   window.addEventListener('mousedown', Mouse_on_down, false);
   window.addEventListener('mouseup', Mouse_on_up, false);
-  window.addEventListener("resize", OnWindowResize, false);
+  window.addEventListener("resize", On_window_resize, false);
 
   // Disabling the context menu on long taps on Android. 
   canvas.oncontextmenu = function (event) {

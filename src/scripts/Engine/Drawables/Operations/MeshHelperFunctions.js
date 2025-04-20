@@ -7,6 +7,7 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get_vb_byidx } from "../../Core
 import { Root_group_vbidx_view_get, Root_group_view_buffer_get_mesh_by_rootidx } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
+import { Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Components_get_scroller_component } from "../Widgets/ScrollerComponent.js";
 
 
@@ -189,3 +190,16 @@ export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border 
         border: border,
     };
 }
+
+
+
+   
+export function Mesh_remove_time_interval(mesh, idx) {
+      const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[idx];
+      if(intervalIdx===-1){
+         console.error('intervalIdx', intervalIdx, 'mesh.timeIntervalsIdxBuffer.buffer', mesh.timeIntervalsIdxBuffer.buffer)
+         alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
+      }
+      Time_intervals_destroy_byidx(intervalIdx);
+      mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(idx);
+   }

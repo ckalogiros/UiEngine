@@ -222,8 +222,6 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
 
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 3.5, jiggley: 6 });
-
-   // emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
    emitter.EnableProperties(PARTICLES.HAS_FADE);
 
 
@@ -377,7 +375,7 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
    // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true,})
    Widget_gfx_ready_enable({mesh:emitter, enable_unif_scale:true,})
 
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);emitter.EnableProperties(PARTICLES.HAS_FADE);
+   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 1.5, jiggley: 2 });
    emitter.EnableProperties(PARTICLES.HAS_FADE);
 
@@ -530,7 +528,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    Particles_gen_gfx_ctx(emitter, controls_section);
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
-   emitter.GfxUniformSetAndUpdate('u_generic_controls', [.2, 1., .1]);
+   emitter.GfxUniformSetAndUpdate('u_generic_controls', contols_values);
 
 
 
@@ -757,7 +755,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
 
 
 /** For rendering the slider controls seperately from the smoke particles */
-export function Create_smoke_particles_controls(emitter, color = GREY[2], parameters = null, shader_parameters = null, generic_contols_parameters, uniform_name) {
+export function Create_smoke_particles_controls(emitter, color = GREY[2], parameters = null, shader_parameters = null, generic_contols_parameters, uniform_name='u_generic_controls') {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
       const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, name:name, layout:LAYOUT.VERTICAL, texture_id:texture_id}));

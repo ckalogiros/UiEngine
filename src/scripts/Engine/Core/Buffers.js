@@ -405,8 +405,11 @@ export function New_int8_buffer(size=1, debug_name='INT8 DEBUB UNAMED') {
 }
 /** */
 export function Free_int8_buffer(buffer){
-   if(!buffer || buffer===_)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918767. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS--;
    // DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS = 0;
@@ -490,8 +493,11 @@ export function New_int16_buffer(size=1, debug_name='INT16 DEBUB UNAMED') {
 }
 /** */
 export function Free_int16_buffer(buffer){
-   if(!buffer || buffer===_)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918769. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
@@ -561,7 +567,11 @@ export function New_int32_buffer(size=1, debug_name='INT32 DEBUB UNAMED') {
 }
 /** */
 export function Free_int32_buffer(buffer){
-   
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918764. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT32.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
@@ -702,6 +712,12 @@ export class M_Buffer {
 
 
    ResetFull() {
+
+      if(!this.buffer || this.buffer===_) {
+
+         console.error('7155431200918768. Free buffer:Buffer is null ');
+         return;
+      }
 
       // If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
       if(this.buffer[this.boundary] instanceof Int32_Buffer) {
@@ -995,8 +1011,11 @@ export function New_generic_buffer(obj, debug_name = 'UNAMED BUFFER') {
 /** */
 export function Free_generic_buffer(buffer) {
 
-   if(!buffer)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918765. Free buffer:Buffer is null ');
+      return;
+   }
    //  If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
    if(buffer.buffer[buffer.boundary] instanceof Int32_Buffer) {
 
@@ -1164,7 +1183,11 @@ export function New_generic_char_buffer(obj, debug_name = 'UNAMED BUFFER') {
 }
 /** */
 export function Free_generic_char_buffer(buffer) {
+   if(!buffer || buffer===_) {
 
+      console.error('7155431200918766. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.TOTAL_BUFFER_SIZE -= buffer.size; // Remove from the total allocations size the size of the buffer that is destroyed
    DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.NUM_BUFFERS--;
 

@@ -1,5 +1,5 @@
 "use strict";
-import { Scene_set_projection_matrix, Scenes_create_scene } from '../Engine/Scenes.js'
+import { Scene_reset_window_resized_meshes, Scene_set_projection_matrix, Scenes_create_scene } from '../Engine/Scenes.js'
 import { Renderqueue_init, Renderqueue_reset } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Renderer_create_renderer } from '../Engine/Renderers/Renderer.js';
 import { CameraOrthographic } from '../Engine/Renderers/Renderer/Camera.js';
@@ -176,6 +176,8 @@ export function App_reset(){
     GFX_VBIDX_RENAME_ME.Reset();
 
     Generic_buffers_container_reset();
+
+    Scene_reset_window_resized_meshes();
 
 }
 

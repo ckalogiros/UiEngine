@@ -18,6 +18,7 @@ import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focuse
 import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -30,10 +31,10 @@ export class Rect_Mesh extends Mesh {
       const geom = new Geometry2D(properties.pos, properties.dim, _, properties.num_faces);
 
       // Create texture if the user has passed a texture id of type:TEXTURES.
-      const mat = (properties.texture_id === undefined) ? new Material(properties.col) : 
-      (properties.sub_texture_id !== INT_NULL && properties.sub_texture_id !== undefined) ? new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _) : new Material_Texture(properties.col, properties.texture_id);
+      const mat = (properties.texture_id === undefined) ? new Material(properties.col) :
+         (properties.sub_texture_id !== INT_NULL && properties.sub_texture_id !== undefined) ? new Material_Atlas_Texture(properties.col, properties.texture_id, properties.sub_texture_id, _) : new Material_Texture(properties.col, properties.texture_id);
 
-      
+
       super(geom, mat);
       // console.log(properties.name, properties.col)
 
@@ -79,6 +80,13 @@ export class Rect_Mesh extends Mesh {
 
       mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
 
+      // If it is the first child, then HORIZONTAL layout must be applied.
+      if (mesh.align.flags & LAYOUT.VERTICAL && idx === 0) {
+         mesh.align.flags &= ~LAYOUT.VERTICAL ;
+         mesh.align.flags |= LAYOUT.HORIZONTAL;
+      }
+
+      // console.error(Mesh_get_name(this), 'horr', this.align.TEMP_children_hor, 'vert', this.align.TEMP_children_vert)
       return idx;
    }
    /** */
@@ -103,7 +111,7 @@ export class Rect_Mesh extends Mesh {
 
          if (this.children.buffer[i]) is_child_shifted = this.children.buffer[i].Destroy();
          // IMPORTANT: Because of the (childrens) buffer shifts remaining children, the buffer is getting smaller, and we need to reduce the index too.           
-         if(is_child_shifted) {
+         if (is_child_shifted) {
             i -= 1;
             is_child_shifted = false;
          }
@@ -145,12 +153,12 @@ export class Rect_Mesh extends Mesh {
       }
 
    }
-   
-   /** */
-   GfxCtxSetFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
 
-      if(this.gfx_ctx_parent === INT_NULL) {
-         
+   /** */
+   GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
          this.gfx_ctx_flags = FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
 
@@ -162,13 +170,13 @@ export class Rect_Mesh extends Mesh {
       }
    }
    /** */
-   GfxCtxAddFlag(FLAGS, gfx_ctx_parent=INT_NULL, recurse=false) {
-      
-      if(this.gfx_ctx_parent === INT_NULL) {
-         
+   GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
+
+      if (this.gfx_ctx_parent === INT_NULL) {
+
          this.gfx_ctx_flags |= FLAGS;
          this.gfx_ctx_parent = gfx_ctx_parent;
-         
+
          if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
                if (this.children.buffer[i]) this.children.buffer[i].GfxCtxAddFlag(FLAGS, gfx_ctx_parent, recurse);
@@ -208,7 +216,7 @@ export class Rect_Mesh extends Mesh {
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
 
-      if(this.scroller_comp) {
+      if (this.scroller_comp) {
 
          Scoller_component_gengfx(this.scroller_comp,);
       }
@@ -228,7 +236,7 @@ export class Rect_Mesh extends Mesh {
          }
       }
 
-      if(this.scroller_comp) {
+      if (this.scroller_comp) {
 
          Scoller_component_render(this.scroller_comp);
          // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
@@ -322,7 +330,7 @@ export class Rect_Mesh extends Mesh {
       const mesh = this;
 
       if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-         
+
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
             Mesh_listener_add(mesh, E.H, null, null);
@@ -470,6 +478,9 @@ export class Rect_Mesh extends Mesh {
          const clip_top = root_pos[1];
          const clip_bottom = root_pos[1] + root.geom.dim[1] * 2;
          const clip_right = root_pos[0] + root.geom.dim[0] * 2;
+
+
+         Align_pre_simple___with_grow_containers(root);
 
          // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
          for (let i = 0; i <= root.children.boundary; i++) {
