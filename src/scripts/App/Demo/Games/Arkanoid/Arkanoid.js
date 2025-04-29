@@ -48,7 +48,7 @@ const _arkanoid_struct = {
       start_btn: { view_group: null, mesh: null },
    },
    game_menu: {
-      panel: { view_group: null, mesh: null },
+      panel: { view_group: null, mesh: null, pos_x: 0, pos_y: 0 },
    },
    game_panel: {
       panel: { view_group: null, mesh: null },
@@ -144,7 +144,8 @@ function Arkanoid_load_state(state) {
    else if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) { // Case the game is at the start stage
       View_activate_all_vbs(_arkanoid_struct.game_panel.panel.view_group, true);
       Bricks_reset_all_deactivated_bricks();
-      Bricks_set_stage_bricks(_, _, _arkanoid_struct.game_panel.panel.view_group[0]);
+      // Bricks_set_stage_bricks(_arkanoid_struct.game_panel.panel.pos_x, _arkanoid_struct.game_panel.panel.pos_y, _arkanoid_struct.game_panel.panel.view_group[0]);
+      Bricks_set_stage_bricks(0, 0, _arkanoid_struct.game_panel.panel.view_group[0]);
       Arkanoid_create_brick_animation();
       ARK_STATE.ADD(ARK_STATE.BALL_START);
    }
@@ -208,6 +209,7 @@ function Arkanoid_initialize_start_menu(x, y) {
    // Render
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    section.Render()
+   
    Construct_listen_events_from_mesh_tree(section);
    Construct_listen_events_relations_from_mesh_tree(section);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -369,7 +371,7 @@ function Arkanoid_initialize_game(x, y) {
    Root_group_activate_all_vbs_in_renderqueue(game_panel.root_bufferidx);
    
    
-   game_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, game_panel.gfx.vb.groupidx)
+   game_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, game_panel.gfx.vb.groupidx);
    // game_panel.GfxUniformSetAndUpdate('u_generic_controls', control_values);
    game_panel.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, game_panel.gfx.vb.groupidx);
 
@@ -381,6 +383,8 @@ function Arkanoid_initialize_game(x, y) {
    View_build_group_from_root_mesh(game_panel);
    _arkanoid_struct.game_panel.panel.view_group = game_panel.group_bufferidxs;
    _arkanoid_struct.game_panel.panel.mesh = game_panel;
+   _arkanoid_struct.game_panel.panel.pos_x = game_panel.geom.pos[0] ;
+   _arkanoid_struct.game_panel.panel.pos_y = game_panel.geom.pos[1];
 
    View_add_to_group(game_panel, group_idx);
 
@@ -390,8 +394,8 @@ function Arkanoid_initialize_game(x, y) {
    const parent = game_panel;
 
    const player = Player_init(0, 0, group_idx, parent.root_posidx, parent.mesh_bufferidx);
-   const player_posx = ARKANOID_SECTION_DIM_X - player.mesh.geom.dim[0];
-   const player_posy = ARKANOID_SECTION_DIM_Y * 2 - (player.mesh.geom.dim[1] * 2 + 20); // 20: some padd from bottom
+   const player_posx = game_panel.geom.pos[0] + ARKANOID_SECTION_DIM_X - player.mesh.geom.dim[0];
+   const player_posy = game_panel.geom.pos[1] + ARKANOID_SECTION_DIM_Y * 2 - (player.mesh.geom.dim[1] * 2 + 20); // 20: some padd from bottom
    Player_set_position(player_posx, player_posy);
    _arkanoid_struct.game_panel.player.view_group = player.mesh.group_bufferidxs;
    _arkanoid_struct.game_panel.player.mesh = player;
@@ -402,7 +406,9 @@ function Arkanoid_initialize_game(x, y) {
    const fx_explosion_glow = Effects_explosion_glow_init_buffer(group_idx, parent.root_posidx, parent.mesh_bufferidx);
    _arkanoid_struct.game_panel.fx_explosion_glow.view_group = fx_explosion_glow.mesh.group_bufferidxs;
    
-   const brick = Bricks_init_buffer(group_idx, parent.root_posidx, parent.mesh_bufferidx);
+   const br_pos_x = game_panel.geom.pos[0];
+   const br_pos_y = game_panel.geom.pos[0];
+   const brick = Bricks_init_buffer(br_pos_x, br_pos_y, group_idx, parent.root_posidx, parent.mesh_bufferidx);
    _arkanoid_struct.game_panel.bricks.view_group = brick.mesh.group_bufferidxs;
    _arkanoid_struct.game_panel.bricks.mesh = brick;
 
@@ -476,6 +482,7 @@ function Arkanoid_run(params) {
    const bound_right = game_panel_pos[0] + panel.geom.dim[0] * 2;
 
    let posx = mouse_posx - game_panel_pos[0] - player_half_dimx;
+   // let posx = mouse_posx  - player_half_dimx;
 
    // Limit player move to the left and right panel bounds
    if (posx > bound_right - player_half_dimx * 2) posx = bound_right - player_half_dimx * 2;
@@ -498,7 +505,7 @@ function Arkanoid_run(params) {
          // Ball follows player and constrain it in players width 
 
          const ball = Ball_get_main_ball();
-
+         
          // Make the ball not leave the players's width area
          if (ball.mesh.geom.pos[0] < pl_left) {
             ball.mesh.geom.pos[0] = pl_left;
@@ -506,6 +513,7 @@ function Arkanoid_run(params) {
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
          }
          else if (ball.mesh.geom.pos[0] > pl_right) {
+            // STATE.loop.paused = true
             ball.mesh.geom.pos[0] = pl_right;
             Mesh_set_wpos_x(ball.mesh, pl_right);
             Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
@@ -515,7 +523,7 @@ function Arkanoid_run(params) {
 
          const bound_local_left = (apos[0]);
          const bound_local_right = (apos[0] + panel.geom.dim[0] * 2);
-         const bound_local_bottom = (apos[0] + panel.geom.dim[1] * 2);
+         const bound_local_bottom = (apos[1] + panel.geom.dim[1] * 2);
          const bound_local_top = apos[1];
          Ball_update(bound_local_left, bound_local_right, bound_local_top, bound_local_bottom, player.mesh.geom.pos, player.mesh.geom.dim);
       }
@@ -850,7 +858,8 @@ export function Arkanoid_test_game_options() {
    }
 
 
-   const panel = Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh_yellow, slider_dim, control_values, 'u_generic_controls', 0x0, 0, 0); controls_panel.AddItem(panel);
+   const panel = Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh_yellow, slider_dim, control_values, 'u_generic_controls', 0x0, 0, 0); 
+   controls_panel.AddItem(panel);
 
    Align_nested_sections_pre(controls_panel);
    controls_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);

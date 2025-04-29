@@ -1,7 +1,7 @@
 "use strict";
 
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
-import { BLUEL, GREY, WHITE, YELLOWL } from "../../Material/Colors.js";
+import { BLUEL, Color_hsv_to_rgb_calibrated, GREY, WHITE, YELLOWL } from "../../Material/Colors.js";
 
 
 
@@ -20,7 +20,7 @@ export function Widget_gfx_ready_enable({
    mesh = null,
    enable_unif_wpos = true,
    enable_unif_blend = true,
-   enable_unif_scale = false,
+   enable_unif_scale,
    enable_unif_time = false,
    enable_src_color_in_main = true,
    enable_sdf_rect,
@@ -36,7 +36,15 @@ export function Widget_gfx_ready_enable({
 
    if (enable_unif_wpos) mesh.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
    if (enable_unif_blend) mesh.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
-   if (enable_unif_scale) mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+   if (enable_unif_scale !== undefined) {
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
+      if (enable_unif_scale[0] !== undefined) {
+         mesh.geom.scale[0] = enable_unif_scale[0];
+      }
+      if (enable_unif_scale[1] !== undefined) {
+         mesh.geom.scale[1] = enable_unif_scale[1];
+      }
+   }
    if (enable_unif_time) mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
    if (enable_attr_dim) { mesh.GfxEnableAttr(SID.ATTR.DIM2); mesh.GfxPassAttr(SID.ATTR.DIM2); }
@@ -245,19 +253,6 @@ export function Style_slider_simple_default_properties(user_properties) {
 /** */
 export function Style_slider_default_properties(user_properties) {
 
-   /**
-    * Widget_Slider_XX1 properties
-    * constructor(ROOT_WIDGET_FLAGS, _pos, dim, col, hover_margin, name, is_debug_mesh) {
-
-    * 
-    * Rect mesh properties
-    * {mesh_bufferidx, ROOT_WIDGET_FLAGS, _pos, dim, col, hover_margin, name, is_debug_mesh}
-    * 
-    * Text mesh properties
-    * { pos: pos, font_size: font_size, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
-    */
-
-
    const properties = {
       is_root: user_properties.is_root,
       pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
@@ -271,24 +266,18 @@ export function Style_slider_default_properties(user_properties) {
       // For image texture rendering. Also can be used to pass texture_id for the slider's text meshes, if the texture_id is a font texture 
       // set this to undefined and store the texture_id to the value_text/name_text fields to be consumed in the slider constructor
       texture_id: user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? _ : user_properties.texture_id,
-      // font_size: user_properties.font_size,
       variant_idx: user_properties.variant_idx,
-      
       layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       bar: {
-         // col:BLUEL[7],
          col: user_properties.bar_col !== undefined ? user_properties.bar_col : GREY[8],
          rcorners: user_properties.bar_rcorners !== undefined ? user_properties.bar_rcorners : 4,
       },
       handle: {
-         // col:GREY[8],
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : BLUEL[7],
          dim:user_properties.handle_dim !== undefined ? user_properties.handle_dim : [10, 10],
       },
       name_text: {
-         // Text_Mesh properties: { pos: pos, font_size: font_size, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
-
          col: user_properties.value_text_col !== undefined ? user_properties.value_text_col : WHITE,
          text: user_properties.name !== undefined ? user_properties.name : 'Slider UNAMED',
          font_size: user_properties.font_size !== undefined ? user_properties.font_size : 8,
@@ -297,8 +286,6 @@ export function Style_slider_default_properties(user_properties) {
          variant_idx: user_properties.value_text_variant_idx !== undefined ? user_properties.value_text_variant_idx : _,
       },
       value_text: {
-         // Text_Mesh properties: { pos: pos, font_size: font_size, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
-
          col: user_properties.value_text_col !== undefined ? user_properties.value_text_col : WHITE,
          font_size: user_properties.font_size !== undefined ? user_properties.font_size : 8,
          texture_id: user_properties.value_text_texture_id !== undefined ? user_properties.value_text_texture_id : user_properties.texture_id <= TEXTURES.TEXTURE_FONTS_COUNT ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024,
@@ -309,6 +296,14 @@ export function Style_slider_default_properties(user_properties) {
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
 
    };
+
+   if(user_properties.theme!==undefined) {
+      properties.col = user_properties.theme.col;
+      properties.bar.col = user_properties.theme.bar_col;
+      properties.handle.col = user_properties.theme.handle_col;
+      properties.name_text.col = user_properties.theme.name_text_col;
+      properties.value_text.col = user_properties.theme.value_text_col;
+   }
    
 
    // Avoid using image texture for the slider's text meshes
@@ -366,6 +361,11 @@ export function Style_label_default_properties(user_properties) {
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
 
+   if(user_properties.theme!==undefined) {
+      properties.col = user_properties.theme.col;
+      properties.text_col = user_properties.theme.text_col;
+   }
+
    return properties;
 }
 /** */
@@ -401,6 +401,11 @@ export function Style_button_default_properties(user_properties) {
       
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
+
+   if(user_properties.theme!==undefined) {
+      properties.col = user_properties.theme.col;
+      properties.text_col = user_properties.theme.text_col;
+   }
 
    return properties;
 }
@@ -463,6 +468,10 @@ export function Style_switch_default_properties(user_properties) {
 
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
+   if(user_properties.theme!==undefined) {
+      properties.col = user_properties.theme.col;
+      properties.handle.col = user_properties.theme.handle_col;
+   }
 
    return properties;
 }
@@ -574,6 +583,8 @@ export function Style_dropdown_default_properties(user_properties) {
          texture_id:_,
          sub_texture_id:_,
          variant_idx:_,
+
+         layout:(user_properties.layout !== undefined && user_properties.layout & LAYOUT.EXPAND) ? LAYOUT.EXPAND|LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL : LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL,
          
          is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
       },

@@ -515,7 +515,8 @@ export class Close_Button extends Widget_Button {
       root.Destroy(root);
 
       if (root.event_clbks) {
-         root.event_clbks.buffer[0].evt_clbks();
+         const params = root.event_clbks.buffer[0].params;
+         root.event_clbks.buffer[0].evt_clbks(params);
       }
 
    }

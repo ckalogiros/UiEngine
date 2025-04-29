@@ -5,7 +5,7 @@ import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_grou
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_get_shader_attribs_indexing, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
-import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../../Scenes.js";
 import { Uniforms_block_set_uniform, Uniforms_block_get_uniform_by_name, Uniforms_buffer_find_ubidx_from_name, Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
@@ -14,7 +14,7 @@ import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Mesh_unif_create_vb_root_col, Mesh_unif_create_vb_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wpos_has_absolute_pos, Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Mesh_set_uniform_ubidx_from_name } from "../../Drawables/Operations/MeshHelperFunctions.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
+import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_buffer_get_root_meshidx, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
@@ -396,18 +396,52 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
                   // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
                   const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY;
-                  // Choose to assign the mesh as the root uniform position, or the mesh and any mesh of this vertexbuffer should use it's Move function to be moved 
-                  const COPY_MESH_POS = (flags) ? true : false;
+                  
+                  // OLD CODE: const COPY_MESH_POS = (flags) ? true : false;
+                  let COPY_MESH_POS = false;
+                  // Copy initial position to uniform? Note that a mesh with a root parent(or up the parent tree) will 'get' the root unif wposition on any position related functionality.
+                  // So we wouldn't want to copy the initial position of the mesh since the 'get' of the root wposition will double the position value 
+
+                  /**SAVE*/
+                  // if(mesh.mesh_bufferidx === mesh.root_bufferidx || mesh.root_bufferidx === INT_NULL) { 
+                  //    COPY_MESH_POS = true
+                  // }
+                  // else if(mesh.root_bufferidx !== INT_NULL) { 
+                     
+                  //    const root_mesh_idx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
+                  //    if(mesh.mesh_bufferidx !== root_mesh_idx) {
+                  //       const root_mesh = Mesh_buffer_get_mesh_byidx(root_mesh_idx);
+                  //       // if(Sid_check_match(mesh.sid, root_mesh.sid)) // Checking if mesh and root mesh are on different vertex buffers
+                  //       if(vb_groupidx === root_mesh.gfx.vb.groupidx) // Checking if mesh and root mesh are on the same vertex buffer. If yes, the mesh will 'get' one wpos, from one vb, so it is necessary to copy
+                  //          COPY_MESH_POS = true
+                  //    }
+
+                  // }
+
+                  // if(mesh.root_bufferidx !== INT_NULL) {
+
+                  //    const root_mesh_idx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
+
+                  //    if(mesh.mesh_bufferidx === root_mesh_idx) { 
+                  //       COPY_MESH_POS = true;
+                  //    }
+                  //    else {
+                  //       const root_mesh = Mesh_buffer_get_mesh_byidx(root_mesh_idx);
+                  //       if(vb_groupidx === root_mesh.gfx.vb.groupidx) // Checking if mesh and root mesh are on the same vertex buffer. If yes, the mesh will 'get' one wpos, from one vb, so it is necessary to copy
+                  //          COPY_MESH_POS = true;
+                  //    }
+                  // }
+                  // else COPY_MESH_POS = true;
+                  COPY_MESH_POS = true;
+
+                  // console.log(mesh.name, 'copy pos?', COPY_MESH_POS, 'mbidx', mesh.mesh_bufferidx, 'rootidx', mesh.root_bufferidx)
+
                   // Create the uniform position that will update the vertexbuffer's uniform
                   mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
-                  // mesh.geom.pos[0] = 0;
-                  // mesh.geom.pos[1] = 0;
 
                   if (mesh.root_posidx !== vb_groupidx)
                      alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
 
-                  // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-                  // has_unif_wpos_enabled = true;
                }
             }
          }

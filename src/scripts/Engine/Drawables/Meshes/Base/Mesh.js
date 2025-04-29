@@ -213,8 +213,7 @@ export class Mesh {
     }
     /** */
     Destroy() {
-        // console.log('DSTROY-Mesh class:', this.GetName())
-        console.log('DESTROY:', Mesh_get_name(this));
+        // console.log('DESTROY:', Mesh_get_name(this));
 
 
         /*************************************************************************************/
@@ -363,76 +362,6 @@ export class Mesh {
     }
 
 
-
-
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Listeners
-    /*******************************************************************************************************************************************************/
-
-    /** */
-    // CreateListenEvent(etype, is_fake_event = false) {
-
-    //     if (!this.listeners) {
-    //         this.listeners = New_generic_buffer(_, 'Mesh-Listeners');
-    //         this.listeners.Init(LISTEN_EVENT_TYPES_INDEX.SIZE);
-    //     }
-
-    //     if (etype & LISTEN_EVENT_TYPES.HOVER) {
-
-    //         this.listeners.AddAtIndex(E.H, INT_NULL);
-
-    //         this.state.mask |= (MESH_STATE_FLAGS.IS_HOVERABLE | MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
-    //         this.event_flags |= LISTEN_EVENT_TYPES.HOVER;
-
-    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_HOVERABLE);
-
-    //     }
-    //     if (etype & LISTEN_EVENT_TYPES.CLICK_UP) {
-
-    //         this.listeners.AddAtIndex(E.C, INT_NULL)
-
-    //         this.state.mask |= (MESH_STATE_FLAGS.IS_CLICKABLE);
-    //         this.event_flags |= LISTEN_EVENT_TYPES.CLICK_UP;
-
-    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
-
-    //     }
-    //     if (etype & LISTEN_EVENT_TYPES.MOVE) {
-
-    //         this.listeners.AddAtIndex(E.C, INT_NULL);
-
-    //         this.state.mask |= (MESH_STATE_FLAGS.IS_GRABABLE | MESH_STATE_FLAGS.IS_MOVABLE | MESH_STATE_FLAGS.IS_CLICKABLE);
-    //         this.event_flags |= LISTEN_EVENT_TYPES.MOVE;
-
-    //         if (is_fake_event) this.state.mask |= (MESH_STATE_FLAGS.IS_FAKE_EVENT | MESH_STATE_FLAGS.IS_FAKE_CLICKABLE);
-
-    //     }
-
-    // }
-
-
-
-
-
-
-
-    /*******************************************************************************************************************************************************/
-    // Transformations   Setters-Getters
-    /*******************************************************************************************************************************************************/
-
-    // /** */
-    // SetColorRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGB(col, this.gfx, this.geom.num_faces); }
-    // /** */
-    // SetColorAllRGB(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorAllRGB(col, this.gfx, this.geom.num_faces); }
-    // /** */
-    // SetColorRGBA(col) { this.SetUpdateFrameBuffer(); this.mat.SetColorRGBA(col, this.gfx, this.geom.num_faces); }
-
-
-
-
     /** */
     StylesGetMargin(axis = STYLES.AXIS.ALL) { return Styles_margin_get(axis, this.styles); }
     /** */
@@ -539,10 +468,10 @@ export class Mesh {
 
         if (params) {
 
-            if (params.time) { this.geom.time = params.time; }
-            if (params.generic) { this.geom.generic = params.generic; }
-            if (params.rcorners) this.mat.style.rcorners = params.rcorners;
-            if (params.col4_per_vertex) { this.mat.col = params.col4_per_vertex; }
+            if (params.time!==undefined) { this.geom.time = params.time; }
+            if (params.generic!==undefined) { this.geom.generic = params.generic; }
+            if (params.rcorners!==undefined) this.mat.style.rcorners = params.rcorners;
+            if (params.col4_per_vertex!==undefined) { this.mat.col = params.col4_per_vertex; }
         }
 
     }
@@ -572,8 +501,10 @@ export class Mesh {
     /** */
     GfxEnableFn(flags, params) {
 
+        
         // Enable shader function calls (from shader main())
         if (flags === SID.SHAD.FN_GLOW) {
+            if(params===undefined) alert('Enable shader FN_GLOW needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
             };
@@ -588,6 +519,7 @@ export class Mesh {
             this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
         if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
+            if(params===undefined) alert('Enable shader FN_EXPLOSION_CIRCLE needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
                 generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
@@ -597,20 +529,21 @@ export class Mesh {
             this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
         if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
+            if(params===undefined) alert('Enable shader FN_EXPLOSION_GLOW needs: \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
-                generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
             };
             this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+            this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+            this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
-        if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
+        if (flags === SID.SHAD.FN_GLOW_SPHERE) {
             this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
             this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
             this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
         }
         if (flags === SID.SHAD.FN_NOISE) {
+            if(params===undefined) alert('Enable shader FN_NOISE needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
             const param = { // Create default attribs values
                 time: params.time !== undefined ? params.time : 0,
             };

@@ -430,7 +430,7 @@ export function Program_store_shader_operations(function_operation, blend_mode) 
 		// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
 		// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
 		const idx = _shader_operations.Add({ fn_op: function_operation, blend_mode: blend_mode });
-		console.log('----- _shader_operations:', idx, 'fn_op:', TEMP_Shader_operation_get_name_by_id(function_operation))
+		// console.log('----- _shader_operations:', idx, 'fn_op:', TEMP_Shader_operation_get_name_by_id(function_operation))
 		return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
 	}
 }

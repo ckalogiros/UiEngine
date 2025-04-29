@@ -32,6 +32,8 @@ export class Material {
       this.texture_file_id = INT_NULL;
       this.texidx = INT_NULL;
 
+      this.hsv = [0, 1, 1];
+
       if (col[0].constructor === Float32Array) {
 
          const len = col.length;
@@ -52,19 +54,6 @@ export class Material {
       }
 
    }
-   // SetColorAllRGB(col, gfx, num_faces) {
-   //    math.CopyArr3(this.col, col);
-   //    math.CopyArr3(this.defCol, col);
-   //    Gl_set_rgb(gfx, this.col, num_faces);
-   // }
-   // SetColorRGB(col, gfx, num_faces) {
-   //    math.CopyArr3(this.col, col);
-   //    Gl_set_rgb(gfx, this.col, num_faces);
-   // }
-   // SetColorRGBA(col, gfx, num_faces) {
-   //    math.CopyArr4(this.col, col);
-   //    Gl_set_rgba(gfx, this.col, num_faces);
-   // }
 
 }
 /** */

@@ -8,7 +8,7 @@ import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/
 import { Detect_host_platform, Device_set_up, Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
 import { Time_intervals_destroy, Time_intervals_init_time, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
-import { Dbg_ui_info_all_reset, Debug_info_ui_performance_set_initial_position_screen_right } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Dbg_ui_info_all_reset } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Listener_init_event_storage_buffers, Listener_reset_event_storage_buffers_dealocate } from '../Engine/Events/EventListeners.js';
 import { Notifications_initialize, Notifications_reset } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
@@ -85,7 +85,7 @@ export function AppInit() {
     // Renderer_set_canvas_size(VIEWPORT.WIDTH, VIEWPORT.HEIGHT);
     Scene_set_projection_matrix(renderer.scene.sceneidx); // update camera's projection matrix
 
-    Debug_info_ui_performance_set_initial_position_screen_right()
+    // Debug_info_ui_performance_set_initial_position_screen_right()
 
 }
 

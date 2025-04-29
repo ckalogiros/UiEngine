@@ -19,53 +19,47 @@ import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operation
 
 
 
-
+// TODO: In case the button is not a root and it is in the same vb as the root, the text MUST take the buttons position 
 
 export class Widget_Label extends Rect_Mesh {
 
     constructor(mesh_bufferidx, properties) {
 
-        // HACK: 
-        // if(properties.variant_idx === undefined) properties.variant_idx = ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0
-
-        // if(properties.font === undefined) properties.font = TEXTURES.DEFAULT_FONT
-
-        // const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
-        // if (sdfouter + bold > 1) bold = 1 - sdfouter;
-
         const text = properties.text;
 
-        const text_mesh = Create_text_mesh({text:text, pos:[0, 0, properties.pos[2]+1], col:properties.text_col, pad:properties.text_pad, font_size:properties.font_size, texture_id:properties.texture_id, sub_texture_id:properties.sub_texture_id, variant_idx:properties.variant_idx, is_debug_mesh:properties.is_debug_mesh});
-        Widget_gfx_ready_enable({mesh:text_mesh, enable_attr_dim:false,});
+        const text_pos_x = (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) ? 0 : properties.pos[0];
+        const text_pos_y = (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) ? 0 : properties.pos[1];
+        const text_mesh = Create_text_mesh({ text: text, pos: [text_pos_x, text_pos_y, properties.pos[2] + 1], col: properties.text_col, pad: properties.text_pad, font_size: properties.font_size, texture_id: properties.texture_id, sub_texture_id: properties.sub_texture_id, variant_idx: properties.variant_idx, is_debug_mesh: properties.is_debug_mesh });
+        Widget_gfx_ready_enable({ mesh: text_mesh, enable_attr_dim: false, });
         text_mesh.StylesSetPad(properties.text_pad);
 
-        // // HACK: Create equal x pad for the ratio dif of w/h
+        // Create equal x pad for the ratio dif of w/h
         // properties.text_pad[0] += text_mesh.geom.dim[0] * 1.1708984375/2
 
         // Align text to the center of the label
         text_mesh.geom.pos[0] += properties.text_pad[0];
         text_mesh.geom.pos[1] += properties.text_pad[1];
 
-        
+
         // HERE: Do not send any texture to Rect_Mesh. This is the labels rect panel
         // super(mesh_bufferidx, properties);
         super(mesh_bufferidx, Style_rect_default_properties({
-            is_root:properties.is_root,
-            pos:properties.pos,
-            dim:properties.dim,
-            col:properties.col,
-            pad:properties.pad,
-            name:properties.text,
-            num_faces:properties.num_faces,
-            is_debug_mesh:properties.is_debug_mesh,
+            is_root: properties.is_root,
+            pos: properties.pos,
+            dim: properties.dim,
+            col: properties.col,
+            pad: properties.pad,
+            name: properties.text,
+            num_faces: properties.num_faces,
+            is_debug_mesh: properties.is_debug_mesh,
         }));
         this.type |= MESH_TYPE.WIDGET_LABEL | this.geom.type | this.mat.type;
-        
+
         this.text_mesh = text_mesh;
-        
+
         this.geom.dim[0] = text_mesh.text_width + properties.text_pad[0];
         this.geom.dim[1] = text_mesh.text_height + properties.text_pad[1];
-        
+
 
         text_mesh.sceneidx = this.sceneidx;
 
@@ -89,12 +83,12 @@ export class Widget_Label extends Rect_Mesh {
     SetLayout(align_flags) {
 
         this.align.flags = align_flags;
-     }
-  
-     AddLayout(align_flags) {
-  
+    }
+
+    AddLayout(align_flags) {
+
         this.align.flags |= align_flags;
-     }
+    }
 
     /****************************************************************************************************************************************************/
     /****************************************************************************************************************************************************/
@@ -184,9 +178,11 @@ export class Widget_Label extends Rect_Mesh {
     GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
         if (this.gfx_ctx_parent === INT_NULL) {
-
-            this.gfx_ctx_flags = FLAGS;
-            this.gfx_ctx_parent = gfx_ctx_parent;
+            
+            if ((this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW) === 0) {
+                this.gfx_ctx_flags = FLAGS;
+                this.gfx_ctx_parent = gfx_ctx_parent;
+            }
             this.text_mesh.gfx_ctx_flags = FLAGS;
             this.text_mesh.gfx_ctx_parent = gfx_ctx_parent;
         }
@@ -229,7 +225,7 @@ export class Widget_Label extends Rect_Mesh {
             }
         }
         else {
-            
+
             if (text_specific_vb_groupidx !== INT_NULL) {
                 this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
             }
@@ -369,8 +365,8 @@ export class Widget_Label extends Rect_Mesh {
         Mesh_update_set_wpos_x(this);
         Mesh_set_wpos_relative_x(this.text_mesh, x);
     }
-    
-    
+
+
     SetWposY(y) {
         this.geom.pos[1] = y;
         Mesh_update_set_wpos_y(this);
@@ -549,7 +545,7 @@ export class Widget_Label extends Rect_Mesh {
             // Construct CLICK_UP/MOVE event
             if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
                 const evt_params = { target_mesh: mesh, };
-                Mesh_listener_add(mesh,E.C, mesh.OnClick, evt_params);
+                Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
             }
         }
     }

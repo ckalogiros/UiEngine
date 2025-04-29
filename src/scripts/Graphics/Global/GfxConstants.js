@@ -152,10 +152,6 @@ const SID = {
         FS_RCORNERS_VEC3: BIT5<<=0x1,
         FS_GLOW_VEC3: BIT5<<=0x1,
         // Generic Uniforms
-        FS_GENERIC_FLOAT: BIT5<<=0x1,
-        FS_GENERIC_VEC2: BIT5<<=0x1,
-        FS_GENERIC_VEC3: BIT5<<=0x1,
-        FS_GENERIC_VEC4: BIT5<<=0x1,
         FS_GENERIC_CONTROLS: BIT5<<=0x1,
 
 

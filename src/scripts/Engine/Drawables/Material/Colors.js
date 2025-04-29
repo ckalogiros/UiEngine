@@ -1,6 +1,6 @@
 "use strict";
 
-import { Abs, AddArr3, Clamp, CopyArr4, Fract, Lerp, Mix_vec3_float32Array, Mix_vec4_float32Array, Mod, Mult_arr3_scalar, Mult_arr4_scalar2 } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Clamp, Fract, Mod, Mult_arr3_scalar } from "../../../Helpers/Math/MathOperations.js";
 
 
 
@@ -59,12 +59,7 @@ export function RGB(int, widness=0, color_offset=5, brightness=1.3) {
 
 	const offset = .13
 	let final = hsv2rgb3( Fract( int* ( u5(Math.sqrt(color_wideness) ) ) ) + offset*color_offset);
-	// let final = hsv2rgb3( Fract( int* ( u5(Math.sin(color_wideness) ) ) ) + offset*color_offset);
-	// let final = hsv2rgb3( Fract( int* ( u5(Math.cos(color_wideness) ) ) + color_offset*3 ) );
-
-	const b = [1-brightness, 1-brightness, 1-brightness]; 
 	
-	// final = Mix_vec3_float32Array(b, final, .5); 
 	Mult_arr3_scalar(final, brightness); 
 	return final;
 } 
@@ -94,6 +89,131 @@ export function RGB(int, widness=0, color_offset=5, brightness=1.3) {
 
 
 
+export function  Color_hsv_to_rgb(h, s, v, a=1) {
+
+	const c = v * s;
+	const h6 = (h * 6) % 6;
+	const x = c * (1 - Math.abs(h6 % 2 - 1));
+
+	let r = 0, g = 0, b = 0;
+
+	if (h6 < 1)       [r, g, b] = [c, x, 0];
+	else if (h6 < 2)  [r, g, b] = [x, c, 0];
+	else if (h6 < 3)  [r, g, b] = [0, c, x];
+	else if (h6 < 4)  [r, g, b] = [0, x, c];
+	else if (h6 < 5)  [r, g, b] = [x, 0, c];
+	else              [r, g, b] = [c, 0, x];
+
+	const m = v - c;
+	return new Float32Array([r + m, g + m, b + m, a]);
+}
+
+export function Color_hsv_to_rgb_calibrated(h, s, v, alpha=1, contrast=75, hue_preservation=.3) {
+
+	const c = v * s;
+	const h6 = (h * 6) % 6;
+	const x = c * (1 - Math.abs(h6 % 2 - 1));
+
+	let r = 0, g = 0, b = 0;
+
+	if (h6 < 1)       [r, g, b] = [c, x, 0];
+	else if (h6 < 2)  [r, g, b] = [x, c, 0];
+	else if (h6 < 3)  [r, g, b] = [0, c, x];
+	else if (h6 < 4)  [r, g, b] = [0, x, c];
+	else if (h6 < 5)  [r, g, b] = [x, 0, c];
+	else              [r, g, b] = [c, 0, x];
+
+	const m = v - c;
+	return new Float32Array([
+		(r + m) * (contrast + (1 - contrast) * hue_preservation), 
+		(g + m) * (contrast + (1 - contrast) * hue_preservation), 
+		(b + m) * (contrast + (1 - contrast) * hue_preservation), 
+		alpha,
+	]);
+
+
+}
+
+
+export function Contrast_calibrated(c, contrast=1, a) {
+	return c * contrast + (1 - contrast) * a;
+}
+export function Contrast_calibrated_rgba(c, contrast=1, a=.5) {
+	return new Float32Array([
+		c[0] * contrast + (1 - contrast) * a,
+		c[1] * contrast + (1 - contrast) * a,
+		c[2] * contrast + (1 - contrast) * a,
+		c[3],
+	]);
+}
+
+export function Contrast(c, contrast=1) {
+	return c * contrast + (1 - contrast) * 0.5;
+}
+
+
+export function Contrast_rgba(color, contrast=1) {
+	return new Float32Array([
+		color[0] * contrast + (1 - contrast) * 0.5,
+		color[1] * contrast + (1 - contrast) * 0.5,
+		color[2] * contrast + (1 - contrast) * 0.5,
+		color[3],
+	]);
+}
+
+
+
+// * 1. (0.2126*R + 0.7152*G + 0.0722*B)
+// * 2. (0.299*R + 0.587*G + 0.114*B)
+// * 3. ( 0.241*R^2 + 0.691*G^2 + 0.068*B^2 ) 
+// const lum_r = 1.0 - 0.241, lum_g = 1.0 - 0.691, lum_b = 1.0 - 0.068;
+// const lum_r = 1.0 - 0.2126, lum_g = 1.0 - 0.7152, lum_b = 1.0 - 0.0722;
+const lum_r = 1.0 - 0.299, lum_g = 1.0 - 0.587, lum_b = 1.0 - 0.114;
+
+export function Luminance_rgb(color, makeup=1.8) {
+	return new Float32Array([
+		Math.sqrt(color[0] * lum_r) * makeup,
+		Math.sqrt(color[1] * lum_g) * makeup,
+		Math.sqrt(color[2] * lum_b) * makeup,
+		color[3],
+	]);
+}
+
+
+export function Color_calculate_luminance_from_hsv(h, s, v, alpha, contrast, hue_preservation) {
+
+	const color = Color_hsv_to_rgb_calibrated(h, s, v, alpha, contrast, hue_preservation)
+	// const Lum = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
+	// 0.299 R + 0.587 G + 0.114 B
+	const Lum = 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2];
+	// const Lum = color[0] * color[1] * color[2];
+	return Lum;
+}
+export function Color_calculate_luminance_from_rgb(rgb) {
+
+	const Lum = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+	return Lum;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -103,29 +223,7 @@ export function RGB(int, widness=0, color_offset=5, brightness=1.3) {
 export const TRANSPARENT = new Float32Array([0.0, 0.0, 0.0, 0.0]);
 export const WHITE = new Float32Array([1.0, 1.0, 1.0, 1.0]);
 export const BLACK = new Float32Array([0.04, 0.04, 0.04, 1.0]);
-// export const CYAN = new Float32Array([0.0, 1.0, 1.0, 1.0]);
 export const MAGENTA = new Float32Array([1.0, 0.0, 1.0, 1.0]);
-
-// sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
-let scale = 2.5
-// export const RED_LUM_ADJ = new Float32Array([(1.0-0.329)*scale, 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const GREEN_LUM_ADJ = new Float32Array([0.0, (1.0-0.587)*scale, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, (1.0-0.114)*scale, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const RED_LUM_ADJ = new Float32Array([.5, 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const GREEN_LUM_ADJ = new Float32Array([0.0, .5, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, .5, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, Math.sqrt((1.0-0.114)*(1.0-0.114))*scale, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const RED_LUM_ADJ = new Float32Array([Math.sqrt((0.299)*(0.299)), 0.0, 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const GREEN_LUM_ADJ = new Float32Array([0.0, Math.sqrt((0.587)*(0.587)), 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const BLUE_LUM_ADJ = new Float32Array([0.0, 0.0, Math.sqrt((0.114)*(0.114)), 1.0]); //  A full yellow color with human perception luminance adasted
-// export const YELLOW_LUM_ADJ = new Float32Array([Math.sqrt((1.0-0.299)*(1.0-0.299)), Math.sqrt((1.0-0.587)*(1.0-0.587)), 0.0, 1.0]); //  A full yellow color with human perception luminance adasted
-// export const YELLOW_ = new Float32Array([.9, .9, 0.1, .9]);
-
-// export function CHECK_WHITE(){
-// 	if(WHITE[3] < 1)
-// 		console.log()
-// }
-
 
 const ORANGE0 = new Float32Array([0.1, 0.050, 0.0, 1.0]);
 const ORANGE1 = new Float32Array([0.2, 0.100, 0.0, 1.0]);
@@ -385,16 +483,7 @@ const CYAN9 = new Float32Array([0.0, 1.0, 1.0, 1.0]);
 export const CYAN = [CYAN0, CYAN1, CYAN2, CYAN3, CYAN4, CYAN5, CYAN6, CYAN7, CYAN8, CYAN9,];
 
 
-// export const COLOR_ARRAY1 = [
-// 	BLUEL,
-// 	PURPLEB,
-// 	PURPLER,
-// 	YELLOW,
-// 	GREEN,
-// 	ORANGE,
-// 	ORANGEL,
-// 	REDL,
-// ];
+
 export const COLOR_ARRAY3 = [
 	BLUEL,
 	YELLOW,
@@ -422,6 +511,8 @@ export const COLOR_ARRAY = [
 ]
 
 export function Get_fasma_color(index, max_count, num_colors = 4, brightness=1, alpha=1) {
+
+	if(num_colors > COLOR_ARRAY.length) num_colors = COLOR_ARRAY.length;
 
 	let color_wide = max_count / num_colors;
 	const overlap = 0;
@@ -696,3 +787,28 @@ export function COLOR_GRADIENT_VERTICAL(color1, color2) {
 	];
 	return ret;
 }
+
+
+
+
+
+
+
+/***************************************************************************************************************************************************/
+// Themes: Ready colors
+/***************************************************************************************************************************************************/
+
+export const COLOR_THEME_BASIC = {
+
+	GREY_DARK_BASE: new Float32Array([0.12, 0.12, 0.12, 1.0]),
+	// GREY_DARK_MID: new Float32Array([0.18, 0.18, 0.18, 1.0]),
+	GREY_DARK_MID: new Float32Array([0.17, 0.17, 0.17, 1.0]),
+	GREY_DARK_LIGHT: new Float32Array([0.2, 0.2, 0.2, 1.0]),
+	// GREY_DARK_LIGHT: new Float32Array([0.24, 0.24, 0.24, 1.0]),
+
+	// HSV: h:206, s:[85,55,35]
+	BLUE_DARK: new Float32Array([0.16, 0.2666, 0.349, 1.0]),
+	BLUE_MID: new Float32Array([0.247, 0.4196, 0.549, 1.0]),
+	BLUE_LIGHT: new Float32Array([0.376, 0.643, 0.85, 1.0]),
+};
+

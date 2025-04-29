@@ -443,51 +443,56 @@ class Emitter {
    }
    GfxEnableFn(flags, params) {
 
+        
       // Enable shader function calls (from shader main())
       if (flags === SID.SHAD.FN_GLOW) {
-         const param = { // Create default attribs values
-            time: params.time !== undefined ? params.time : 0,
-         };
-         this.sid.shad |= SID.SHAD.FN_GLOW;
-         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+          if(params===undefined) alert('Enable shader FN_GLOW needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+          const param = { // Create default attribs values
+              time: params.time !== undefined ? params.time : 0,
+          };
+          this.sid.shad |= SID.SHAD.FN_GLOW;
+          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       // TODO: See if attr enable and passes are required, It seems NOT
       if (flags === SID.SHAD.FN_INNER_SHADOW) {
-         this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+          this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-         const param = { // Create default attribs values
-            time: params.time !== undefined ? params.time : 0,
-            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-         };
-         this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+          if(params===undefined) alert('Enable shader FN_EXPLOSION_CIRCLE needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+          const param = { // Create default attribs values
+              time: params.time !== undefined ? params.time : 0,
+              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+          };
+          this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-         const param = { // Create default attribs values
-            time: params.time !== undefined ? params.time : 0,
-            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-         };
-         this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+          if(params===undefined) alert('Enable shader FN_EXPLOSION_GLOW needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+          const param = { // Create default attribs values
+              time: params.time !== undefined ? params.time : 0,
+              // generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+          };
+          this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
-      if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-         this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+      if (flags === SID.SHAD.FN_GLOW_SPHERE) {
+          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE) {
-         const param = { // Create default attribs values
-            time: params.time !== undefined ? params.time : 0,
-         };
-         this.sid.shad |= SID.SHAD.FN_NOISE;
-         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
+          if(params===undefined) alert('Enable shader FN_NOISE needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+          const param = { // Create default attribs values
+              time: params.time !== undefined ? params.time : 0,
+          };
+          this.sid.shad |= SID.SHAD.FN_NOISE;
+          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
@@ -497,9 +502,9 @@ class Emitter {
       if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
 
       if (params !== undefined) {
-         if (params.blend_mode !== undefined) {
-            this.sid.blend_options |= params.blend_mode;
-         }
+          if (params.blend_mode !== undefined) {
+              this.sid.blend_options |= params.blend_mode;
+          }
       }
 
       // TODO
@@ -508,7 +513,77 @@ class Emitter {
       // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-   }
+  }
+   // GfxEnableFn(flags, params) {
+
+   //    // Enable shader function calls (from shader main())
+   //    if (flags === SID.SHAD.FN_GLOW) {
+   //       const param = { // Create default attribs values
+   //          time: params.time !== undefined ? params.time : 0,
+   //       };
+   //       this.sid.shad |= SID.SHAD.FN_GLOW;
+   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //    }
+   //    // TODO: See if attr enable and passes are required, It seems NOT
+   //    if (flags === SID.SHAD.FN_INNER_SHADOW) {
+   //       this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //    }
+   //    if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
+   //       const param = { // Create default attribs values
+   //          time: params.time !== undefined ? params.time : 0,
+   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+   //       };
+   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //    }
+   //    if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
+   //       const param = { // Create default attribs values
+   //           time: params.time !== undefined ? params.time : 0,
+   //           generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+   //       };
+   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+   //       // this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+   //       // this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //   }
+   //    if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
+   //       this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+   //    }
+   //    if (flags === SID.SHAD.FN_NOISE) {
+   //       const param = { // Create default attribs values
+   //          time: params.time !== undefined ? params.time : 0,
+   //       };
+   //       this.sid.shad |= SID.SHAD.FN_NOISE;
+   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
+   //    }
+   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
+   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
+   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3_TYPES) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
+   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3D) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3D; }
+   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
+   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
+
+   //    if (params !== undefined) {
+   //       if (params.blend_mode !== undefined) {
+   //          this.sid.blend_options |= params.blend_mode;
+   //       }
+   //    }
+
+   //    // TODO
+   //    // case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
+   //    // case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
+   //    // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
+   //    // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
+   //    // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
+   // }
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 

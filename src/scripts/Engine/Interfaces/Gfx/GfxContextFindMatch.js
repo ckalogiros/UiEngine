@@ -321,6 +321,8 @@ function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
          return vb_groupidx;
       }
 
+      console.log('Found match for:', mesh.name, 'vb_groupidx', vb_groupidx)
+
    }
 
    // Else search in parent's children recursively

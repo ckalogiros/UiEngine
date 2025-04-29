@@ -451,7 +451,7 @@ function Coin_update_state_2(coin) {
 
       // Move the coin glow a little bit closer to destination position by small ammounts
       dist[0] *= 0.01;
-      dist[1] *= 0.03;
+      dist[1] *= 0.036;
 
       // Update coin glow position
       coin_glow.geom.pos[0] += dist[0];

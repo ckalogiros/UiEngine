@@ -63,6 +63,8 @@ const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget..
 const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
+const MAX_NAME_LENGTH = 8;
+
 
 
 
@@ -335,11 +337,15 @@ const LAYOUT = {
 	FIXED_HEIGHT: _CNT <<= 0x1,
 	FLOAT_RIGHT: _CNT <<= 0x1,
 	EXPAND: _CNT <<= 0x1,
-	PRESERVE_SELF_POS: _CNT <<= 0x1,
+	// PRESERVE_SELF_POS: _CNT <<= 0x1,
 
 
 	GROW_HORIZONTAL: _CNT <<= 0x1, // Takes up any space from parent's fixed width
 	GROW_VERTICAL: _CNT <<= 0x1, // Takes up any space from parent's fixed height
+
+
+	// Create some kind of types, in order to denote what align layout function to be used
+	TYPE_GROW_CONTAINER: _CNT <<= 0x1, 
 }
 
 

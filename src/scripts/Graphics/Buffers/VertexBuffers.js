@@ -30,6 +30,7 @@ const DISABLE_DEBUG = true;
 
 
 // TODO: The VAO must be created per Program and not per Vertex buffer
+/** */
 export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx, IS_PRIVATE) {
 
     /***********************************************************************************************/
@@ -146,34 +147,26 @@ export function Vertex_buffer_create(sid, size = MAX_VERTEX_BUFFER_SIZE, progidx
 // Vertex Buffer Data
 /****************************************************************************************************************************************************/
 
-
+/** */
 const _vertex_buffers_data = New_generic_buffer(_, 'GFX Index Buffer');
 _vertex_buffers_data.Init(1);
 
 
+/** */
 export function Vertex_buffer_reset_full() {
     Vertex_buffer_info_gl_destroy(gfxCtx.gl);
     _vertex_buffers_data.ResetFull();
 }
-
-
-
-
+/** */
 export function Vertex_buffer_get_Active_count() { return _vertex_buffers_data.active_count; }
-
-
-
+/** */
 export function Vertex_buffer_get() { return _vertex_buffers_data; }
-
-
-
+/** */
 export function Vertex_buffer_get_by_vbidx(vbidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_data, vbidx, new Error().lineNumber);
     return _vertex_buffers_data.buffer[vbidx];
 }
-
-
-
+/** */
 export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_data, vbidx, new Error().lineNumber);
     return _vertex_buffers_data.buffer[vbidx][attr_idx];
@@ -208,20 +201,18 @@ export function Vertex_buffer_get_attrib_value_from_vb_byidx(vbidx, attr_idx) {
 // Vb info describes a '_vertex_buffers_data'. One info for every '_vertex_buffers_data'.
 const _vertex_buffer_infos = New_generic_buffer(_, 'GFX Vertex Buffer Infos');
 
+/** */
 export function Vertex_buffer_info_reset() {
     Gl_vertex_buffer_group_vbo_delete_all();
     _vertex_buffer_infos.ResetFull();
 }
-
-
-
+/** */
 function Gl_vertex_buffer_group_vbo_delete(ibidx) {
 
     const vao = _vertex_buffer_infos.buffer[ibidx];
     gfxCtx.gl.deleteBuffer(vao);
 }
-
-
+/** */
 function Gl_vertex_buffer_group_vbo_delete_all() {
 
     for (let i = 0; i <= _vertex_buffer_infos.boundary; i++) {
@@ -231,9 +222,7 @@ function Gl_vertex_buffer_group_vbo_delete_all() {
         gfxCtx.gl.deleteBuffer(vbo);
     }
 }
-
-
-
+/** */
 class Vertex_Buffer_Info {
 
     constructor(size, vbo, vbidx, type, sid) {
@@ -304,28 +293,21 @@ class Vertex_Buffer_Info {
 
 
 }
-
-
+/** */
 export function VBI_get_byidx(vb_infoidx) {
     // TODO: Check for valid buffer element
     return _vertex_buffer_infos.buffer[vb_infoidx];
 }
-
-
-
+/** */
 export function VBI_reset_full() {
     _vertex_buffer_infos.ResetFull()
 }
-
-
-
+/** */
 export function VBI_get_whole_buffer() {
     // TODO: Check for valid buffer element
     return _vertex_buffer_infos;
 }
-
-
-
+/** */
 export function Vertex_buffer_info_gl_destroy(gl) {
     for (let i = 0; i <= _vertex_buffer_infos.boundary; i++) {
         gl.deleteBuffer(_vertex_buffer_infos.buffer[i].vbo);
@@ -358,6 +340,7 @@ export function Vertex_buffer_info_gl_destroy(gl) {
 // A group defines a set of vertex buffers that render a particular mesh/meshes (vb's are separated by attributes of that mesh)
 const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Vertex Buffer Groups');
 
+/** */
 export function Vertex_buffer_group_reset() {
     Gl_vertex_buffer_group_vbo_delete_all()
     _vertex_buffer_groups.ResetFull();
@@ -367,6 +350,7 @@ export function Vertex_buffer_group_reset() {
 
 
 
+/** */
 class Vertex_Buffer_Group {
 
     constructor(progidx, vaoidx, vao, sid) {
@@ -430,86 +414,62 @@ class Vertex_Buffer_Group {
 // GETTERS-SETTERS 
 /****************************************************************************************************************************************************/
 
+/** */
 export function Vertex_buffer_group_get() { return _vertex_buffer_groups; }
-
-
-
+/** */
 export function Vertex_buffer_group_get_count() {
     return _vertex_buffer_groups.active_count;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_get_size() {
     return _vertex_buffer_groups.size;
 }
-
-
-
+/** */
 export function Vertex_buffer_set_name_for_debuging(vb_groupidx, name) {
     if (!DISABLE_DEBUG) (_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     _vertex_buffer_groups.buffer[vb_groupidx].name = name;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_get_byidx(vb_groupidx) {
     if (!DISABLE_DEBUG) (_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     return _vertex_buffer_groups.buffer[vb_groupidx];
 }
-
-
-
+/** */
 export function Vertex_buffer_group_get_progidx(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].progidx;
 }
-
-
-
+/** */
 export function Gl_vertex_group_buffer_get_vao(vb_groupidx) {
     return {
         vao: _vertex_buffer_groups.buffer[vb_groupidx].vao,
         vaoidx: _vertex_buffer_groups.buffer[vb_groupidx].vaoidx,
     };
 }
-
-
-
+/** */
 export function Vertex_buffer_group_get_render_queueidx(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].render_queueidx;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_get_sid(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].sid
 }
-
-
-
+/** */
 export function Vertex_buffer_group_set_texidx(vb_groupidx, texidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].texidx = texidx;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_set_mesh_debug_name(vb_groupidx, name) {
     _vertex_buffer_groups.buffer[vb_groupidx].name = name;
 }
-
-
+/** */
 export function Vertex_buffer_group_get_texidx(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].texidx;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].ibidx = ibidx;
 }
-
-
-
+/** */
 export function Vertex_buffer_group_set_render_queueidx(vb_groupidx, render_queueidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].render_queueidx = render_queueidx;
 }
@@ -592,6 +552,7 @@ export function Vertex_buffer_group_remove_scissorbox(vb_groupidx) {
 /*************************************************************************************************************************/
 // Uniforms
 
+/** */
 export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, params, ubidx, unif_name) {
 
     // Avoid adding callbacks if they have already been created for this vertex buffer
@@ -616,9 +577,7 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
     });
 
 }
-
-
-
+/** */
 export function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
 
@@ -629,9 +588,7 @@ export function Vertex_buffer_remove_uniforms(vb_groupidx) {
     }
 
 }
-
-
-
+/** */
 export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, debug_progidx) {
 
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
@@ -643,19 +600,10 @@ export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx
 
         Uniforms_buffer_set_uniform_val_from_index(ubidx, val, params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);
-
-        // if(vb_groupidx===1)
-        //     console.log(val)
-
-        // if(vb_groupidx===10)
-        // if(debug_progidx===5)
-        // console.log(params, val, ubidx)
     }
 
 }
-
-
-
+/** */
 export function Vertex_buffer_set_and_update_uniform(vb_groupidx, ubidx, unif_val, unif_val_idx=null) {
 
     Program_use_program2(_vertex_buffer_groups.buffer[vb_groupidx].progidx);
@@ -669,9 +617,6 @@ export function Vertex_buffer_set_and_update_uniform(vb_groupidx, ubidx, unif_va
     Uniforms_buffer_set_uniform_val_from_index(ubidx, unif_val, unif_val_idx);
     Uniforms_buffer_update_uniform(ubidx);
 }
-
-
-
 /** If a vb is re-used, then the unif_wpos index is gonna be different and needs update.
  * The 'clbk_params' OR else unif_wpos index, is the index of the '_per_vb_mesh_unif_wpos' buffer,
  * from where the VertexBufferGroup should draw the root position for the vb uniform.
@@ -699,9 +644,7 @@ export function Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, unif
     // Replace the index of the '_per_vb_mesh_unif_wpos' buffer
     _vertex_buffer_groups.buffer[vb_groupidx].unif_set_val_clbk_params[foundidx] = unif_wpos_idx
 }
-
-
-
+/** */
 export function Vertex_buffer_get_uniform_ubidx_from_name(vb_groupidx, ubidx, unif_val, unif_val_idx=null) {
 
     Program_use_program2(_vertex_buffer_groups.buffer[vb_groupidx].progidx);
@@ -729,12 +672,13 @@ export function Vertex_buffer_get_uniform_ubidx_from_name(vb_groupidx, ubidx, un
 
 
 /*************************************************************************************************************************/
-
+/** */
 export function Vertex_buffer_group_get_vb(vb_groupidx, vbidx) {
     alert()
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
     return _vertex_buffer_groups.buffer[vb_groupidx].vbs[vbidx];
 }
+/** */
 export function Vertex_buffer_group_copy_vbs(vb_groupidx, buffer) {
     alert()
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
@@ -744,6 +688,7 @@ export function Vertex_buffer_group_copy_vbs(vb_groupidx, buffer) {
     }
     return buffer;
 }
+/** */
 export function Vertex_buffer_group_get_vbidxs(vb_groupidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffer_groups, vb_groupidx, new Error().lineNumber);
 
@@ -755,24 +700,20 @@ export function Vertex_buffer_group_get_vbidxs(vb_groupidx) {
 
 
 
-
+/** */
 export function Vertex_buffer_state_enable(vb_grouidx, vbidx, STATE_FLAG) {
     // alert()
     _vertex_buffer_infos.buffer[vbidx].state.mask |= STATE_FLAG;
     _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 }
-
-
-
+/** */
 export function Vertex_buffer_group_state_enable(vb_grouidx, STATE_FLAG) {
 
     _vertex_buffer_groups.buffer[vb_grouidx].state.mask |= STATE_FLAG;
     if (STATE_FLAG & BUFFER_STATE.NEEDS_UPDATE)
         _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 }
-
-
-
+/** */
 export function Vertex_buffer_state_disable(vb_grouidx, STATE_FLAG) {
     alert()
     const len = _vertex_buffer_groups.buffer[vb_grouidx].vbs.length;
@@ -781,9 +722,7 @@ export function Vertex_buffer_state_disable(vb_grouidx, STATE_FLAG) {
         _vertex_buffer_groups.buffer[vb_grouidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
     }
 }
-
-
-
+/** */
 export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset, byte_length) {
 
     // gl.bindVertexArray(buffer.vao);
@@ -793,9 +732,6 @@ export function Vertex_buffer_set_vb_sub_data(gl, buffer, src_offset, dst_offset
 
     buffer.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
 }
-
-
-
 /** Returns true/false */
 export function Vertex_buffer_exists_from_index(vbidx) {
 
@@ -858,9 +794,6 @@ export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
     vb_group.needs_any_update = true;
 
 }
-
-
-
 /** Reset Vertex Buffer to 0 */
 export function Vertex_buffer_reset(vb_groupidx, starts) {
     // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
@@ -901,9 +834,6 @@ export function Vertex_buffer_reset(vb_groupidx, starts) {
     vb_group.needs_any_update = true;
 
 }
-
-
-
 /**
  * // TODO:
  * The index buffer pattern ({123, 234} or fan{12,13,14,15})
@@ -983,9 +913,7 @@ export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_m
     // console.log(vb_groupidx, vb_group.draw_count)
     // return start;
 }
-
-
-
+/** */
 export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces = 0) {
 
 
@@ -1063,9 +991,7 @@ export function Vertex_buffer_add_vertices_from_reset(gfx, geom, mat, _num_faces
 
     return start
 }
-
-
-
+/** */
 export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 
     const vb_groupidx = gfx.vb.groupidx;
@@ -1109,9 +1035,7 @@ export function Vertex_buffer_update_vertices(gfx, geom, mat, dbg_mesh_name) {
 
 
 }
-
-
-
+/** */
 export function Vertex_buffer_update_vertices_explicit_Params(vb_groupidx, start, geom, mat) {
 
     // const prog = Progarm_get_program(progidx);
@@ -1141,9 +1065,7 @@ export function Vertex_buffer_update_vertices_explicit_Params(vb_groupidx, start
     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 
 }
-
-
-
+/** */
 export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
     const vb_group = _vertex_buffer_groups.buffer[gfx.vb.groupidx];
@@ -1240,7 +1162,7 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 /****************************************************************************************************************************************************/
 // Attributes Indexing Getters
 /****************************************************************************************************************************************************/
-
+/** */
 export function Vertex_buffer_get_attrib_index_col(vb_groupidx, start, geom, mat) {
 alert('0000000000')
     // const vb_info = Vertex_buffer_group_get_byidx(vb_groupidx);
@@ -1283,6 +1205,7 @@ alert('0000000000')
 // DEBUG
 /****************************************************************************************************************************************************/
 
+/** */
 function DEBUG_PRINT(buffer, index, line) {
     if (index < 0 || index > buffer.boundary) {
         console.error('Index is out of bounds. @GlVertexBuffer.js.\nLine:', line, 'index:', index, buffer);
@@ -1293,96 +1216,11 @@ function DEBUG_PRINT(buffer, index, line) {
         alert('Buffer at index is NULL. @GlVertexBuffer.js.');
     }
 }
-
-
-
+/** */
 export function Gl_vertex_buffer_print() {
     console.log('VertexBufferGroup', _vertex_buffer_groups)
     console.log('VertexBufferInfo', _vertex_buffer_infos)
     console.log('VertexBuffer:', _vertex_buffers_data)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-_CNT = 0x1;
-const VB_TO_STRING_FLAGS = {
-    COLOR: _CNT,
-    WPOS: _CNT <<= 0x1,
-    DIM: _CNT <<= 0x1,
-    TEX: _CNT <<= 0x1,
-}
-
-function Vertex_to_string(flags, progidx, vbidx, count) {
-
-    const is_wpos = flags & VB_TO_STRING_FLAGS.WPOS;
-
-    const attribsidx = Program_get_shader_attributes_index(progidx);
-    const stride = Program_get_shader_attribute_attribs_per_vertex(progidx);
-    const wpos_attr = Shader_attributes_get_attribs_offset_size(attribsidx, SID.ATTR.WPOS3);
-
-    const arr = [];
-    const faces = count / (stride * 4);
-
-    for (let i2 = 0; i2 < faces; i2++) {
-
-        let i = wpos_attr.offset;
-        let wpos = '';
-        while (i < stride * 4) {
-
-            if (is_wpos) {
-
-                wpos += `${Floor(_vertex_buffers_data.buffer[vbidx][i++])}, `;
-                wpos += `${Floor(_vertex_buffers_data.buffer[vbidx][i++])}, `;
-            }
-
-            i += stride - 2;
-        }
-
-        // const copy = Object.assign({}, wpos);
-        const copy = JSON.parse(JSON.stringify(wpos));
-        arr.push(copy);
-        console.log(copy)
-    }
-
-    // console.log(arr)
-    return arr;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

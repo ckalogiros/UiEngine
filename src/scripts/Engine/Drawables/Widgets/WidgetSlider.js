@@ -1012,6 +1012,16 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
    }
 
+   GetMeshes() {
+      return {
+         slider:this,
+         bar:this.children.buffer[this.bar_idx],
+         handle:this.children.buffer[this.bar_idx].children.buffer[0],
+         name_text:this.text_mesh,
+         value_text:this.children.buffer[this.value_text_idx],
+      };
+   }
+
 
    Activate() {
 
@@ -1109,7 +1119,11 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
       if (this.gfx_ctx_parent === INT_NULL) {
-         this.gfx_ctx_flags = FLAGS;
+
+         if ((this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW) === 0) {
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+        }
 
          const bar = this.children.buffer[this.bar_idx];
          bar.gfx_ctx_flags = FLAGS;

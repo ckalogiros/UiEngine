@@ -8,6 +8,7 @@
 "use strict";
 
 import { Vertex_buffer_group_get, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Mesh_set_and_update_wpos_uniform } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
@@ -24,24 +25,19 @@ import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";
 
 const _screen_wpos = new Int16Array([0, 0]);
 
+/** */
 export function Screen_wpos_get() { return _screen_wpos; }
-
-
+/** */
 export function Screen_wpos_get_x() { return _screen_wpos[0]; }
-
-
+/** */
 export function Screen_wpos_get_y() { return _screen_wpos[1]; }
-
-
+/** */
 export function Screen_wpos_add_x(x) { _screen_wpos[0] += x; }
-
-
+/** */
 export function Screen_wpos_add_y(y) { _screen_wpos[1] += y; }
-
-
+/** */
 export function Screen_wpos_set_x(x) { _screen_wpos[0] = x; }
-
-
+/** */
 export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
 
 
@@ -61,19 +57,28 @@ export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
 /*******************************************************************************************************************************************************************************/
 // Widget Root Positions as uniforms per vertex buffer 
 /*******************************************************************************************************************************************************************************/
+/** */
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
+/** */
 const _per_vb_mesh_unif_wpos_ubidxs = New_generic_buffer(_, '_per_vb_mesh_unif_wpos_ubidxs');
+/** */
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
 
 
+/** */
 export function Mesh_unif_wpos_reset() { _per_vb_mesh_unif_wpos.ResetFull(); }
+/** */
 export function Mesh_unif_wpos_ubidxs_reset(){ _per_vb_mesh_unif_wpos_ubidxs.ResetFull(); }
+/** */
 export function Mesh_unif_wpos_debug_names_reset(){ _debug_names_per_vb_mesh_unif_wpos.ResetFull(); }
 
 
 
+/** */
 export function Mesh_unif_wpos_get_debug() { return _per_vb_mesh_unif_wpos.buffer; }
+/** */
 export function Mesh_unif_wpos_get_count() { return _per_vb_mesh_unif_wpos.active_count; }
+/** */
 export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; }
 
 
@@ -82,11 +87,8 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 
 // IMPORTANT! The index of a root wpos is the same as the vb_groupidx and same as mesh.root_posidx
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
-export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, 
-                              progidx, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT) {
-
-
-
+/** */
+export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, progidx, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, COPY_MESH_POS) {
    // const mesh_bufferidx = mesh.mesh_bufferidx, mesh_pos = mesh.geom.pos, mesh_type = mesh.type, mesh_nameidx = mesh.nameidx, mesh_parent = mesh.parent;
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -98,6 +100,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    if(IS_VB_ROOT){
       wpos[0] = mesh_pos[0];
       wpos[1] = mesh_pos[1];
+      
    }
    
 
@@ -147,9 +150,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
 
    return idx;
 }
-
-
-
+/** */
 export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, 
                                                 progidx, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, IS_VB_USED) {
    // TODO: check NULL object
@@ -222,22 +223,17 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
 
    return vb_groupidx; // Return this unif wpos index(which matches the vb_groupidx)
 }
-
-
-
+/** */
 export function Mesh_unif_is_vb_root_wpos(root_posidx, meshidx) {
    if(_per_vb_mesh_unif_wpos.buffer[root_posidx] === undefined) return false;
    if(_per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx === meshidx) return true;
    return false;
 }
-
-
-
+/** */
 export function Mesh_unif_remove_root_wpos(root_posidx) {
    _per_vb_mesh_unif_wpos.buffer.RemoveByIdx(root_posidx);
 }
-
-
+/** */
 // HACK: Manually add a parent from which to draw the uniform wpos
 export function Mesh_unif_hack_parent_root_wpos(root_posidx, parent_root_posidx, parent_mesh_bufferidx) {
 
@@ -259,27 +255,15 @@ export function Mesh_unif_hack_parent_root_wpos(root_posidx, parent_root_posidx,
 /*********************************************************************************************************/
 // GETTERS
 // Can take vbidx as the 'idx' to return the wpos for all meshes of a vertex buffer
+/** */
 export function Mesh_unif_get_vb_root_wpos_meshidx(root_posidx) {
    return _per_vb_mesh_unif_wpos.buffer[root_posidx].meshidx;
 }
+/** */
 export function Mesh_unif_get_vb_root_wpos_has_absolute_pos(root_posidx) {
    return _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos;
 }
-
-// TODO: 
-// EFFICIENCY: Pass a buffer to store the positions. Too much 'heat' of the js GarbageColector
-
-// export function Mesh_unif_get_vb_root_wpos(root_posidx) {
-
-//    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
-
-//    if( _per_vb_mesh_unif_wpos.buffer[root_posidx].has_absolute_pos === 0){
-//       pos[0] += _screen_wpos[0];
-//       pos[1] += _screen_wpos[1];
-//    }
-//    return pos;
-// }
-
+/** */
 export function Mesh_unif_get_vb_root_wpos(root_posidx) {
 
    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
@@ -290,6 +274,12 @@ export function Mesh_unif_get_vb_root_wpos(root_posidx) {
    }
    return pos;
 }
+// export function Mesh_unif_get_vb_root_wpos_no_screen_wpos(root_posidx) {
+
+//    const pos = Mesh_unif_get_vb_root_wpos_recursive(root_posidx);
+//    return pos;
+// }
+/** */
 function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[root_posidx];
@@ -305,8 +295,7 @@ function Mesh_unif_get_vb_root_wpos_recursive(root_posidx) {
    return pos;
 }
 
-
-
+/** */
 export function Mesh_unif_get_vb_root_wposx(root_posidx) {
 
    let pos = Mesh_unif_get_vb_root_wposx_recursive(root_posidx);
@@ -316,6 +305,12 @@ export function Mesh_unif_get_vb_root_wposx(root_posidx) {
    }
    return pos;
 }
+// export function Mesh_unif_get_vb_root_wposx_no_screen_wpos(root_posidx) {
+
+//    let pos = Mesh_unif_get_vb_root_wposx_recursive(root_posidx);
+//    return pos;
+// }
+/** */
 function Mesh_unif_get_vb_root_wposx_recursive(root_posidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[root_posidx];
@@ -330,8 +325,7 @@ function Mesh_unif_get_vb_root_wposx_recursive(root_posidx) {
    return pos;
 }
 
-
-
+/** */
 export function Mesh_unif_get_vb_root_wposy(root_posidx) {
    
    let pos = Mesh_unif_get_vb_root_wposy_recursive(root_posidx);
@@ -341,6 +335,12 @@ export function Mesh_unif_get_vb_root_wposy(root_posidx) {
    }
    return pos;
 }
+// export function Mesh_unif_get_vb_root_wposy_no_screen_wpos(root_posidx) {
+   
+//    let pos = Mesh_unif_get_vb_root_wposy_recursive(root_posidx);
+//    return pos;
+// }
+/** */
 function Mesh_unif_get_vb_root_wposy_recursive(root_posidx) {
 
    const _this = _per_vb_mesh_unif_wpos.buffer[root_posidx];
@@ -362,6 +362,7 @@ function Mesh_unif_get_vb_root_wposy_recursive(root_posidx) {
 /*********************************************************************************************************/
 // SETTERS
 
+/** */
 export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
 
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].parent_posidx;
@@ -377,23 +378,17 @@ export function Mesh_unif_set_vb_root_wpos_all_siblings(root_posidx, x, y){
 
    }
 }
-
-
+/** */
 export function Mesh_unif_set_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
    
 }
-
-
-
+/** */
 export function Mesh_unif_set_vb_root_wposx(root_posidx, x) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] = x;
    
 }
-
-
-
 /** Set wpos for all roots with the same parent */
 export function Mesh_unif_set_vb_root_wposx_all_siblings(root_posidx, x) {
    
@@ -413,17 +408,14 @@ export function Mesh_unif_set_vb_root_wposx_all_siblings(root_posidx, x) {
       }
    }
 }
-
-
-
+/** */
 export function Mesh_unif_set_vb_root_wposy(root_posidx, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] = y;
    
 }
 
-
-
 /*************************************************************************************************************/
+/** */
 export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
@@ -443,25 +435,19 @@ export function Mesh_unif_add_vb_root_wpos(root_posidx, x, y) {
 
    }
 }
-
-
-
+/** */
 export function Mesh_unif_add_vb_root_wposx(root_posidx, x) {
    
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[0] += x;
    
 }
-
-
-
+/** */
 export function Mesh_unif_add_vb_root_wposy(root_posidx, y) {
    
    _per_vb_mesh_unif_wpos.buffer[root_posidx].wpos[1] += y;
 
 }
-
-
-
+/** */
 export function Mesh_unif_add_vb_root_wpos_all_siblings(root_posidx, x, y){
    
    const parent_rootidx = _per_vb_mesh_unif_wpos.buffer[root_posidx].parent_posidx;
@@ -486,6 +472,7 @@ export function Mesh_unif_add_vb_root_wpos_all_siblings(root_posidx, x, y){
 /*********************************************************************************************************/
 // MISC FUNCTIONS
 
+/** */
 export function Mesh_unif_update_sticky_pos(xdif, ydif){
 
    for(let i=0; i <= _per_vb_mesh_unif_wpos.boundary; i++){
@@ -499,9 +486,6 @@ export function Mesh_unif_update_sticky_pos(xdif, ydif){
       }
    }
 }
-
-
-
 /**Get all vertex buffers from a root via the unif wpos struct */
 export function Mesh_unif_get_all_root_wpos_indexes(root_posidx){
 
@@ -530,17 +514,15 @@ export function Mesh_unif_get_all_root_wpos_indexes(root_posidx){
 // per_vb_mesh_unif_#type
 
 const _per_vb_mesh_unif_col = New_generic_buffer(_, '_per_vb_mesh_unif_col');
+/** */
 export function Mesh_unif_col_reset() {
    _per_vb_mesh_unif_col.ResetFull();
 }
-
-
+/** */
 export function Mesh_unif_col_get_count() { return _per_vb_mesh_unif_col.active_count; }
+/** */
 export function Mesh_unif_col_get_size() { return _per_vb_mesh_unif_col.size; }
-
-
-
-
+/** */
 // Each element(uniform color) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_col'. 
 export function Mesh_unif_create_vb_root_col(mesh_col) {
 
@@ -560,9 +542,7 @@ export function Mesh_unif_create_vb_root_col(mesh_col) {
    // console.log('ROOT PER VB MESH UNIFORM COLOR BUFFER', _per_vb_mesh_unif_col.buffer, entry)
    return idx;
 }
-
-
-
+/** */
 export function Mesh_unif_store_vb_root_col(idx, pos) {
    // TODO: check NULL object
 
@@ -577,15 +557,14 @@ export function Mesh_unif_store_vb_root_col(idx, pos) {
 
 /*********************************************************************************************************/
 // SETTERS
+/** */
 export function Mesh_unif_set_vb_root_col(idx, rgba) {
    _per_vb_mesh_unif_col.buffer[idx].col[0] = rgba[0];
    _per_vb_mesh_unif_col.buffer[idx].col[1] = rgba[1];
    _per_vb_mesh_unif_col.buffer[idx].col[2] = rgba[2];
    _per_vb_mesh_unif_col.buffer[idx].col[3] = rgba[3];
 }
-
-
-
+/** */
 export function Mesh_unif_add_vb_root_col(idx, rgba) {
    _per_vb_mesh_unif_col.buffer[idx].col[0] += rgba[0];
    _per_vb_mesh_unif_col.buffer[idx].col[1] += rgba[1];
@@ -625,6 +604,7 @@ export function Mesh_unif_add_vb_root_col(idx, rgba) {
 /*************************************************************************************************************/
 // Connect scrollbars unif_wpos with their scrolled section unif_wpos
 // Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
+/** */
 export function Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(root_posidx, scrollbar_posidx) {
    _per_vb_mesh_unif_wpos.buffer[root_posidx].scroll_bar = scrollbar_posidx;
 }
@@ -660,6 +640,7 @@ export function Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(root_pos
 
 
 // Print the widget groups buffer
+/** */
 export function Root_uniforms_for_wpos() {
 
 
@@ -668,31 +649,43 @@ export function Root_uniforms_for_wpos() {
    console.log('_per_vb_mesh_unif_wpos:');
    for (let i = 0; i <= _per_vb_mesh_unif_wpos.boundary; i++) {
 
-      const parent = Mesh_buffer_get_mesh_byidx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx);
-      const parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL';
-
+      
       const unif_obj = _per_vb_mesh_unif_wpos.buffer[i];
-
+      
       let mesh_posx = -1, mesh_posy = -1;
       if(unif_obj.meshidx != INT_NULL) {
-
+         
          const mesh = Mesh_buffer_get_mesh_byidx(unif_obj.meshidx);
-         mesh_posx = mesh.geom.pos[0], mesh_posy = mesh.geom.pos[1]
-      }
+         if(!mesh) {
+            console.error('554398709871928. Mesh is null. Check if any mesh has been deleted but not removed from the @_per_vb_mesh_unif_wpos.buffer')
+            continue 
+         }
 
-      console.log(i,
-         '| meshidx:', unif_obj.meshidx,
-         'vbidx:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
-         'draw_count:', vb_groups.buffer[i].draw_count,
+            mesh_posx = mesh.geom.pos[0], mesh_posy = mesh.geom.pos[1]
+      }
+      
+      let name = Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx);
+      if(name.length > MAX_NAME_LENGTH) 
+         name = name.slice(0, MAX_NAME_LENGTH)
+         
+      const parent = Mesh_buffer_get_mesh_byidx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].parent_meshidx);
+      let parent_name = (parent) ? Str_buffer_mesh_names_get_by_idx(parent.nameidx) : 'NULL';
+      if(parent_name.length > MAX_NAME_LENGTH) 
+         parent_name = parent_name.slice(0, MAX_NAME_LENGTH)
+
+      console.log(
+         'meshi:', unif_obj.meshidx,
+         'vbi:', _debug_names_per_vb_mesh_unif_wpos.buffer[i].vbidx,
+         'drawcnt:', vb_groups.buffer[i].draw_count,
          // 'ABS:', (unif_obj.has_absolute_pos & GFX_CTX_FLAGS.ABSOLUTE_POSITION) ? true : false,
          // '| STICK:', (unif_obj.sticky_pos & MESH_STATE_FLAGS.STICKY_POSX) ? true : false,
          // '| scroll:', unif_obj.scroll_bar,
-         'par_posidx:', unif_obj.parent_posidx,
-         '| unifpos:', unif_obj.wpos,
-         '| wpos:', mesh_posx, mesh_posy,
-         '| vb_groups:', vb_groups.buffer[i].name,
-         '| name:', Str_buffer_mesh_names_get_by_idx(_debug_names_per_vb_mesh_unif_wpos.buffer[i].nameidx),
-         '| parent:', parent_name,
+         'par_posi:', unif_obj.parent_posidx,
+         'unifpos:', Floor(unif_obj.wpos[0]), Floor(unif_obj.wpos[1]),
+         'wpos:', Floor(mesh_posx), Floor(mesh_posy),
+         'vb_grp:', vb_groups.buffer[i].name,
+         'parent:', parent_name,
+         'name:', name,
       );
    }
 }

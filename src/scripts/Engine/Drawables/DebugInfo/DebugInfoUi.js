@@ -6,7 +6,7 @@ import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_w
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
 import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
-import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW } from "../Material/Colors.js";
+import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW, YELLOWR } from "../Material/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_initialize, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
 import { View_add_to_group, View_build_group_from_root_mesh, View_get_count, View_remove_from_group, View_set_view_vb_start, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_one_mesh } from "../Operations/Clip.js";
@@ -290,9 +290,9 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_nested_sections_pre(section);
-
+      
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
+      Align_nested_sections_pre(section);
       section.GenGfxCtx();
 
       section.Render();
@@ -361,11 +361,10 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
 
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
-
-      Align_nested_sections_pre(section);
-
+      
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -425,10 +424,10 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_nested_sections_pre(section);
-
+      
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -443,7 +442,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
 
    const transp = .9;
    const zpos = 0;
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:GREY[2], layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    Mesh_set_name(section, 'ApplicationBuffers');
 
@@ -497,10 +496,10 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_nested_sections_pre(section);
-
+      
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -567,11 +566,10 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
 
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
-
-      Align_nested_sections_pre(section);
-
+      
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -638,11 +636,9 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      Align_nested_sections_pre(section);
-
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -708,10 +704,9 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      Align_nested_sections_pre(section);
-
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
+      Align_nested_sections_pre(section);
 
       section.Render();
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -767,7 +762,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
    const rcorners = 6;
    
    // const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:TRANSPARENCY(GREY[0], .1), pad:dp_margin, text_pad:[10, 3], is_debug_mesh:true}));
-   const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:_, pad:dp_margin, text_pad:[10, 3], is_debug_mesh:true}));
+   const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:_, pad:dp_margin, text_pad:[10, 3], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF, is_debug_mesh:true}));
    Widget_gfx_ready_enable({mesh:dp, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}})
    Dropdown_roots_set_root(dp, dp);
 
@@ -795,11 +790,12 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
       perf_timers_ui.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       
       
-      /************************************************************************************************************************************************/
-      // Mouse Info
-      const mouse_ui = Ui_create_label_switch('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
-      dp.AddToMenu(mouse_ui);
-      mouse_ui.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      // TODO: Function @Debug_info_create_ui_mouse takes  params: root_widget,x,y. So we cannot set it as a callback because the callback system passes @params as parameters
+      // /************************************************************************************************************************************************/
+      // // Mouse Info
+      // const mouse_ui = Ui_create_label_switch('Mouse', fontsize, switch_size, Debug_info_create_ui_mouse, null, section_col, label_col, label_text_col, switch_col, switch_col2, section_pad, label_pad, switch_pad, label_style, zindex);
+      // dp.AddToMenu(mouse_ui);
+      // mouse_ui.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
 
       // /************************************************************************************************************************************************/
@@ -852,10 +848,9 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
    if (is_root_widget !== undefined) {
 
 
-      Align_nested_sections_pre(dp);
-
       dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       dp.GenGfxCtx();
+      Align_nested_sections_pre(dp);
 
       dp.Render();
       Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
@@ -925,11 +920,11 @@ function Debug_info_create_ui_stats() {
    }
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui stats timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui stats timers panel', pad:[10, 10], pos:DEBUG_INFO.UI_STATS.POS, dim:[0,0], col:GREY[2], layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
-   const fontsize = 8;
+   const fontsize = 10;
    const texture_id = TEXTURES.MTSDF_CONSOLAS_1024;
    const fontsizedynamic = 9;
    let pad1 = [0, 1];
@@ -950,8 +945,9 @@ function Debug_info_create_ui_stats() {
       font_size:fontsizedynamic, 
       pad:[8, 5],
       col:WHITE, 
-      texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+      texture_id:texture_id, 
       variant_idx:_,
+      layout:LAYOUT.VERTICAL,
       is_debug_mesh:false,
    };
 
@@ -1153,7 +1149,7 @@ function Debug_info_create_ui_stats() {
 
       }
       { // Active Buffers
-         // const i2 = Create_widget_multi_text(_, 'Active:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, TEXTURES.MTSDF_CONSOLAS_1024, _, _);
+         // const i2 = Create_widget_multi_text(_, 'Active:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, texture_id, _, _);
          // i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
          // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Renderqueue_active_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
@@ -1174,10 +1170,7 @@ function Debug_info_create_ui_stats() {
    // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-
-   section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-   section.Calc_no_gfx_update();
-
+   Align_nested_sections_pre(section);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
@@ -1218,10 +1211,10 @@ function Debug_info_create_ui_stats() {
 // Performance timers
 /************************************************************************************************************************************************/
 
-export function Debug_info_ui_performance_set_initial_position_screen_right() {
+// export function Debug_info_ui_performance_set_initial_position_screen_right() {
 
-   DEBUG_INFO.UI_TIMERS.POS[0] = VIEWPORT.RIGHT;
-}
+//    // DEBUG_INFO.UI_TIMERS.POS[0] = VIEWPORT.RIGHT;
+// }
 
 function Debug_info_create_ui_performance_timers() {
 
@@ -1239,8 +1232,7 @@ function Debug_info_create_ui_performance_timers() {
       return;
    }
 
-   const zpos = DEBUG_INFO.UI_TIMERS.POS[2];
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui performance timers panel', pad:[10, 10], pos:DEBUG_INFO.UI_TIMERS.POS, dim:[0,0], col:GREY[2], layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
 
@@ -1251,6 +1243,7 @@ function Debug_info_create_ui_performance_timers() {
    const g_ms = 0;
    let ms = 500;
    const align = TEXT_ALIGN.HORIZONTAL;
+   const dyn_text_col = YELLOWR[9];
 
    //TODO: Name all the timers correctly
 
@@ -1259,7 +1252,6 @@ function Debug_info_create_ui_performance_timers() {
 
    { // FPS average 1 second
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Render:avg:', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Render:avg:', 
@@ -1269,33 +1261,33 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.HORIZONTAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop worst`, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.GameLoop);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Renderloop worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.GameLoop, timeridx], _, generic_time_interval)
 
    }
    { // All Timers Update timer
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Timers:avg:', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Timers:avg:', 
@@ -1305,28 +1297,28 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Timers avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Timers 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Timers worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AllTimersUpdate, timeridx], _, generic_time_interval)
 
    }
    { // Gl_draw timer.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'GlDraw:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'GlDraw:avg:', 
@@ -1336,28 +1328,28 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} GlDraw avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.GlDraw, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GlDraw);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} GlDraw 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.GlDraw, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.GlDraw);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} GlDraw worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.GlDraw, timeridx], _, generic_time_interval)
 
    }
    { // Event Listener.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Events:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Events:avg:', 
@@ -1367,28 +1359,28 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Events avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.EventListener, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.EventListener);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Events 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.EventListener, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.EventListener);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Events worst`, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.EventListener, timeridx], _, generic_time_interval)
 
    }
    { // Hover Listener.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Hover:avg', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Hover:avg:', 
@@ -1398,28 +1390,28 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.HoverListener, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.HoverListener);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.HoverListener, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.HoverListener);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.HoverListener, timeridx], _, generic_time_interval)
 
    }
    { // AddToGfxRect.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'AddToGfxRect', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'AddToGfxRect:', 
@@ -1429,33 +1421,33 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxRect);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.AddToGfxRect, timeridx], _, generic_time_interval)
 
    }
    { // AddToGfxText.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'AddToGfxText', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'AddToGfxText:', 
@@ -1465,33 +1457,33 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.AddToGfxText);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.AddToGfxText, timeridx], _, generic_time_interval)
 
    }
    { // Animations.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Animations', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Animations:', 
@@ -1501,33 +1493,33 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Animations avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.Animations, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.Animations);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Animations 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Animations, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Animations);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Animations worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.Animations, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Animations);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Animations worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Animations, timeridx], _, generic_time_interval)
 
    }
    { // Particles.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'Particles', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'Particles:', 
@@ -1537,33 +1529,33 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Particles avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.Particles, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.Particles);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Particles 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Particles);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Particles worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.Particles);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Particles worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.Particles, timeridx], _, generic_time_interval)
 
    }
    { // MiscTest2.
       ms = (g_ms) ? g_ms : 1000;
-      // const timer = Create_widget_multi_text(_, 'ConstructListeners', align, [0, 0, zpos + 1], fontsize, GREY[7], .5, pad1);
       const timer = Create_widget_multi_text({
          is_root:0x0,
          text:'ConstructListeners:', 
@@ -1573,142 +1565,36 @@ function Debug_info_create_ui_performance_timers() {
          font_size:fontsizedynamic, 
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+         layout:LAYOUT.VERTICAL,
          is_debug_mesh:false,
       });
       section.AddItem(timer);
 
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover avg`, ms, PerformanceTimersGetFps, [PERFORMANCE_TIMERS_IDXS.MiscTest2, 0], _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
       let timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.BASE, PERFORMANCE_TIMERS_IDXS.MiscTest2);
       timer.CreateNewText('avg_1sec:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsizedynamic, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover 1secReset`, ms, Performance_timers_get_avg_1sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest2, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest2);
       timer.CreateNewText('worst:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetWorstFps, [PERFORMANCE_TIMERS_IDXS.MiscTest2, timeridx], _, generic_time_interval)
 
       timeridx = Performance_timer_create_secondary_timer(PERFORMANCE_TIMER.DETAILED, PERFORMANCE_TIMERS_IDXS.MiscTest2);
       timer.CreateNewText('ms:', fontsize, GREY[7], pad2, .9);
-      timer.CreateNewText('0000000', fontsize, YELLOW[9], pad2, .9);
+      timer.CreateNewText('0000000', fontsize, dyn_text_col, pad2, .9);
       timer.SetDynamicText(`ms${ms} Hover worst `, ms, PerformanceTimersGetMilisec, [PERFORMANCE_TIMERS_IDXS.MiscTest2, timeridx], _, generic_time_interval)
 
    }
-   {
-      // { // Batch Buffer
-      //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Batch: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
-      //    section.AddItem(timer);
-      //    timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch_update.timer, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
-      //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch_update, _, generic_time_interval)
 
-      //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch_update.timer, _, generic_time_interval)
+   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-      //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch_update.timer, _, generic_time_interval)
-
-      // }
-      // { // Batch2 Buffer
-      //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Batch2: | avg:', align, [0, 0, 0], fontsize, GREY[7], .5, pad1);
-      //    section.AddItem(timer);
-      //    timer.CreateNewText('00000000', fontsize, PURPLER[7], pad2, .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_batch2_update.timer, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-
-      //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_avg_1sec_reset, _pt_batch2_update, _, generic_time_interval)
-
-      //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_batch2_update.timer, _, generic_time_interval)
-
-      //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_batch2_update.timer, _, generic_time_interval)
-
-      // }
-      // { // Framebuffer Rendering.
-      //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Framebuffer Rendering: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
-      //    section.AddItem(timer);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetFps`, ms, PerformanceTimersGetFps, _pt_framebuffer_rendering.timer, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-
-      //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, Performance_timers_get_ms_1sec_reset, _pt_framebuffer_rendering, _, generic_time_interval)
-
-      //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetBestFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
-
-      //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`DynText ${ms} Timer TimeGetDeltaAvg`, ms, PerformanceTimersGetWorstFps, _pt_framebuffer_rendering.timer, _, generic_time_interval)
-
-      // }
-      // { // Mesh info tip.
-      //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'MeshInfo: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
-      //    section.AddItem(timer);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} MeshInfo avg`, ms, PerformanceTimersGetFps, _pt_mesh_info_tip.timer, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-
-      //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} MeshInfo 1secReset`, ms, Performance_timers_get_ms_1sec_reset, _pt_mesh_info_tip, _, generic_time_interval)
-
-      //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} MeshInfo best`, ms, PerformanceTimersGetBestFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
-
-      //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, PURPLER[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} MeshInfo worst`, ms, PerformanceTimersGetWorstFps, _pt_mesh_info_tip.timer, _, generic_time_interval)
-
-      // }
-      // { // Scene Update timer
-      //    ms = (g_ms) ? g_ms : 1000;
-      //    const timer = Create_widget_multi_text(_, 'Scene: | avg:', align, [0, 0, zpos+1], fontsize, GREY[7], .5, pad1);
-      //    section.AddItem(timer);
-      //    timer.CreateNewText('0000000', fontsize, BLUEL[7], pad2, .9);
-      //    timer.SetDynamicText(`ms${ms} Scene avg`, ms, PerformanceTimersGetFps, _pt_scene_update.timer, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-
-      //    timer.CreateNewText('| avg_1sec:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} Scene 1secReset`, ms, Performance_timers_get_avg_1sec_reset, _pt_scene_update, _, generic_time_interval)
-
-      //    timer.CreateNewText('| best:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} Scene best`, ms, PerformanceTimersGetBestFps, _pt_scene_update.timer, _, generic_time_interval)
-
-      //    timer.CreateNewText('| worst:', fontsize, GREY[7], pad2, .9);
-      //    timer.CreateNewText('0000000', fontsize, BLUEL[7], [0, 0], .9);
-      //    timer.SetDynamicText(`ms${ms} Scene worst`, ms, PerformanceTimersGetWorstFps, _pt_scene_update.timer, _, generic_time_interval)
-
-      // }
-   }
-
-   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-
-   section.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-   section.Calc_no_gfx_update();
-
-   const w = section.GetMaxWidth();
-   Mesh_unif_set_vb_root_wpos(section.root_posidx, VIEWPORT.RIGHT - w * 2, 0);
+   Align_nested_sections_pre(section);
 
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1810,12 +1696,8 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    infomesh.gfx_pool_request &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
 
-   // Align
-   Align_nested_sections_pre(section);
-
-
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
+   Align_nested_sections_pre(section);
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
@@ -1893,7 +1775,7 @@ export function Debug_info_create_ui_focused() {
 
    const fontsize = _font_size;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui focused info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_FOCUSED.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui focused info panel', pad:[10, 10], pos:[x, y, DEBUG_INFO.UI_FOCUSED.POS[2]], dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
@@ -2389,7 +2271,7 @@ function Debug_info_create_mesh_info(params) {
 
    const tr = 1.45;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'MeshInfo DebugUi', pad:[10, 10], pos:DEBUG_INFO.UI_MESH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'MeshInfo DebugUi', pad:[10, 10], pos:DEBUG_INFO.UI_MESH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}});
 
 
@@ -2523,7 +2405,7 @@ function Debug_info_mesh_update(params) {
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
       dp_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, dp_mesh.mesh_bufferidx, true);
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, gfx_idxs);
-      root_info_dp.Calc_no_gfx_update();
+      Align_nested_sections_pre(dp_mesh);
       dp_mesh.Render();
       Root_group_activate_all_vbs_in_renderqueue(dp_mesh.root_bufferidx);
       dp_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp_mesh.gfx.vb.groupidx);
@@ -2595,7 +2477,7 @@ function Debug_info_create_batch_info(params) {
       return;
    }
 
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, name:'ui batch info panel', pad:[10, 10], pos:DEBUG_INFO.UI_BATCH.POS, dim:[0,0], col:TRANSPARENCY(GREY[1], .8), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10,});
    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
    Mesh_set_name(section, 'InfoUi-Batch section');
@@ -2609,7 +2491,7 @@ function Debug_info_create_batch_info(params) {
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-   section.Calc_no_gfx_update();
+   Align_nested_sections_pre(section);
 
    section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -2941,8 +2823,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    scrolled.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, scrolled.mesh_bufferidx, true);
    scrolled.GenGfxCtx();
 
-
-   scrolled.Calc_no_gfx_update();
+   Align_nested_sections_pre(scrolled);
 
    scrolled.Render();
    Root_group_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
@@ -3514,7 +3395,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
    }
 
 
-   scrolled.Calc_no_gfx_update();
+   Align_nested_sections_pre(scrolled);
    // scrolled.Recalc_no_gfx_update();
    /********************************************************************************************************************/
    // Re-create listen events 

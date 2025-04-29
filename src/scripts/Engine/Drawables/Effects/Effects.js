@@ -48,7 +48,7 @@ export const EFFECTS_TYPES = {
 
 
 
-
+// TODO: Widget_gfx_ready_enable( enable_pass_vpos:true, enable_pass_wpos:true ARE NOT NEEDED, REMOVE THEM
 
 
 /*************************************************************************************************************************************************************************/
@@ -59,19 +59,11 @@ class Effect_Mesh_Explosion_Circle {
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, ring_diameter, intensity) {
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshCircle',}));
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, enable_pass_vpos:true, });
-      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
-      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, enable_src_color_in_main:false, });
+      Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false, });
 
 
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:0, generic:{a:.01, b:0}});
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_GENERIC_VEC2, { a:ring_diameter, b:intensity });
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      
-      // TODO: Remove uniform. Attribute is anabled
-      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+
       
       // Render
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -86,10 +78,6 @@ class Effect_Mesh_Explosion_Circle {
       
       // Initialize generic uniforms, only once(first mesh initialization)
       if(vb_groupidx===INT_NULL) {
-         // mesh.GfxUniformSetAndUpdate('u_generic_vec3', [1, .5, .2]);
-         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
-         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, ring_diameter, intensity]);
-         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1]);
          Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
       }
       
@@ -267,7 +255,7 @@ export function Effects_explosion_circle_update() {
 
 
 
-
+// TODO: Widget_gfx_ready_enable( enable_pass_vpos:true, enable_pass_wpos:true ARE NOT NEEDED, REMOVE THEM
 
 
 
@@ -287,18 +275,13 @@ class Effect_Mesh_Explosion_Glow {
       this.timer_step = 0;
       
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshGlow',}));
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_pass_vpos:true, });
-      // Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:w, });
-      // Widget_gfx_ready_enable({mesh:mesh, enable_attr_dim:false,});
-      // Widget_gfx_ready_enable({mesh:mesh, });
-      Widget_gfx_ready_enable({mesh:mesh, enable_pass_vpos:true, enable_pass_wpos:true, enable_src_color_in_main:false});
+      Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false});
 
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_GLOW, {time:0});
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.PASS_WPOS2);
 
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
+
+      // const 
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
       
       // Render
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -312,7 +295,7 @@ class Effect_Mesh_Explosion_Glow {
       
       // Initialize generic uniforms, only once(first mesh initialization)
       if(vb_groupidx===INT_NULL) {
-         mesh.GfxUniformSetAndUpdate('u_generic_controls', [.8, .0]);
+         mesh.GfxUniformSetAndUpdate('u_generic_controls', [.8, .0, .7]);
       }
       
       Renderqueue_set_active(mesh.gfx.vb.groupidx, true);

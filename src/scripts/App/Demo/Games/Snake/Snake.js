@@ -6,7 +6,7 @@ import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
-import { BLACK, BLUEL, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
+import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/ScrollerComponent.js";
@@ -194,7 +194,7 @@ export function Game_snake(y = 0, controls_create = true) {
    }
 
    // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(26, 70, 30), 1.);
-   const board_color = TRANSPARENCY(Interpolate_rgb_to_01(40, 50, 46), 1.);
+   const board_color = Color_hsv_to_rgb_calibrated(.3, .4, 1., 1, .2, .0);
    // const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[VIEWPORT.WIDTH / 2 - board_width, vertical_space, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', }));
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[0, 0, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', }));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, });
@@ -210,7 +210,7 @@ export function Game_snake(y = 0, controls_create = true) {
 
    const collectable_size = 20;
 
-   const collectable = Create_rect_mesh(Style_rect_default_properties({pos:[300, 300, 0], dim:collectable_dim, col:REDL[3], name:'collectable', }));
+   const collectable = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 0], dim:collectable_dim, col:REDL[3], name:'collectable', }));
    Widget_gfx_ready_enable({mesh:collectable, enable_sdf_rect:collectable_dim[0], enable_unif_scale:true});
    // Widget_gfx_ready_enable({mesh:collectable, enable_unif_scale:true});
    collectable.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
@@ -264,7 +264,7 @@ export function Game_snake(y = 0, controls_create = true) {
       style.feather = snake.style.feather;
       const col = GetSequencedColor(9);
       // const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[next_posx, next_posy, 1], dim:[calc_size, calc_size], col:col, name:'body_mesh', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
-      const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[0, 0, 1], dim:[calc_size, calc_size], col:col, name:'body_mesh', layout:LAYOUT.VERTICAL}));
+      const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[0, 0, 1], dim:[calc_size, calc_size], col:col, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:body_mesh, enable_sdf_rect:style.rcorners, enable_unif_scale:true});
       section.AddItem(body_mesh);
 
@@ -552,7 +552,7 @@ function Snake_start_menu(params) {
    const tr = .75;
 
    // const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[VIEWPORT.WIDTH / 2, 100, 10], col:TRANSPARENCY(GREY[3], tr), name:'StartMenuPanel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[100, 100, 10], col:TRANSPARENCY(GREY[3], tr), name:'StartMenuPanel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[100, 100, 10], col:Color_hsv_to_rgb_calibrated(0,0,1,1,.08,0), name:'StartMenuPanel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:r_corners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
    menu_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
@@ -663,9 +663,9 @@ click mouse button.`;
 
    /*************************************************************************************************/
    // Render Menu 
-   Align_nested_sections_pre(menu_panel);
    menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
+   Align_nested_sections_pre(menu_panel);
 
    // start_btn.MoveNoGfxUpdate(
    //    (menu_panel.geom.pos[0] - start_btn.geom.pos[0]) + (menu_panel.geom.dim[0] - start_btn.geom.dim[0]),

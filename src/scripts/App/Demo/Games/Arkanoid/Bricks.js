@@ -3,7 +3,7 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
-import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
@@ -136,6 +136,7 @@ export class Brick {
       const posx = x;
       const posy = y;
 
+      // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
       Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_src_color_in_main: true, });
 
@@ -160,7 +161,10 @@ export class Brick {
       mesh.geom.pos[1] = posy;
 
       mesh.Render();
+      
       // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, vb_groupidx);
+
       // // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
       mesh.GfxUniformsSetClbk('u_generic_controls', () => {
          return this.generic_control_values;
@@ -211,7 +215,7 @@ export function Brick_destroy_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 /** */
-export function Bricks_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = BRICKS.PRE_INITIALIZED_MESHES) {
+export function Bricks_init_buffer(x=0, y=0, group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = BRICKS.PRE_INITIALIZED_MESHES) {
 
    Bricks_init();
 
@@ -220,7 +224,7 @@ export function Bricks_init_buffer(group_idx, parent_root_posidx, parent_mesh_bu
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      brick = new Brick(0, 0, _, _, vb_groupidx);
+      brick = new Brick(x, y, _, _, vb_groupidx);
       vb_groupidx = brick.mesh.gfx.vb.groupidx;
 
       // Add to View Group
@@ -317,10 +321,13 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
 
    // Here we add any padding for the bricks rows positioning
    // The brick row 0 is the refference position to remove all unecessary pading for calculating the row from the ball's position
+   // bricks_row_0_x = x+BRICKS.PAD_X;
+   // bricks_row_0_y = y+BRICKS.PAD_Y;
    bricks_row_0_x = BRICKS.PAD_X;
    bricks_row_0_y = BRICKS.PAD_Y;
 
    let posx = x + bricks_row_0_x, posy = y + bricks_row_0_y;
+   // let posx = bricks_row_0_x, posy = bricks_row_0_y;
 
    let vb_groupidx = BRICKS.VB_GROUP_IDX;
 
@@ -360,11 +367,14 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
 
       posy += BRICKS.ROW_HEIGHT;
       posx = x + bricks_row_0_x;
+      // posx = bricks_row_0_x;
 
    }
 
    // Calculate number of alive rows 
    Bricks_set_alive_rows_counter();
+
+   console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[', _bricks_rows)
 
    return _bricks_buffer;
 }
@@ -380,7 +390,7 @@ function Bricks_set_alive_rows_counter() {
       }
    }
 
-   // console.warn('_bricks_counter', _bricks_counter);
+   console.warn('_bricks_counter', _bricks_counter);
 }
 /** */
 export function Bricks_get_alive_rows_counter() {
@@ -399,8 +409,10 @@ function Bricks_calc_row_from_pos(y) {
    if (y < bricks_row_0_y) return INT_NULL; // Case the y pos is above of first row pos
    else if (clean_posy < BRICKS.ROW_HEIGHT) return 0; // Case the y pos is on the first row(0-th index)
 
+   
    const rowy = (clean_posy) / BRICKS.ROW_HEIGHT;
    const row = Floor(rowy);
+   // console.log(y, row)
 
    if (row >= BRICKS.STAGE_SCHEMA.length) return INT_NULL;// Case the pos is lower of the lowest row
    return row;
@@ -511,10 +523,13 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
             const t = posy;
             const b = posy + (dimy * 2);
 
+            // console.log('br_l', br_l, 'br_t', br_t)
+            console.log('br_t', br_t,'ball t', t, )
+
             if (r > br_l && l < br_r && b > br_t && t < br_b) {
 
                /**
-                * // TODO: Since we need to resolve the hit side by conventional means, maybe the 'fancy' point of collision calculation must go!
+                * // TODO: Since we need to resolve the hit side by conventional means, maybe the 'fancy' point of contact calculation must go!
                 */
 
                // Find the point of contact

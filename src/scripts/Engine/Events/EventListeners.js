@@ -840,9 +840,9 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
    let abort = false;
    let last_prev_elem_idx = INT_NULL; // Avoid null buffer elements
    
-   if(is_scroller) console.log('--------------------------------------------------------------------------');
-   if(is_scroller) console.log('Set priority', buffer);
-   if(is_scroller) console.log('index', idx);
+   // if(is_scroller) console.log('--------------------------------------------------------------------------');
+   // if(is_scroller) console.log('Set priority', buffer);
+   // if(is_scroller) console.log('index', idx);
    
    
    // Shift all elements to the right once

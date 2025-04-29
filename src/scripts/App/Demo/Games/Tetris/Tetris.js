@@ -126,7 +126,7 @@ let tetris_end = false;
 let game_loop_time_interval_idx = INT_NULL;
 let tetris_panel_posx = 0;
 let tetris_panel_posy = 0;
-let is_activated_by_demo = false, activation_id = 0x0;
+let is_activated_by_demo = false, demo_category_idx = INT_NULL, demo_sub_category_idx = INT_NULL;
 let complete_rows_cell_idxs = []; // TODO: create Int16 buffers, to easily reset/reuse them
 let complete_rows_idxs = [];
 
@@ -1556,7 +1556,7 @@ function Tetris_start_menu(section_, emitter_) {
 
 
 /** */
-export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, activation_id_) {
+export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, category_idx, sub_category_idx) {
 
    /*************************************************************************************************/
    // Create the columns to store any
@@ -1565,7 +1565,8 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, a
    tetris_panel_posx = x;
    tetris_panel_posy = y;
    is_activated_by_demo = is_activated_by_demo_;
-   activation_id = activation_id_;
+   demo_category_idx = category_idx;
+   demo_sub_category_idx = sub_category_idx;
 
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[10, 10], pos:[VIEWPORT.WIDTH / 2 - (TETRIS_PANEL_WIDTH + tetris_panel_pad), y, 0], dim:[(TETRIS_PANEL_WIDTH + tetris_panel_pad), TETRIS_PANEL_HEIGHT + tetris_panel_pad], col:GREY[0], name:'TetrisSection'}));
@@ -1890,8 +1891,9 @@ function Animation_end_game_stop(params_) {
    Scene_camera_scroll_set(_, 0);
    App_reinitialize();
 
-   if (is_activated_by_demo) Demo_page(activation_id);
-   else Tetris(ROOT_WIDGETS.CREATE_ROOT, tetris_panel_posx, tetris_panel_posy, false, activation_id);
+   if (is_activated_by_demo) 
+      Demo_page(demo_sub_category_idx);
+   else Tetris(ROOT_WIDGETS.CREATE_ROOT, tetris_panel_posx, tetris_panel_posy, false, demo_sub_category_idx);
 
    return false;
 }

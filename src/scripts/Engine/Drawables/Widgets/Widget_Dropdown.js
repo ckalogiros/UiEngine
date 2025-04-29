@@ -14,8 +14,8 @@ import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
-import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
+import { Align_expand, Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
+import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
@@ -122,7 +122,6 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-      this.menu.align.flags = LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF;
       this.menu.StylesSetPad(properties.menu.pad);
       
       
@@ -132,6 +131,8 @@ export class Widget_Dropdown extends Rect_Mesh {
       Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP }})
       btn.align.flags = LAYOUT.VERTICAL
       btn.StylesSetPad(properties.btn.pad);
+
+      this.menu.geom.pos[1] = btn.geom.dim[1];
       
 
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
@@ -320,8 +321,10 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       if (this.gfx_ctx_parent === INT_NULL) {
 
-         this.gfx_ctx_flags = FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+         if ((this.gfx_ctx_flags  & GFX_CTX_FLAGS.NEW)===0) {
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+         }
 
          if(recurse){
             if(this.menu) this.menu.GfxCtxSetFlag(FLAGS, gfx_ctx_parent, recurse);
@@ -427,7 +430,7 @@ export class Widget_Dropdown extends Rect_Mesh {
          Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, scrolled_section.scroller_comp.root_posidx)
          this.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
 
-         if(1) { // TODO: Scroller component should store if it has scissor box enabled
+         if(0) { // TODO: Scroller component should store if it has scissor box enabled
             // Set scissor box
             const mx = scrolled_section.mesh_bufferidx;
             const my = scrolled_section.scroller_comp.mesh_bufferidx;
@@ -451,13 +454,13 @@ export class Widget_Dropdown extends Rect_Mesh {
       }
 
    }
-   EnableScroller(scroller) {
+   EnableScroller(scroller_params) {
 
-      Components_create_scroller_component(scroller.width, scroller.max_height, this.menu, );
+      Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this.menu, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
 
       this.menu.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
       this.menu.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
-   }
+   }  
 
 
 
@@ -853,8 +856,11 @@ export class Widget_Dropdown extends Rect_Mesh {
       if(widget_root.has_children_scrollers) {
          for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
             const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
+            // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
-            Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
+            // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
+
+            // console.log('y', this.menu.geom.pos[1], 'dim', this.menu.geom.dim[1], scroller_comp.geom.pos)
          }
       }
       
@@ -910,6 +916,12 @@ export class Widget_Dropdown extends Rect_Mesh {
       const menu = this.menu;
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
+      // HACK: In current implementation the menu is never  Rendered(). It is only GfxGenerated(). The problem comes from any scroller that the dp.menu has, since the Render() handles the scroller's render too.
+      // FIXME: Is this the best way to  implement dp.menu rendering?
+      if (!this.menu.is_gfx_inserted) {
+         this.menu.Render()
+      }
+
 
       this.isOn |= DP_MENU_STATE.ON;
       this.isOn &= ~DP_MENU_STATE.OFF;
@@ -945,7 +957,8 @@ export class Widget_Dropdown extends Rect_Mesh {
       cur_pos[1] = this.geom.pos[1]; 
       
 
-      Align_nested_sections_pre(widget_root)
+      Align_nested_sections_pre(widget_root);
+      Align_expand(this.menu);
       
       /********************************************************************************************************************/
       // Re-create listen events 
@@ -953,11 +966,22 @@ export class Widget_Dropdown extends Rect_Mesh {
       Construct_listen_events_relations_from_mesh_tree(this.menu);
       
       
-      if(widget_root.has_children_scrollers) {
-         for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
-            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
+      // if(widget_root.has_children_scrollers) {
+      //    for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
+      //       const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
+      //       // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+      //       Scroller_component_calculate_handle_pos_dim(scroller_comp);
+      //       // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
+      //       console.log('y', scroller_comp.scrolled_section.geom.pos[1], 'dim', scroller_comp.scrolled_section.geom.dim[1])
+      //    }
+      // }
+      if(this.menu.has_children_scrollers) {
+         for(let i=0; i <= this.menu.children_scrollers_buffer.boundary; i++) {
+            const scroller_comp = Components_get_scroller_component(this.menu.children_scrollers_buffer.buffer[i]);
+            Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
-            Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
+            // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
+            console.log('y', scroller_comp.scrolled_section.geom.pos[1], 'dim', scroller_comp.scrolled_section.geom.dim[1])
          }
       }
 

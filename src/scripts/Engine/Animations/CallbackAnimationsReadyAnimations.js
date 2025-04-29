@@ -1,10 +1,10 @@
 "use strict";
 
-import { Gl_add_wpos_xy, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Mesh_set_dim_xy, Mesh_update_set_dim_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_event_callback_create } from "../Drawables/Operations/MeshPropertiesFunctions.js";
-import { Callback_animations_create, Callback_animations_destroy_byidx, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
+import { Callback_animations_create, Callback_animations_replace_byidx } from "./CallbackAnimations.js";
 
 
 
@@ -31,6 +31,7 @@ const _ready_animations_buffer = [
    { run: Animation_move_x_inflate_run, stop: Animation_move_x_inflate_stop },
    { run: Animation_scale_inflate_run, stop: Animation_scale_inflate_stop },
    { run: Animation_rcorners_inflate_run, stop: Animation_rcorners_inflate_stop },
+
    { run: Animation_move_xy_deflate_run, stop: Animation_move_xy_deflate_stop },
    { run: Animation_move_x_deflate_run, stop: Animation_move_x_deflate_stop },
    { run: Animation_scale_deflate_run, stop: Animation_scale_deflate_stop },
@@ -70,6 +71,8 @@ export function Callback_animations_create_specific(target_mesh, animation_type_
       cur_value_y: target_mesh.geom.pos[1],
       start_dimx: target_mesh.geom.dim[0],
       start_dimy: target_mesh.geom.dim[1],
+      cur_dimx: target_mesh.geom.dim[0],
+      cur_dimy: target_mesh.geom.dim[1],
       function_slope: slope_params_pointer,
       animation_index: INT_NULL,
       limit: ammount,
@@ -179,6 +182,37 @@ function Callback_animations_clbk(params, event_handler_type) {
 
 
 
+// TESTING: Generic animation run. Runs that many animations as there are in the animation buffer
+/**
+ * To inlude all animations efficiently, we need a combiner logic.
+ * If an x and y move animations are selected, the combiner must create a Gl_set_wposxy and run them together
+ * 
+ * # By using a buffer of Gl update functions we need to:
+ *    1. The callback animation is one and is created once.
+ *    2. The binder must be able to replace already stored Gl update animations. If MOVE_X is already set and MOVE_Y is to be activated, the combiner must replace the Gl_set_wposx with Gl_set_wposxy
+ *    The params must be build based on the active animations: has init_wposx? Has cur_posx? etc
+ *    I think there is no need of generic 'Animation_run, Animation_back_run' functionality since there is only one callback
+ * 
+ * Drawbacks: 
+ *    There can be only one stop callback animation condition
+ *    For example, if the condition is on the move xy,
+ *    we need if statements to determine if scale reached its 'limit' and dont need further scaling
+ */
+function TEST(params) {
+
+   /**
+    * for i in params.animations
+    * params.animations[i].Run
+    */
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -188,12 +222,12 @@ function Animation_move_xy_inflate_run(params) {
 
    const target_mesh = params.target_mesh;
 
-   const amt = params.step;
-   params.cur_value_x -= amt;
-   params.cur_value_y -= amt * .3;
+   const move_amt = params.step;
+   params.cur_value_x -= move_amt;
+   params.cur_value_y -= move_amt * .3;
 
    Gl_set_wpos_xy(target_mesh.gfx, params.cur_value_x + target_mesh.geom.dim[0], params.cur_value_y + target_mesh.geom.dim[1]);
-
+   // console.log(params.cur_value_x)
    if (params.cur_value_x > params.init_value_x - params.limit) 
       return true;
    else return false;
@@ -215,6 +249,7 @@ function Animation_move_xy_inflate_stop(params) {
       params.in_animation_deflate = true;
    }
 
+   // console.log('------------------------------------------------------')
    return false;
 }
 /** */
@@ -222,12 +257,13 @@ function Animation_move_xy_deflate_run(params) {
 
    const target_mesh = params.target_mesh;
 
-   const amt = params.step;
-   params.cur_value_x += amt;
-   params.cur_value_y += amt * .3;
+   const move_amt = params.step;
+   params.cur_value_x += move_amt;
+   params.cur_value_y += move_amt * .3;
 
    Gl_set_wpos_xy(target_mesh.gfx, params.cur_value_x + target_mesh.geom.dim[0], params.cur_value_y + target_mesh.geom.dim[1]);
 
+   // console.log(params.cur_value_x)
    if (params.cur_value_x < params.init_value_x) return true;
    else return false;
 }
@@ -241,6 +277,9 @@ function Animation_move_xy_deflate_stop(params) {
    params.is_animation_active = false;
    params.lock = false;
    params.unlock_anim_auto_completion = false;
+
+   // const target_mesh = params.target_mesh;
+   // Gl_set_wpos_xy(target_mesh.gfx, params.init_value_x + target_mesh.geom.dim[0]-20, params.init_value_y + target_mesh.geom.dim[1]);
 
    return false;
 }
@@ -332,28 +371,19 @@ function Animation_scale_inflate_run(params) {
    const amt = (slope * ammount);
    const sizex = params.start_dimx + amt;
    const sizey = params.start_dimy + amt * .3;
-   // const sizex = target_mesh.geom.dim[0] + amt;
-   // const sizey = target_mesh.geom.dim[1] + amt;
 
-   target_mesh.geom.dim[0] = sizex;
-   target_mesh.geom.dim[1] = sizey;
-   Mesh_update_set_dim_xy(target_mesh);
+
+   Mesh_set_dim_xy(target_mesh, sizex, sizey);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
-   // target_mesh.geom.dim[0] = sizex;
-   // target_mesh.geom.dim[1] = sizey;
-
-   /** Keep target mesh pinned left-up corner */
+   // /** Keep target mesh pinned left-up corner */
    // const diffx = target_mesh.geom.pos[0] + sizex;
    // const diffy = target_mesh.geom.pos[1] + sizey;
    // Gl_set_wpos_xy(target_mesh.gfx, diffx, diffy);
 
    if (target_mesh.sid.attr & SID.ATTR.R_CORNERS) {
-      // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * amt);
-      // Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners * (slope + 1.0));
-      // Gl_set_attr_round_corners(target_mesh.gfx, slope * amt);
-      Gl_set_attr_round_corners(target_mesh.gfx, amt);
-      // Gl_set_attr_round_corners(target_mesh.gfx, slope);
+      // Gl_set_attr_round_corners(target_mesh.gfx, amt);
+      Gl_set_attr_round_corners(target_mesh.gfx, target_mesh.mat.style.rcorners);
    }
 
 
@@ -361,8 +391,8 @@ function Animation_scale_inflate_run(params) {
     * // TODO: Implement an ability to stop the animation at any point, if the user has unhovered the target mesh
     * We need to access the STATE of the target_mesh, as well as if the ability is enabled.
     */
-   if(params.interupt && STATE.mesh.hoveredIdx !== target_mesh.mesh_bufferidx) 
-      return false;
+   // if(params.interupt && STATE.mesh.hoveredIdx !== target_mesh.mesh_bufferidx) 
+   //    return false;
    if (slope < 1.) return true;
    else {
       return false;
@@ -404,8 +434,6 @@ function Animation_scale_deflate_run(params) {
    Mesh_set_dim_xy(target_mesh, sizex, sizey);
    Gl_set_dim_xy(target_mesh.gfx, sizex, sizey);
 
-   // target_mesh.geom.dim[0] = sizex;
-   // target_mesh.geom.dim[1] = sizey;
 
    /** Keep target mesh pinned left-up corner */
    // const diffx = target_mesh.geom.pos[0] + sizex;
@@ -449,6 +477,7 @@ function Animation_scale_deflate_stop(params) {
 
 
 /** Round Corners */
+// DEPRECATED
 function Animation_rcorners_inflate_run(params) {
 
    const target_mesh = params.target_mesh;

@@ -360,8 +360,10 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
 
-         this.gfx_ctx_flags = FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+         if ((this.gfx_ctx_flags  & GFX_CTX_FLAGS.NEW)===0) {
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+         }
 
          if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {

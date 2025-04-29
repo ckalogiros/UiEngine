@@ -1300,8 +1300,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '#include <precision_high>',
 
       // TODO: REMOVE  U_SMOKE_PARAMS_VEC3 U_NOISE_PARAMS and replace with generic buffer
-      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
-      // (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.ANGLE) ? '#define A_ANGLE 1' : '',
@@ -1359,24 +1357,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
-      // TODO: Is U_GENERIC_FLOAT needed?? REMOVE IT
-      // TODO: Is U_GENERIC_VECxxx needed?? REMOVE IT
       // Generic Uniforms
       (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '#define U_SCALE_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_TIME_FLOAT) ? '#define U_TIME_FLOAT 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '#define U_GENERIC_VEC3 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '#define U_GENERIC_VEC4 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_CONTROLS) ? '#define U_GENERIC_CONTROLS 1' : '',
 
-      // Uniforms for testing
-      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
-
-      // Resolve function operations shader code 
-      // (shader_ops!==null) ? Resolve_function_operations(shader_ops) : '',
 
 
 
@@ -1410,8 +1395,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '\n#include <smoothmin>',
       '\n#include <brightness_contrast>',
 
-      // IMPORTANT: Ca;;s the old 'frag_round_corners()' only if both rcorners and feather are enabled.
-      // FIXME: Repeal 'frag_round_corners()', but think if we need the feather effect or the SFD_RECT satisfies the feathering
+      // FIXME: Remove any unecessary
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
@@ -1487,13 +1471,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
   `,
       (sid.pass & SID.ATTR.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
 
-      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
       (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
       
       (sid.pass & SID.ATTR.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
       '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
-      // '  vec2 uv = gl_FragCoord.xy;', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
       // '  final_color = src_color;', // The final output color
@@ -1507,11 +1489,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
 
-      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
-      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
-      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
-      // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2_call : '',
-      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
 
       
@@ -1532,7 +1509,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2_call : '',
       
-      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
       // Test Shaders
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
@@ -1541,18 +1517,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.shad & SID.SHAD.FS_TEST5) ? frag_test5_bubble_call : '',
       
       
-      // '  );',
-
-
-      // Resolve_function_operations_called_from_main(shader_ops),
-
-
-
 
       /********************************************************************************************************/
       // Color fragment
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   final_color.rgb *= final_color.a; ' : '',
-      // '   color.rgb *= color.a; ',
 
       /**
        * Human Perception Luminance Formulas
@@ -1597,6 +1565,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // '  frag_color = final_color;',
       // '  frag_color = final_color * src_color;',
       (sid.shad & SID.SHAD.ENABLE_SRC_COLOR_IN_FRAG_MAIN) ? '  frag_color = final_color * src_color;' : '  frag_color = final_color;',
+      // '  frag_color = src_color;',
 
 
 
@@ -1604,21 +1573,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
 
       /********************************************************************************************************/
-      // HACK: prevent optimizer from removing the uniform u_scale2
-      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  if(u_scale2.x == 0.) ;' : '', 
+      // HACK: prevent optimizer from removing unused uuniforms
       (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '  if(u_generic_float == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
-      // '  if(u_blend_mode) bool a = false;',
       '  if(u_blend_mode == 0) final_color *= 1.0;',
-      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '   if(u_generic_vec2.x == 0.) ;' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '   if(u_generic_vec3.x == 0.) ;' : '', 
-      // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
-      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  frag_color.xyz *= u_scale2.x;' : '',
-      // true ? 'frag_color = vec4(1.);' : '',
 
       true ? '}' : '',
 

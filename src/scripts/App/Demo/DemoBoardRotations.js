@@ -114,11 +114,10 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
       color[2] = color_arr[k++]; if (k >= 4) k = 0;
       color[3] = color_arr[k++]; if (k >= 4) k = 0;
 
-      if (i % cols === 0 && i !== 0) inner_pad[0] = 0
-      else inner_pad[0] = size/8;
+      if (i % cols === 0) inner_pad[0] = 0
+      else inner_pad[0] = size/3;
 
-      // console.log(i, inner_pad)
-
+      
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pad: inner_pad, dim: dim, col: color }));
       Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
       mesh.align.flags = (i % cols === 0) ? LAYOUT.VERTICAL : align;

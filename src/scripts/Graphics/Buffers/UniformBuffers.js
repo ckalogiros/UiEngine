@@ -196,7 +196,7 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, p
 
 export function Uniforms_buffer_get_uniform_byidx(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
-   return _uniforms_buffer.buffer[ubidx];
+   return _uniforms_buffer.buffer[ubidx].val;
 }
 
 

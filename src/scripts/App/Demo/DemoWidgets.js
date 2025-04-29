@@ -1340,7 +1340,7 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
 
 
-export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
+export function Demo_complicated_widget_layout(x = 0, y = 0) {
 
 
    const Many_sections_builder = () => {
@@ -1538,7 +1538,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    const color_intensity = 8;
 
 
-   const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
+   const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: `ROOT`, pos: [x, y, 0], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE} });
    // dp.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
    // dp.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -1559,7 +1559,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
       const align_l1 = (i % 2) ? LAYOUT.HORIZONTAL : LAYOUT.VERTICAL;
 
       const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-      Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15,  });
+      Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: 15,  });
       // dpsub1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
       // dpsub1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       dpsub1.align.flags = align_l1 | LAYOUT.RESIZE_SELF
@@ -1575,7 +1575,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          const align_l2 = LAYOUT.VERTICAL;
 
          const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15,  });
+         Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: 15,  });
          // dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
          // dpsub2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          dpsub2.align.flags = align_l2 | LAYOUT.RESIZE_SELF
@@ -1587,7 +1587,7 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
          for (let k = 0; k < sub_dp2_count; k++) {
 
             const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}${k}`, pos: [0, 0, zpos++], col: dp_col, menu_col: menu_col, btn_col: btn_col, text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
-            Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15,  });
+            Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: 15,  });
             // dpsub3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
             //    dpsub3.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
             dpsub2.AddToMenu(dpsub3);
@@ -1606,12 +1606,9 @@ export function Demo_complicated_widget_layout(pos = [0, 0, 0]) {
    // { const w = Many_scrollers(GetSequencedColor(color_intensity), LAYOUT.VERTICAL); dp.AddToMenu(w); }
 
 
-   Align_nested_sections_pre(dp)
-
-   dp.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
+   
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
+   Align_nested_sections_pre(dp)
    dp.Render()
    Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 

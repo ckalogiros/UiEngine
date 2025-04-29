@@ -179,11 +179,6 @@ export class Bullet {
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR[9], name:'Bullet', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
-      // mesh.EnableGfx(SID.SHAD.FN_EXPLOSION_GLOW);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, .0);
-      // mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-      // mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 5);
-
       // Render
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 
@@ -197,7 +192,6 @@ export class Bullet {
 
       // Initialize generic uniforms, only once(first mesh initialization)
       if (vb_groupidx === INT_NULL) {
-         // mesh.GfxUniformSetAndUpdate('u_generic_controls', [1., 0.8, 1, 1, 1]);
          Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
       }
 

@@ -31,7 +31,7 @@ vec4 Noise_procedural(float scale_down, inout int u_gen_ctrl_map_cnt)
   float ${u}fire_variation = u_generic_controls[u_gen_ctrl_map_cnt++];
   float ${u}intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
   float ${u}noise_complexity = u_generic_controls[u_gen_ctrl_map_cnt++];
-  float ${u}ctrl4 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}mixer_variation = u_generic_controls[u_gen_ctrl_map_cnt++];
       
 
   vec2 res = u_screen_res;
@@ -98,9 +98,9 @@ vec4 Noise_procedural(float scale_down, inout int u_gen_ctrl_map_cnt)
   // Final Color
   // vec4 c = mix(s1, s2, F);
   // vec4 c = mix(s1, s2, mixer);
-  vec4 c = mix(s1, mix(s1, s2, mixer), ${u}ctrl4);
+  vec4 c = mix(s1, mix(s1, s2, mixer), ${u}mixer_variation);
   // vec4 c = mix(s1, mix(s1, s2, mixer), 1.);
-  // vec4 c = mix(s1, s2, ${u}ctrl4);
+  // vec4 c = mix(s1, s2, ${u}mixer_variation);
   
   
   // // Brightness effect

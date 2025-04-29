@@ -7,7 +7,6 @@ import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_se
 import { Shader_builder_create_attribs_info } from '../../../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
-import { WHITE } from '../Material/Colors.js';
 import { Mesh_get_uniform_ubidx_from_name } from './MeshHelperFunctions.js';
 
 
@@ -231,6 +230,27 @@ export function Mesh_get_real_pos_y(mesh,) {
    let p = Mesh_unif_get_vb_root_wposy(mesh.root_posidx);
    return p + mesh.geom.pos[1];
 }
+// export function Mesh_get_real_pos_xy_no_screen_wpos(mesh) {
+
+//    const p = Mesh_unif_get_vb_root_wpos_no_screen_wpos(mesh.root_posidx);
+//    let pos = [p[0], p[1], 0];
+
+//    pos[0] += mesh.geom.pos[0];
+//    pos[1] += mesh.geom.pos[1];
+//    return pos;
+// }
+// /** */
+// export function Mesh_get_real_pos_x_no_screen_wpos(mesh,) {
+
+//    let p = Mesh_unif_get_vb_root_wposx_no_screen_wpos(mesh.root_posidx);
+//    return p + mesh.geom.pos[0];
+// }
+// /** */
+// export function Mesh_get_real_pos_y_no_screen_wpos(mesh,) {
+
+//    let p = Mesh_unif_get_vb_root_wposy_no_screen_wpos(mesh.root_posidx);
+//    return p + mesh.geom.pos[1];
+// }
 /** */
 export function Set_time(mesh, t) {
    mesh.geom.time = t;
@@ -241,6 +261,7 @@ export function Set_time(mesh, t) {
 /** World Position*/
 export function Mesh_update_set_wpos_xy(mesh,) {
    Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces);
+   // Gl_set_wpos_xy(mesh.gfx, mesh.geom.pos[0] , mesh.geom.pos[1] , mesh.geom.num_faces);
 }
 /** */
 export function Mesh_update_set_wpos_x(mesh,) {
@@ -253,6 +274,7 @@ export function Mesh_update_set_wpos_y(mesh,) {
 /** */
 export function Mesh_set_wpos_xy(mesh, x, y) {
    Gl_set_wpos_xy(mesh.gfx, x + mesh.geom.dim[0], y + mesh.geom.dim[1] + y, mesh.geom.num_faces);
+   // Gl_set_wpos_xy(mesh.gfx, x + x, y + y, mesh.geom.num_faces);
 }
 /** */
 export function Mesh_set_wpos_x(mesh, x) {

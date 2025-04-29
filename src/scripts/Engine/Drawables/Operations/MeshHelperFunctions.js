@@ -43,8 +43,6 @@ export function Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_val,
     // console.error('ubidx', ubidx, 'progidx', progidx, 'vbidx', vb_groupidx)
 }
 
-
-
 export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
 
     const len = uniforms_buffer.length;
@@ -57,8 +55,6 @@ export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
     console.error('unif_name', unif_name, '\nuniforms_buffer', uniforms_buffer);
     alert('Mesh_get_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
-
-
 
 export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshidx_w, meshidx_h) {
 
@@ -84,11 +80,6 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
     }
 }
 
-
-
-
-
-
 export function Mesh_calc_pos_dif(mesh1, mesh2) {
 
     const m1_posx = mesh1.geom.pos[0] + mesh1.geom.dim[0];
@@ -100,10 +91,6 @@ export function Mesh_calc_pos_dif(mesh1, mesh2) {
         m1_posy - m2_posy,
     ];
 }
-
-
-
-
 
 // export function Mesh_set_root_in_focus(mesh, root_bufferidx) {
 export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_NULL) {
@@ -180,8 +167,6 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
     State_mesh_set_focused(root);
 }
 
-
-
 export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border = 0) {
 
     return {
@@ -190,9 +175,6 @@ export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border 
         border: border,
     };
 }
-
-
-
    
 export function Mesh_remove_time_interval(mesh, idx) {
       const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[idx];

@@ -10,6 +10,7 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Floor } from "../../../Helpers/Math/MathOperations.js";
 
 
 
@@ -865,7 +866,10 @@ export function Root_group_buffer_print_w1() {
 
          const root_mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[i].buffer[0]); // 0-th element in each widget root buffer is the root mesh
 
-         console.log('root:', Mesh_get_name(root_mesh),
+         let root_name = Mesh_get_name(root_mesh);
+         if(root_name.length > MAX_NAME_LENGTH) 
+            root_name = root_name.slice(0, MAX_NAME_LENGTH);
+         console.log('root:', root_name,
             'size:', root_group_view_buffer.buffer[i].size,
             'boun:', root_group_view_buffer.buffer[i].boundary,
             'coun:', root_group_view_buffer.buffer[i].active_count,
@@ -877,6 +881,10 @@ export function Root_group_buffer_print_w1() {
             if (root_group_view_buffer.buffer[i].buffer[j] !== INT_NULL) {
                const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[i].buffer[j]);
 
+               let name = Mesh_get_name(mesh);
+               if(name.length > MAX_NAME_LENGTH) 
+                  name = name.slice(0, MAX_NAME_LENGTH);
+
                if (!mesh.gfx) {
                   console.warn('   ', j,
                      'ridx:', root_group_view_buffer.buffer[i].buffer[j],
@@ -885,27 +893,25 @@ export function Root_group_buffer_print_w1() {
                      'state', mesh.state.mask,
                      'GFX NOT CREATED', 'isActive', mesh.state.mask & MESH_STATE_FLAGS.ACTIVE,
                      'root_pos', mesh.root_posidx,
-                     'name', mesh.geom.pos, Mesh_get_name(mesh));
+                     'pos', Floor(mesh.geom.pos[0]), Floor(mesh.geom.pos[1]), 
+                     'name', name 
+                  );
                   // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
                else {
                   console.log('   ', j,
-                     'msbidx', mesh.mesh_bufferidx,
+                     'mbidx', mesh.mesh_bufferidx,
                      'ridx:', mesh.root_bufferidx,
-                     // 'is_gfx_inserted:', mesh.is_gfx_inserted,
                      // 'gfxidx', mesh.per_vb_bufferidx,
                      'gfx', mesh.gfx.prog.idx, mesh.gfx.vb.groupidx, 'isActive', mesh.state.mask & MESH_STATE_FLAGS.ACTIVE,
-                     'root_pos', mesh.root_posidx,
+                     'rposidx', mesh.root_posidx,
                      // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                      // 'state', mesh.state.mask,
                      'start', mesh.gfx.vb.starts.buffer[0],
-                     'realpos', Mesh_get_real_pos_x(mesh), Mesh_get_real_pos_y(mesh),
-                     'pos', mesh.geom.pos,
-                     // 'dim', mesh.geom.dim,
-                     // 'rel pos', mesh.geom.pos, 
-                     Mesh_get_name(mesh),
+                     'realpos', Floor(Mesh_get_real_pos_x(mesh)), Floor(Mesh_get_real_pos_y(mesh)),
+                     'pos', Floor(mesh.geom.pos[0]), Floor(mesh.geom.pos[1]),
+                     'name', name,
                   );
-                  // 'ubidxs', mesh.uniforms, mesh.GetName());
                }
             }
          }

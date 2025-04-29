@@ -23,9 +23,9 @@ import { Magnitude } from "../../Helpers/Math/MathOperations.js";
 
 
 
-const size = 15;
-const feather = 2.;
-const count = 24*2;
+const size = 10;
+const num_colors = 4;
+const count = 48*num_colors;
 
 
 
@@ -35,7 +35,6 @@ const count = 24*2;
 
 export function Demo_chain_link(x=0, y=0) {
 
-   const style = {rcorners:size, feather:0, border:1.8};
    const color = WHITE;
    const tr = .9;
    
@@ -44,8 +43,7 @@ export function Demo_chain_link(x=0, y=0) {
    const head = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[next_posx, y, 1], dim:[size,size], col:TRANSPARENCY(color,tr), name:'head',}));
    Widget_gfx_ready_enable({mesh:head, enable_sdf_rect:size, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
    
-   head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
-   // head.options = SECTION.INHERIT|SECTION.HORIZONTAL|SECTION.RESIZE_PARENT;
+   head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
    
    
    
@@ -53,7 +51,7 @@ export function Demo_chain_link(x=0, y=0) {
       
       next_posx -= size*2 + next_posx;
       
-      const c = Get_fasma_color(i, count, 2);
+      const c = Get_fasma_color(i, count, num_colors);
       const body_child = Create_rect_mesh(Style_rect_default_properties({pos:[next_posx, 0, 1], dim:[size,size], col:TRANSPARENCY(c,tr), name:'body',}));
       Widget_gfx_ready_enable({mesh:body_child, enable_sdf_rect:size, });
       head.AddItem(body_child);
