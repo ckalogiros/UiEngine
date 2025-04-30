@@ -8,5 +8,5 @@
     "exclude": ["node_modules", "scemas"],
    //  "exclude": ["node_modules", "images", "saves"],
     // "include": ["src/**/*"]
-    "include": ["src", "resources", ]
+    "include": ["src", "resources", "src/scripts/tests", ]
 }

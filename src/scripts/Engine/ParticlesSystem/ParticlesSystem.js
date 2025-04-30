@@ -2,10 +2,9 @@
 
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
-import { Shader_builder_create_attribs_info } from "../../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
@@ -13,9 +12,8 @@ import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/B
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
 import { Material, Material_Texture } from "../Drawables/Material/Material.js";
-import { Mesh_create_attributes } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
-import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
+import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
@@ -308,7 +306,8 @@ class Emitter {
          generic: this.particles_buffer.buffer[particle_idx].generic,
       }
 
-      const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
+      // const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
+      const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
 
 
@@ -835,7 +834,8 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
    emitter.parent = parent;
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, _, specific_vb_groupidx,);
+   // emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, specific_vb_groupidx,);
+   emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true);
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
 
    // emitter.per_vb_bufferidx = Mesh_per_vb_store_mesh(emitter.gfx.vb.groupidx, emitter.mesh_bufferidx);

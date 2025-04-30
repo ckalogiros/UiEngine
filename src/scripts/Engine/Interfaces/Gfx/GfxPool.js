@@ -28,7 +28,7 @@ import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js"
 
 
 
-
+/** */
 export function Gfx_pool_vb_reset() {
    
    Vertex_buffer_reset_full();
@@ -48,9 +48,7 @@ export function Gfx_pool_vb_reset() {
 
    Uniforms_buffer_reset();
 }
-
-
-
+/** */
 export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh=null) {
 
    Gl_remove_geometry(gfx, num_faces, start_index, debug_mesh);
@@ -59,6 +57,7 @@ export function Gfx_pool_remove_geometry(gfx, num_faces, start_index, debug_mesh
 
 
 
+/** */
 export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, has_absolute_pos=0x0) {
 
    const vb_group_buffer = Vertex_buffer_group_get();
@@ -161,9 +160,7 @@ export function Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, 
 
    return INT_NULL;
 }
-
-
-
+/** */
 export function Gfx_pool_find_vb_notPrivate(sid, pool_request_flags, has_absolute_pos=0x0) {
 
    const vb_group_buffer = Vertex_buffer_group_get();
@@ -191,9 +188,7 @@ export function Gfx_pool_find_vb_notPrivate(sid, pool_request_flags, has_absolut
 
    return INT_NULL;
 }
-
-
-
+/** */
 export function Gfx_pool_find_ib_notActive(shad) {
 
    const ib_buffer = Index_buffer_info_get();

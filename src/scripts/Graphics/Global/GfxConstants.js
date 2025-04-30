@@ -315,6 +315,11 @@ const GFX_CTX_FLAGS = {
     SCROLLER_VB: _CNT <<= 0x1, // TODO: The index of the scroller meshes must be stored globaly?????
 
 
+    // Render groups
+    NEW_RENDER_GROUP: _CNT<<=0x1,
+    PRIVATE_RENDER_GROUP: _CNT<<=0x1, // Enable the explicit usage of the current render group
+
+
     // UNUSED
     // These are prioritized over all other above options.
     STATIC: _CNT <<= 0x1, // Choose a buffer that is going to be updated rarely

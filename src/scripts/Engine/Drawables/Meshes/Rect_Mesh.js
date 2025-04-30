@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -260,6 +260,7 @@ export class Rect_Mesh extends Mesh {
    AddToGfx() {
 
       Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
+      // Vertex_buffer_add_vertices_render_group_implementation(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
@@ -270,7 +271,8 @@ export class Rect_Mesh extends Mesh {
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-      Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, Mesh_get_name(this))
+      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this), true)
+      // Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, Mesh_get_name(this))
 
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
@@ -481,7 +483,6 @@ export class Rect_Mesh extends Mesh {
          const sizey = mouse_pos[1] - pos[1];
          root.geom.dim[1] = sizey / 2;
          changes_hapened = true;
-         console.log(sizey/2 - root.geom.dim[1])
       }
 
 
@@ -498,17 +499,6 @@ export class Rect_Mesh extends Mesh {
 
 
          if(root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) Align_pre_simple___with_grow_containers(root);
-
-         
-         
-         // // console.log('1', root.geom.dim[1])
-         // if(root.scroller_comp) {
-         //    // const scroller_comp = Components_get_scroller_component(root.children_scrollers_buffer.buffer[i]);
-         //    // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
-         //    Scroller_component_calculate_handle_pos_dim(root.scroller_comp);
-         // }
-         // console.log('2', root.geom.dim[1])
-
 
 
          // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);

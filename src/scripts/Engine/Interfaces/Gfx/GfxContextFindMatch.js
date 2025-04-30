@@ -63,10 +63,13 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_DSC) {
          if(parent) vb_groupidx = Find_match_gfx_from_parent_descending_search_all(mesh, parent)
       }
+      else if (FLAGS & GFX_CTX_FLAGS.NEW) {
+         return INT_NULL;
+      }
       else {
          console.error(
             'NO CORRECT GenGfxCtx FLAG found for generating gfx.\nProbably forgot to pass one of the flags \'FROM_ROOT_WIDGET, FROM_PARENT_ASC, FROM_PARENT_CHILDREN_DESC, ...\'',
-            'mesh', Mesh_get_name(mesh), 'parent',
+            'mesh', Mesh_get_name(mesh), '\nparent:', mesh.parent,
             // 'mesh', mesh.GetName(), 'parent', parent.GetName(),
          );
       }
@@ -210,7 +213,7 @@ function Find_match_from_children(mesh, parent) {
             }
             
          }
-         else if (child.text_mesh && child.text_mesh.gfx && Sid_check_match(mesh.sid, child.text_mesh.sid)) {
+         else if (child.text_mesh && child.text_mesh.gfx && Sid_check_match(mesh.sid, child.text_mesh.sid)) { // For Text meshes
             
             const absolute_pos_match = (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION) === (child.text_mesh.gfx_ctx_flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION)
             // Check also if mesh has texture and the texidx matches the vb group's texidx
@@ -305,6 +308,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
 function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
 
+   let ret = { vb_groupidx: INT_NULL, done: false };
    
    // If the mesh match the parent sid, use parent's gfx buffer
    if (Sid_check_match(mesh.sid, parent.sid)) {
@@ -324,9 +328,21 @@ function Find_match_gfx_from_parent_descending_search_all(mesh, parent) {
       console.log('Found match for:', mesh.name, 'vb_groupidx', vb_groupidx)
 
    }
+   else if(mesh.type & MESH_TYPE.TEXT_MESH) {
+      // If  mesh is of type text mesh and the parent is a label (rect), what we want is to search in the label's parent.
+      
+      if(mesh.parent && mesh.parent.parent) {
 
-   // Else search in parent's children recursively
-   let ret = Find_match_from_children(mesh, parent);
+         ret = Find_match_from_children(mesh, mesh.parent.parent);
+      }
+
+   }
+   else {
+
+      // Else search in parent's children recursively
+      ret = Find_match_from_children(mesh, parent);
+   }
+
    return ret.vb_groupidx;
 }
 

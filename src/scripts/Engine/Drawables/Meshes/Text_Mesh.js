@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_reset } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Material_Font } from "../Material/Material.js";
@@ -604,6 +604,7 @@ export class Text_Mesh extends Mesh {
          dim: [this.geom.dim[0], this.geom.dim[1]],
       }
 
+
       let cur_line_posy = this.geom.pos[1];
 
       this.gfx.tb.idx = this.mat.texidx;
@@ -646,10 +647,11 @@ export class Text_Mesh extends Mesh {
             
             // The first face exists as an entity, the rest are constructed here and stored only to the vertex buffer
             if (i === 0) {
-               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
+               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, false);
             }
             else { // Avoid function call to store any data to '.gfx.start' etc and to accumulate all char faces to the vertex buffer. 
-               Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
+               Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, true);
+               // Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
             }
    
             // Advance to next free char position

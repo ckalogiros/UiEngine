@@ -43,6 +43,7 @@ import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
 import { Color_theme_slider_1, Color_theme_slider_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
+import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
 
 
 
@@ -122,7 +123,7 @@ export function TestWidgetsGeneric() {
     // Test: New implementation -> VB render groups
     {
         
-        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
         Widget_gfx_ready_enable({
             mesh: section, enable_sdf_rect: 15,
             listener: { type: LISTEN_EVENT_TYPES.MOVE },
@@ -131,23 +132,62 @@ export function TestWidgetsGeneric() {
         section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
     
     
-    
-        // const count = colors.length;
-        const count = 5;
-        let label = null;
-        const brightness_increments = 1/count;
-        let brightness =  0;
-        for (let i = 0; i < count; i++) {
-    
-            const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: Color_hsv_to_rgb_calibrated(0.7, 1., .8, 1, brightness, .0), text_pad: [6, 4], layout:LAYOUT.VERTICAL }))
-            Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-            section.AddItem(l);
+
+        // {
+        //     const s = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .2, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'S1' }));
+        //     Widget_gfx_ready_enable({
+        //         mesh: s, enable_sdf_rect: 15,
+        //         listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        //     });
+        //     section.AddItem(s);
+        //     s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.NEW);
+
+
+        //     const count = 5;
+        //     let label = null;
+        //     const brightness_increments = 1/count;
+        //     let brightness =  0;
+        //     for (let i = 0; i < count; i++) {
+        
+        //         const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: Color_hsv_to_rgb_calibrated(0.7, 1., .8, 1, brightness, .0), text_pad: [6, 4], layout:LAYOUT.VERTICAL }))
+        //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+        //         s.AddItem(l);
+        //         l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                
+        //         brightness += brightness_increments;
+        //         label = l;
+        //     }
+        // }
+        {
+            const s = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .2, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'S2' }));
+            Widget_gfx_ready_enable({
+                mesh: s, enable_sdf_rect: 15,
+                listener: { type: LISTEN_EVENT_TYPES.MOVE },
+            });
+            section.AddItem(s);
+            s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
             
-            brightness += brightness_increments;
-            label = l;
+            
+            const count = 5;
+            let label = null;
+            const brightness_increments = 1/count;
+            let brightness =  0;
+            for (let i = 0; i < count; i++) {
+                
+                // const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: Color_hsv_to_rgb_calibrated(0.7, 1., .8, 1, brightness, .0), text_pad: [6, 4], layout:LAYOUT.VERTICAL }))
+                const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL }))
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+                s.AddItem(l);
+                l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+                
+                brightness += brightness_increments;
+                label = l;
+            }
         }
+    
 
             
+        section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
         Align_nested_sections_pre(section)
         section.Render();
@@ -660,10 +700,8 @@ export function TestWidgetsGeneric() {
         }
     }
 
-    // TODO: Group all first letters directives to dropdowns and add button animation (SEE Demo_animations_ready_button_anim())
-    // const helpui = Help();
-
-
+    // TODO: Group all first letters directives to dropdowns and add button animation (SEE Demo_animations_ready_button_anim())    
+    // // const helpui = Help();
 
     // // Test Quadratic_interpolation
     // console.log('Quadratic_interpolation');
@@ -671,6 +709,11 @@ export function TestWidgetsGeneric() {
     // console.log('val:0', Quadratic_interpolation(min, max, min));
     // console.log('val:1', Quadratic_interpolation(min, max, min+((max-min)/2)));
     // console.log('val:2', Quadratic_interpolation(min, max, max));
+
+    // Tests
+    {
+        // Test_find_match_from_parent_descending();
+    }
 }
 
 

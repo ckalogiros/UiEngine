@@ -1,5 +1,10 @@
 TODO
 
+# IMIDIATELY 
+ * Remove the 'draw_count from the vertex buffer group', substituting with the render groups draw_count
+ * Replace verts_per_rect with verts_per_face
+
+
 # Resizable containers
    1. Must be set as resizable OR resize self
    2. Ισος καταμερισμος χωρου
