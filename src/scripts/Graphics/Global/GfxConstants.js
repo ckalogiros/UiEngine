@@ -340,6 +340,7 @@ const BUFFER_STATE = {
 
     // SHOW: _CNT,
     NEEDS_UPDATE: _CNT,
+    NEEDS_UPDATE_FROM_REALLOC: _CNT,
     // IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
     IS_PRIVATE: _CNT <<= 0x1,

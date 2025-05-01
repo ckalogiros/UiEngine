@@ -22,7 +22,7 @@ import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
 
 
 /** */
-const _vertex_buffer_render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Render Groups');
+const _render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Render Groups');
 
 
 
@@ -30,7 +30,7 @@ const _vertex_buffer_render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Re
 /** */
 export function Vertex_buffer_render_group_create(start, size) {
 
-   const render_group_idx = _vertex_buffer_render_groups.Add(
+   const render_group_idx = _render_groups.Add(
       {
          start:start, 
          count:0, 
@@ -41,28 +41,36 @@ export function Vertex_buffer_render_group_create(start, size) {
 
    return render_group_idx;
 }
+// /** */
+// export function Vertex_buffer_render_group_reset_to_index(render_group_idx, start=0) {
+
+//    // _render_groups.start = 0;
+//    _render_groups.buffer[render_group_idx].count = start;
+//    // _render_groups.size = 0;
+//    _render_groups.buffer[render_group_idx].draw_count = 0;
+// }
 
 // GETTERS-SETTERS
 /** */
 export function Vertex_buffer_render_group_get_render_group(render_group_idx) { 
-   return _vertex_buffer_render_groups.buffer[render_group_idx];
+   return _render_groups.buffer[render_group_idx];
 }
 /** */
 export function Vertex_buffer_render_group_set(render_group_idx, start, draw_count) { 
-   _vertex_buffer_render_groups.buffer[render_group_idx].start = start;
-   _vertex_buffer_render_groups.buffer[render_group_idx].draw_count = draw_count;
+   _render_groups.buffer[render_group_idx].start = start;
+   _render_groups.buffer[render_group_idx].draw_count = draw_count;
 }
 /** */
 export function Vertex_buffer_render_group_set_start(render_group_idx, start) { 
-   _vertex_buffer_render_groups.buffer[render_group_idx].start = start;
+   _render_groups.buffer[render_group_idx].start = start;
 }
 /** */
 export function Vertex_buffer_render_group_set_draw_count(render_group_idx, draw_count) { 
-   _vertex_buffer_render_groups.buffer[render_group_idx].draw_count = draw_count;
+   _render_groups.buffer[render_group_idx].draw_count = draw_count;
 }
 /** */
 export function Vertex_buffer_render_group_set_size(render_group_idx, size) { 
-   _vertex_buffer_render_groups.buffer[render_group_idx].size = size;
+   _render_groups.buffer[render_group_idx].size = size;
 }
 
 
@@ -85,9 +93,9 @@ export function Vertex_buffer_render_group_set_size(render_group_idx, size) {
 export function Vertex_buffer_render_group_print_loop() {
 
    console.log( '----- Vertex Buffer Render Groups -----');
-   for(let i=0; i <= _vertex_buffer_render_groups.boundary; i++) {
+   for(let i=0; i <= _render_groups.boundary; i++) {
       
-      const g = _vertex_buffer_render_groups.buffer[i];
+      const g = _render_groups.buffer[i];
       
       console.log( i, 
          'start:', g.start,
@@ -97,7 +105,7 @@ export function Vertex_buffer_render_group_print_loop() {
 }
 export function Vertex_buffer_render_group_print_render_group(render_group_idx) {
    
-   const g = _vertex_buffer_render_groups.buffer[render_group_idx];
+   const g = _render_groups.buffer[render_group_idx];
    console.log(
       '----- Vertex Buffer Render Group -----\n',
       'render_group_idx', render_group_idx,

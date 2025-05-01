@@ -1,8 +1,15 @@
 TODO
 
+* CONTINUE
+   MeshBufferViews.js: the render_group must be stored in a view, so it can handle it
+
 # IMIDIATELY 
  * Remove the 'draw_count from the vertex buffer group', substituting with the render groups draw_count
  * Replace verts_per_rect with verts_per_face
+ * Unify MeshGfxContext for particles and meshes
+ * Scroller should be rendered at the mesh site
+   When that happens do:
+      Remove Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE); and delete the function also
 
 
 # Resizable containers

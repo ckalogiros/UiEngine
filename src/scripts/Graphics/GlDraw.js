@@ -4,7 +4,7 @@ import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
-import { Vertex_buffer_render_group_get_render_group } from './Buffers/VertexBufferRenderGroups.js';
+import { Vertex_buffer_render_group_get_render_group } from './Buffers/RenderGroups.js';
 
 
 
@@ -15,19 +15,9 @@ import { Vertex_buffer_render_group_get_render_group } from './Buffers/VertexBuf
 const R = .0;
 const G = .0;
 const B = .0;
-// const R = .1;
-// const G = .1;
-// const B = .1;
-// const R = .5;
-// const G = .5;
-// const B = .5;
-// const R = (1/255) * 32;
-// const G = (1/255) * 32;
-// const B = (1/255) * 32;
-// const R = (1/255) * 72;
-// const G = (1/255) * 32;
-// const B = (1/255) * 72;
-// let set = true
+
+
+
 export function Gl_draw(gl) {
 
     // Renderer_webgl_begin_timer_query(gfxCtx);
@@ -107,12 +97,42 @@ export function Gl_draw(gl) {
 
                         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                         gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                        gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
-                        // if(set){gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); }
-                        // else gl.bufferSubData(gl.ARRAY_BUFFER, 0, vb_data);
+                        // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
+                        if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
+                            gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); 
+                            vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+                        }
+                        else {
+                            
+                            // gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
+                            gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start, vb_data, render_group.start, render_group.count);
+
+                            /**MAPPING DIRECTLY TO GPU MEMORY
+                             * 
+                             * Create a pointer to the gpu memory. 
+                             * // 2. Map buffer to CPU memory
+                                 const ptr = gl.mapBufferRange(
+                                    gl.ARRAY_BUFFER,
+                                    0,                // byte offset
+                                    1024,             // byte length
+                                    gl.MAP_WRITE_BIT
+                                );
+
+                                // Then on update Draw(), just ch
+                                // 3. Directly modify via typed array view
+                                const view = new Float32Array(ptr);
+                                view.set([1,2,3], 0); // Write at element offset 0
+
+                                // 4. Unmap to sync changes
+                                gl.unmapBuffer(gl.ARRAY_BUFFER);
+                            */
+                        }
+
                         vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
                         GL_STATE.BOUND_VBO = vb_info.vbo;
                         GL_STATE.BOUND_VBIDX = vb_info.vbidx;
+
+
                     }
                 }
                 vb_group.needs_any_update = false;
@@ -128,13 +148,9 @@ export function Gl_draw(gl) {
 
             const index_elements_offset = 0;
             const instance_count = 1;
+
             // gl.LINES, gl.POINTS, gl.TRIANGLES
-            // gl.drawElementsInstanced(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
-            // gl.drawElementsInstanced(gl.LINES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
-            // gl.drawElementsInstanced(gl.TRIANGLES, 40, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
-            // gl.drawElements(gl.TRIANGLES, vb_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset)
-            // gl.drawArrays(gl.TRIANGLES, 0, 3)
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
         }

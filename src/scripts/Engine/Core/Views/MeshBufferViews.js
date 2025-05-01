@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_render_group_reset_to_index, Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "../Buffers.js";
@@ -48,8 +48,6 @@ export const VIEW_INFO = {
    VB_GROUP_IDX: _CNT++,
    START: _CNT++,
    NUM_FACES: _CNT++,
-   // PROGIDX: _CNT++,
-   // IBIDX: _CNT++,
 
    SIZE: _CNT,
 };
@@ -60,11 +58,14 @@ export const VIEW_INFO = {
 /**
  * View Group struct 
  *  
- *  view:[]
- *     .buffer[i]:       {vb:[]GenericBuffer} Stores all vb_groupidxs that the meshes of the group belong.
- *        .vb.buffer[i]: {info:[]Int16Array, data:[]Int16_Buffer}
- *           .info:      {num_faces:int, starts:[]},
- *           .mesh_data: [meshidx, meshidx, ...]
+ *  view:[
+ *    .buffer[i]: {
+ *       .vb.buffer[i]: {                                   Stores all vb_groupidxs that the meshes of the group belong.
+ *          info:[ {num_faces:int, starts:[] } ]            num faces of all meshes per vertex buffer and start of first mesh per vb  
+ *          data:[ [meshidx, meshidx, ...] ]                all mesh indexes per vb
+ *       }
+ *    }
+ * ] 
  *
  */
 
@@ -465,8 +466,10 @@ export function View_reset_from_view_all_buffers(view_bufferidx) {
       const mesh = Mesh_buffer_get_mesh_byidx(view.rootidx);
       const starts = mesh.gfx.vb.starts.buffer;
       Vertex_buffer_reset_to_index(vb_groupidx, starts);
+      // Vertex_buffer_render_group_reset_to_index(vb_groupidx, mesh.gfx.vb.starts.buffer[0], mesh.gfx.vb.render_group_idx)
 
-      // Loop for all meshidxs for this vb
+
+      // Remove each mesh from @mesh_per_vb storage buffer
       for (let j = 0; j <= view.vb.buffer[i].data.boundary; j++) {
 
          const meshidx = view.vb.buffer[i].data.buffer[j];
