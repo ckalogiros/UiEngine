@@ -17,7 +17,7 @@ const G = .0;
 const B = .0;
 
 
-
+let TEST = 0
 export function Gl_draw(gl) {
 
     // Renderer_webgl_begin_timer_query(gfxCtx);
@@ -59,7 +59,7 @@ export function Gl_draw(gl) {
         }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
-        if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
+        if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_IBO !== ib_info.ibo) {
             const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
@@ -67,9 +67,9 @@ export function Gl_draw(gl) {
             GL_STATE.BOUND_IBIDX = ib_info.ibidx;
         }
 
-        for (let j = 0; j <= vb_group.render_group_idxs.boundary; j++) {
+        for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
 
-            const render_group = Vertex_buffer_render_group_get_render_group(vb_group.render_group_idxs.buffer[j]);
+            const render_group = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[j]);
 
             // TODO: Distinguish uniforms that will update with uniforms with constant value
             Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx); // OLD: Update via Vertex buffer
@@ -137,22 +137,26 @@ export function Gl_draw(gl) {
                 }
                 vb_group.needs_any_update = false;
             }
-
-
+            
+            
             /** The last param is the instance count.
              * That means: draw that many instances ONLY from the vertex buffer of the instanced geometry,
              * If instance count is 1, draw the first instanced geometry attributes. 
              * If instance count is 2, draw the first instanced geometry attributes for the first instance and the second for the second. etc
              * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
-             */
+            */
 
-            const index_elements_offset = 0;
+            const index_elements_offset = 6*j;
             const instance_count = 1;
 
             // gl.LINES, gl.POINTS, gl.TRIANGLES
-            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset, instance_count)
+            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, instance_count)
+            // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, index_elements_offset*UINT16_BYTE_SIZE, instance_count)
+            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, instance_count)
+            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 6, instance_count)
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
+
         }
 
     }

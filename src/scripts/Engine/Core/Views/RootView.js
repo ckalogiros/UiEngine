@@ -583,7 +583,7 @@ export function Root_group_reset_gfxs(root_bufferidx) {
 
       // TODO: We call 'Vertex_buffer_reset_to_index' because there is no vb reset to 0. Create that function
       Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
-      // Vertex_buffer_render_group_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer[0], mesh.gfx.vb.render_group_idx)
+      // Vertex_buffer_render_group_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer[0], mesh.gfx.vb.render_groupidx)
       Vertex_buffer_create_attribs_info_per_vb_instanced(mesh.gfx.prog.attribsidx, mesh.gfx.vb.starts.buffer);
 
       Index_buffer_reset(mesh.gfx.ib.idx); // BUG: The vertex buffer is getting reset to specific index, although the index buffer is reset to 0

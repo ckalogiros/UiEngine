@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_set_name_for_debuging, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_group_state_enable, Vertex_buffer_group_get_vertices_per_face, Vertex_buffer_group_get_render_group_idxs } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_set_name_for_debuging, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_group_state_enable, Vertex_buffer_group_get_vertices_per_face, } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
@@ -9,7 +9,7 @@ import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../../Scenes.js";
 import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
-import { Gfx_pool_find_ib_notActive, Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
+import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
@@ -44,7 +44,7 @@ export class GfxInfoMesh {
       this.vb = { // The vertex buffer info the mesh belongs to
 
          groupidx: INT_NULL,	// 
-         render_group_idx: 0, // The render group the mesh belongs to.
+         render_groupidx: 0, // The render group the mesh belongs to.
          idxs: New_int8_buffer(_, 'NEW GfxInfo-vbidxs'),	// The vertex buffer (float*) idx that this Mesh is stored to.
          starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
          counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
@@ -106,7 +106,7 @@ export class GfxInfoMesh {
 
 
 
-function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1, render_group_idx) {
+function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1, render_groupidx) {
 
    const prog = Progarm_get_program(progidx);
    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
@@ -129,9 +129,6 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
    gfx_ctx.vb.groupidx = vb_groupidx;
 
-   if(render_group_idx===INT_NULL) alert('0099187761878177181')
-   gfx_ctx.vb.render_group_idx = render_group_idx;
-
 
 
    /********************************************************************/
@@ -152,7 +149,6 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
       // Here we assign the correct vertex buffer index to the mesh attributes(COL,WPOS,DIM, etc)
       if (vb_info.sid & SID.ATTR.COL4) { gfx_ctx.vb.which_vb.col_buf = i; }
       if (vb_info.sid & SID.ATTR.WPOS3) { gfx_ctx.vb.which_vb.wpos_buf = i; }
-      // if (vb_info.sid & SID.ATTR.STYLE) { gfx_ctx.vb.which_vb.generic_attr1_buf = i; }
       if (vb_info.sid & SID.ATTR.VPOS2) { gfx_ctx.vb.which_vb.dim_buf = i; }
       if (vb_info.sid & SID.ATTR.TEX2) { gfx_ctx.vb.which_vb.tex_buf = i; }
 
@@ -197,7 +193,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    let vb_group = null;
    let vbidxs = null;
    let vb_groupidx = INT_NULL;
-   let render_group_idx = INT_NULL;
+   let render_groupidx = INT_NULL;
 
 
 
@@ -308,7 +304,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
 
          // IMPORTANT: Here the mesh gets the rendergroup that it belongs
-         render_group_idx = vb_group.render_group_idxs.buffer[0];
+         // render_groupidx = vb_group.render_groupidxs.buffer[0];
 
 
          // For debugging only 
@@ -425,32 +421,10 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
          Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
 
+
       }
 
    }
-
-
-
-
-
-
-
-
-   /*******************************************************************************************************************/
-   // Render Group
-   // TODO: implement many render groups: match from flags to  find or create new rnder group
-   const render_groups = Vertex_buffer_group_get_render_group_idxs(vb_groupidx);
-   if(render_group_idx === INT_NULL) {
-      render_group_idx = render_groups.buffer[0]; // Get default render group (#FOR NOW#)
-   }
-   
-   console.log(
-      'mesh', mesh.name,
-      'vb_groupidx', vb_groupidx,
-      'render_group_idx', render_group_idx,
-   )
-
-
 
 
 
@@ -462,9 +436,12 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    if (sid.shad & SID.SHAD.INDEXED) {
 
       // NOTE: Can we use same index buffer for different vertex buffers? No, cause the geometry may have different vertex index break points. Yes, if the geometries do not use connected vertices
-      ibidx = Gfx_pool_find_ib_notActive(sid.shad);
+      // ibidx = Gfx_pool_find_ib_match_any(sid.shad);
+      
+      // HACK. For now we need an index buuffer per vertex. So we use the vb index since they MUST be 1 to 1 
+      ibidx = vb_groupidx; 
 
-      if (ibidx === INT_NULL) { // Create new index buffer
+      if (ibidx === INT_NULL || is_vertex_buffer_created) { // Create new index buffer
 
          const ib_info = Index_buffer_info_create(sid, _);
          ibidx = ib_info.ibidx;
@@ -496,7 +473,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
 
-   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count, render_group_idx);
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count, render_groupidx);
 
    return gfx;
 

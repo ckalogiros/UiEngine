@@ -7,7 +7,7 @@ import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Grap
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
 import { Mesh_buffer_print, Mesh_buffer_print_loop, Mesh_per_vb_print, Mesh_per_vb_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
-import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
@@ -27,6 +27,7 @@ import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_g
 import { Shaders_print_loop } from "../../../Graphics/GlShaders.js";
 import { Arkanois_print_scrore_mod } from "../../../App/Demo/Games/Arkanoid/ScoreMod.js";
 import { Uvmaps_print } from "../../Loaders/Textures/TextureUvMap.js";
+import { Vertex_buffer_render_group_print_loop } from "../../../Graphics/Buffers/RenderGroups.js";
 
 _CNT = 0;
 const p = _CNT++;
@@ -59,6 +60,7 @@ const w6 = _CNT++;
 const w7 = _CNT++;
 const va = _CNT++;
 const vb = _CNT++;
+const vr = _CNT++;
 const vi = _CNT++;
 const vp = _CNT++;
 const vs = _CNT++;
@@ -338,10 +340,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'vb',
-      discr: 'Gl_vertex_buffer_print',
+      discr: 'Vertex_buffer_print',
       func: (e)=>{
-         console.log('------------------ Gl_vertex_buffer_print() ------------------');
-         Gl_vertex_buffer_print();
+         console.log('------------------ Vertex_buffer_print() ------------------');
+         Vertex_buffer_print();
+      },
+   },
+   {
+      key: 'vr',
+      discr: 'Vertex_buffer_render_group_print_loop',
+      func: (e)=>{
+         console.log('------------------ Vertex_buffer_render_group_print_loop() ------------------');
+         Vertex_buffer_render_group_print_loop();
       },
    },
    {
@@ -751,6 +761,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[0].key === 'v') { 
          if       (_keys_buffer[len].key === 'a') DEBUG_PRINT_KEYS[va].func(e);  
          else if       (_keys_buffer[len].key === 'b') DEBUG_PRINT_KEYS[vb].func(e);  
+         else if       (_keys_buffer[len].key === 'r') DEBUG_PRINT_KEYS[vr].func(e);  
          else if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
          else if       (_keys_buffer[len].key === 'p') DEBUG_PRINT_KEYS[vp].func(e);  
          else if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
@@ -818,7 +829,7 @@ export function OnKeyUp(e){
    else if  (_keys_buffer[len].key === 's') { console.log('@ String Buffer', `\n  1:${DEBUG_PRINT_KEYS[s1].discr}\n  2:${DEBUG_PRINT_KEYS[s2].discr}\n  3:${DEBUG_PRINT_KEYS[s3].discr}\n  4:${DEBUG_PRINT_KEYS[s4].discr}`); }
    else if  (_keys_buffer[len].key === 'w') { console.log('@ Widget Root', `\n  1:${DEBUG_PRINT_KEYS[w1].discr}\n  2:${DEBUG_PRINT_KEYS[w2].discr}\n  3:${DEBUG_PRINT_KEYS[w3].discr}\n  4:${DEBUG_PRINT_KEYS[w4].discr}\n  5:${DEBUG_PRINT_KEYS[w5].discr}\n  6:${DEBUG_PRINT_KEYS[w6].discr}\n  7:${DEBUG_PRINT_KEYS[w7].discr}`); }
    else if  (_keys_buffer[len].key === 't') { console.log('@ Styles', `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}\n--\n  7:${DEBUG_PRINT_KEYS[t7].discr}`); }
-   else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}\n  1:${DEBUG_PRINT_KEYS[v1].discr}` ); }
+   else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  r:${DEBUG_PRINT_KEYS[vr].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}\n  1:${DEBUG_PRINT_KEYS[v1].discr}` ); }
    else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  d:${DEBUG_PRINT_KEYS[gd].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
    else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
    else if  (_keys_buffer[len].key === 'y') { console.log('@ Debug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }

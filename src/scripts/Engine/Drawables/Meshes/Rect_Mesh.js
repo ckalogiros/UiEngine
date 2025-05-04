@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -19,6 +19,7 @@ import { Components_create_scroller_component, Components_get_scroller_component
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
+import { View_group_create } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -48,6 +49,8 @@ export class Rect_Mesh extends Mesh {
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+         // this.group_bufferidxs = View_group_create(this);
+         // this.group_bufferidxs = View_group_create(this);
       }
 
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
@@ -225,6 +228,23 @@ export class Rect_Mesh extends Mesh {
 
 
    }
+   // NewRender(run_for_children = true) {
+
+   //    if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
+   //       this.AddToGfx();
+   //    }
+
+   //    if (this.scroller_comp) {
+
+   //       Scoller_component_render(this.scroller_comp);
+   //       // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
+   //       const aaa = this.scroller_comp.base_unif_wpos ? this.scroller_comp.base_unif_wpos : this
+   //       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
+   //       this.AddChildScrollerIdx(this.scroller_comp_idx);
+
+   //    }
+
+   // }
    Render(run_for_children = true) {
 
       if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
@@ -259,7 +279,8 @@ export class Rect_Mesh extends Mesh {
    }
    AddToGfx() {
 
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
+      Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
+      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       // Vertex_buffer_add_vertices_render_group_implementation(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
 
@@ -516,7 +537,6 @@ export class Rect_Mesh extends Mesh {
          Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
       }
    }
-
    Bind(EventClbk = null, targetBindingFunctions = _, params, click_flags) {
 
       if (!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }

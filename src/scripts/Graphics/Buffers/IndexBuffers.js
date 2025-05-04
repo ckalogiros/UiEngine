@@ -2,6 +2,8 @@
 
 
 import { New_generic_buffer } from '../../Engine/Core/Buffers.js';
+import { Floor } from '../../Helpers/Math/MathOperations.js';
+import { Vertex_buffer_render_group_get_render_group } from './RenderGroups.js';
 import { Typed_array_create_from_type } from './TypedArrayBuffersInterface.js';
 
 
@@ -214,9 +216,10 @@ class Index_Buffer_Info {
 
       const old_data = _index_buffers.buffer[this.ibidx];
       const size = old_data.length;
-      for (let i = 0; i < size; i++) {
-         new_data[i] = old_data[i];
-      }
+      new_data.set(old_data, 0);
+      // for (let i = 0; i < size; i++) {
+      //    new_data[i] = old_data[i];
+      // }
       _index_buffers.buffer[this.ibidx] = new_data;
 
       if (DEBUG.GFX.BUFFERS) console.warn('Resizing index buffer!')
@@ -316,6 +319,127 @@ export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, nu
       // ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
       // console.log('iskjds')
    }
+}
+
+
+export function Index_buffer_info_add_indices_NEW(ibidx, num_faces, vertex_index_offset) {
+
+
+   const ib_info = _index_buffers_info.buffer[ibidx];
+
+   
+   if ((ib_info.vCount % 1) !== 0) console.error('index buffer count mismatch');
+   
+   // Check for buffer realloc
+   const total_draw_count = (num_faces*INDICES_PER_RECT)+ib_info.count;
+   if (total_draw_count >= ib_info.size) {
+      ib_info.Realloc(total_draw_count);
+   }
+   
+   const data = _index_buffers.buffer[ib_info.ibidx];
+
+   let k = vertex_index_offset;
+   for (let i = 0; i < num_faces; ++i) {
+
+      for (let j = 0; j < 2; j++) {
+
+         data[ib_info.count++] = k + j;
+         data[ib_info.count++] = k + j + 1;
+         data[ib_info.count++] = k + j + 2;
+      }
+
+      k += ib_info.discontinue_offset;
+      ib_info.vCount += ib_info.discontinue_offset;
+
+      k -= ib_info.connect_offset;
+      ib_info.vCount -= ib_info.connect_offset;
+   }
+
+   k += ib_info.connect_offset;
+   ib_info.vCount += ib_info.connect_offset;
+
+
+   if ((ib_info.vCount % 1) !== 0) console.error('index buffer count mismatch')
+
+   ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE; // Make sure that we update GL bufferData 
+
+
+}
+// export function Index_buffer_info_break_indices(ibidx, num_vertices) {
+
+//    const ib_info = _index_buffers_info.buffer[ibidx];
+
+//    // Check for buffer realloc
+//    if (ib_info.count+num_vertices > ib_info.size) {
+//       ib_info.Realloc(ib_info.count+num_vertices);
+//    }
+
+//    const data = _index_buffers.buffer[ibidx];
+
+//    // if ((ib_info.vCount % 1) !== 0) console.error('index buffer count mismatch')
+
+//    let k = ib_info.count;
+//    for (let i = k; i < k+num_vertices; ++i) {
+//       data[k] = 0;
+//    }
+
+//    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+// }
+
+export function Index_buffer_build_indices_from_render_group(ibidx, render_groupidxs, attribs_per_vertex, vertices_per_faces) {
+
+   const ib_info = _index_buffers_info.buffer[ibidx];
+
+   let offset = 0;
+   let k = 0;
+   let total_attribs_size = 0;
+
+   for (let i = 0; i <= render_groupidxs.boundary; ++i) {
+
+      const rg = Vertex_buffer_render_group_get_render_group(render_groupidxs.buffer[i]);
+
+      const start = rg.start;
+      const count = rg.count;
+      const num_faces = (rg.count / attribs_per_vertex) / vertices_per_faces;
+
+      // Check for buffer realloc
+      const total_draw_count = (num_faces*INDICES_PER_RECT)+ib_info.count;
+      if (total_draw_count >= ib_info.size) {
+         ib_info.Realloc(total_draw_count);
+      }
+      
+      const data = _index_buffers.buffer[ib_info.ibidx];
+
+      
+      for (let i = 0; i < num_faces; ++i) {
+         
+         for (let j = 0; j < 2; j++) {
+            
+            data[ib_info.count++] = k + j;
+            data[ib_info.count++] = k + j + 1;
+            data[ib_info.count++] = k + j + 2;
+         }
+         
+         k += ib_info.discontinue_offset;
+         ib_info.vCount += ib_info.discontinue_offset;
+         
+         k -= ib_info.connect_offset;
+         ib_info.vCount -= ib_info.connect_offset;
+      }
+      
+      k += ib_info.connect_offset;
+      ib_info.vCount += ib_info.connect_offset;
+      
+      rg.index_offset = offset;
+      // rg.draw_count += num_faces * INDICES_PER_RECT;
+
+      // offset = Floor(num_faces * INDICES_PER_RECT);
+      total_attribs_size += rg.size;
+      offset += num_faces * INDICES_PER_RECT;
+      k = total_attribs_size / attribs_per_vertex;
+   }
+   
+   ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 
 

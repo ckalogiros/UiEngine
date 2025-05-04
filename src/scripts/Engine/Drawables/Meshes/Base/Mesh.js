@@ -141,7 +141,7 @@ export class Mesh {
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
         this.per_vb_bufferidx = INT_NULL;
-        this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL];
+        this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
 
         this.align = {
