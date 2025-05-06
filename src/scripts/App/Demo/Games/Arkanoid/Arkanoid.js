@@ -333,12 +333,7 @@ function Arkanoid_initialize_game(x, y) {
    View_build_group_from_root_mesh(menu);
    const group_idx = menu.group_bufferidxs[0];
 
-   // View_add_to_group(score_text, group_idx);
-   // View_add_to_group(score_num_text, group_idx);
-   // View_add_to_group(score_mod_text, group_idx);
-   // View_add_to_group(score_mod_num_text, group_idx);
-   // View_add_to_group(combo_text, group_idx);
-   // View_add_to_group(combo_num_text, group_idx);
+
 
    ypos += ARKANOID_MENU_DIM_Y * 2;
 

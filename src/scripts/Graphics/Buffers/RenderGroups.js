@@ -28,19 +28,21 @@ const _render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Render Groups');
 
 
 /** */
-export function Vertex_buffer_render_group_create() {
+// export function Vertex_buffer_render_group_create(start=0, count=0, size=0, draw_count=0, index_offset= 0,debug_vbidx=-1,) {
+export function Vertex_buffer_render_group_create(num_faces=INT_NULL) {
 
    const render_groupidx = _render_groups.Add(
       {
          start:0, 
          count:0, 
          size:0, 
+         num_faces:num_faces, 
          draw_count:0, 
-         index_offset: 0,
-         // view_vb_groupidx:view_vb_groupidx,
-         // vb_groupidx:vb_groupidx,
-         // vb_groupidx:INT_NULL,
-         // vertex_offset: 0,
+         index_offset:0,
+         
+         debug_vbidx:INT_NULL,
+         debug_is_reseted:true,
+
       }
    );
 
@@ -64,35 +66,26 @@ export function Vertex_buffer_render_group_get_size(render_groupidx) {
 }
 
 // SETTERS
+
 /** */
-export function Vertex_buffer_render_group_set_all(render_groupidx, start, count, size, draw_count, index_offset) { 
-   _render_groups.buffer[render_groupidx].start = start;
-   _render_groups.buffer[render_groupidx].count = count;
-   _render_groups.buffer[render_groupidx].size = size;
-   _render_groups.buffer[render_groupidx].draw_count = draw_count;
-   _render_groups.buffer[render_groupidx].index_offset = index_offset;
-   console.log('Vertex_buffer_render_group_set_all\n render_groupidx:', render_groupidx,  _render_groups.buffer[render_groupidx])
+export function Vertex_buffer_render_group_set_num_faces(render_groupidx, num_faces) { 
+   _render_groups.buffer[render_groupidx].num_faces = num_faces;
 }
 /** */
-export function Vertex_buffer_render_group_set(render_groupidx, start, draw_count) { 
-   _render_groups.buffer[render_groupidx].start = start;
-   _render_groups.buffer[render_groupidx].draw_count = draw_count;
+export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx, debug_is_reseted) { 
+   _render_groups.buffer[render_groupidx].debug_is_reseted = debug_is_reseted;
 }
 /** */
-export function Vertex_buffer_render_group_set_start(render_groupidx, start) { 
-   _render_groups.buffer[render_groupidx].start = start;
-}
+// export function Vertex_buffer_render_group_set_start(render_groupidx, start) { 
+//    _render_groups.buffer[render_groupidx].start = start;
+// }
 /** */
-export function Vertex_buffer_render_group_set_draw_count(render_groupidx, draw_count) { 
-   _render_groups.buffer[render_groupidx].draw_count = draw_count;
-}
+// export function Vertex_buffer_render_group_set_draw_count(render_groupidx, draw_count) { 
+//    _render_groups.buffer[render_groupidx].draw_count = draw_count;
+// }
 /** */
-export function Vertex_buffer_render_group_set_size(render_groupidx, size) { 
-   _render_groups.buffer[render_groupidx].size = size;
-}
-// /** */
-// export function Vertex_buffer_render_group_set_view_vb(render_groupidx, view_vb_groupidx) { 
-//    _render_groups.buffer[render_groupidx].view_vb_groupidx = view_vb_groupidx;
+// export function Vertex_buffer_render_group_set_size(render_groupidx, size) { 
+//    _render_groups.buffer[render_groupidx].size = size;
 // }
 
 
@@ -120,15 +113,14 @@ export function Vertex_buffer_render_group_print_loop() {
       const g = _render_groups.buffer[i];
       
       console.log( 
+         'vbidx', g.debug_vbidx,
          'rgidx', i,
          'start:', g.start,
          'count:', g.count,
          'size:', g.size,
          'draw_count:', g.draw_count,
          'index_offset:', g.index_offset,
-         // 'view_vb_groupidx:', g.view_vb_groupidx,
-         // 'offset:', g.offset,
-         // 'vertex_offset:', g.vertex_offset,
+         'num_faces:', g.num_faces,
       );
    }
 }
@@ -137,14 +129,13 @@ export function Vertex_buffer_render_group_print_render_group(render_groupidx) {
    const g = _render_groups.buffer[render_groupidx];
    console.log(
       '----- Vertex Buffer Render Group -----\n',
+      'vbidx', g.debug_vbidx,
       'rgidx', render_groupidx,
       'start:', g.start,
       'count:', g.count,
       'size:', g.size,
       'draw_count:', g.draw_count,
       'index_offset:', g.index_offset,
-      // 'view_vb_groupidx:', g.view_vb_groupidx,
-      // 'offset:', g.offset,
-      // 'vertex_offset:', g.vertex_offset,
+      'num_faces:', g.num_faces,
    );
 }

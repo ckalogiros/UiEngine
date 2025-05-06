@@ -2,7 +2,7 @@
 
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
@@ -305,9 +305,9 @@ class Emitter {
          time: this.particles_buffer.buffer[particle_idx].time,
          generic: this.particles_buffer.buffer[particle_idx].generic,
       }
-
+allert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
       // const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
-      const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
+      // const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
 
 

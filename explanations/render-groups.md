@@ -1,39 +1,19 @@
 # Render groups
 
-# Just thoughts on how to implement
-* A render group is limited on:
-   If a new render group is created for a VB, then all of the children of that mesh have 3 options, 
-   as to where they are gonna be rendered:
-   1. Rendered to the parent's render group
-      Explicitly or implicitly a flag of type FIND_FROM_PARENT_DESCENDING must be enabled.
-   2. Rendered to the default render group of the VB
-   3. Rendered on a NEW_RENDER_GROUP, if explicitly set  for any child mesh.
-   4. Rendered to a specific render group.
-
-   For case 2, we need to answer:
-   1. Is there a default render group per VB? 
-      Is it always the first render group?
-   2. If no defauuult render group is used, then we must check any of the render groups of the VB
-      if any is NOT PRIVATE. If none is found, then we set NEW_RENDER_GROUP so a new none privat render group will be created.
-   So in case of rendering a mesh the above means that:
-      If a NEW_RENDER_GROUP is set for that mesh, then the render group is flaged as private.
-      If another mesh is to be added to the same VB, that is not child of that mesh, then the Finder() muust not find a 'default'
-      render group and must set  NEW_RENDER_GROUP and NOT PRIVATE, for the VB
-
-
-   For case 4, we need to answer:
-   1. Before calling MeshGfxCtx() there is no render_groupidx for any mesh to know any SPECIFIC render group.
-      So do we use flags to do it ???
 
 
 
-# With render groups we are able to NOT draw portions of a vb.
+# With render groups we are able to un-draw re-draw  and manipulate differently portions of a vb.
    We must have an 'active' variable to check against(in the main loop!!)
    OR create a an abstraction struct of only active render groups
    OR unify Renderqueue with active render groups 
 
 
 
+
+# Decision: Where the render group idx is stored in the mesh's .render_grouidx 
+   -> MeshBufferViews.js
+   -> In many places inside the function View_add_mesh().
 
 # Decision: Child inherits parent's render group
    -> MeshBufferViews.js
@@ -54,3 +34,32 @@
    ->    else { // Else if not found, create new View.
                const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
                const new_render_groupidx = Vertex_buffer_render_group_create(0, 0);
+
+# Decision: Where the render group 'start' and 'size' are calculated
+   -> It is calculated in the VertexBuffers.js file
+      by Vertex_buffer_calculate_render_group_starts() function
+      where we run for each vertexbuffer->for each rendergroup
+
+# Decision: Where the render group 'num_faces'is calculated
+   -> In MeshBufferViews.js
+      By View_add_mesh() in many places.
+      The num_faces accumulates the number of faces for each mesh.
+
+
+
+# Decision: Where the render group 'count' index is calculated
+   -> It is calculated in the VertexBuffer.js file
+      By Vertex_buffer_add_vertices_from_render_group()
+      when individual meshes are inserted in the vertex buffer
+      'render_group.count += total_attribs'
+
+# Decision: Where the index buffer is build
+   * Via the MeshBufferViews.js
+   There is a specific function that builds the index buffer for all vertexbuffers of the current view group 
+   ISSUE: With Current implementation the same vertex buffers CANNOT be shared via render groups across root widgets. A new group will be created and the find-match algo will create new vb
+      If the same vb is to be created then the index buffer will be populated without advancing the index count, rather it will reset to 0 index for the second root widget 
+
+
+
+
+

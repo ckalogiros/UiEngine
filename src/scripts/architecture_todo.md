@@ -1,3 +1,8 @@
+* Implement having root widgets use the same vertex buffers (using find-match from GfxContextFindMatch)
+   In other words, we need to reconfigure ViewGrouups and RenderGroups for one buffer rules.
+   I think that the only matter is the index buffer buld, which is called by each root widget
+   therefore the index count resets (0) on every call from root
+
 * Add to gfx buffers - new implementation
 Mesh: has an attributes float32 buffer
 The buffers is part of Attributes[], a larger buffer to hold all attributes of all meshes

@@ -1,7 +1,7 @@
 "use strict";
 
 import { Index_buffer_reset } from "../../../Graphics/Buffers/IndexBuffers.js";
-import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
+// import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Vertex_buffer_create_attribs_info_per_vb_instanced } from "../../../Graphics/ShaderAttributes.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
@@ -582,8 +582,7 @@ export function Root_group_reset_gfxs(root_bufferidx) {
       // console.log('root_mesh_per_vb_idx', root_mesh_per_vb_idx)
 
       // TODO: We call 'Vertex_buffer_reset_to_index' because there is no vb reset to 0. Create that function
-      Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
-      // Vertex_buffer_render_group_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer[0], mesh.gfx.vb.render_groupidx)
+      // Vertex_buffer_reset_to_index(rootgfx.buffer[i], mesh.gfx.vb.starts.buffer);
       Vertex_buffer_create_attribs_info_per_vb_instanced(mesh.gfx.prog.attribsidx, mesh.gfx.vb.starts.buffer);
 
       Index_buffer_reset(mesh.gfx.ib.idx); // BUG: The vertex buffer is getting reset to specific index, although the index buffer is reset to 0

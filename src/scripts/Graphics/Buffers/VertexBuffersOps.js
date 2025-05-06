@@ -469,7 +469,7 @@ export function Gl_set_vpos_xy(gfx, x, y, num_faces = 1) {
    const xx = x;
    const yy = y;
 
-   // const len = (num_faces * gfx.verts_per_rect)+2;
+   // const len = (num_faces * gfx.verts_per_face)+2;
    // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
 
 
@@ -709,7 +709,7 @@ export function Gl_add_vpos_xy_right(gfx, x, y, num_faces = 1) {
    const xx = x;
    const yy = y;
 
-   // const len = (num_faces * gfx.verts_per_rect)+2;
+   // const len = (num_faces * gfx.verts_per_face)+2;
    // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
 
 
@@ -752,7 +752,7 @@ export function Gl_add_vpos_xy_left(gfx, x, y, num_faces = 1) {
    const xx = x;
    const yy = y;
 
-   // const len = (num_faces * gfx.verts_per_rect)+2;
+   // const len = (num_faces * gfx.verts_per_face)+2;
    // Set_vertex_position_VPOS2(vb_data, start + a_offset, vb_info.attribs_info.count, xx, yy, num_faces, len)
 
 

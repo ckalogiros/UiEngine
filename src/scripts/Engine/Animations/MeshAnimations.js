@@ -103,7 +103,7 @@ class VB_DATA {
             starts: [],
             counts: null,
             which_vb: null,
-            verts_per_rect: 0,
+            verts_per_face: 0,
             values: [],
             values_indices: [],
             num_faces: [],
@@ -112,7 +112,7 @@ class VB_DATA {
         this.data_count = 0;
     }
 
-    SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_rect, start_val=0, has_start_value=false){
+    SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_face, start_val=0, has_start_value=false){
         if(values.constructor !== Float32Array && values.constructor !== Array) alert('values should be an array\nAnimations.js')
         
 
@@ -120,7 +120,7 @@ class VB_DATA {
         this.data.num_faces.push(num_faces);
         this.data.counts = counts;
         this.data.which_vb = which_vb;
-        this.data.verts_per_rect = verts_per_rect;
+        this.data.verts_per_face = verts_per_face;
         
         
         this.data.offsets = MeshAnimations_get_value_offset(anim_type_flag, anim_data_type);
@@ -259,7 +259,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     const starts = mesh.gfx.vb.starts.buffer;
     const counts = mesh.gfx.vb.counts.buffer;
     const which_vb = mesh.gfx.vb.which_vb;
-    const verts_per_rect = (mesh.gfx.vb.counts.active_count > 1) ? 1 : VERTS_PER_RECT_INDEXED; // For instanced meshes that have per instance data, the number of times run must be 1 and not 4(per vertex)
+    const verts_per_face = (mesh.gfx.vb.counts.active_count > 1) ? 1 : VERTS_PER_RECT_INDEXED; // For instanced meshes that have per instance data, the number of times run must be 1 and not 4(per vertex)
     const attribsidx = mesh.gfx.prog.attribsidx;
     const num_faces = mesh.geom.num_faces;
     let values = [];
@@ -334,7 +334,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     }
     
     // Finally, after type and vb are set, create the animation data for the mesh
-    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_rect, start_v, has_start_value)
+    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_face, start_v, has_start_value)
     anim.anim_data[vb_data_idx].SetData(t, t_step, min, max)
     
     // Set apropriate callback

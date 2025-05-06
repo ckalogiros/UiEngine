@@ -52,6 +52,20 @@ float screenPxRange(vec2 v_tex_coord) {
 //   return blur /= 8.0;
 // }
 
+vec4 Glow(float D, float alpha) {
+
+  // float inside = 1.  - smoothstep(-1., 1., D);
+  // float glow = 1.  - smoothstep(0., 10.1, D);
+  float inside = smoothstep(-2., 2., D);
+  float glow = smoothstep(-1., 1., D);
+  vec3 inside_color = vec3(1., 1., 0.);
+  vec3 glow_col = vec3(1., .3, 0.);
+  vec3 frag_color = mix(glow * glow_col, inside_color, inside);
+
+  return vec4(frag_color, 1.);
+
+}
+
 
 vec4 Msdf(vec2 v_tex_coord) {
 
@@ -63,6 +77,13 @@ vec4 Msdf(vec2 v_tex_coord) {
   // float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
   float opacity = clamp(pxDist + .5, 0.0, 1.0);
   // opacity += Glow() * 2.4; // Combine the original texture with the blured alpha
+
+  // float threshold = .5;
+  // float afwidth = 0.7 * length(vec2(dFdx(dist), dFdy(dist)));
+  // float c = smoothstep(threshold - afwidth, threshold + afwidth, dist);
+  // return vec4(c); 
+
+  // return Glow(dist, opacity);
   
   // vec4 alpha = vec4((opacity+.0) * v_col4_w); 
   float tex_alpha = texel.a * (2.0 - texel.a);

@@ -1,12 +1,25 @@
 TODO
 
-* CONTINUE
-   MeshBufferViews.js: the render_group must be stored in a view, so it can handle it
+
+# Vertex buuffer
+ * Replace Vertex_buffer_add_vertices() with the new add vertices from render group
+
+# View groups
+ * Do we need the .vb field of the mesh view group?????
+ * implement set vertex buffer initial size, to match the mesh data
+
+# Render groups
+ * implement resize-realloc
 
 # IMIDIATELY 
- * Remove the 'draw_count from the vertex buffer group', substituting with the render groups draw_count
- * Replace verts_per_rect with verts_per_face
- * Unify MeshGfxContext for particles and meshes
+ * MUST implement IndexBuffer insertion, for meshes that are added after application creation(widget dropdown). 
+ * MeshBufferViews.js:
+   many more...
+ * Remove the per vb mesh buffer
+
+
+
+   
  * Scroller should be rendered at the mesh site
    When that happens do:
       Remove Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE); and delete the function also

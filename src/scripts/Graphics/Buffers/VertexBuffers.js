@@ -2,20 +2,20 @@
 
 
 import { New_generic_buffer, New_int8_buffer } from "../../Engine/Core/Buffers.js";
-import { Shader_attributes_enable, Shader_attributes_get_attribs, Shader_attributes_get_attribs_offset_size, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
-import { Progarm_get_program, Program_get_shader_attribute_attribs_per_vertex, Program_get_shader_attributes_index, Program_use_program2 } from "../ShaderPrograms.js";
+import { Shader_attributes_enable, Shader_attributes_get_attribs_per_vertex, Vertex_buffer_create_attribs_info_per_vb_instanced } from "../ShaderAttributes.js";
+import { Progarm_get_program, Program_get_shader_attributes_index, Program_use_program2 } from "../ShaderPrograms.js";
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
-import { Index_buffer_build_indices_from_render_group, Index_buffer_info_add_indices_NEW, Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
+import { Index_buffer_add_indices_from_render_group, Index_buffer_build_indices_from_render_group, Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
 import { Renderqueue_set_active } from "../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Mesh_buffer_get_mesh_byidx } from "../../Engine/Core/MeshBuffer.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_num_faces } from "../../Engine/Core/MeshBuffer.js";
 import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Vertex_buffer_render_group_create, Vertex_buffer_render_group_get_all, Vertex_buffer_render_group_get_render_group, Vertex_buffer_render_group_get_size, Vertex_buffer_render_group_print_loop, Vertex_buffer_render_group_print_render_group, Vertex_buffer_render_group_set_start } from "./RenderGroups.js";
+import { Vertex_buffer_render_group_get_render_group } from "./RenderGroups.js";
 
 
 
@@ -425,7 +425,7 @@ class Vertex_Buffer_Group {
         this.vaoidx = vaoidx;       // Index to the array of stored VAO's
         this.texidx = INT_NULL;     // webGl texture index.
         this.ibidx = INT_NULL;      // index ref to index buffer this vb uses.
-        this.draw_count = 0;
+        // this.draw_count = 0;
         this.vertices_per_face = (sid.shad & SID.SHAD.INDEXED) ? VERTS_PER_RECT_INDEXED : VERTS_PER_RECT;
         this.idx = INT_NULL;        // Self index to the '_vertex_buffer_groups' buffer
         this.needs_any_update = false; // 
@@ -496,7 +496,7 @@ export function Vertex_buffer_group_get_shader_attributes_index(vb_groupidx) {
 /** */
 export function Vertex_buffer_group_store_render_groupidx(vb_groupidx, render_groupidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.Add(render_groupidx);
-    console.log('VB ASSIGN RG', render_groupidx, _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.buffer)
+    // console.log('VB ASSIGN RG', render_groupidx, _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.buffer)
 }
 
 
@@ -586,72 +586,7 @@ export function Vertex_buffer_group_state_enable(vb_groupidx, STATE_FLAG) {
         _vertex_buffer_groups.buffer[vb_groupidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 
 }
-/** */
-// export function Vertex_buffer_group_create_new_render_group(vb_groupidx, render_group_start, render_group_size, mesh_count=1) {
 
-//     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-//     const cur_size = Vertex_buffer_render_group_get_size(vb_group.render_groupidxs.buffer[0]);// Get the size ofthe first render group
-//     const render_groupidx = Vertex_buffer_render_group_create(render_group_start, cur_size);
-//     vb_group.render_groupidxs.Add(render_groupidx);
-
-//     console.log('Create New Render group',)
-//     // Resolve render groups sizes and starts
-//     const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
-//     const new_size = vb_info.attribs_info.count * vb_group.vertices_per_face * mesh_count;
-//     console.log('Added size in attribs',new_size)
-    
-//     console.log('vb_info.size BEFORE ALLOC',vb_info.size)
-//     const vb_prev_size = vb_info.size;
-    
-//     const size_dif = vb_info.Realloc(vb_info.size + new_size);
-//     console.log('vb_info.size AFTER ALLOC',vb_info.size)
-//     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-    
-//     const rg = Vertex_buffer_render_group_get_render_group(render_groupidx);
-//     rg.size = new_size;
-//     rg.start = vb_prev_size;
-//     // rg.offset = vb_info.attribs_info.count * vb_group.vertices_per_face;
-//     // rg.vertex_offset = vb_info.attribs_info.count * vb_group.vertices_per_face;
-//     // rg.index_offset = Floor(((vb_prev_size / vb_info.attribs_info.count) / vb_group.vertices_per_face) * 6);
-
-
-//     // let offset = 0;
-//     // for(let i=0; i <= vb_group.render_groupidxs.boundary; i++) {
-//     //     const rgg = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[i]);
-//     //     offset = Floor(((rgg.count / vb_info.attribs_info.count) / vb_group.vertices_per_face) * 6);
-//     // }
-//     // rg.index_offset = offset;
-
-//     console.log('000000000000000000000000', rg)
-
-
-
-//     Vertex_buffer_render_group_print_loop();
-
-//     return render_groupidx;
-
-// }
-/** */
-// export function Vertex_buffer_group_resolve_render_group_boundaries(vb_groupidx, mesh_count=1) {
-
-//     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-
-//     for (let i = 0; i <= vb_group.render_groupidxs.boundary; i++) {
-
-//         const rg = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[i]);
-
-
-
-//     }
-
-
-
-
-//     Vertex_buffer_render_group_print_loop();
-
-//     return render_groupidx;
-
-// }
 
 
 
@@ -844,62 +779,115 @@ export function Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, unif
 // Insert-Remove-Reset From Vertex Buffer
 /***************************************************************************************************************************************************/
 
-/** */
-export function Vertex_buffer_build_index_buffer(vb_groupidx) {
-    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-    const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
-    const attribs_per_vertex = vb_info.attribs_info.count;
-    Index_buffer_build_indices_from_render_group(vb_group.ibidx, vb_group.render_groupidxs, attribs_per_vertex, vb_group.vertices_per_face)
+/** Calculates all render group's start index on a per vertex buffer basis 
+ * // TODO: We must implement the calcuuulation of the index_offsets for each render group, in the index buffer
+*/
+export function Vertex_buffer_calculate_render_group_starts() {
+
+    for(let i=0; i<=_vertex_buffer_groups.boundary; i++) {
+
+        const vb = _vertex_buffer_groups.buffer[i];
+        let num_faces = 0;
+        let num_attributes = 0;
+        let start_attrib = 0; // Resets on each diffferent vertex buffer
+        
+        const vb_groupidx = i;
+        const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+        const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
+        const attribs_per_vertex = vb_info.attribs_info.count;
+        const vertices_per_face = vb_group.vertices_per_face;
+
+        for(let j=0; j<=vb.render_groupidxs.boundary; j++) {
+
+            const rgidx = vb.render_groupidxs.buffer[j];
+            const rg = Vertex_buffer_render_group_get_render_group(rgidx); 
+
+            
+            rg.start = start_attrib; // Stores for every previous attributes size accumulation
+            rg.size = rg.num_faces * vertices_per_face * attribs_per_vertex; 
+            
+            // Calculate index buffer's offset of this render group 
+            rg.index_offset = rg.start / (vertices_per_face * attribs_per_vertex) * INDICES_PER_RECT;
+
+            num_faces += rg.num_faces;
+            num_attributes += rg.num_faces * vertices_per_face * attribs_per_vertex;
+
+            start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
+
+        }
+    }
 }
+/** Creates indices for all vertex buffers. Called once at app intitialization (for now...) */
+export function Vertex_buffer_build_index_buffer_all() {
+
+    for(let i=0; i<=_vertex_buffer_groups.boundary; i++) {
+        const vb_groupidx = i;
+        const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+        const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
+        const attribs_per_vertex = vb_info.attribs_info.count;
+        Index_buffer_build_indices_from_render_group(vb_group.ibidx, vb_group.render_groupidxs, attribs_per_vertex, vb_group.vertices_per_face);
+    }
+}
+
 /** */
 export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
-
+    
     const progidx = gfx.prog.idx;
     const vb_groupidx = gfx.vb.groupidx;
     const prog = Progarm_get_program(progidx);
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-
+    
     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
     
     const render_groupidx = gfx.vb.render_groupidx;
     const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
 
+    // // Catch error: when this is called to add from a reset state.
+    // if(use_from_reset===true && render_group.debug_is_reseted===false) { 
+    //     console.error('sjdklhjshjdfjhsjdhjhj')
+    //     alert('34503734049948972387\nRender group has not been reset.\nThe data in the vertex buffer will be duplicated'); 
+    //     // throw new Error(); 
+    // }
+    // else if(render_group.debug_is_reseted) render_group.debug_is_reseted = true;
+
     
     // Run for every vertex buffer of the group.
     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
         
-        const start_attribute_index = render_group.start + render_group.count;
-
         const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
         
         const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
         const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
         const attr_uv_idx = vb_info.attribs_indexing.TEX2;
         const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
-        const attribs_count = vb_info.attribs_info.count;
+        const attribs_per_vertex = vb_info.attribs_info.count;
         
-        // const start_attribute_index = vb_info.count;
-        
-        const verts_per_rect = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
+        const verts_per_face = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
         let total_attribs = 0;
         if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
-            total_attribs = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
+            total_attribs = vb_info.attribs_info.count * ((verts_per_face * num_faces) + 2); 
         }
-        else total_attribs = attribs_count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
-       
+        else total_attribs = attribs_per_vertex * verts_per_face * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
+        
+        const start_attribute_index = render_group.start + render_group.count;
+        
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start_attribute_index, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
+        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start_attribute_index, num_faces, attribs_per_vertex, verts_per_face, a_vpos_offset, a_uv_offset);
+        
 
-        vb_info.count += total_attribs;
+        // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
+        Index_buffer_add_indices_from_render_group(vb_group.ibidx, render_groupidx, attribs_per_vertex, verts_per_face, num_faces);
+
         render_group.count += total_attribs;
+        vb_info.count = render_group.count;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
-
+        
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
         vb_group.needs_any_update = true;
-
+        
         render_group.draw_count += num_faces * INDICES_PER_RECT;
-
+        
         // Store the texture index in the vertex
         vb_info.texidx = mat.texidx;
         if(use_from_reset === false) {
@@ -912,294 +900,33 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     return 0;
 
 }
-/** SAVE */
-// export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
 
-//     /**
-//      * for each render group
-//      *      for each mesh in render group
-//      *          for each vb (instances) in vertex buffer group
-//      *              Gl_add()
-//      */
-
-//     const progidx = gfx.prog.idx;
-//     const vb_groupidx = gfx.vb.groupidx;
-//     const prog = Progarm_get_program(progidx);
-//     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-
-//     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
-    
-//     const render_groupidx = gfx.vb.render_groupidx;
-//     // const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
-
-    
-//     // Run for every vertex buffer of the group.
-//     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
-        
-//         const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
-        
-//         const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
-//         const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
-//         const attr_uv_idx = vb_info.attribs_indexing.TEX2;
-//         const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
-//         const attribs_count = vb_info.attribs_info.count;
-        
-//         const start_attribute_index = vb_info.count;
-
-        
-        
-//         const verts_per_rect = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
-//         let total_attribs = 0;
-//         if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
-//             total_attribs = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
-//         }
-//         else total_attribs = attribs_count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
-        
-        
-//         // if (render_group.start+render_group.count + total_attribs >= render_group.size) {
-
-//         //     let strt = 0;
-//         //     for (let i = 0; i <= vb_group.render_groupidxs.boundary; i++) {
-//         //         const rg = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[i]);
-//         //         Vertex_buffer_render_group_set_start(i, strt)
-//         //         strt += rg.size;
-//         //     }
-//         // }
-
-       
-//         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-//         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start_attribute_index, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
-
-//         vb_info.count += total_attribs;
-//         // render_group.count += total_attribs;
-//         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
-
-//         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
-//         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-//         vb_group.needs_any_update = true;
-
-
-
-//         // Store the texture index in the vertex
-//         vb_info.texidx = mat.texidx;
-//         if(use_from_reset === false) {
-//             gfx.vb.counts.buffer[i] = total_attribs;
-//             gfx.vb.starts.buffer[i] = start_attribute_index;
-//         }
-        
-        
-
-//     }
-
-//     return 0;
-
-// }
 /** Reset Vertex Buffer to specific mesh start index */
 export function Vertex_buffer_reset_to_index_NEW(vb_groupidx, render_groupidx) {
 
     const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
     render_group.count = 0;
     render_group.draw_count = 0;
+    render_group.debug_is_reseted = true;
     
-    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-    vb_group.needs_any_update = true;
+    _vertex_buffer_groups.buffer[vb_groupidx].needs_any_update = true;
 
 }
-/** SAVE */
-export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
-
-    const progidx = gfx.prog.idx;
-    const vb_groupidx = gfx.vb.groupidx;
-    const prog = Progarm_get_program(progidx);
-    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-
-    const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
-    
-    const render_groupidx = gfx.vb.render_groupidx;
-    const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
-
-
-    // const start = vb_info.count;
-    const start = render_group.start+render_group.count;
-    // const start = render_group.start;
-
-    // Run for every vertex buffer of the group.
-    for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
-
-        const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
-        
-        const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
-        const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
-        const attr_uv_idx = vb_info.attribs_indexing.TEX2;
-        const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
-        const attribs_count = vb_info.attribs_info.count;
-        
-        
-        if(use_from_reset === false) // Skip updating mesh.gfx start if this is called from a 'add attr to an empty vb' context 
-            gfx.vb.starts.buffer[i] = render_group.start+render_group.count;
-        
-        
-        const verts_per_rect = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
-        let total_attribs = 0;
-        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
-            total_attribs = vb_info.attribs_info.count * ((verts_per_rect * num_faces) + 2); 
-        }
-        else total_attribs = attribs_count * verts_per_rect * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
-        
-        
-        if (render_group.start+render_group.count + total_attribs >= render_group.size) {
-
-            let strt = 0;
-            for (let i = 0; i <= vb_group.render_groupidxs.boundary; i++) {
-                const rg = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[i]);
-                Vertex_buffer_render_group_set_start(i, strt)
-                strt += rg.size;
-            }
-
-            if(render_group.count+total_attribs > render_group.size) { 
-                // Case a mesh being inserted outside render group's boundaries(getting in other render group area),
-                // we need to update the start and size of all next render grouups
-
-                // console.log(
-                //     'render_groupidx', render_groupidx,
-                //     '\nrender_group.count+total_attribs', render_group.count+total_attribs,
-                //     '>',
-                //     'render_group.size', render_group.size,
-                //     'vb start', render_group.start+render_group.count,
-                //     // '\nvb_info.count', vb_info.count,
-                // )
-            }
-
-            if(0) {
-                
-                const new_size = vb_info.attribs_info.count * verts_per_rect * num_faces;
-                const vb_prev_size = vb_info.size;
-                const size_dif = vb_info.Realloc(vb_info.size + new_size);
-                // console.log('vb_info.size AFTER ALLOC',vb_info.size)
-                vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-
-                // const rg = Vertex_buffer_render_group_get_render_group(render_groupidx);
-                render_group.size = new_size;
-                render_group.start = vb_prev_size;
-            }
-        }
-
-       
-        const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-        Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, render_group.start+render_group.count, num_faces, attribs_count, verts_per_rect, a_vpos_offset, a_uv_offset);
-
-        vb_info.count += total_attribs;
-        render_group.count += total_attribs;
-        vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
-
-        prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
-        vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-        vb_group.needs_any_update = true;
 
 
 
-        // Store the texture index in the vertex
-        vb_info.texidx = mat.texidx;
-        if(use_from_reset === false) gfx.vb.counts.buffer[i] = total_attribs;
-        
-
-    }
-
-    return start;
-
-}
-/** Reset Vertex Buffer to specific mesh start index */
-export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
-    // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
 
 
-    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
-
-    let num_faces = 0;
-
-    for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
-        /**
-         * // TODO: Check If the view has meshes to its right inside the current vertexbuffer,
-         * If num_faces + start is less than vertex buffers count, the it has, so we need to remove the attributes from the vertex buffer  
-         */
-
-        const vbidx = vb_group.vb_idxs.buffer[i]
-
-        const vb_info = _vertex_buffer_infos.buffer[vbidx];
-        if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js \nstart index:', starts[i], 'vb count', vb_info.count);
-
-        const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
-        const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
-
-        vb_info.count = starts[i];
-        // const render_groupidx = gfx.vb.render_groupidx;
-        // const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
-
-        const vCount = starts[i] ? starts[i] / attribs_per_vertex : 0;
-        vb_info.vCount = vCount;
-        vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-
-        num_faces += vb_info.count / (vb_group.vertices_per_face * attribs_per_vertex);
-        vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-    }
 
 
-    const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
-    vb_group.draw_count = num_faces * indices_per_face;
-    // Vertex_buffer_render_group_set_draw_count(num_faces * indices_per_face);
 
 
-    vb_group.needs_any_update = true;
-
-}
-/** Reset a portion of the vertex buffer */
-export function Vertex_buffer_render_group_reset_to_index(vb_groupidx, start, render_groupidx) {
-    // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
 
 
-    const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+/****************************************************************************************************************************************************/
+// NEED RE-IMPLEMENTATION
+/****************************************************************************************************************************************************/
 
-    let num_faces = 0;
-
-    const vbidx = vb_group.vb_idxs.buffer[0]
-    
-    const vb_info = _vertex_buffer_infos.buffer[vbidx];
-    if (start < 0 || start > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js \nstart index:', start, 'vb count', vb_info.count);
-    
-    const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
-    const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
-    
-    
-    // for(let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
-        
-        // const  render_groupidx = vb_group.render_groupidxs.buffer[j];
-        const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
-
-        const remove_attribs = render_group.count - start;
-        render_group.count = start;
-        vb_info.count -= remove_attribs;
-
-        // TODO: Calculate draw_count
-        // render_group.draw_count = render_group.num_faces * indices_per_face;
-    // }
-    
-    const vCount = start ? start / attribs_per_vertex : 0;
-    vb_info.vCount = vCount;
-    vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-    
-    num_faces += vb_info.count / (vb_group.vertices_per_face * attribs_per_vertex);
-    vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-
-
-    const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
-    vb_group.draw_count = num_faces * indices_per_face;
-    // Vertex_buffer_render_group_set_draw_count(num_faces * indices_per_face);
-    render_group.draw_count = num_faces * indices_per_face;
-
-
-    vb_group.needs_any_update = true;
-
-}
 /** */
 export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
@@ -1294,7 +1021,6 @@ export function Vertex_buffer_remove_geometry(gfx, num_faces, debug_mesh) {
 
 
 
-
 /****************************************************************************************************************************************************/
 // DEBUG
 /****************************************************************************************************************************************************/
@@ -1318,3 +1044,154 @@ export function Vertex_buffer_print() {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DEPRECATED
+/** Reset Vertex Buffer to specific mesh start index */
+// export function Vertex_buffer_reset_to_index(vb_groupidx, starts) {
+//     // if (!DISABLE_DEBUG) (_vertex_buffer_groups, progidx, new Error().lineNumber);
+
+
+//     const vb_group = _vertex_buffer_groups.buffer[vb_groupidx];
+
+//     let num_faces = 0;
+
+//     for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+//         /**
+//          * // TODO: Check If the view has meshes to its right inside the current vertexbuffer,
+//          * If num_faces + start is less than vertex buffers count, the it has, so we need to remove the attributes from the vertex buffer  
+//          */
+
+//         const vbidx = vb_group.vb_idxs.buffer[i]
+
+//         const vb_info = _vertex_buffer_infos.buffer[vbidx];
+//         if (starts[i] < 0 || starts[i] > vb_info.count) console.error('Start should be less than vertex buffer count. @VertexBuffers.js \nstart index:', starts[i], 'vb count', vb_info.count);
+
+//         const attribsidx = Program_get_shader_attributes_index(vb_group.progidx);
+//         const attribs_per_vertex = Shader_attributes_get_attribs_per_vertex(attribsidx);
+
+//         vb_info.count = starts[i];
+//         // const render_groupidx = gfx.vb.render_groupidx;
+//         // const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
+
+//         const vCount = starts[i] ? starts[i] / attribs_per_vertex : 0;
+//         vb_info.vCount = vCount;
+//         vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+
+//         num_faces += vb_info.count / (vb_group.vertices_per_face * attribs_per_vertex);
+//         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+//     }
+
+
+//     // const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
+//     // vb_group.draw_count = num_faces * indices_per_face;
+//     // // Vertex_buffer_render_group_set_draw_count(num_faces * indices_per_face);
+
+
+//     vb_group.needs_any_update = true;
+
+// }
+
+/** SAVE */
+// export function Vertex_buffer_add_vertices(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
+//     alert('01992877661545124342\nVertex_buffer_add_vertices is DEPRECATED')
+//         // const progidx = gfx.prog.idx;
+//         // const vb_groupidx = gfx.vb.groupidx;
+//         // const prog = Progarm_get_program(progidx);
+//         // const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+    
+//         // const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
+        
+//         // const render_groupidx = gfx.vb.render_groupidx;
+//         // const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
+    
+    
+//         // // const start = vb_info.count;
+//         // const start = render_group.start+render_group.count;
+//         // // const start = render_group.start;
+    
+//         // // Run for every vertex buffer of the group.
+//         // for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+    
+//         //     const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
+            
+//         //     const attr_vpos_idx = vb_info.attribs_indexing.VPOS2;
+//         //     const a_vpos_offset = vb_info.attribs_info.offsets[attr_vpos_idx];
+//         //     const attr_uv_idx = vb_info.attribs_indexing.TEX2;
+//         //     const a_uv_offset = vb_info.attribs_info.offsets[attr_uv_idx];
+//         //     const attribs_per_vertex = vb_info.attribs_info.count;
+            
+            
+//         //     if(use_from_reset === false) // Skip updating mesh.gfx start if this is called from a 'add attr to an empty vb' context 
+//         //         gfx.vb.starts.buffer[i] = render_group.start+render_group.count;
+            
+            
+//         //     const verts_per_face = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
+//         //     let total_attribs = 0;
+//         //     if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
+//         //         total_attribs = vb_info.attribs_info.count * ((verts_per_face * num_faces) + 2); 
+//         //     }
+//         //     else total_attribs = attribs_per_vertex * verts_per_face * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
+            
+            
+//         //     if (render_group.start+render_group.count + total_attribs >= render_group.size) {
+    
+//         //         let start = 0;
+//         //         for (let i = 0; i <= vb_group.render_groupidxs.boundary; i++) {
+//         //             const rg = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[i]);
+//         //             // Vertex_buffer_render_group_set_start(i, start)
+//         //             start += rg.size;
+//         //         }
+    
+//         //         if(render_group.count+total_attribs > render_group.size) { 
+//         //             // Case a mesh being inserted outside render group's boundaries(getting in other render group area),
+//         //             // we need to update the start and size of all next render grouups
+//         //         }
+    
+//         //         if(0) {
+                    
+//         //             const new_size = vb_info.attribs_info.count * verts_per_face * num_faces;
+//         //             const vb_prev_size = vb_info.size;
+//         //             const size_dif = vb_info.Realloc(vb_info.size + new_size);
+//         //             // console.log('vb_info.size AFTER ALLOC',vb_info.size)
+//         //             vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+    
+//         //             // const rg = Vertex_buffer_render_group_get_render_group(render_groupidx);
+//         //             render_group.size = new_size;
+//         //             render_group.start = vb_prev_size;
+//         //         }
+//         //     }
+    
+           
+//         //     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//         //     Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, render_group.start+render_group.count, num_faces, attribs_per_vertex, verts_per_face, a_vpos_offset, a_uv_offset);
+    
+//         //     vb_info.count += total_attribs;
+//         //     render_group.count += total_attribs;
+//         //     vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
+    
+//         //     prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
+//         //     vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+//         //     vb_group.needs_any_update = true;
+    
+    
+    
+//         //     // Store the texture index in the vertex
+//         //     vb_info.texidx = mat.texidx;
+//         //     if(use_from_reset === false) gfx.vb.counts.buffer[i] = total_attribs;
+    
+//         // }
+    
+//         // return start;
+    
+// }

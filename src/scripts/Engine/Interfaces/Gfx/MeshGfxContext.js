@@ -303,10 +303,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
 
-         // IMPORTANT: Here the mesh gets the rendergroup that it belongs
-         // render_groupidx = vb_group.render_groupidxs.buffer[0];
-
-
          // For debugging only 
          Vertex_buffer_set_name_for_debuging(vb_group.idx, Mesh_get_name(mesh));
 

@@ -5,7 +5,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
+import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_render_from_view_specific_render_group_NEW, View_reset_from_view_all_buffers, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -16,7 +16,7 @@ import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed }
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_expand, Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from "./ScrollerComponent.js";
-import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -407,7 +407,7 @@ export class Widget_Dropdown extends Rect_Mesh {
    }
    /** */
    Render() {
-
+alert('00000111119999922222')
       // super.AddToGfx();
       if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
          super.AddToGfx()
@@ -416,11 +416,11 @@ export class Widget_Dropdown extends Rect_Mesh {
       const btn = this.children.buffer[0];
       btn.Render();
 
-      if (this.isOn & DP_MENU_STATE.ON) {
+      // if (this.isOn & DP_MENU_STATE.ON) {
          for (let i = 0; i <= this.children.boundary; i++) {
             if(this.children.buffer[i]) this.children.buffer[i].Render();
          }
-      }
+      // }
 
       if(this.menu.scroller_comp) {
 
@@ -815,7 +815,8 @@ export class Widget_Dropdown extends Rect_Mesh {
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
       // Reset vertex buffers from group
-      View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
+      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
+      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
 
       // Remove menu and all its items from the group view
       if (menu.group_bufferidxs[0] !== INT_NULL) {
@@ -867,7 +868,9 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       /********************************************************************************************************************/
       // Re-render   
-      View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+
    }
 
 
@@ -918,22 +921,24 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       // HACK: In current implementation the menu is never  Rendered(). It is only GfxGenerated(). The problem comes from any scroller that the dp.menu has, since the Render() handles the scroller's render too.
       // FIXME: Is this the best way to  implement dp.menu rendering?
-      if (!this.menu.is_gfx_inserted) {
-         this.menu.Render()
-      }
+      // if (!this.menu.is_gfx_inserted) {
+      //    this.menu.Render()
+      // }
 
 
-      this.isOn |= DP_MENU_STATE.ON;
-      this.isOn &= ~DP_MENU_STATE.OFF;
+      // this.isOn |= DP_MENU_STATE.ON;
+      // this.isOn &= ~DP_MENU_STATE.OFF;
 
-      View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
+      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
+      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
 
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
-         View_add_to_group(menu, this.group_bufferidxs[0])
+         View_add_to_group(menu, this.group_bufferidxs[0]);
+         Vertex_buffer_calculate_render_group_starts();
       }
       
       this.#ActivateMenu(); // Add dropdown to gfx buffers.
@@ -988,7 +993,9 @@ export class Widget_Dropdown extends Rect_Mesh {
       /********************************************************************************************************************/
       // Re-render   
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-      View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
+      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+
 
    }
 

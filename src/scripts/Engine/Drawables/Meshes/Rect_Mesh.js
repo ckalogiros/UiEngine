@@ -5,7 +5,7 @@ import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
 import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -15,11 +15,11 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
-import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_gengfx, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
-import { View_group_create } from "../../Core/Views/MeshBufferViews.js";
+import { View_build_NEW_IMPLEMENTATION } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -49,8 +49,6 @@ export class Rect_Mesh extends Mesh {
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
-         // this.group_bufferidxs = View_group_create(this);
-         // this.group_bufferidxs = View_group_create(this);
       }
 
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
@@ -226,7 +224,6 @@ export class Rect_Mesh extends Mesh {
          Scoller_component_gengfx(this.scroller_comp,);
       }
 
-
    }
    // NewRender(run_for_children = true) {
 
@@ -280,8 +277,6 @@ export class Rect_Mesh extends Mesh {
    AddToGfx() {
 
       Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
-      // Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
-      // Vertex_buffer_add_vertices_render_group_implementation(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
@@ -292,8 +287,7 @@ export class Rect_Mesh extends Mesh {
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
-      Vertex_buffer_add_vertices(this.gfx, this.geom, this.mat, _, Mesh_get_name(this), true)
-      // Vertex_buffer_add_vertices_from_reset(this.gfx, this.geom, this.mat, _, Mesh_get_name(this))
+      Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this), true);
 
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;

@@ -53,6 +53,7 @@ export function Mesh_buffer_get_mesh_name_byidx(mesh_bufferidx) { return Mesh_ge
 
 export function Mesh_buffer_get_mesh_pos(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.pos; }
 export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.dim; }
+export function Mesh_buffer_get_mesh_num_faces(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces; }
 
 
 

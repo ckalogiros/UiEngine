@@ -294,8 +294,8 @@ export function Select_fnidx_to_fill_vertex_buffer(attribsidx, attr, inst) {
 
 
 
-export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
-   const vb_info_count = Vertex_buffer_fn_table_operation_add[fnidx](vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset);
+export function Gl_operation_add(fnidx, vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
+   const vb_info_count = Vertex_buffer_fn_table_operation_add[fnidx](vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset);
    return vb_info_count;
 }
 
@@ -426,11 +426,11 @@ function Set_dimention_DIM2(vb_data, start, stride, dimx, dimy) {
 
 
 
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -460,11 +460,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -502,11 +502,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS_FEATHER(vb_data,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -540,11 +540,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TEX2(vb_data, geom
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -580,11 +580,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_TIME(vb_data, geom, mat, 
    Set_vertex_uv_coordinates_TEX2(vb_data, start + a_uv_offset, stride, mat.uv);
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -614,11 +614,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2(vb_data, geom, mat, start, num
    Set_vertex_uv_coordinates_TEX2(vb_data, start + a_uv_offset, stride, mat.uv);
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -651,11 +651,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME(vb_data, geom, mat, start
    // Set_vertex_uv_coordinates_TEX2(vb_data, start+a_uv_offset, stride, mat.uv);
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -684,11 +684,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TIME(vb_data, geom, mat, start, num
    Set_vertex_uv_coordinates_TEX2(vb_data, start + a_uv_offset, stride, mat.uv);
 
 }
-function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -711,11 +711,11 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_TIME(vb_data, geom, mat, start, num_
    }
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -745,11 +745,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_TEX2(vb_data, geom, mat, start, num
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -783,11 +783,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_RCORNERS_FEATHER_BORDER(vb_dat
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -824,11 +824,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -871,11 +871,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME(vb_data, geom, m
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -912,11 +912,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TEX2_RCORNERS(vb_data, geom, m
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -959,11 +959,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, s
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME_GENERIC2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME_GENERIC2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1006,11 +1006,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME_GENERIC2(vb_data
    return attribs_count;
 
 }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_GENERIC2(vb_data, geom, mat, start, num_faces, stride , verts_per_rect, a_vpos_offset) {
+// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_GENERIC2(vb_data, geom, mat, start, num_faces, stride , verts_per_face, a_vpos_offset) {
 
 //    let attribs_count = 0;
 //    let index = start;
-//    const len = num_faces * verts_per_rect;
+//    const len = num_faces * verts_per_face;
 
 //    for (let i = 0; i < len; i++) {
 
@@ -1050,11 +1050,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_TIME_GENERIC2(vb_data
 //    return attribs_count;
 
 // }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME_GENERIC2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME_GENERIC2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1094,11 +1094,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_TIME_GENERIC2(vb_data, geom, m
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1127,11 +1127,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
    return attribs_count;
 
 }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_BORDER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
 //    let attribs_count = 0;
 //    let index = start;
-//    const len = num_faces * verts_per_rect;
+//    const len = num_faces * verts_per_face;
 
 //    for (let i = 0; i < len; i++) {
 
@@ -1165,11 +1165,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
 //    return attribs_count;
 
 // }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
 //    let attribs_count = 0;
 //    let index = start;
-//    const len = num_faces * verts_per_rect;
+//    const len = num_faces * verts_per_face;
 
 //    for (let i = 0; i < len; i++) {
 
@@ -1206,11 +1206,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
 //    return attribs_count;
 
 // }
-// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+// function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_GLOW_INTENSITY(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
 //    let attribs_count = 0;
 //    let index = start;
-//    const len = num_faces * verts_per_rect;
+//    const len = num_faces * verts_per_face;
 
 //    for (let i = 0; i < len; i++) {
 
@@ -1243,11 +1243,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_FEATHER(vb_data, geom, mat, start, 
 //    return attribs_count;
 
 // }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1284,11 +1284,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_ANGLE(vb_data
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1324,11 +1324,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_ANGLE(vb_data, geom, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1365,11 +1365,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TIME_VPOS2_DIM2_RCORNERS_FEATHER(vb_data,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1406,11 +1406,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_DIM2_RCORNERS_FEATHER_TIME(vb_data,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TIME(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1443,11 +1443,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2_RCORNERS_FEATHER_TIME(vb_data, geom
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1473,11 +1473,11 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_VPOS2(vb_data, geom, mat, start, num_face
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect) {
+function FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1501,11 +1501,11 @@ function FILL_VERTEX_BUFFER_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, sta
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1525,11 +1525,11 @@ function FILL_VERTEX_BUFFER_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, st
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1548,7 +1548,7 @@ function FILL_VERTEX_BUFFER_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, nu
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
 
@@ -1557,7 +1557,7 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2() {
 
    let attribs_count = 0;
    let index = start;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
 
    for (let i = 0; i < len; i++) {
 
@@ -1584,18 +1584,18 @@ function FILL_VERTEX_BUFFER_COL4_WPOS3_TEX2() {
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, a_uv_offset) {
+function FILL_VERTEX_BUFFER_VPOS2_TEX2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, a_uv_offset) {
 
    Set_vertex_position_VPOS2(vb_data, start + a_vpos_offset, stride, geom.dim[0], geom.dim[1], num_faces, len);
    Set_vertex_uv_coordinates_TEX2(vb_data, start + a_uv_offset, stride, mat.uv);
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
    const col_len = mat.col.length - 1;
 
    for (let i = 0; i < len; i++) {
@@ -1625,12 +1625,12 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset, _, vCount) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, _, vCount) {
    alert('8877166541009. vCount params has been deprecated from function parameters. CHECK THIS FUNCTION')
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect+2;
+   const len = num_faces * verts_per_face+2;
    const col_len = mat.col.length - 1;
 
    // for (let i = 0; i < len; i++) {
@@ -1669,13 +1669,13 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geo
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   // const len = num_faces * verts_per_rect;
-   const len = (num_faces * verts_per_rect) + 2;
+   // const len = num_faces * verts_per_face;
+   const len = (num_faces * verts_per_face) + 2;
    const col_len = mat.col.length - 1;
 
    for (let i = 0; i < len; i++) {
@@ -1707,12 +1707,12 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2(vb_data, geom, mat, start,
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
    const col_len = mat.col.length - 1;
 
    for (let i = 0; i < len; i++) {
@@ -1747,12 +1747,12 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_RCORNERS_FEATHER(vb_data, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
    const col_len = mat.col.length - 1;
 
    for (let i = 0; i < len; i++) {
@@ -1795,12 +1795,12 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER_ANGL
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_rect;
+   const len = num_faces * verts_per_face;
    const col_len = mat.col.length - 1;
 
    for (let i = 0; i < len; i++) {
@@ -1842,15 +1842,15 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_ANGLE(vb_dat
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = (num_faces * verts_per_rect) + 2;
+   const len = (num_faces * verts_per_face) + 2;
    const col_len = mat.col.length - 1;
 
-   // if(verts_per_rect === 2) len += 2
+   // if(verts_per_face === 2) len += 2
    // if(index >= 780)
    //    len = 14
 
@@ -1901,7 +1901,7 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_DIM2_VPOS2_RCORNERS_FEATHER(vb_d
 // Fill - Instanced Attributes - Vertex Buffer Functions
 /**************************************************************************************************************************************/
 
-function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER_ANGLE(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
@@ -1937,7 +1937,7 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER_ANGLE(vb_data,
    return attribs_count;
 
 }
-function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
@@ -1970,7 +1970,7 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_DIM2_RCORNERS_FEATHER(vb_data, geom,
    return attribs_count;
 
 }
-function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;
@@ -1999,7 +1999,7 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3_RCORNERS_FEATHER(vb_data, geom, mat,
    return attribs_count;
 
 }
-function INST_FILL_VERTEX_BUFFER_COL4_WPOS3(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset = 0) {
+function INST_FILL_VERTEX_BUFFER_COL4_WPOS3(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset = 0) {
 
    let attribs_count = 0;
    let index = start;
@@ -2024,7 +2024,7 @@ function INST_FILL_VERTEX_BUFFER_COL4_WPOS3(vb_data, geom, mat, start, num_faces
    return attribs_count;
 
 }
-function INST_FILL_VERTEX_BUFFER_WPOS3(vb_data, geom, mat, start, num_faces, stride, verts_per_rect, a_vpos_offset) {
+function INST_FILL_VERTEX_BUFFER_WPOS3(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
 
    let attribs_count = 0;
    let index = start;

@@ -1,19 +1,19 @@
 "use strict";
 import { FloorArr2, FloorArr3, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
-import { View_ASSIGN_TO_RENDER_GROUP, View_build_group_from_root_mesh, View_build_NEW_IMPLEMENTATION, View_group_create, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_vb_from_render_group } from '../Engine/Core/Views/MeshBufferViews.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
+import { View_build_group_from_root_mesh, View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
 import { Test_alignment } from './Demo/DemoAlignNestedSections.js';
-import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_switch } from '../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { Vertex_buffer_build_index_buffer, Vertex_buffer_group_create_scissorbox, Vertex_buffer_reset_to_index_NEW } from '../Graphics/Buffers/VertexBuffers.js';
+import { Vertex_buffer_build_index_buffer_all, Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox,  } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Gl_set_angle, Gl_set_generic2, Gl_set_rgba, Gl_set_time } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
@@ -41,7 +41,7 @@ import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Tetris } from './Demo/Games/Tetris/Tetris.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
-import { Color_theme_slider_1, Color_theme_slider_auto } from '../Engine/Drawables/Material/Themes.js';
+import { Color_theme_slider_1, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
 
@@ -84,146 +84,135 @@ export function TestWidgetsGeneric() {
     
     /*************************************************************************************************************************/
     // Test: New implementation -> VB render groups
-    {
+    // {
         
-        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1., .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
-        Widget_gfx_ready_enable({
-            mesh: section, enable_sdf_rect: 15,
-            listener: { type: LISTEN_EVENT_TYPES.MOVE },
-        });
+    //     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1., .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+    //     Widget_gfx_ready_enable({
+    //         mesh: section, enable_sdf_rect: 15,
+    //         listener: { type: LISTEN_EVENT_TYPES.MOVE },
+    //     });
     
-        section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
-        // const view_group = View_group_create(section);
-        // section.group_bufferidxs[0] = view_group[0];
+    //     section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
+    //     // section.group_bufferidxs[0] = view_group[0];
     
-        let cnt = 1;
+    //     let cnt = 1;
+    //     const font_size = 20;
 
-        {
-            const s = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: 15, }); 
-            // s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-            s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-            section.AddItem(s);
-
-            // {
-            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            //     s.AddItem(s1); 
-            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-            // }
-            // {
-            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.23, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER}  }); 
-            //     s.AddItem(s1); 
-            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-                
-            // }
-            {
-                const count = 1; const brightness_increments = 1/count; let brightness =  0;
-                for (let i = 0; i < count; i++) {
-                    const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: fontsize, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-                    s.AddItem(l);
-                    // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-                    l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-                    brightness += brightness_increments;
-                }
-            }
-            {
-                const count = 1; const brightness_increments = 1/count; let brightness =  0;
-                for (let i = 0; i < count; i++) {
-                    const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: fontsize, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-                    s.AddItem(l);
-                    // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-                    l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-                    brightness += brightness_increments;
-                }
-            }
-        }
-        {
-            const s = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: 15, }); 
-            // s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-            s.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-            section.AddItem(s);
-            // {
-            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            //     s.AddItem(s1); 
-            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-            // }
-            // {
-            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.33, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER}  }); 
-            //     s.AddItem(s1); 
-            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-                
-            // }
-            {
-                const count = 1; const brightness_increments = 1/count; let brightness =  0;
-                for (let i = 0; i < count; i++) {
-                    const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: fontsize, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-                    s.AddItem(l);
-                    // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-                    l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-                    brightness += brightness_increments;
-                }
-            }
-        }
-
-
-    
-
+    //     {
+    //         const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
+    //         Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15, }); 
+    //         // red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //         red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //         section.AddItem(red);
             
-        section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //         {
+    //             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+    //             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+    //             red.AddItem(s1); 
+    //             s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //             // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             {
+    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             }
+    //             {
+    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             }
+    //             {
+    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             }
+    //         }
+    //         {
+    //             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+    //             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+    //             red.AddItem(s1); 
+    //             s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //             // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             {
+    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //             }
+    //         }
+    //         { // Label
+    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
+    //             for (let i = 0; i < count; i++) {
+    //                 const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
+    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    //                 red.AddItem(l);
+    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+    //                 brightness += brightness_increments;
+    //             }
+    //         }
+    //         { // Switch
+    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
+    //             for (let i = 0; i < count; i++) {
 
-        View_build_NEW_IMPLEMENTATION(section);
+    //                 const l = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, }));
+    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    //                 red.AddItem(l);
+    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+    //                 brightness += brightness_increments;
+    //             }
+    //         }
+    //         { // Slider
+    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
+    //             for (let i = 0; i < count; i++) {
 
-        View_ASSIGN_TO_RENDER_GROUP(section.group_bufferidxs[0]);
-        
-        
-        Align_nested_sections_pre(section);
-        
-        // section.NewRender();
-        // section.Render();
-        View_render_from_view_NEW(section.group_bufferidxs[0]);
-        // Vertex_buffer_build_index_buffer(section.gfx.vb.groupidx);
-        
-        // View_build_group_from_root_mesh(section);
-        // View_build_group_from_root_mesh(section);
-        Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-        
-        section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-        
-        Construct_listen_events_from_mesh_tree(section)
-        Construct_listen_events_relations_from_mesh_tree(section);
-        
-        
-        // TEST if the gfx buffers are set properly
-        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section, .03, 0., 1.,)
-        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0], .015, 0., 1.,)
-        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[0], .031, 0., 1.,)
-        // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[1], .03, 0., 1.,)
-        // Mesh_set_color_rgba(section.children.buffer[0], BLUEL[9])
-        // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[0], BLUEL[9])
-        // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[1], BLUEL[9])
+    //                 const l = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, }); 
+    //                 red.AddItem(l);
+    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+    //                 brightness += brightness_increments;
+    //             }
+    //         }
+
+    //     }
 
 
-        // Time_intervals_create(1, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
-        //     () => {
-        //         Vertex_buffer_reset_to_index_NEW(section.gfx.vb.groupidx, 2);
-        //         View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
-        //     }, _,
-        // )
-        // Vertex_buffer_reset_to_index_NEW(section.gfx.vb.groupidx, 2);
-        // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 1)
+    //     { // Render
+    //         section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            
+    //         Align_nested_sections_pre(section);
+            
+    
+    //         View_build_NEW_IMPLEMENTATION(section);
+    //         Vertex_buffer_calculate_render_group_starts();
+    //         View_render_from_view_NEW(section.group_bufferidxs[0]);
+            
+    //         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+    //         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+    //         Construct_listen_events_from_mesh_tree(section)
+    //         Construct_listen_events_relations_from_mesh_tree(section);
+    //     }
+
         
-        // View_reset_vb_from_render_group(section.group_bufferidxs[0], 2)
-        // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
-    }
+        
+    //     // TEST if the gfx buffers are set properly
+    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section, .03, 0., 1.,)
+    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0], .015, 0., 1.,)
+    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[0], .031, 0., 1.,)
+    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[1], .03, 0., 1.,)
+    //     // Mesh_set_color_rgba(section.children.buffer[0], BLUEL[9])
+    //     // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[0], BLUEL[9])
+    //     // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[1], BLUEL[9])
+
+
+    //     // View_reset_to_index_from_view_group_NEW(1);
+    //     // View_render_from_view_specific_render_group_NEW(1)
+
+
+    //     // View_reset_to_index_from_view_group_NEW(1);
+    //     // View_render_from_view_specific_render_group_NEW(1)
+        
+    //     // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
+    // }
+
 
 
 
@@ -347,7 +336,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Dropdown
 
-        // CreateDropdownTree([30, 50, 0])
+        CreateDropdownTree([30, 50, 0])
 
         // CreateDropdownTreeHorizontalLayout();
 
@@ -778,6 +767,9 @@ export function TestWidgetsGeneric() {
     {
         // Test_find_match_from_parent_descending();
     }
+
+
+    // Vertex_buffer_build_index_buffer_all();
 }
 
 
@@ -3044,7 +3036,7 @@ function CreateSliderSimple(is_root = ROOT_WIDGETS.CREATE_ROOT) {
     return slider;
 }
 /** */
-function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name = 'Slider Unamed') {
+function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name = 'S') {
 
     const pos = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? [x, y, 0] : [0, 0, 0]
 
@@ -3053,7 +3045,8 @@ function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_
         is_root: ROOT_WIDGETS.CREATE_ROOT,
         pos: pos,
         dim: [120, 15],
-        name: 'Slider Sample',
+        // name: 'Slider Sample',
+        name: 'SSS',
         col: GREY[5],
         theme: Color_theme_slider_auto(.0, .8, .18, 0),
     }));
@@ -3066,12 +3059,20 @@ function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+        View_build_NEW_IMPLEMENTATION(slider);
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(slider.group_bufferidxs[0]);
+        
         slider.Render();
+        
         Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(slider)
         Construct_listen_events_relations_from_mesh_tree(slider);
+
+            
 
     }
 
@@ -3121,49 +3122,77 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     zpos++
     { // Many dps
 
-        const sub_dp1_count = 2;
+        const sub_dp1_count = 1;
         const sub_dp2_count = 3;
 
-        const col = YELLOWR[7];
+        // const col = YELLOWR[7];
         for (let i = 0; i < sub_dp1_count; i++) {
 
-            const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            dp.AddToMenu(dpsub1);
+            // { // Label
+            //     const count = 1; const brightness_increments = 1/count; let brightness =  0;
+            //     for (let i = 0; i < count; i++) {
+            //         const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
+            //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            //         dp.AddToMenu(l);
+            //         // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            //         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+            //         brightness += brightness_increments;
+            //     }
+            // }
 
-            const col1 = TRANSPARENCY(PURPLEB[6], 1.);
-            for (let j = 0; j < sub_dp2_count; j++) {
-
-                const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-                Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-                dpsub1.AddToMenu(dpsub2);
-
-                const col2 = TRANSPARENCY(GREEN[6], 1.)
-
-                for (let k = 0; k < sub_dp2_count; k++) {
-
-                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-                    Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-                    dpsub2.AddToMenu(dpsub3);
-
-                    const col3 = TRANSPARENCY(YELLOW[6], 1.)
-                    for (let n = 0; n < sub_dp2_count; n++) {
-
-                        const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-                        Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-                        dpsub3.AddToMenu(dpsub4);
-
-                        const col4 = TRANSPARENCY(PURPLER[6], 1.)
-                        for (let m = 0; m < 10; m++) {
-
-                            const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-                            Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-                            dpsub4.AddToMenu(dpsub5);
-
-                        }
-                    }
+            {
+                let cnt = 0;
+                // const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+                // Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                // dp.AddToMenu(s1); 
+                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                {
+                    const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`Rect ${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                    dp.AddToMenu(s2); 
+                    s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
                 }
+
             }
+
+            // const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            // Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            // dp.AddToMenu(dpsub1);
+
+            // const col1 = TRANSPARENCY(PURPLEB[6], 1.);
+            // for (let j = 0; j < sub_dp2_count; j++) {
+
+            //     const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //     Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //     dpsub1.AddToMenu(dpsub2);
+
+            //     const col2 = TRANSPARENCY(GREEN[6], 1.)
+
+            //     for (let k = 0; k < sub_dp2_count; k++) {
+
+            //         const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //         Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //         dpsub2.AddToMenu(dpsub3);
+
+            //         const col3 = TRANSPARENCY(YELLOW[6], 1.)
+            //         for (let n = 0; n < sub_dp2_count; n++) {
+
+            //             const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //             Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //             dpsub3.AddToMenu(dpsub4);
+
+            //             const col4 = TRANSPARENCY(PURPLER[6], 1.)
+            //             for (let m = 0; m < 10; m++) {
+
+            //                 const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //                 Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //                 dpsub4.AddToMenu(dpsub5);
+
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 
@@ -3172,8 +3201,15 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
         
         dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        Align_nested_sections_pre(dp)
-        dp.Render()
+        
+        View_build_NEW_IMPLEMENTATION(dp);
+        Vertex_buffer_calculate_render_group_starts();
+        
+        Align_nested_sections_pre(dp);
+        
+        // dp.Render();
+        View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
@@ -3182,7 +3218,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
         Construct_listen_events_relations_from_mesh_tree(dp);
 
         // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-        View_build_group_from_root_mesh(dp);
+        // View_build_group_from_root_mesh(dp);
     }
 
     return dp;

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Vertex_buffer_add_vertices, Vertex_buffer_add_vertices_from_render_group } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices_from_render_group } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Material_Font } from "../Material/Material.js";
@@ -608,6 +608,8 @@ export class Text_Mesh extends Mesh {
       let cur_line_posy = this.geom.pos[1];
 
       this.gfx.tb.idx = this.mat.texidx;
+
+      let add_abstract_char_mesh = false; // Tell the vertex buffer not to update this.gfx start index
       
 
       const size = this.geom.font_size;
@@ -646,21 +648,15 @@ export class Text_Mesh extends Mesh {
             }
             
             // The first face exists as an entity, the rest are constructed here and stored only to the vertex buffer
-            if (i === 0) {
-               Vertex_buffer_add_vertices_from_render_group(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, false);
-               // Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, false);
-            }
-            else { // Avoid function call to store any data to '.gfx.start' etc and to accumulate all char faces to the vertex buffer. 
-               Vertex_buffer_add_vertices_from_render_group(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, true);
-               // Vertex_buffer_add_vertices(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, true);
-               // Vertex_buffer_add_vertices_from_reset(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`);
-            }
+            Vertex_buffer_add_vertices_from_render_group(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, add_abstract_char_mesh);
    
             // Advance to next free char position
             geom_copy.pos[0] += (width * size * 2)+0;
-            
+
          }
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = cur_line_posy;
+
+         add_abstract_char_mesh = true; // For the rest of the characters dont copy any  data to this.gfx (start, etc)
 
       }
       

@@ -8,9 +8,9 @@ import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW, YELLOWR } from "../Material/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_initialize, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
-import { View_add_to_group, View_build_group_from_root_mesh, View_get_count, View_remove_from_group, View_set_view_vb_start, View_render_from_view_all_buffers, View_reset_from_view_all_buffers } from "../../Core/Views/MeshBufferViews.js";
+import { View_add_to_group, View_build_group_from_root_mesh, View_get_count, View_remove_from_group, View_set_view_vb_start, View_render_from_view_all_buffers, View_reset_from_view_all_buffers, View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_one_mesh } from "../Operations/Clip.js";
-import { VBI_get_byidx, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { VBI_get_byidx, Vertex_buffer_calculate_render_group_starts, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_get_count, Str_buffer_mesh_names_get_size } from "../../Core/StringBuffer.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { DEBUG_INFO_STRUCTS, Generic_buffers_container_get_active_count, Generic_buffers_container_get_boundary, Generic_buffers_container_get_size, New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
@@ -295,7 +295,10 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
       Align_nested_sections_pre(section);
       section.GenGfxCtx();
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -366,7 +369,10 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -429,7 +435,10 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -501,7 +510,10 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -571,7 +583,10 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -640,7 +655,10 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -708,7 +726,10 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
 
-      section.Render();
+      // section.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -852,7 +873,10 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
       dp.GenGfxCtx();
       Align_nested_sections_pre(dp);
 
-      dp.Render();
+      // dp.Render();
+      View_build_NEW_IMPLEMENTATION(dp);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(dp.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
       dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
@@ -1171,7 +1195,10 @@ function Debug_info_create_ui_stats() {
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
    Align_nested_sections_pre(section);
-   section.Render();
+   // section.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -1596,7 +1623,10 @@ function Debug_info_create_ui_performance_timers() {
 
    Align_nested_sections_pre(section);
 
-   section.Render();
+   // section.Render()
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -1698,7 +1728,10 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    Align_nested_sections_pre(section);
-   section.Render();
+   // section.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -1807,7 +1840,10 @@ export function Debug_info_create_ui_focused() {
    const clip_bottom = clip_top + section.geom.dim[1] * 2;
    Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
 
-   section.Render();
+   // section.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -2309,7 +2345,10 @@ function Debug_info_create_mesh_info(params) {
    section.GenGfxCtx();
 
 
-   scroller.Render();
+   // scroller.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(scroller.root_bufferidx);
 
    scroller.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scroller.gfx.vb.groupidx)
@@ -2406,7 +2445,10 @@ function Debug_info_mesh_update(params) {
       dp_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, dp_mesh.mesh_bufferidx, true);
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, gfx_idxs);
       Align_nested_sections_pre(dp_mesh);
-      dp_mesh.Render();
+      // dp_mesh.Render();
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
       Root_group_activate_all_vbs_in_renderqueue(dp_mesh.root_bufferidx);
       dp_mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp_mesh.gfx.vb.groupidx);
 
@@ -2493,7 +2535,10 @@ function Debug_info_create_batch_info(params) {
 
    Align_nested_sections_pre(section);
 
-   section.Render();
+   // section.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -2825,7 +2870,10 @@ function Dbg_info_ui_create_ui(pos, name) {
 
    Align_nested_sections_pre(scrolled);
 
-   scrolled.Render();
+   // scrolled.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
    Root_group_activate_all_vbs_in_renderqueue(scrolled.root_bufferidx);
 
    scrolled.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled.gfx.vb.groupidx)
