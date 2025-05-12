@@ -469,6 +469,12 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
 
+   // console.log(
+   //    '--', 
+   //    mesh.mesh_bufferidx,
+   //    'render_groupidx', render_groupidx,
+   //    mesh.name,
+   // )
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count, render_groupidx);
 
    return gfx;

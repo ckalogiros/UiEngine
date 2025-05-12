@@ -85,9 +85,9 @@ vec4 Msdf(vec2 v_tex_coord) {
 
   // return Glow(dist, opacity);
   
-  // vec4 alpha = vec4((opacity+.0) * v_col4_w); 
+  // vec4 alpha = vec4((opacity+.4) * v_col4_w); 
   float tex_alpha = texel.a * (2.0 - texel.a);
-  vec4 alpha = vec4((opacity+.0) * tex_alpha * v_col4_w); 
+  vec4 alpha = vec4((opacity+.2) * tex_alpha * v_col4_w); 
   return alpha; 
 }
 `;

@@ -10,16 +10,19 @@ import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHe
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
+import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
-import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners, Gl_set_vpos_y } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Widget_ready_label } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
-import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value } from "./DemoTextAnimations.js";
-import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value, text_animation_gfx_vertex_set_vpos_x_default, move_y_upper_vertices_up, move_y_bottom_vertices_down, set_y_vertices, set_x_vertices, set_x, set_y_vpos, set_y } from "./DemoTextAnimations.js";
+import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_x } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Align_expand, Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.js";
+import { View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Floor } from "../../Helpers/Math/MathOperations.js";
 
 
 
@@ -31,14 +34,9 @@ const MULTI_COLOR = [BLUEL[9], RED[9], GREEN[9], YELLOW[9],];
 
 
 
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
+/*********************************************************************************************************************************************/
 // Create Demo Animations
+/*********************************************************************************************************************************************/
 
 export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size = 20, pad = 6, time_step = 0.01) {
 
@@ -111,7 +109,11 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
       // HACK: Scale down before render
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
-      panel.Render();
+            
+      View_build_NEW_IMPLEMENTATION(panel);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(panel.group_bufferidxs[0]);
+      
 
 
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
@@ -188,7 +190,11 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
       // HACK: Scale down before render
       // for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
-      panel.Render();
+                  
+      View_build_NEW_IMPLEMENTATION(panel);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(panel.group_bufferidxs[0]);
+      
 
 
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
@@ -352,7 +358,11 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    ret1.target_mesh.geom.dim[1] = size+scale; // HACK: We need that the scaled size is calculated for the panel's dimentions
    Align_nested_sections_pre(panel);
    ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
-   panel.Render();
+               
+   View_build_NEW_IMPLEMENTATION(panel);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(panel.group_bufferidxs[0]);
+   
 
    Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(panel);
@@ -362,7 +372,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    return panel;
 }
 /** */
-export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
+export function Demo_animations_text(x = 0, y = 0, create_controls = true, font_size) {
 
    const rcorners = 10;
 
@@ -379,7 +389,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
 
    /**********************************************************************************************************/
    // Scale
-   const anim_ret = Demo_clbk_animations_text_counter(0x0, create_controls, 0, 0, );
+   const anim_ret = Demo_clbk_animations_text_counter(0x0, create_controls, 0, 0, font_size );
    panel.AddItem(anim_ret.target_mesh);
    if (create_controls) {
       panel.AddItem(anim_ret.controls_section);
@@ -396,7 +406,11 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true) {
    panel.GenGfxCtx();
 
 
-   panel.Render();
+               
+   View_build_NEW_IMPLEMENTATION(panel);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(panel.group_bufferidxs[0]);
+   
 
 
    Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
@@ -450,7 +464,11 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       panel.GenGfxCtx();
    
-      panel.Render();
+                  
+      View_build_NEW_IMPLEMENTATION(panel);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(panel.group_bufferidxs[0]);
+      
    
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
@@ -498,17 +516,9 @@ export function Demo_clbk_animations_create_transition_slope(time_step = 0.01, s
 
 
 
-
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-// Button animations
+/*********************************************************************************************************************************************/
+// Generic - Button Animations
+/*********************************************************************************************************************************************/
 /** Pass flag of type: CALLBACK_ANIMATION_TYPE_FLAGS */
 export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0, anim_type_flag=0x0, create_label='', layout=LAYOUT.VERTICAL) {
    if(!anim_type_flag) alert('No animation type flag is set. Please pass the animation type flag (of type: CALLBACK_ANIMATION_TYPE_FLAGS) to create animations.');
@@ -545,7 +555,11 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
       menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
       menu_panel.GenGfxCtx();
 
-      menu_panel.Render();
+                  
+      View_build_NEW_IMPLEMENTATION(menu_panel);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
+      
    
       Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(menu_panel);
@@ -669,16 +683,9 @@ function Create_menu_items_buttons() {
 
 
 
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-// Circle scale animation
+/*********************************************************************************************************************************************/
+// Scale Animations
+/*********************************************************************************************************************************************/
 
 export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = false, x = 100, y = 100, size = 20, time_step = 0.01, slope_const = 0.4, scale = 100, color = GREY[2], layout = LAYOUT.HORIZONTAL, pad_x=0) {
 
@@ -725,7 +732,11 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
       if (create_slider) {
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-         slider.Render();
+            
+         View_build_NEW_IMPLEMENTATION(slider);
+         Vertex_buffer_calculate_render_group_starts();
+         View_render_from_view_NEW(slider.group_bufferidxs[0]);
+      
          // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
          slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
@@ -737,7 +748,11 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
 
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
-      mesh.Render();
+            
+      View_build_NEW_IMPLEMENTATION(mesh);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+      
 
       Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
       Construct_listen_events_from_mesh_tree(mesh);
@@ -805,8 +820,8 @@ function Animation_scale_up_run(params) {
 
 function Animation_scale_up_stop(params) {
 
-   Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `Stop:${params.function_slope.slope_constant}`)
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_scale_down_run, Animation_scale_down_stop, params, `Stop:${params.function_slope.slope_constant}`)
 
    return false;
 }
@@ -841,8 +856,8 @@ function Animation_scale_down_run(params) {
 
 function Animation_scale_down_stop(params) {
 
-   Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Stop:${params.function_slope.slope_constant}`);
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_scale_up_run, Animation_scale_up_stop, params, `Stop:${params.function_slope.slope_constant}`);
 
    return false;
 }
@@ -850,18 +865,9 @@ function Animation_scale_down_stop(params) {
 
 
 
-
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-// Circle flip animation
-
+/*********************************************************************************************************************************************/
+// Rotate Animations
+/*********************************************************************************************************************************************/
 let rotation = 0;
 
 export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = false, x = 0, y = 0, size = 20, time_step = 0.01, slope_const = 0.4, angle = 0, color = GREY[2], layout=LAYOUT.VERTICAL, pad_x=0) {
@@ -900,7 +906,11 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
       if (create_slider) {
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-         slider.Render();
+                     
+         View_build_NEW_IMPLEMENTATION(slider);
+         Vertex_buffer_calculate_render_group_starts();
+         View_render_from_view_NEW(slider.group_bufferidxs[0]);
+      
          Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
          slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
@@ -914,7 +924,11 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
-      mesh.Render();
+            
+      View_build_NEW_IMPLEMENTATION(mesh);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+      
 
 
       Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
@@ -975,8 +989,8 @@ function Animation_rotate_run(params) {
 
 function Animation_rotate_stop(params) {
 
-   Callback_animations_create(Animation_rotate_back_run, Animation_rotate_back_stop, params, `Stop${params.function_slope.slope_constant}`);
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_rotate_back_run, Animation_rotate_back_stop, params, `Stop${params.function_slope.slope_constant}`);
 
    return false;
 }
@@ -1003,8 +1017,8 @@ function Animation_rotate_back_run(params) {
 
 function Animation_rotate_back_stop(params) {
 
-   Callback_animations_create(Animation_rotate_run, Animation_rotate_stop, params, `Stop:${params.function_slope.slope_constant}`);
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_rotate_run, Animation_rotate_stop, params, `Stop:${params.function_slope.slope_constant}`);
 
    return false;
 }
@@ -1012,18 +1026,10 @@ function Animation_rotate_back_stop(params) {
 
 
 
-
-
-
-
-
-
-
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-/**************************************************************************************************************************************************************/
-
-export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20, layout=LAYOUT.VERTICAL) {
+/*********************************************************************************************************************************************/
+// Text Counter Animations
+/*********************************************************************************************************************************************/
+export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_contols = false, x = 0, y = 0, font_size=12, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, size = 20, time_step = 0.01, slope = .2, speed = 20, layout=LAYOUT.VERTICAL) {
 
    let total_height = 0;
 
@@ -1068,7 +1074,11 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
       controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
       controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-      controls_section.Render();
+
+      View_build_NEW_IMPLEMENTATION(controls_section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
+      
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
       Construct_listen_events_from_mesh_tree(controls_section);
       Construct_listen_events_relations_from_mesh_tree(controls_section);
@@ -1093,11 +1103,11 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    // Create animated meshes
    const text_pad_x = 10, text_pad_y = 6;
-   const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10, layout:LAYOUT.HORIZONTAL}));
+   const mesh2 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:font_size, layout:LAYOUT.HORIZONTAL}));
    // Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLER[9], PURPLER[0])});
    Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect: 6});
    section.AddItem(mesh2)
-   const mesh1 = Create_widget_label(Style_label_default_properties({text:'.', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:10, layout:LAYOUT.HORIZONTAL}));
+   const mesh1 = Create_widget_label(Style_label_default_properties({text:'-', pos:[0, 0, 0], col:BLUEL[9], text_col:WHITE, text_pad:[text_pad_x, text_pad_y], texture_id:TEXTURES.MTSDF_CONSOLAS_1024, font_size:font_size, layout:LAYOUT.HORIZONTAL}));
    // Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(PURPLEB[9], PURPLEB[0])});
    Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6});
    section.AddItem(mesh1)
@@ -1114,7 +1124,11 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
-      section.Render()
+      
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
+      
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       Construct_listen_events_from_mesh_tree(section);
       Construct_listen_events_relations_from_mesh_tree(section);
@@ -1133,6 +1147,22 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    animation_properties.digit1_mesh = mesh1;
    animation_properties.digit2_mesh = mesh2;
 
+   // { // One time call
+
+   //    if (cnt > 9) cnt = 0;
+   //    const text_substitution = `${cnt++}`;
+      
+   //    let limit = 0;
+   //    if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+   //    else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) limit = Texture_metrics_get_sub_tex_height(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+   //    else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) limit = Texture_metrics_get_line_height(mesh.text_mesh.mat.metrics_idx) * mesh.text_mesh.geom.dim[0];
+
+   //    const times_to_run = -1;
+   //    const wait_time = 500; // In miliseconds
+      
+   //    Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, clbk_anim_flag, font_size, times_to_run, cnt, wait_time, text_substitution, 'TESTETESTTEST', );
+   // }
+
    Time_intervals_create(1000, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
       (params) => {
 
@@ -1145,7 +1175,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
             let limit_ = 0;
             const text_substitution_ = `${params.params.counter2++}`
             if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Texture_metrics_get_sub_tex_width(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-            else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Texture_metrics_get_line_height(digit2_mesh.text_mesh.mat.metrics_idx) / 2;
+            else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Texture_metrics_get_sub_tex_height(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
 
             const anim_idx = Demo_clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
             params.params.counter1 = 0;
@@ -1159,7 +1189,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
          let limit = 0;
          if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-         else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_line_height(digit1_mesh.text_mesh.mat.metrics_idx) / 2;
+         else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_sub_tex_height(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
 
          const anim_idx = Demo_clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
       },
@@ -1181,12 +1211,6 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 export function Demo_clbk_animations_text_create_contols(slope_params_pointer, animation_properties) {
 
    const contols_buffer = [];
-
-
-   const u_wpos_flags = {
-      unif: SID.UNIF.ROOT_WPOS2,
-      pass: SID.ATTR.WPOS3,
-   }
    let zpos = 0;
 
    /*****************************************************************************************/
@@ -1341,14 +1365,19 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    return contols_buffer;
 }
 /** */
-export function Demo_clbk_animations_text_create(target_mesh, slope_params_pointer, limit, name, animation_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution = '0') {
+export function Demo_clbk_animations_text_create(target_mesh, slope_params_pointer, limit, animation_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, font_size, times_to_run=-1, counter, wait_time, text_substitution = '0', name, ) {
 
    const params = {
       mesh: target_mesh,
       limit: limit,
       text_mesh: target_mesh.text_mesh,
-      text_substitution: text_substitution,
       function_slope: slope_params_pointer,
+      clbk_anim_flag:animation_flag,
+      font_size:font_size,
+      times_to_run:times_to_run,
+      cnt:counter,
+      text_substitution: text_substitution,
+      wait_time: wait_time,
       name: name,
    };
 
@@ -1361,24 +1390,20 @@ export function Demo_clbk_animations_text_create(target_mesh, slope_params_point
 
 
 
-
-
-
-/************************************************************************/
-// Squeeze text animation
-
-// X AXIS
+/*********************************************************************************************************************************************/
+// Squeeze X
+/*********************************************************************************************************************************************/
 function Animation_text_run_squeeze_x(params) {
 
-
    const text = params.mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+
    const limit = params.limit;
-   // Substitution text
-   const text_substitution = params.text_substitution;
+   const text_substitution = params.text_substitution; // Substitution text
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
@@ -1394,8 +1419,6 @@ function Animation_text_run_squeeze_x(params) {
 
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
-      // text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
-      Mesh_set_wpos_x(text);
 
       text_animation_gfx_vertex_set_sqeeze_x_axis(text, -limit);
 
@@ -1408,33 +1431,43 @@ function Animation_text_run_squeeze_x(params) {
 
 function Animation_text_stop_squeeze_x(params) {
 
-   Callback_animations_create(Animation_text_back_run_squeeze_x, Animation_text_back_stop_squeeze_x, params, `Stop:${params.name}`)
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_text_back_run_squeeze_x, Animation_text_back_stop_squeeze_x, params, `Stop:${params.name}`)
+
+   // Reset vertices position to the 'left' face's boundary(from right), to start the procces of 'un-sqeeze' moving right vertices right
+   const text = params.mesh.text_mesh;
+   const x = params.limit; 
+   set_x_vertices(text, -x);
 
    return false;
+
 }
 
 function Animation_text_back_run_squeeze_x(params) {
 
    const mesh = params.mesh;
-   const text = params.mesh.text_mesh;
+   const text = mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+
+   const effect = 10; // Exceed the limit to create a bounce effect
    const limit = params.limit;
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-
    // Squeeze text down to a limit
-   const a = move_x_right_vertices_right(text, val, limit);
+   const a = move_x_right_vertices_right(text, val, limit+effect);
 
    if (a === false) {
 
-      // text_animation_gfx_vertex_set_vpos_x_default(text);
       text_animation_gfx_vertex_set_vpos_x_by_value(text, limit);
+      // Translate to original starting position
+      const center_posx = (mesh.geom.pos[0] + mesh.geom.dim[0]);
+      set_x(text, center_posx);
 
       return false;
    }
@@ -1444,23 +1477,59 @@ function Animation_text_back_run_squeeze_x(params) {
 
 function Animation_text_back_stop_squeeze_x(params) {
 
-   params.function_slope.SetTimer(0);
-   return false;
+   Time_intervals_create(params.wait_time, 'Text_Animations-WAIT Time', 1,  (params)=>{
+
+      params.params.function_slope.SetTimer(0);
+   
+      if(params.params.times_to_run !== 0) {
+   
+         if (params.params.cnt > 9) params.params.cnt = 0;
+         const text_substitution = `${params.params.cnt++}`;
+         
+         let limit = Texture_metrics_get_sub_tex_width(params.params.mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * params.params.font_size;
+      
+         params.params.times_to_run--;
+   
+         Demo_clbk_animations_text_create(
+            params.params.mesh, 
+            params.params.function_slope, 
+            limit, 
+            params.params.clbk_anim_flag, 
+            params.params.font_size,
+            params.params.times_to_run,
+            params.params.cnt,
+            params.params.wait_time,
+            text_substitution, 
+            params.params.name, 
+         );
+      }
+   
+   
+      return false;
+   }, params);
+
+   return true;
 }
 
-// Y AXIS
+
+
+
+/*********************************************************************************************************************************************/
+// Squeeze Y
+/*********************************************************************************************************************************************/
 function Animation_text_run_squeeze_y(params) {
 
 
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+
    const limit = params.limit;
-   // Substitution text
-   const text_substitution = params.text_substitution;
+   const text_substitution = params.text_substitution; // Substitution text
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
@@ -1476,10 +1545,12 @@ function Animation_text_run_squeeze_y(params) {
 
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
+      // Face should be fully squeezed. Avoid text face been render as a rect, because of RenderTextFromString() reseting the upper vertex positions.
+      move_y_upper_vertices_down(text, (limit*2+10), 10000);
 
-      vertex_y_set(text, -limit);
-      Mesh_set_wpos_x(text);
-
+      // Center new text 
+      const center_posx = (mesh.geom.pos[0] + mesh.geom.dim[0]);
+      set_x(text, center_posx);
 
       return false;
    }
@@ -1490,8 +1561,13 @@ function Animation_text_run_squeeze_y(params) {
 
 function Animation_text_stop_squeeze_y(params) {
 
-   Callback_animations_create(Animation_text_back_run_squeeze_y, Animation_text_back_stop_squeeze_y, params, `Stop:${params.name}`)
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_text_back_run_squeeze_y, Animation_text_back_stop_squeeze_y, params, `Stop:${params.name}`)
+
+   // Reset vertices position to the 'upper' face's boundary(from bottom), to start the procces of 'un-sqeeze' moving bottom vertices down
+   const text = params.mesh.text_mesh;
+   const y = params.limit; 
+   set_y_vertices(text, -y);
 
    return false;
 }
@@ -1499,72 +1575,100 @@ function Animation_text_stop_squeeze_y(params) {
 function Animation_text_back_run_squeeze_y(params) {
 
    const mesh = params.mesh;
-   const text = params.mesh.text_mesh;
+   const text = mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+   
+   const effect = 10; // Exceed the limit to create a bounce effect
    const limit = params.limit;
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-
+   
    // Squeeze text down to a limit
-   const a = move_y_bottom_vertices_up(text, val, limit);
-
+   const a = move_y_bottom_vertices_down(text, val, limit+effect);
+   
    if (a === false) {
-
-      vertex_y_set_default(text);
+      set_y_vpos(text, limit);
       return false;
    }
-   return true
+
+   return true;
 
 }
 
 function Animation_text_back_stop_squeeze_y(params) {
 
-   params.function_slope.SetTimer(0);
-   return false;
+   Time_intervals_create(params.wait_time, 'Text_Animations-WAIT Time', 1,  (params)=>{
+
+      params.params.function_slope.SetTimer(0);
+         
+      if(params.params.times_to_run !== 0) {
+   
+         if (params.params.cnt > 9) params.params.cnt = 0;
+         const text_substitution = `${params.params.cnt++}`;
+         
+         let limit = Texture_metrics_get_sub_tex_height(params.params.mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * params.params.font_size;
+      
+         params.params.times_to_run--;
+   
+         Demo_clbk_animations_text_create(
+            params.params.mesh, 
+            params.params.function_slope, 
+            limit, 
+            params.params.clbk_anim_flag, 
+            params.params.font_size,
+            params.params.times_to_run,
+            params.params.cnt,
+            params.params.wait_time,
+            text_substitution, 
+            params.params.name, 
+         );
+      }
+   
+      return false;
+      
+   }, params);
+   
+   return true;
 }
 
 
 
 
-
-
-/************************************************************************/
-// Translate text animation
-
-// X AXIS
+/*********************************************************************************************************************************************/
+// Translate X
+/*********************************************************************************************************************************************/
 function Animation_text_run_translation_x(params) {
 
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
+   
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
-   // Substitution text
-   const text_substitution = params.text_substitution;
 
+   const limit = mesh.text_mesh.geom.pos[0] + (mesh.text_mesh.geom.dim[0] * 2) + 4;
+   const text_substitution = params.text_substitution; // Substitution text
+   
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-   // Translate text down to a limit
-   const center = mesh.geom.pos[0] + mesh.geom.dim[0];
-   const limit = center + (mesh.geom.dim[0]) - text.geom.dim[0] * 2;
+   // Translate text right to a limit
    const a = move_x(text, val, limit);
 
-   // if limit height reached,
-   if (a === false) {
+   if (a === false) { // if limit is reached,
 
-      // ... move the text in the upper starting position, for the next animation to start  
-
-      // Also substitute the text
+      // Substitute the text
       text.RenderTextFromString(text_substitution);
-      // TODO: The dimention of the text changes according to the rendered character, and not the INITIAL character
-      pos_x_set(text, mesh.geom.pos[0] + text.geom.dim[0]);
+
+      // Translate to original starting position
+      set_x(text, mesh.geom.pos[0] - params.limit);
 
       return false;
    }
@@ -1575,8 +1679,8 @@ function Animation_text_run_translation_x(params) {
 
 function Animation_text_stop_translation_x(params) {
 
-   Callback_animations_create(Animation_text_back_run_translation_x, Animation_text_back_stop_translation_x, params, `Stop:${params.name}`)
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_text_back_run_translation_x, Animation_text_back_stop_translation_x, params, `Stop:${params.name}`)
 
    return false;
 }
@@ -1585,22 +1689,26 @@ function Animation_text_back_run_translation_x(params) {
 
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
+   
+   const effect = 10; // Exceed the limit to create a bounce effect
+   const limit = mesh.geom.pos[0] + mesh.geom.dim[0] + effect;
 
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-   // Translate text down to a limit
-   const center = mesh.geom.pos[0] + mesh.geom.dim[0];
-   const a = move_x(text, val, center);
+   // Translate text right to a limit
+   const a = move_x(text, val, limit);
 
    if (a === false) {
 
-      // Translate to original position
-      pos_x_set_default(text);
+      // Translate to original starting position
+      const center_posx = (mesh.geom.pos[0] + mesh.geom.dim[0]);
+      set_x(text, center_posx);
 
       return false;
    }
@@ -1610,29 +1718,65 @@ function Animation_text_back_run_translation_x(params) {
 
 function Animation_text_back_stop_translation_x(params) {
 
-   params.function_slope.SetTimer(0);
-   return false;
+   Time_intervals_create(params.wait_time, 'Text_Animations-WAIT Time', 1,  (params)=>{
+
+      params.params.function_slope.SetTimer(0);
+         
+      if(params.params.times_to_run !== 0) {
+   
+         if (params.params.cnt > 9) params.params.cnt = 0;
+         const text_substitution = `${params.params.cnt++}`;
+         
+         let limit = Texture_metrics_get_sub_tex_width(params.params.mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * params.params.font_size;
+      
+         params.params.times_to_run--;
+   
+         Demo_clbk_animations_text_create(
+            params.params.mesh, 
+            params.params.function_slope, 
+            limit, 
+            params.params.clbk_anim_flag, 
+            params.params.font_size,
+            params.params.times_to_run,
+            params.params.cnt,
+            params.params.wait_time,
+            text_substitution, 
+            params.params.name, 
+         );
+      }
+   
+      return false;
+      
+   }, params);
+
+   return true;
 }
 
-// Y AXIS
+
+
+
+/*********************************************************************************************************************************************/
+// Translate Y
+/*********************************************************************************************************************************************/
 function Animation_text_run_translation_y(params) {
 
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
-   // Substitution text
-   const text_substitution = params.text_substitution;
 
+   // const limit = mesh.text_mesh.geom.pos[1] + (mesh.geom.dim[1] * 2) + 35;
+   const limit = mesh.text_mesh.geom.pos[1] + (mesh.geom.dim[1] * 2) + 4;
+   // const limit = mesh.text_mesh.geom.pos[1] + (params.limit * 2) + 4;
+   const text_substitution = params.text_substitution; // Substitution text
+   
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-
-   // Translate text down to a limit
-   const center = mesh.geom.pos[1] + mesh.geom.dim[1];
-   const limit = center + (mesh.geom.dim[1]) - text.geom.dim[1];
+   // Translate text right to a limit
    const a = move_y(text, val, limit);
 
    // if limit height reached,
@@ -1642,9 +1786,17 @@ function Animation_text_run_translation_y(params) {
 
       // Also substitute the text
       text.RenderTextFromString(text_substitution);
-      pos_y_set(text, center - (mesh.geom.dim[1]) + text.geom.dim[1]);
-      // text.SetWposX(text.geom.pos[0] + text.geom.dim[0]);
-      Mesh_set_wpos_x(text);
+
+      // // Translate to original starting position
+      // const center_posx = (mesh.geom.pos[1] + mesh.geom.dim[1]);
+      // set_x(text, center_posx);
+
+      // Translate to original starting position
+      set_y(text, mesh.geom.pos[1] - params.limit);
+                  
+      // Center new text in x coord 
+      const center_posx = (mesh.geom.pos[0] + mesh.geom.dim[0]);
+      set_x(text, center_posx);
 
       return false;
    }
@@ -1652,46 +1804,79 @@ function Animation_text_run_translation_y(params) {
    return true
 
 }
-
+/** */
 function Animation_text_stop_translation_y(params) {
 
-   Callback_animations_create(Animation_text_back_run_translation_y, Animation_text_back_stop_translation_y, params, `Stop:${params.name}`)
    params.function_slope.SetTimer(0);
+   Callback_animations_create(Animation_text_back_run_translation_y, Animation_text_back_stop_translation_y, params, `Stop:${params.name}`)
 
    return false;
 }
-
+/** */
 function Animation_text_back_run_translation_y(params) {
 
    const mesh = params.mesh;
    const text = params.mesh.text_mesh;
+
    const slope_constant = params.function_slope.GetSlope();
    const speed = params.function_slope.GetAmmount();
    params.function_slope.IncrementTimer();
    const timer = params.function_slope.GetTimer();
 
+   const effect = 10; // Exceed the limit to create a bounce effect
+   const limit = mesh.geom.pos[1] + mesh.geom.dim[1] + effect;
+
    const slope = Logarithmic_interpolation(timer, slope_constant);
    const val = (slope * speed);
 
-
-   // Translate text down to center
-   const center = mesh.geom.pos[1] + mesh.geom.dim[1];
-   const a = move_y(text, val, center);
+   // Translate text right to a limit
+   const a = move_y(text, val, limit);
 
    if (a === false) {
 
-      // Correct to text's original position
-      pos_y_set_default(text);
+      // Translate to original starting position
+      const center_posy = (mesh.geom.pos[1] + mesh.geom.dim[1]);
+      set_y(text, center_posy);
 
       return false;
    }
    return true;
-
 }
-
+/** */
 function Animation_text_back_stop_translation_y(params) {
 
-   params.function_slope.SetTimer(0);
-   return false;
+   
+   Time_intervals_create(params.wait_time, 'Text_Animations-WAIT Time', 1,  (params)=>{
+
+      params.params.function_slope.SetTimer(0);
+         
+      if(params.params.times_to_run !== 0) {
+         
+         if (params.params.cnt > 9) params.params.cnt = 0;
+         const text_substitution = `${params.params.cnt++}`;
+         
+         let limit = Texture_metrics_get_line_height(params.params.mesh.text_mesh.mat.metrics_idx) * params.params.mesh.text_mesh.geom.dim[0];
+         
+         params.params.times_to_run--;
+   
+         Demo_clbk_animations_text_create(
+            params.params.mesh, 
+            params.params.function_slope, 
+            limit, 
+            params.params.clbk_anim_flag, 
+            params.params.font_size,
+            params.params.times_to_run,
+            params.params.cnt,
+            params.params.wait_time,
+            text_substitution, 
+            params.params.name, 
+         );
+      }
+   
+      return false;
+      
+   }, params);
+
+   return true;
 }
 

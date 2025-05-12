@@ -12,7 +12,7 @@ import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
-import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
+import { Sid_check_match, State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_expand, Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from "./ScrollerComponent.js";
@@ -118,7 +118,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       
       properties.dp.pos[2] += 1;
       this.menu = Create_rect_mesh(properties.menu);
-      Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10,})
+      Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10, });
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
@@ -131,19 +131,20 @@ export class Widget_Dropdown extends Rect_Mesh {
       Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP }})
       btn.align.flags = LAYOUT.VERTICAL
       btn.StylesSetPad(properties.btn.pad);
-
+      
       this.menu.geom.pos[1] = btn.geom.dim[1];
       
-
+      
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
-
+      
       this.AddItem(btn);
 
       this.menu_active = false;
 
       Mesh_set_name(btn, `Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
       Mesh_set_name(this.menu, `Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
-      Mesh_set_name(this, `Dropdown[${this.mesh_bufferidx}]{${properties.btn.text}}`);
+      Mesh_set_name(this, `${properties.dp.name}:Dp[${this.mesh_bufferidx}]`);
+      // Mesh_set_name(this, `Dp[${this.mesh_bufferidx}]{${properties.btn.text}}`);
 
    }
    /** */
@@ -381,6 +382,25 @@ export class Widget_Dropdown extends Rect_Mesh {
       }
 
    }
+   /** */
+   RenderToNewRenderGroup() {
+      this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+
+      // Assure independent rendering for each dropdown children, if their shaders differ from the dropdown's
+
+
+      if(Sid_check_match(this.sid, this.menu.sid) === false) {
+         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+      }
+
+      const btn = this.children.buffer[0];
+      if(Sid_check_match(this.sid, btn.sid) === false) {
+         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+      }
+
+      // Text is certain to have different shader 
+      btn.text_mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+   }
 
    
    /*******************************************************************************************************************************************************/
@@ -398,9 +418,13 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       const btn = this.children.buffer[0];
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 
-
-      // this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
-      this.menu.GenGfxCtx()
+      // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC); // Set button's area gfx same with dropDown mesh 
+      
+      this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
+      // console.log(this.menu.name, this.menu.gfx.vb.groupidx)
+      // this.menu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC); // Set button's area gfx same with dropDown mesh 
+      // this.menu.GenGfxCtx()
+      // console.log('menu', this.menu.name, this.menu)
       if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', Mesh_get_name(this))
 
       return this.gfx;
@@ -815,13 +839,13 @@ alert('00000111119999922222')
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
       // Reset vertex buffers from group
-      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
 
       // Remove menu and all its items from the group view
-      if (menu.group_bufferidxs[0] !== INT_NULL) {
-         View_remove_from_group(menu);
-      }
+      // if (menu.group_bufferidxs[0] !== INT_NULL) {
+      //    View_remove_from_group(menu);
+      // }
 
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
@@ -868,8 +892,8 @@ alert('00000111119999922222')
 
       /********************************************************************************************************************/
       // Re-render   
-      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0])
 
    }
 
@@ -892,15 +916,25 @@ alert('00000111119999922222')
          if(item){
 
             item.Activate();
+            // Here all items are set to the menu group and then in MeshBufferViews->View_add_mesh() we decide further as to what item's rgidx should be
+            // item.SetRenderGroup(menu.gfx.vb.render_groupidx); 
+            // console.log('ACTIVATE ITEM', item.name)
+            
+            // Here we assign every item to the same render group of the manu
+            // item.gfx.vb.render_groupidx = menu.gfx.vb.render_groupidx; // #181716
+            
             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
-   
+               
+               const btn = item.children.buffer[0];
+               // console.log('    dp-btn:rgidx', btn.gfx.vb.render_groupidx);
+               // console.log('    text:rgidx', btn.text_mesh.gfx.vb.render_groupidx);
                // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
                if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
-   
+                  
                   // If the menu was deactivated while open, then on activation keep its '-' symbol
-                  const btn = item.children.buffer[0];
                   btn.text_mesh.SliceText(0, 1);
                   btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+                  // btn.SetRenderGroup(item.gfx.vb.render_groupidx); 
                   item.#ActivateMenu();
                }
             }
@@ -919,29 +953,24 @@ alert('00000111119999922222')
       const menu = this.menu;
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
-      // HACK: In current implementation the menu is never  Rendered(). It is only GfxGenerated(). The problem comes from any scroller that the dp.menu has, since the Render() handles the scroller's render too.
-      // FIXME: Is this the best way to  implement dp.menu rendering?
-      // if (!this.menu.is_gfx_inserted) {
-      //    this.menu.Render()
-      // }
-
-
-      // this.isOn |= DP_MENU_STATE.ON;
-      // this.isOn &= ~DP_MENU_STATE.OFF;
-
-      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
-      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
-
-      this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
-
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
+         menu.gfx.vb.render_groupidx = this.gfx.vb.render_groupidx; // #181716
          View_add_to_group(menu, this.group_bufferidxs[0]);
          Vertex_buffer_calculate_render_group_starts();
       }
+
+
+      // IMPORTANT: ONLY IF MENU IS IN ITS OWN GROUP
+      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
+
+      this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
+
       
       this.#ActivateMenu(); // Add dropdown to gfx buffers.
+
       
       const btn = this.children.buffer[0];
       btn.text_mesh.SliceText(0, 1);
@@ -993,8 +1022,8 @@ alert('00000111119999922222')
       /********************************************************************************************************************/
       // Re-render   
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0]);
+      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0]);
 
 
    }

@@ -63,3 +63,16 @@
 
 
 
+
+
+
+# What if a mesh needs to be drawn on runtime? (Like dropdown menus and items)
+   For now the impl of dropdown menus is a quick fixand is as follows:
+   The menu gets activated along with its items.
+   For the first time init of the menu:
+      the menu must be inserted in a view render group
+      and the starts and sizes of the render group are calculated.
+      But the mesh hasn't been added to the vb and the start attrib index is not stored in the meshes.
+   Finally we call render from group, where for each mesh we check if it is already 'is_gfx_inserted'
+   and call accordingly.
+

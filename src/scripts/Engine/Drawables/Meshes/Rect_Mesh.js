@@ -37,7 +37,6 @@ export class Rect_Mesh extends Mesh {
 
 
       super(geom, mat);
-      // console.log(properties.name, properties.col)
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
 
@@ -128,11 +127,19 @@ export class Rect_Mesh extends Mesh {
       }
    }
    /** */
-   Deactivate() {
+   Deactivate() { // TODO: ADD to all widget-Mesh classes
 
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
+      }
+   }
+   /** */
+   SetRenderGroup(render_groupidx) {
+
+      this.gfx.vb.render_groupidx = render_groupidx; // #181716
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if (this.children.buffer[i]) this.children.buffer[i].SetRenderGroup(render_groupidx);
       }
    }
    /** */
@@ -280,7 +287,7 @@ export class Rect_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -293,7 +300,7 @@ export class Rect_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 

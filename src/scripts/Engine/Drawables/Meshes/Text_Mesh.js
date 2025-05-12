@@ -116,7 +116,7 @@ export class Text_Mesh extends Mesh {
          this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.size;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       this.is_gfx_inserted = true;
 
@@ -136,7 +136,7 @@ export class Text_Mesh extends Mesh {
 
       
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
       
       this.is_gfx_inserted = true;
 
@@ -651,7 +651,7 @@ export class Text_Mesh extends Mesh {
             Vertex_buffer_add_vertices_from_render_group(this.gfx, geom_copy, this.mat, 1, `${char} in: ${Mesh_get_name(this)}`, add_abstract_char_mesh);
    
             // Advance to next free char position
-            geom_copy.pos[0] += (width * size * 2)+0;
+            geom_copy.pos[0] += (width * size * 2)+1;
 
          }
          geom_copy.dim[0] = this.geom.dim[0]; geom_copy.dim[1] = this.geom.dim[1]; geom_copy.pos[1] = cur_line_posy;

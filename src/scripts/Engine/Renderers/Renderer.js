@@ -1,7 +1,7 @@
 "use strict";
 
 import { Gl_draw } from "../../Graphics/GlDraw.js";
-import { TimeSample, TimeUpdate } from "../Timers/Time.js";
+import { Time_sample, Time_update } from "../Timers/Time.js";
 import { Timers_update_global_timer, Timers_update } from "../Timers/Timers.js";
 import { Time_intervals_update } from "../Timers/TimeIntervals.js";
 import { Framebuffer_update_draw } from "../../Graphics/Buffers/FrameBuffers.js";
@@ -87,7 +87,7 @@ export class Renderer {
 
       if (STATE.loop.paused === false) {
 
-         TimeUpdate();
+         Time_update();
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
 
@@ -123,7 +123,7 @@ export class Renderer {
          
          Performance_timers_update_tick();
 
-         TimeSample();
+         Time_sample();
 
       }
 

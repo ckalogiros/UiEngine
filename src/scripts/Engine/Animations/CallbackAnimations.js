@@ -180,7 +180,6 @@ export function Callback_animations_create(animationClbk, stopAnimationClbk, par
 /** */
 export function Callback_animations_run() {
 
-
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
       
       const anim = _clbk_animations_buffer.buffer[i];

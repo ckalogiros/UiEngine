@@ -186,8 +186,8 @@ const SID = {
 
 
 // TODO: Create a smaller buffer that ca resize its self
-const MAX_VERTEX_BUFFER_SIZE = 3048;
-const MAX_INDEX_BUFFER_SIZE = 64;
+const MAX_VERTEX_BUFFER_SIZE = 300;
+const MAX_INDEX_BUFFER_SIZE = 30;
 const INDICES_PER_RECT = 6;
 const VERTS_PER_RECT = 6;
 const VERTS_PER_RECT_INDEXED = 4;
@@ -340,7 +340,7 @@ const BUFFER_STATE = {
 
     // SHOW: _CNT,
     NEEDS_UPDATE: _CNT,
-    NEEDS_UPDATE_FROM_REALLOC: _CNT,
+    NEEDS_UPDATE_FROM_REALLOC: _CNT <<= 0x1,
     // IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
     IS_PRIVATE: _CNT <<= 0x1,

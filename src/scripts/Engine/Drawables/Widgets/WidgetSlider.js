@@ -9,7 +9,7 @@ import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } fro
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices_from_render_group } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
-import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_x, Mesh_update_set_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
+import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_x, Mesh_update_set_wpos_x, Mesh_update_set_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_simple_default_properties } from './Helpers/WidgetEnableProperties.js';
@@ -37,8 +37,16 @@ export class Widget_Slider_Simple extends Rect_Mesh {
     */
    constructor(mesh_bufferidx, properties) {
 
-
-      super(mesh_bufferidx, properties);
+      super(mesh_bufferidx, Style_rect_default_properties({
+         is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
+         pos: properties.pos,
+         dim: properties.dim,
+         col: properties.col,
+         pad: properties.pad,
+         name: properties.text,
+         num_faces: properties.num_faces,
+         is_debug_mesh: properties.is_debug_mesh,
+      }));
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
@@ -679,7 +687,7 @@ export function Slider_simple_set_value(slider_bar, new_value) {
       // const pos = ((bar.geom.dim[0] * 2 * bar.geom.num_faces)) * new_value;
       const pos = ((bar.geom.dim[0] * 2)) * new_value;
       handle.geom.pos[0] = pos - (handle.geom.dim[0] * 2 * bar.slider_val - extra_padd); // Neccesary to take into consideration of the width, cause the value is calculated to full(100) but the handle does not go over the bar. 
-      Mesh_set_wpos_x(handle);
+      Mesh_update_set_wpos_x(handle);
    }
    else {
 
@@ -795,7 +803,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       const name_text = Create_widget_text({
-         is_root:_, 
+         is_root:0x0, 
          pos:[0, 0, 1], 
          col:properties.name_text.col,
          pad:[outer_pad, outer_pad],
@@ -810,7 +818,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       name_text.StylesSetPad([outer_pad, outer_pad]);
       
       const value_text = Create_widget_text({
-         is_root:_, 
+         is_root:0x0, 
          pos:[0, 0, 1], 
          col:properties.value_text.col,
          pad:[outer_pad, outer_pad],
@@ -830,10 +838,17 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       if((name_text.text_width + value_text.text_width) > dim[0])
          dim[0] = name_text.text_width + value_text.text_width + outer_pad + 20; // 20 is the pad between the name text and the value text
 
-      // { pos: pos, dim: dim, col: col, name: name, style: style, num_faces: num_faces, texture_id: INT_NULL, sub_texture_id: INT_NULL, is_debug_mesh: is_debug_mesh },
-      // super(mesh_bufferidx, _, { pos: _pos, dim: dim, col: col, name: name, style:_, num_faces: _, is_debug_mesh: is_debug_mesh },);
-      super(mesh_bufferidx, Style_rect_default_properties({ pos: _pos, dim: dim, col: col, name: name, num_faces: 1, is_debug_mesh: is_debug_mesh }));
-
+      // super(mesh_bufferidx, Style_rect_default_properties({ pos: _pos, dim: dim, col: col, name: name, num_faces: 1, is_debug_mesh: is_debug_mesh }));
+      super(mesh_bufferidx, Style_rect_default_properties({
+         is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
+         pos: properties.pos,
+         dim: properties.dim,
+         col: properties.col,
+         pad: properties.pad,
+         name: properties.text,
+         num_faces: properties.num_faces,
+         is_debug_mesh: properties.is_debug_mesh,
+      }));
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER;
@@ -889,6 +904,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
 
       if (is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
+
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
 
          const name_text = this.text_mesh;

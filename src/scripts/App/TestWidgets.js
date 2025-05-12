@@ -24,7 +24,7 @@ import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders } from './Demo/DemoParticles.js';
 import { Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_fps_detailed, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Demo_complicated_widget_layout, Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
-import { Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_width } from '../Engine/Loaders/Textures/TextureUvMap.js';
+import { Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height, Texture_metrics_get_sub_tex_width, Texture_metrics_get_texture_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
 import { Callback_animations_create } from '../Engine/Animations/CallbackAnimations.js';
 import { App_reinitialize, App_reset } from './App.js';
@@ -84,7 +84,7 @@ export function TestWidgetsGeneric() {
     
     /*************************************************************************************************************************/
     // Test: New implementation -> VB render groups
-    // {
+    {
         
     //     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1., .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
     //     Widget_gfx_ready_enable({
@@ -211,7 +211,7 @@ export function TestWidgetsGeneric() {
     //     // View_render_from_view_specific_render_group_NEW(1)
         
     //     // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
-    // }
+    }
 
 
 
@@ -263,6 +263,8 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Label-buttons
 
+        // CreateLabel(_, '0', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
+        // CreateLabel(_, 'Qr|\`\'0123456789', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
         // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,398);
         // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
         // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
@@ -336,7 +338,7 @@ export function TestWidgetsGeneric() {
 
     { // Widget: Dropdown
 
-        CreateDropdownTree([30, 50, 0])
+        // CreateDropdownTree([30, 50, 0])
 
         // CreateDropdownTreeHorizontalLayout();
 
@@ -540,16 +542,16 @@ export function TestWidgetsGeneric() {
             {
                 // Demo_animations();
                 // Demo_animations_with_slider_slope();
-                // Demo_animations_text();
+                // Demo_animations_text(_, _, _, 40 );
                 // Demo_animations_ready_button_with_panel(ROOT_WIDGETS.CREATE_ROOT);
 
 
                 { // Text Animations Testing
                     { // All
-                        // Test_text_clbk_animations_with_counter(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
-                        // Test_text_clbk_animations_with_counter(200, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, );
-                        // Test_text_clbk_animations_with_counter(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, );
-                        // Test_text_clbk_animations_with_counter(400, 100, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, );
+                        Test_text_clbk_animations_with_counter(100, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, 40, .1);
+                        Test_text_clbk_animations_with_counter(220, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, 40, .1);
+                        Test_text_clbk_animations_with_counter(100, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, 40, .1);
+                        Test_text_clbk_animations_with_counter(220, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, 40, .1);
                     }
                     { // Counter with 2 text labels
                         // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
@@ -2333,48 +2335,88 @@ function Test_hsv_color_sequence_from_integer_input() {
     CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
 }
 
-function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_y = 6, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, speed = 10, slope = .1) {
+function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_y = 6, font_size = 20, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, speed = 10, slope = .1) {
 
-    const mesh = Create_widget_label(Style_label_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: '1', pos: [x, y, 0], col: BLUEL[9], text_pad: [text_pad_x, text_pad_y], texture_id: TEXTURES.CONSOLAS_32px, }));
-    Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_col_per_vertex: COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]) })
-    mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    mesh.align.flags = (LAYOUT.VERTICAL);
+    const mesh = Create_widget_label(Style_label_default_properties({ 
+        is_root: ROOT_WIDGETS.CREATE_ROOT, 
+        text: 'W', pos: [x, y, 0], col: BLUEL[9], 
+        text_pad: [text_pad_x, text_pad_y], 
+        texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
+        font_size:font_size, 
+    }));
+    // Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_col_per_vertex: COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]), layout:LAYOUT.HORIZONTAL })
+    Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, layout:LAYOUT.HORIZONTAL, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
     mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    mesh.Render();
+
+    View_build_NEW_IMPLEMENTATION(mesh);
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+
     mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx)
     Construct_listen_events_from_mesh_tree(mesh);
     Construct_listen_events_relations_from_mesh_tree(mesh);
     Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
 
-    // Auto Create Animation(Only for button meshes, calls .Bind to trigger on click)
-    // Demo_clbk_animations_text_counter(ROOT_WIDGETS.CREATE_ROOT, mesh, true);
-
+    /**************************************************************************************************************************/
+    // Set scissor box
+    const mx = mesh.mesh_bufferidx;
+    const my = mesh.mesh_bufferidx;
+    const mw = mesh.mesh_bufferidx;
+    const mh = mesh.mesh_bufferidx;
+    Vertex_buffer_group_create_scissorbox(mesh.text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
+    
     const slope_params_pointer = Demo_clbk_animations_create_transition_slope(_, slope, speed);
-
+    
     let cnt = 0;
 
-    Time_intervals_create(700, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
-        () => {
+    { // One time call
 
-            if (cnt > 9) cnt = 0;
-            const text_substitution = `${cnt++}`
+        if (cnt > 9) cnt = 0;
+        const text_substitution = `${cnt++}`;
+        
+        let limit = 0;
+        if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+        else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) limit = Texture_metrics_get_sub_tex_height(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+        else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) limit = Texture_metrics_get_line_height(mesh.text_mesh.mat.metrics_idx) * mesh.text_mesh.geom.dim[0];
 
-            let limit = 0;
-            if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-            else if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_line_height(mesh.text_mesh.mat.metrics_idx) / 2;
+        const times_to_run = -1;
+        const wait_time = 500; // In miliseconds
+        
+        Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, clbk_anim_flag, font_size, times_to_run, cnt, wait_time, text_substitution, 'TESTETESTTEST', );
+    }
 
-            if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_X) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_X, text_substitution);
-            if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, text_substitution);
-            if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_X) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_SQUEEZE_X, text_substitution);
-            if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, 'TESTETESTTEST', CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, text_substitution);
-        }, _,
-    )
+    // const params = {
+    //     target_mesh:mesh,
+    //     clbk_anim_flag:clbk_anim_flag,
+    //     slope_params_pointer:slope_params_pointer,
+    //     counter:cnt,
+    //     font_size:font_size,
+    // };
+
+    // Time_intervals_create(2000, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
+    // // Time_intervals_create(3000, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
+    // // Time_intervals_create(3000, 'TEST_text_animation', 1,
+    //     (params) => {
+
+    //         const target_mesh = params.params.target_mesh;
+    //         const clbk_anim_flag = params.params.clbk_anim_flag;
+    //         const slope_params_pointer = params.params.slope_params_pointer;
+    //         const font_size = params.params.font_size;
+    //         let limit = 0;
+
+    //         if (params.params.counter > 9) params.params.counter = 0;
+    //         const text_substitution = `${params.params.counter++}`;
+
+    //         if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(target_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+    //         else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) limit = Texture_metrics_get_sub_tex_height(target_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+    //         else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) limit = Texture_metrics_get_line_height(target_mesh.text_mesh.mat.metrics_idx) * target_mesh.text_mesh.geom.dim[0];
 
 
-    // Auto-Create button
-    // Demo_clbk_animations_text_counter(ROOT_WIDGETS.CREATE_ROOT, null, true);
+    //         Demo_clbk_animations_text_create(target_mesh, slope_params_pointer, limit, 'TESTETESTTEST', clbk_anim_flag, text_substitution);
 
+    //     }, params,
+    // )
 }
 function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, text_pad_y = 6, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, speed = 10, slope = .04) {
 
@@ -2888,7 +2930,7 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
         is_root: is_root,
         pos: [x, y, 0],
         col: color,
-        text_pad: [10, 6],
+        text_pad: [20, 6],
         text: name,
         texture_id: font,
         variant_idx: variant_idx,
@@ -2908,7 +2950,10 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
 
         if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
         else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        label.Render()
+
+        View_build_NEW_IMPLEMENTATION(label);
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(label.group_bufferidxs[0]);
 
         label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
@@ -3088,7 +3133,11 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 
     // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    line.Render();
+
+    View_build_NEW_IMPLEMENTATION(line);
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(line.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(line.root_bufferidx);
     line.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, line.gfx.vb.groupidx)
     Construct_listen_events_from_mesh_tree(line)
@@ -3112,6 +3161,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: is_root, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
     dp.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
+    // dp.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
 
 
     Dropdown_roots_set_root(dp, dp);
@@ -3123,9 +3173,9 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     { // Many dps
 
         const sub_dp1_count = 1;
-        const sub_dp2_count = 3;
+        const sub_dp2_count = 2;
 
-        // const col = YELLOWR[7];
+        const col = YELLOWR[7];
         for (let i = 0; i < sub_dp1_count; i++) {
 
             // { // Label
@@ -3134,65 +3184,83 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
             //         const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
             //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
             //         dp.AddToMenu(l);
-            //         // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-            //         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+            //         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
             //         brightness += brightness_increments;
             //     }
             // }
 
-            {
-                let cnt = 0;
-                // const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-                // Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-                // dp.AddToMenu(s1); 
-                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-                {
-                    const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`Rect ${cnt++}` }));
-                    Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-                    dp.AddToMenu(s2); 
-                    s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-                }
-
-            }
-
-            // const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            // Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            // dp.AddToMenu(dpsub1);
-
-            // const col1 = TRANSPARENCY(PURPLEB[6], 1.);
-            // for (let j = 0; j < sub_dp2_count; j++) {
-
-            //     const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            //     Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            //     dpsub1.AddToMenu(dpsub2);
-
-            //     const col2 = TRANSPARENCY(GREEN[6], 1.)
-
-            //     for (let k = 0; k < sub_dp2_count; k++) {
-
-            //         const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            //         Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            //         dpsub2.AddToMenu(dpsub3);
-
-            //         const col3 = TRANSPARENCY(YELLOW[6], 1.)
-            //         for (let n = 0; n < sub_dp2_count; n++) {
-
-            //             const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            //             Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            //             dpsub3.AddToMenu(dpsub4);
-
-            //             const col4 = TRANSPARENCY(PURPLER[6], 1.)
-            //             for (let m = 0; m < 10; m++) {
-
-            //                 const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            //                 Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            //                 dpsub4.AddToMenu(dpsub5);
-
-            //             }
-            //         }
+            // { // Rects nested
+            //     let cnt = 0;
+            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`Rect ${cnt++}` }));
+            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            //     dp.AddToMenu(s1); 
+            //     s1.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC);
+            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            //     {
+            //         const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`Rect ${cnt++}` }));
+            //         Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            //         s1.AddItem(s2); 
+            //         s2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
             //     }
+
             // }
+
+            const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'dp2' }));
+            Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            dpsub1.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            dpsub1.gfx_ctx_flags = (GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            dpsub1.RenderToNewRenderGroup();
+            dp.AddToMenu(dpsub1);
+            
+            const col1 = TRANSPARENCY(PURPLEB[6], 1.);
+            for (let j = 0; j < sub_dp1_count; j++) {
+                
+                const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'dp3' }));
+                Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                dpsub1.AddToMenu(dpsub2);
+                
+                const col2 = TRANSPARENCY(GREEN[6], 1.)
+                
+                for (let k = 0; k < sub_dp2_count; k++) {
+                    
+                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'dp4' }));
+                    Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                    dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                    dpsub3.RenderToNewRenderGroup();
+                    dpsub2.AddToMenu(dpsub3);
+
+                    { // Label
+                        const count = 4; const brightness_increments = 1/count; let brightness =  0;
+                        for (let i = 0; i < count; i++) {
+                            const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
+                            Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                            dpsub3.AddToMenu(l);
+                            l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                            brightness += brightness_increments;
+                        }
+                    }
+
+                    // const col3 = TRANSPARENCY(YELLOW[6], 1.)
+                    // for (let n = 0; n < sub_dp2_count; n++) {
+
+                    //     const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+                    //     Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                    //     dpsub4.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                    //     dpsub3.AddToMenu(dpsub4);
+
+                    //     const col4 = TRANSPARENCY(PURPLER[6], 1.)
+                    //     for (let m = 0; m < 10; m++) {
+
+                    //         const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+                    //         Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                    //         dpsub5.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                    //         dpsub4.AddToMenu(dpsub5);
+
+                    //     }
+                    // }
+                }
+            }
         }
     }
 
@@ -3201,13 +3269,10 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
         
         dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        Align_nested_sections_pre(dp);
         
         View_build_NEW_IMPLEMENTATION(dp);
         Vertex_buffer_calculate_render_group_starts();
-        
-        Align_nested_sections_pre(dp);
-        
-        // dp.Render();
         View_render_from_view_NEW(dp.group_bufferidxs[0]);
 
         Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);

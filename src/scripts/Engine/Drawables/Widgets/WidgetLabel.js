@@ -41,10 +41,8 @@ export class Widget_Label extends Rect_Mesh {
         text_mesh.geom.pos[1] += properties.text_pad[1];
 
 
-        // HERE: Do not send any texture to Rect_Mesh. This is the labels rect panel
-        // super(mesh_bufferidx, properties);
         super(mesh_bufferidx, Style_rect_default_properties({
-            is_root: properties.is_root,
+            is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
             pos: properties.pos,
             dim: properties.dim,
             col: properties.col,
@@ -66,7 +64,7 @@ export class Widget_Label extends Rect_Mesh {
         this.mesh_bufferidx = mesh_bufferidx;
 
         // this.text_mesh.parent = NO_MESH_PARENT; // Use a special case for text meshes that are part of a widget without being in children's buffer.
-        this.text_mesh.parent = this; // Use a special case for text meshes that are part of a widget without being in children's buffer.
+        this.text_mesh.parent = this;
 
 
         this.SetLayout(properties.layout);

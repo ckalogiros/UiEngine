@@ -147,7 +147,6 @@ export function Create_widget_button(properties) {
 
 
 
-//  is_root = 0x0, text_on, text_off, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
 export function Create_widget_switch_button(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -195,7 +194,6 @@ export function Create_widget_slider(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, is_root, pos, dim, col, hover_margin, name, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Slider_XX1(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
@@ -220,12 +218,10 @@ export function Create_widget_scroller(is_root = 0x0, scrolled_section, dim, col
 
 
 
-// export function Create_widget_dropdown(is_root = 0x0, text, pos, col1, col_menu, text_col, btn_pad, bold, font, font_size=10, style, margin, is_debug_mesh = 0x0) {
 export function Create_widget_dropdown(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, is_root, text, pos, col1, col_menu, text_col, btn_pad, bold, font, font_size, style, margin, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Dropdown(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
@@ -256,7 +252,6 @@ export function Create_widget_close_btn(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, is_root, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Close_Button(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)

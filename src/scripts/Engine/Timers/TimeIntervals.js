@@ -2,7 +2,7 @@
 
 import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
-import { TimeGet } from "./Time.js";
+import { Time_get } from "./Time.js";
 
 
 
@@ -23,7 +23,7 @@ import { TimeGet } from "./Time.js";
 
 let _time = null; // Store a local refference of the App's timer
 export function Time_intervals_init_time(){
-   _time = TimeGet();
+   _time = Time_get();
 }
 
 
@@ -73,18 +73,16 @@ class Interval {
       if (this.repeat > 0){ // Case repeat certain number of times
 
          if (this.t >= this.interval) {
-
-            // HERE // TODO: set break point and look for performance timers debug ui. All the callbacks are stored to a buffer, but there are duplicate function pointers. See if we cal optimize by storing unique functions only
+            // TODO: set break point and look for performance timers debug ui. All the callbacks are stored to a buffer, but there are duplicate function pointers. See if we can optimize by storing unique functions only
             if (this.clbk) this.clbk(this.clbkParams); // Call the callback, if exists.
-            // console.log(this.GetName())
             this.t = 0; // Reset interval timer
             this.repeat--;
-            return true; // Case we only need if the interval time has passed(no callback)
+            return true; 
          }
       }
       else{ // Destroy the interval timer
 
-         this.#Destroy();
+         Time_intervals_destroy_byidx(this.idx);
          return false;
       }
 
@@ -161,7 +159,7 @@ class TimeIntervals {
          time_interval_idx: freeIdx,
          params: params,
       }; 
-      this.ti[freeIdx].Create(interval, this.count, name, repeat, clbk, parameters);
+      this.ti[freeIdx].Create(interval, freeIdx, name, repeat, clbk, parameters);
       this.count++;
 
       return freeIdx;
@@ -171,9 +169,9 @@ class TimeIntervals {
    Update() {
 
       for (let i = 0; i < this.count; i++) {
-         this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
-         // const is_running = this.ti[i].Update();
-         // if(!is_running) this.DestroyByIdx(i);
+
+         if(this.ti[i].isActive)
+            this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
       }
    }
 
@@ -194,7 +192,7 @@ class TimeIntervals {
          this.#Destroy(idx);
          this.count--;
          if(this.count < 0) 
-            console.error('Time interval index is:', this.count, this)
+            console.error('Time interval index is:', this.count, this);
       }
    }
 
@@ -252,7 +250,7 @@ export function Time_intervals_initialize(){
    intervalTimers.Init();
 }
 
-export function Time_intervals_destroy() {
+export function Time_intervals_destroy_all() {
    for (let i = 0; i < intervalTimers.size; i++) {
       intervalTimers.DestroyByIdx(i);
    }
