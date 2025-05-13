@@ -1,6 +1,7 @@
 "use strict"
 
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
+import { Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_state_enable } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_set_vpos_y } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Linear_interpolation } from "../../Helpers/Math/MathFunctions.js";
@@ -53,6 +54,7 @@ export function vertex_y_set_default(target, limit) {
    vb_data[index] =  dim; index+=stride;
 
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
 }
 /** */
 export function vertex_y_set(target, dim) {
@@ -70,6 +72,7 @@ export function vertex_y_set(target, dim) {
    vb_data[index] = dim; index+=stride;
    vb_data[index] =  dim; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -89,6 +92,7 @@ export function pos_y_set_default(target) {
    vb_data[index] = pos; index+=stride;
    vb_data[index] = pos; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -106,6 +110,7 @@ export function pos_y_set(target, pos) {
    vb_data[index] = pos; index+=stride;
    vb_data[index] = pos; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
@@ -128,6 +133,7 @@ export function move_y(target, val, limit) {
    vb_data[index] += val; index+=stride;
    vb_data[index] += val; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -146,6 +152,7 @@ export function set_y(target, y) {
    vb_data[index] = y; index+=stride;
    vb_data[index] = y; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -164,6 +171,7 @@ export function twist_y(target, val) {
    vb_data[index] += -val; index+=stride;
    vb_data[index] += -val; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
@@ -193,6 +201,7 @@ export function move_y_upper_vertices_down(target, val, limit) {
    vb_data[index] += val;  // V3
 
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -222,6 +231,7 @@ export function move_y_upper_vertices_up(target, val, limit) {
 
    index+=stride; // V4
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -252,6 +262,7 @@ export function move_y_bottom_vertices_up(target, val, limit) {
    vb_data[index] += val; 
    index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -281,6 +292,7 @@ export function move_y_bottom_vertices_down(target, val, limit) {
       
 
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -307,6 +319,7 @@ export function set_y_vertices(target, y) {
    vb_data[index] = y; 
    index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
 }
@@ -370,6 +383,7 @@ export function text_animation_gfx_vertex_set_vpos_x_by_value(target, dim) {
    vb_data[index] =  dim; 
    index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -390,6 +404,7 @@ export function text_animation_gfx_vertex_set_vpos_x_default(target) {
    vb_data[index] =  dim; index+=stride;
    vb_data[index] =  dim; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -408,6 +423,7 @@ export function text_animation_gfx_vertex_set_sqeeze_x_axis(target, dim) {
    vb_data[index] = dim; index+=stride;
    vb_data[index] = dim; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -427,6 +443,7 @@ export function pos_x_set_default(target) {
    vb_data[index] = pos; index+=stride;
    vb_data[index] = pos; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -444,6 +461,7 @@ export function pos_x_set(target, pos) {
    vb_data[index] = pos; index+=stride;
    vb_data[index] = pos; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
@@ -467,6 +485,7 @@ export function move_x(target, val, limit) {
    vb_data[index] += val; index+=stride;
    vb_data[index] += val; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -485,6 +504,7 @@ export function set_x(target, x) {
    vb_data[index] = x; index+=stride;
    vb_data[index] = x; index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */
@@ -513,6 +533,7 @@ export function move_x_left_vertices_right(target, val, limit) {
    index+=stride;
    vb_data[index] += val; 
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -546,6 +567,7 @@ export function move_x_right_vertices_right(target, val, limit) {
 
    vb_data[index] += val; 
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
    return true;
@@ -572,6 +594,7 @@ export function set_x_vertices(target, x) {
    vb_data[index] = x; 
    index+=stride;
 
+   Vertex_buffer_render_group_set_state(target.gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    Vertex_buffer_state_enable(target.gfx.vb.groupidx, target.gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 
 }

@@ -1,12 +1,9 @@
 TODO
 
 
-# Vertex buuffer
- * Replace Vertex_buffer_add_vertices() with the new add vertices from render group
-
 # View groups
- * Do we need the .vb field of the mesh view group?????
  * implement set vertex buffer initial size, to match the mesh data
+ * Do we need the .vb field of the mesh view group?????
 
 # Render groups
  * implement resize-realloc

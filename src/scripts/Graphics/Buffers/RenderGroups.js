@@ -29,7 +29,7 @@ const _render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Render Groups');
 
 /** */
 // export function Vertex_buffer_render_group_create(start=0, count=0, size=0, draw_count=0, index_offset= 0,debug_vbidx=-1,) {
-export function Vertex_buffer_render_group_create(num_faces=INT_NULL) {
+export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_faces=INT_NULL) {
 
    const render_groupidx = _render_groups.Add(
       {
@@ -39,7 +39,10 @@ export function Vertex_buffer_render_group_create(num_faces=INT_NULL) {
          num_faces:num_faces, 
          draw_count:0, 
          index_offset:0,
-         
+         vb_data_idx:vb_data_idx, // TODO: For now it gets the vertex buffer group index. On "buffer instances" implementation should take the vb_info or vb_data index.
+         state:0x0,
+
+
          debug_vbidx:INT_NULL,
          debug_is_reseted:true,
 
@@ -87,6 +90,10 @@ export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx,
 // export function Vertex_buffer_render_group_set_size(render_groupidx, size) { 
 //    _render_groups.buffer[render_groupidx].size = size;
 // }
+/** */
+export function Vertex_buffer_render_group_set_state(render_groupidx, STATE_FLAG) {
+   _render_groups.buffer[render_groupidx].state |= STATE_FLAG;
+}
 
 
 

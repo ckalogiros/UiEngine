@@ -2,7 +2,7 @@ import { Texture_get_texture_unit_byidx } from '../Engine/Loaders/Textures/Textu
 import { Renderqueue_get_active, Renderqueue_active_get_count } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Gl_texture_unit_bind } from './GlTextureUnit.js';
 import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buffers/IndexBuffers.js';
-import { VBI_get_byidx, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
+import { VBI_get_byidx, VBI_get_vbo, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Vertex_buffer_render_group_get_render_group } from './Buffers/RenderGroups.js';
 
@@ -86,58 +86,29 @@ export function Gl_draw(gl) {
                 gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
             }
 
+            if(render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
 
+                const vbo = VBI_get_vbo(render_group.vb_data_idx);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                const vb_data = Vertex_buffer_get_by_vbidx(render_group.vb_data_idx);
+                gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
 
-            // IMPORTANT: HERE!: Why check every frame and not update the vb AND ib at the location of the buffer data update??????
-            if (vb_group.needs_any_update) {
-                for (let j = 0; j <= vb_group.vb_idxs.boundary; j++) {
+                
+                render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
+                GL_STATE.BOUND_VBO = vbo;
+                GL_STATE.BOUND_VBIDX = render_group.vb_data_idx;
 
-                    const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
-                    if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
-
-                        const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                        // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
-                        if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
-                            gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); 
-                            vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-                        }
-                        else {
-                            
-                            // gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
-                            gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start, vb_data, render_group.start, render_group.count);
-
-                            /**MAPPING DIRECTLY TO GPU MEMORY
-                             * 
-                             * Create a pointer to the gpu memory. 
-                             * // 2. Map buffer to CPU memory
-                                 const ptr = gl.mapBufferRange(
-                                    gl.ARRAY_BUFFER,
-                                    0,                // byte offset
-                                    1024,             // byte length
-                                    gl.MAP_WRITE_BIT
-                                );
-
-                                // Then on update Draw(), just ch
-                                // 3. Directly modify via typed array view
-                                const view = new Float32Array(ptr);
-                                view.set([1,2,3], 0); // Write at element offset 0
-
-                                // 4. Unmap to sync changes
-                                gl.unmapBuffer(gl.ARRAY_BUFFER);
-                            */
-                        }
-
-                        vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                        GL_STATE.BOUND_VBO = vb_info.vbo;
-                        GL_STATE.BOUND_VBIDX = vb_info.vbidx;
-
-
-                    }
-                }
-                vb_group.needs_any_update = false;
+                console.log(
+                    'vb_idx', render_group.vb_data_idx,
+                    'rg_idx', vb_group.render_groupidxs.buffer[j],
+                    'start', render_group.start,
+                    'coun', render_group.count
+                    // render_group.
+                    // render_group.
+                )
             }
-            
+
+           
             
             /** The last param is the instance count.
              * That means: draw that many instances ONLY from the vertex buffer of the instanced geometry,
@@ -264,3 +235,65 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
     // // gl.depthMask(true);
 
 }
+
+
+
+
+
+
+
+
+
+
+/********************************************************************/
+// OLD
+
+// Update vertex buffer data
+// // IMPORTANT: HERE!: Why check every frame and not update the vb AND ib at the location of the buffer data update??????
+// if (vb_group.needs_any_update) {
+//     for (let j = 0; j <= vb_group.vb_idxs.boundary; j++) {
+
+//         const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
+//         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
+
+//             const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//             gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
+//             gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
+//             if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
+//                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); 
+//                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+//             }
+//             else {
+                
+//                 // gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
+//                 gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start, vb_data, render_group.start, render_group.count);
+
+//                 /**MAPPING DIRECTLY TO GPU MEMORY
+//                  * 
+//                  * Create a pointer to the gpu memory. 
+//                  * // 2. Map buffer to CPU memory
+//                      const ptr = gl.mapBufferRange(
+//                         gl.ARRAY_BUFFER,
+//                         0,                // byte offset
+//                         1024,             // byte length
+//                         gl.MAP_WRITE_BIT
+//                     );
+
+//                     // Then on update Draw(), just ch
+//                     // 3. Directly modify via typed array view
+//                     const view = new Float32Array(ptr);
+//                     view.set([1,2,3], 0); // Write at element offset 0
+
+//                     // 4. Unmap to sync changes
+//                     gl.unmapBuffer(gl.ARRAY_BUFFER);
+//                 */
+//             }
+
+//             vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+//             GL_STATE.BOUND_VBO = vb_info.vbo;
+//             GL_STATE.BOUND_VBIDX = vb_info.vbidx;
+
+//         }
+//     }
+//     vb_group.needs_any_update = false;
+// }

@@ -307,7 +307,7 @@ function View_add_mesh(groupidx, mesh) {
 
       if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.NEW_RENDER_GROUP) {
 
-         const new_render_groupidx = Vertex_buffer_render_group_create(num_faces);
+         const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
          Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
 
          view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
@@ -331,7 +331,7 @@ function View_add_mesh(groupidx, mesh) {
          }
          else {
 
-            const new_render_groupidx = Vertex_buffer_render_group_create(num_faces);
+            const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
             Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
 
             view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
@@ -363,7 +363,7 @@ function View_add_mesh(groupidx, mesh) {
 
       const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
 
-      const new_render_groupidx = Vertex_buffer_render_group_create(num_faces);
+      const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
       Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
 
       const view_rgidx = render_groups.Add({

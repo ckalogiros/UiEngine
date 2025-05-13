@@ -44,6 +44,7 @@ import { Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
 import { Color_theme_slider_1, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
+import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
 
 
 
@@ -66,7 +67,6 @@ export function TestWidgetsGeneric() {
     // Test: Measure performance of the 2 kinds of section auto-alignment
     // Test_performance_align_functions() // DEPRECATED
 
-    // Bitwise_operations_run_test();
 
     { // Statistics
         let yy = 0, pp = 23;
@@ -85,132 +85,140 @@ export function TestWidgetsGeneric() {
     /*************************************************************************************************************************/
     // Test: New implementation -> VB render groups
     {
-        
-    //     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1., .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
-    //     Widget_gfx_ready_enable({
-    //         mesh: section, enable_sdf_rect: 15,
-    //         listener: { type: LISTEN_EVENT_TYPES.MOVE },
-    //     });
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, .7, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+        Widget_gfx_ready_enable({
+            mesh: section, enable_sdf_rect: 15,
+            listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        });
     
-    //     section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
-    //     // section.group_bufferidxs[0] = view_group[0];
+        // section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
     
-    //     let cnt = 1;
-    //     const font_size = 20;
+        let cnt = 1;
+        const font_size = 20;
 
-    //     {
-    //         const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
-    //         Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15, }); 
-    //         // red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //         red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //         section.AddItem(red);
+        {
+            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, .7, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
+            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15, }); 
+            red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            // red.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            section.AddItem(red);
             
-    //         {
-    //             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-    //             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-    //             red.AddItem(s1); 
-    //             s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //             // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             {
-    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             }
-    //             {
-    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             }
-    //             {
-    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             }
-    //         }
-    //         {
-    //             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-    //             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-    //             red.AddItem(s1); 
-    //             s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //             // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             {
-    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //             }
-    //         }
-    //         { // Label
-    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
-    //             for (let i = 0; i < count; i++) {
-    //                 const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-    //                 red.AddItem(l);
-    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-    //                 brightness += brightness_increments;
-    //             }
-    //         }
-    //         { // Switch
-    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
-    //             for (let i = 0; i < count; i++) {
+            {
+                // const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL, name:`${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                red.AddItem(s1); 
+                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC | GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+                s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                // {
+                //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+                //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                // }
+                // {
+                //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+                //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                // }
+                // {
+                //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+                //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                // }
+            }
+            {
+                // const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL, name:`${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                red.AddItem(s1); 
+                // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+                s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            }
+            // {
+            //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+            //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            //     red.AddItem(s1); 
+            //     s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            //     // s1.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            //     {
+            //         const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL , name:`${cnt++}` }));
+            //         Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            //     }
+            // }
+            { // Label
+                const count = 1; const brightness_increments = 1/count; let brightness =  0;
+                for (let i = 0; i < count; i++) {
+                    const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    red.AddItem(l);
+                    l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+                    // l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+                    brightness += brightness_increments;
+                }
+            }
+            // { // Switch
+            //     const count = 1; const brightness_increments = 1/count; let brightness =  0;
+            //     for (let i = 0; i < count; i++) {
 
-    //                 const l = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, }));
-    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-    //                 red.AddItem(l);
-    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-    //                 brightness += brightness_increments;
-    //             }
-    //         }
-    //         { // Slider
-    //             const count = 1; const brightness_increments = 1/count; let brightness =  0;
-    //             for (let i = 0; i < count; i++) {
+            //         const l = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, }));
+            //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            //         red.AddItem(l);
+            //         // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            //         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+            //         brightness += brightness_increments;
+            //     }
+            // }
+            // { // Slider
+            //     const count = 1; const brightness_increments = 1/count; let brightness =  0;
+            //     for (let i = 0; i < count; i++) {
 
-    //                 const l = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-    //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, }); 
-    //                 red.AddItem(l);
-    //                 // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
-    //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-    //                 brightness += brightness_increments;
-    //             }
-    //         }
+            //         const l = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+            //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, }); 
+            //         red.AddItem(l);
+            //         // l.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL|GFX_CTX_FLAGS.NEW_RENDER_GROUP);
+            //         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
+            //         brightness += brightness_increments;
+            //     }
+            // }
 
-    //     }
+        }
 
 
-    //     { // Render
-    //         section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        { // Render
+            section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
             
-    //         Align_nested_sections_pre(section);
+            Align_nested_sections_pre(section);
             
     
-    //         View_build_NEW_IMPLEMENTATION(section);
-    //         Vertex_buffer_calculate_render_group_starts();
-    //         View_render_from_view_NEW(section.group_bufferidxs[0]);
+            View_build_NEW_IMPLEMENTATION(section);
+            Vertex_buffer_calculate_render_group_starts();
+            View_render_from_view_NEW(section.group_bufferidxs[0]);
             
-    //         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-    //         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-    //         Construct_listen_events_from_mesh_tree(section)
-    //         Construct_listen_events_relations_from_mesh_tree(section);
-    //     }
+            Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+            section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+            Construct_listen_events_from_mesh_tree(section)
+            Construct_listen_events_relations_from_mesh_tree(section);
+        }
 
         
         
-    //     // TEST if the gfx buffers are set properly
-    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section, .03, 0., 1.,)
-    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0], .015, 0., 1.,)
-    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[0], .031, 0., 1.,)
-    //     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[1], .03, 0., 1.,)
-    //     // Mesh_set_color_rgba(section.children.buffer[0], BLUEL[9])
-    //     // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[0], BLUEL[9])
-    //     // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[1], BLUEL[9])
+        // TEST if the gfx buffers are set properly
+        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section, .03, 0., 1.,)
+        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0], .015, 0., 1.,)
+        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[0], .031, 0., 1.,)
+        // // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, section.children.buffer[0].children.buffer[1], .03, 0., 1.,)
+        // // Mesh_set_color_rgba(section.children.buffer[0], BLUEL[9])
+        // // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[0], BLUEL[9])
+        // // Mesh_set_color_rgba(section.children.buffer[0].children.buffer[1], BLUEL[9])
 
 
-    //     // View_reset_to_index_from_view_group_NEW(1);
-    //     // View_render_from_view_specific_render_group_NEW(1)
+        // // View_reset_to_index_from_view_group_NEW(1);
+        // // View_render_from_view_specific_render_group_NEW(1)
 
 
-    //     // View_reset_to_index_from_view_group_NEW(1);
-    //     // View_render_from_view_specific_render_group_NEW(1)
+        // // View_reset_to_index_from_view_group_NEW(1);
+        // // View_render_from_view_specific_render_group_NEW(1)
         
-    //     // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
+        // // View_render_from_view_specific_render_group_NEW(section.group_bufferidxs[0], 2)
     }
 
 
@@ -548,10 +556,10 @@ export function TestWidgetsGeneric() {
 
                 { // Text Animations Testing
                     { // All
-                        Test_text_clbk_animations_with_counter(100, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, 40, .1);
-                        Test_text_clbk_animations_with_counter(220, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, 40, .1);
-                        Test_text_clbk_animations_with_counter(100, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, 40, .1);
-                        Test_text_clbk_animations_with_counter(220, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, 40, .1);
+                        // Test_text_clbk_animations_with_counter(100, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, 40, .1);
+                        // Test_text_clbk_animations_with_counter(220, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, 40, .1);
+                        // Test_text_clbk_animations_with_counter(100, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, 40, .1);
+                        // Test_text_clbk_animations_with_counter(220, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, 40, .1);
                     }
                     { // Counter with 2 text labels
                         // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
@@ -770,6 +778,11 @@ export function TestWidgetsGeneric() {
         // Test_find_match_from_parent_descending();
     }
 
+
+
+    // Bitwise_operations_run_test();
+    // Test_bitwise_from_book_run_all_tests();
+    
 
     // Vertex_buffer_build_index_buffer_all();
 }
