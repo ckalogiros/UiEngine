@@ -322,7 +322,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       if (this.gfx_ctx_parent === INT_NULL) {
 
-         if ((this.gfx_ctx_flags  & GFX_CTX_FLAGS.NEW)===0) {
+         if ((this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW)===0) {
             this.gfx_ctx_flags = FLAGS;
             this.gfx_ctx_parent = gfx_ctx_parent;
          }
@@ -384,22 +384,22 @@ export class Widget_Dropdown extends Rect_Mesh {
    }
    /** */
    RenderToNewRenderGroup() {
-      this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+      this.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
 
       // Assure independent rendering for each dropdown children, if their shaders differ from the dropdown's
 
 
       if(Sid_check_match(this.sid, this.menu.sid) === false) {
-         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
       }
 
       const btn = this.children.buffer[0];
       if(Sid_check_match(this.sid, btn.sid) === false) {
-         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+         btn.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
       }
 
       // Text is certain to have different shader 
-      btn.text_mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW_RENDER_GROUP;
+      btn.text_mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
    }
 
    
@@ -916,25 +916,15 @@ alert('00000111119999922222')
          if(item){
 
             item.Activate();
-            // Here all items are set to the menu group and then in MeshBufferViews->View_add_mesh() we decide further as to what item's rgidx should be
-            // item.SetRenderGroup(menu.gfx.vb.render_groupidx); 
-            // console.log('ACTIVATE ITEM', item.name)
-            
-            // Here we assign every item to the same render group of the manu
-            // item.gfx.vb.render_groupidx = menu.gfx.vb.render_groupidx; // #181716
             
             if (item.type & MESH_TYPE.WIDGET_DROP_DOWN) { // Case item is another dropdown
                
                const btn = item.children.buffer[0];
-               // console.log('    dp-btn:rgidx', btn.gfx.vb.render_groupidx);
-               // console.log('    text:rgidx', btn.text_mesh.gfx.vb.render_groupidx);
-               // if (item.isOn & DP_MENU_STATE.ON) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
                if (item.menu_active) { // Case the item dropdown has an 'active' menu, activate the item's menu (runs recursive for any opened sub menus). 
                   
                   // If the menu was deactivated while open, then on activation keep its '-' symbol
                   btn.text_mesh.SliceText(0, 1);
                   btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
-                  // btn.SetRenderGroup(item.gfx.vb.render_groupidx); 
                   item.#ActivateMenu();
                }
             }

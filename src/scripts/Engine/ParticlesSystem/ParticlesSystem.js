@@ -1219,7 +1219,7 @@ export function Particle_system_update() {
          }
       }
 
-      if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+      // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
       if (needs_update) Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
       
 

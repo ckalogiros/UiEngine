@@ -5,6 +5,9 @@ import { BLUEL, Color_hsv_to_rgb_calibrated, GREY, WHITE, YELLOWL } from "../../
 
 
 
+const DEFAULT_GFX_CTX_FLAGS = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW;
+
+
 
 /**
  * 
@@ -30,6 +33,7 @@ export function Widget_gfx_ready_enable({
    enable_pass_vpos = false,
    enable_pass_wpos = false,
    enable_blend_mode,
+   gfx_ctx_flags = 0x0,
    listener={ type:0x0, Clbk:null, params:null },
    scroller=null,
 }) {
@@ -70,14 +74,12 @@ export function Widget_gfx_ready_enable({
          if(enable_col_per_vertex[0].constructor === Float32Array &&
             enable_col_per_vertex[1].constructor === Float32Array &&
             enable_col_per_vertex[2].constructor === Float32Array &&
-            enable_col_per_vertex[3].constructor === Float32Array
-         ) {
+            enable_col_per_vertex[3].constructor === Float32Array   ) {
 
             mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, {col4_per_vertex:enable_col_per_vertex});
          }
       }
       else {
-         
          mesh.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX,);
       }
    }
@@ -89,6 +91,13 @@ export function Widget_gfx_ready_enable({
 
    if (enable_blend_mode !== undefined) {
       mesh.GfxEnableBlend(enable_blend_mode);
+   }
+
+   if (gfx_ctx_flags) {
+      mesh.gfx_ctx_flags = gfx_ctx_flags;
+   }
+   else {
+      mesh.gfx_ctx_flags = DEFAULT_GFX_CTX_FLAGS;
    }
 
    if (listener.type !== 0x0) {

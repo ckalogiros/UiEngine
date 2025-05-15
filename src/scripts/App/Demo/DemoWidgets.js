@@ -1,7 +1,7 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
-import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
+import { View_build_group_from_root_mesh, View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
 import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
@@ -19,6 +19,7 @@ import { Widget_gfx_ready_enable, Style_button_default_properties, Style_color_p
 import { Mesh_set_and_copy_wpos_x, Mesh_set_wpos_relative_x, Mesh_set_wpos_x } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Align_nested_sections_pre, Align_expand } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Mesh_listener_create } from '../../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
+import { Vertex_buffer_calculate_render_group_starts } from '../../Graphics/Buffers/VertexBuffers.js';
 
 
 
@@ -109,10 +110,13 @@ pressing the \"p\" key on the keyboard.\
    Align_nested_sections_pre(section);
    Align_expand(section);
 
-   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   section.Render()
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -187,7 +191,7 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
       const label = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 2], col: color, text_pad: text_pad, texture_id: default_font, font_size: font_size, }));
       Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: rcorners, });
       label.align.flags = LAYOUT.VERTICAL;
-      label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
+      // label.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, scrolled_section.mesh_bufferidx);
       scrolled_section.AddItem(label);
    }
 
@@ -197,12 +201,15 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    Align_nested_sections_pre(section);
 
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
 
-   View_build_group_from_root_mesh(scrolled_section);
+   // View_build_group_from_root_mesh(scrolled_section);
 
-   section.Render();
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -532,8 +539,12 @@ nested layouts with well-aligned items.\
    Align_nested_sections_pre(root_s);
 
    root_s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   View_build_group_from_root_mesh(root_s);
-   root_s.Render();
+   // View_build_group_from_root_mesh(root_s);
+
+   View_build_NEW_IMPLEMENTATION(root_s);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(root_s.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(root_s.root_bufferidx);
 
    root_s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root_s.gfx.vb.groupidx);
@@ -566,37 +577,37 @@ ensuring they remain accessible when reopening a parent dropdown.\
       const s = Create_rect_mesh(Style_rect_default_properties({ pad: [2, 2], pos: [0, 0, 4], col: TRANSPARENCY(GREY[2], .8), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, listener:{type:LISTEN_EVENT_TYPES.MOVE} }));
       Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(BLUEL[9], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(BLUEL[9], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF ,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(GREEN[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOWR[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOWR[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLEB[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLEB[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLER[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(PURPLER[7], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(ORANGEL[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(ORANGEL[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
       {
-         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOW[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,  }));
+         const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 4], col: TRANSPARENCY(YELLOW[8], .8), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, }));
          Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}, });
          s.AddItem(s1);
       }
@@ -679,9 +690,9 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
 
                   const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some SDF font symbols', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: GREEN[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._19, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: REDL[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._20, layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: YELLOWR[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._21, layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: GREEN[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._19, layout: LAYOUT.VERTICAL, name:'MTSDF_SYMBOLS' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: REDL[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._20, layout: LAYOUT.HORIZONTAL, name:'MTSDF_SYMBOLS' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [60, 60], pad: pad, col: YELLOWR[9], texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._21, layout: LAYOUT.HORIZONTAL, name:'MTSDF_SYMBOLS' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
 
                   const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
                   {
@@ -753,9 +764,9 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
 
                   const l2 = Create_widget_label(Style_label_default_properties({ text: 'Some simple textures', col: BLUEL[6], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l2, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l2);
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [256 / 2, 256 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.SMOKE_1, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [32 / 2, 32 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.COIN, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
-                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [64 / 2, 73 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.TEST_APPLE, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [256 / 2, 256 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.SMOKE_1, layout: LAYOUT.VERTICAL, name:'SMOKE' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [32 / 2, 32 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.COIN, layout: LAYOUT.VERTICAL, name:'COIN' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
+                  { const symbol = Create_rect_mesh(Style_rect_default_properties({ dim: [64 / 2, 73 / 2], pad: pad, col: WHITE[9], texture_id: TEXTURES.TEST_APPLE, layout: LAYOUT.VERTICAL, name:'APPLE' })); Widget_gfx_ready_enable({ mesh: symbol, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(symbol); }
                   const l3 = Create_widget_label(Style_label_default_properties({ text: 'More dropdowns...', col: YELLOW[7], text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: l3, enable_sdf_rect: rcorners, }); dpsub4.AddToMenu(l3);
                   {
                      const sub_dp1_count = 2;
@@ -801,9 +812,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
                      }
                   }
                }
-
             }
-
          }
       }
    }
@@ -811,11 +820,13 @@ ensuring they remain accessible when reopening a parent dropdown.\
 
    Align_nested_sections_pre(section);
 
-   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render()
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -825,7 +836,7 @@ ensuring they remain accessible when reopening a parent dropdown.\
    Construct_listen_events_relations_from_mesh_tree(section);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-   View_build_group_from_root_mesh(section);
+   // View_build_group_from_root_mesh(section);
 
    // // Color some words
    // info.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 8);
@@ -1025,11 +1036,13 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
 
    Align_nested_sections_pre(section);
 
-   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render()
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -1107,7 +1120,10 @@ WIDGET: COLOR-PICKER\
 
       Align_nested_sections_pre(section);
 
-      section.Render()
+      View_build_NEW_IMPLEMENTATION(section);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(section.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       { // Must render ontop the text meshes, in case they found an existing vb to be inserted(searching from root) that is rendered bellow the labels.
@@ -1122,7 +1138,7 @@ WIDGET: COLOR-PICKER\
       Construct_listen_events_relations_from_mesh_tree(section);
 
       // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-      View_build_group_from_root_mesh(section);
+      // View_build_group_from_root_mesh(section);
    }
 
    return section;
@@ -1219,10 +1235,13 @@ Adjust the font size using the slider.
    /**************************************************************************************************************************************************/
    // Render
 
-   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   section.Render()
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
@@ -1320,11 +1339,14 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
+      // picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
       picker.GenGfxCtx();
       Align_nested_sections_pre(picker);
 
-      picker.Render();
+      View_build_NEW_IMPLEMENTATION(picker);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(picker.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(picker.root_bufferidx);
       picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
 
@@ -1430,7 +1452,7 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
 
       // const clbk = ()=>{console.error('09093089348938948973')}
       const clbk = () => {
-         View_build_group_from_root_mesh(section);
+         // View_build_group_from_root_mesh(section);
 
          // section.Render();
          Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -1609,7 +1631,11 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
    
    dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    Align_nested_sections_pre(dp)
-   dp.Render()
+
+   View_build_NEW_IMPLEMENTATION(dp);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
    dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
@@ -1618,7 +1644,7 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
    Construct_listen_events_relations_from_mesh_tree(dp);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-   View_build_group_from_root_mesh(dp);
+   // View_build_group_from_root_mesh(dp);
 
    // todo.clbk()
 

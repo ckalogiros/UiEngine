@@ -1,7 +1,8 @@
 "use strict";
 
+import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_render_group_create, Vertex_buffer_render_group_set_num_faces } from "../../../Graphics/Buffers/RenderGroups.js";
-import { Vertex_buffer_group_store_render_groupidx, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
@@ -90,6 +91,17 @@ function View_render_group_exists(groupidx, view_vbidx, render_groupidx) {
 
    return INT_NULL;
 }
+
+
+
+
+
+
+
+
+/******************************************************************************************************************************/
+// FInd Match
+/******************************************************************************************************************************/
 /** */
 /* TODO: We must check with flags if mesh is on its own rg 
  * Running the loop backwards will find match from last registered meshes->closer to the mesh-tree structure
@@ -109,10 +121,26 @@ function View_render_group_find_match(groupidx, view_vbidx) {
    return INT_NULL;
 }
 /** */
+// function View_render_group_find_match_from_render_group(groupidx, view_vbidx) {
+
+//    // const vb = _view_buffer.buffer[groupidx].vb;
+//    const rg = _view_buffer.buffer[groupidx].vb.buffer[view_vbidx].rg;
+
+//    // for (let i = 0; i <= rg.boundary; i++) {
+//    for (let i = rg.boundary; i >= 0 ; i++) {
+
+//       if (rg.buffer[i].render_groupidx !== INT_NULL)
+//          return i;
+//    }
+
+//    return INT_NULL;
+// }
+/** */
 function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
 
    if(parent)  {
-
+      
+      // Case: parent matches vb
       if(parent.gfx.vb.groupidx === new_mesh.gfx.vb.groupidx) {
          // return parent.gfx.vb.render_groupidx;
          console.log(
@@ -123,10 +151,10 @@ function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
          )
          return parent.group_bufferidxs[2];
       }
-      // Avoid null parent, avoid same new_mesh and parent being the same mesh
+      // Case: parent.text_mesh matches vb
       else if(parent.text_mesh && parent.text_mesh.mesh_bufferidx !== new_mesh.mesh_bufferidx
          && parent.text_mesh.gfx.vb.groupidx === new_mesh.gfx.vb.groupidx) {
-         // return parent.text_mesh.gfx.vb.render_groupidx;
+         // Avoid null parent, avoid same new_mesh and parent being the same mesh
          console.log(
             'FOUND:TEXT_MESH',
             'mesh name', new_mesh.name,
@@ -135,7 +163,13 @@ function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
          )
          return parent.text_mesh.group_bufferidxs[2];
       }
-      else if(parent.children.boundary > INT_NULL) {
+      // Case: parent is rendered on o NEW rg(and vbs do not match), child also need to be isolated from the root render group
+      // else if(parent.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
+      //    return INT_NULL;
+      // }
+      // else if(parent.children.boundary > INT_NULL && new_mesh.gfx_ctx_flags & GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC) {
+      else if(parent.children.boundary > INT_NULL 
+         && new_mesh.gfx_ctx_flags & (GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL)) {
 
          for(let i=0; i <= parent.children.boundary; i++)   {
 
@@ -144,7 +178,7 @@ function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
                if(child.gfx.vb.groupidx === new_mesh.gfx.vb.groupidx) {
                   // return parent.gfx.vb.render_groupidx;
                   console.log('FOUND:MESH','mesh name', new_mesh.name,'child name', child.name,'view_rgidx', child.group_bufferidxs[2],)
-                  return parent.group_bufferidxs[2];
+                  return child.group_bufferidxs[2];
                }
                // Avoid null parent, avoid same new_mesh and parent being the same mesh
                else if(child.text_mesh && child.text_mesh.mesh_bufferidx !== new_mesh.mesh_bufferidx
@@ -152,10 +186,16 @@ function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
                   console.log('FOUND:TEXT_MESH','mesh name', new_mesh.name,'child name', child.name,'view_rgidx', child.text_mesh.group_bufferidxs[2],)
                   return child.text_mesh.group_bufferidxs[2];
                }
+               // TODO: Must continue down the tree of childrens(case a label is on its own container and deserves the rg for text of a sibling container with label and text )
+               // ? Is this aproach correct? I think yes  because to create new rg a node must be on its own new rg
             }
          }
+
       }
-      // TODO: Must run for any parent-children too
+
+      if(parent.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
+         return INT_NULL;
+      }
 
       const found_render_groupidx = View_render_group_find_match_from_parent_recursive(new_mesh, parent.parent);
       return found_render_groupidx;
@@ -164,6 +204,123 @@ function View_render_group_find_match_from_parent_recursive(new_mesh, parent) {
 
    return INT_NULL;
 }
+
+
+/** */
+function Find_match_from_children(mesh, parent) {
+
+   let view_rgidx = INT_NULL;
+   let done = false;
+
+   for (let i = 0; i <= parent.children.boundary; i++) {
+
+      const child = parent.children.buffer[i];
+      if (child ) { // Avoid finding a none yet processed sibling(denoted from '.group_bufferidxs[2] = INT_NULL)
+         
+         if(child.mesh_bufferidx !== mesh.mesh_bufferidx 
+            && (Sid_check_match(mesh.sid, child.sid) 
+            && child.group_bufferidxs[2] !== INT_NULL)) {
+            
+            const texidx = Vertex_buffer_group_get_texidx(child.gfx.vb.groupidx);
+            if(texidx === mesh.mat.texidx){
+               view_rgidx = child.group_bufferidxs[2];
+               done = true;
+               return { view_rgidx: view_rgidx, done: done };
+            }
+         }
+         else if (child.text_mesh){
+
+            if (child.text_mesh 
+                     && child.text_mesh.mesh_bufferidx !== mesh.mesh_bufferidx 
+                     && Sid_check_match(mesh.sid, child.text_mesh.sid)
+                     && child.text_mesh.group_bufferidxs[2] !== INT_NULL ) { // For Text meshes
+               
+               const texidx = Vertex_buffer_group_get_texidx(child.text_mesh.gfx.vb.groupidx);
+               if(texidx === mesh.mat.texidx){
+                  view_rgidx = child.text_mesh.group_bufferidxs[2];
+                  done = true;
+                  return { view_rgidx: view_rgidx, done: done };
+               }
+            }
+         }
+         // Search recursively down the children tree
+         if (!done && child.children.boundary !== INT_NULL) {
+            const res = Find_match_from_children(mesh, child);
+            // IMPORTANT: Must return since gfx index is found, else is going to search furthemore and probably will populate the view_rgidx with INT_NULL again.
+            if (res.done) return { view_rgidx: res.view_rgidx, done: res.done };
+         }
+      }
+
+   }
+
+   return { view_rgidx: view_rgidx, done: done };
+}
+function Find_match_gfx_from_parent(mesh, parent) {
+
+   let view_rgidx = INT_NULL;
+   let done = false;
+
+   if (!parent) return { view_rgidx: view_rgidx, done: true }
+
+   
+   if(Sid_check_match(mesh.sid, parent.sid)) {
+      
+      const texidx = Vertex_buffer_group_get_texidx(parent.gfx.vb.groupidx);
+      if(texidx === mesh.mat.texidx){
+         view_rgidx = parent.group_bufferidxs[2];
+         done = true;
+      } 
+   }
+   // Check if the parent has a text_mesh
+   // Below we avoid a cyclical dependecy: If the mesh is a text mesh, the the parent.text_mesh is the mesh its self, so maybe this couuld cause problems 
+   else if (parent.text_mesh && parent !== mesh.parent && Sid_check_match(mesh.sid, parent.text_mesh.sid)) {
+      
+      const texidx = Vertex_buffer_group_get_texidx(parent.text_mesh.gfx.vb.groupidx);
+      if(texidx === mesh.mat.texidx){
+         view_rgidx = parent.text_mesh.group_bufferidxs[2];
+         done = true;
+      }
+   }
+
+
+   return { view_rgidx: view_rgidx, done: done };
+}
+function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
+
+   let ret = Find_match_gfx_from_parent(mesh, parent)
+
+   if (!ret.done) {
+
+      ret = Find_match_from_children(mesh, parent)
+
+      if (!ret.done && parent.parent) { // Run recursively 
+         if ((parent.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW)===0 &&
+              mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW) { // Avoid searches from parent up if parent is in a NEW_GROUP
+               ret.view_rgidx = Find_match_gfx_from_parent_ascending_search_all(mesh, parent.parent)
+            }
+      }
+   }
+
+   return ret.view_rgidx;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************************************************************/
+/******************************************************************************************************************************/
 /** */
 function View_group_add_subgroup_to_group(groupidx, sub_group_idx) {
    const view = _view_buffer.buffer[groupidx];
@@ -255,7 +412,7 @@ function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
       const child = mesh.children.buffer[i];
       if (child) {
 
-         // if (child.gfx_ctx_flags & GFX_CTX_FLAGS.NEW_RENDER_GROUP) {
+         // if (child.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
 
          //    const sub_group_idx = View_group_create(child);
          //    View_group_add_subgroup_to_group(groupidx, sub_group_idx);
@@ -286,26 +443,16 @@ function View_add_mesh(groupidx, mesh) {
    const mesh_bufferidx = mesh.mesh_bufferidx;
    const num_faces = mesh.geom.num_faces;
    const vb_groupidx = mesh.gfx.vb.groupidx;
-   const render_groupidx = mesh.gfx.vb.render_groupidx;
-
    const view = _view_buffer.buffer[groupidx];
-
-   // console.log(mesh.name, mesh.gfx.vb)
-
 
    // Find meshidxs for vertex buffer, if exists
    let view_vbidx = View_vb_exists(groupidx, vb_groupidx);
 
    if (view_vbidx !== INT_NULL) { // Vb buffer found
 
-      let view_rgidx = View_render_group_find_match_from_parent_recursive(mesh, mesh.parent);
-      
-      if(view_rgidx === INT_NULL) {
+      let view_rgidx = INT_NULL;
 
-         view_rgidx = View_render_group_exists(groupidx, view_vbidx, render_groupidx);
-      }
-
-      if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.NEW_RENDER_GROUP) {
+      if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
 
          const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
          Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
@@ -320,9 +467,10 @@ function View_add_mesh(groupidx, mesh) {
          mesh.gfx.vb.render_groupidx = new_render_groupidx;
 
       }
-      else if (view_rgidx === INT_NULL) {
-
-         const found_match = View_render_group_find_match(groupidx, view_vbidx);
+      else {
+         
+         // const found_match = View_render_group_find_match_from_parent_recursive(mesh, mesh.parent);
+         const found_match = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
          if (found_match !== INT_NULL) {
             view_rgidx = found_match;
             mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
@@ -342,24 +490,21 @@ function View_add_mesh(groupidx, mesh) {
             });
 
             mesh.gfx.vb.render_groupidx = new_render_groupidx;
-
          }
 
-
-
-      }
-      else { // Else use mesh's stored .gfx.vb.render_groupidx
-         // console.log('USE EXISTING', mesh.name, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx)
-         mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
-         view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
-         Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
       }
 
+      // else { // Else use mesh's stored .gfx.vb.render_groupidx
+      //    // console.log('USE EXISTING', mesh.name, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx)
+      //    mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+      //    view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
+      //    Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
+      // }
       const view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
       return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
 
    }
-   else { // Else if not found, create new View.
+   else { // Else if not found, create new View vb.
 
       const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
 
@@ -388,6 +533,219 @@ function View_add_mesh(groupidx, mesh) {
    }
 
 }
+/**SAVE-NEW */
+// /** Add mesh to view-group. Create vertex buffer render-group */
+// function View_add_mesh(groupidx, mesh) {
+// // TODO: Comment logic
+//    const mesh_bufferidx = mesh.mesh_bufferidx;
+//    const num_faces = mesh.geom.num_faces;
+//    const vb_groupidx = mesh.gfx.vb.groupidx;
+//    const view = _view_buffer.buffer[groupidx];
+
+//    // Find meshidxs for vertex buffer, if exists
+//    let view_vbidx = View_vb_exists(groupidx, vb_groupidx);
+
+//    if (view_vbidx !== INT_NULL) { // Vb buffer found
+
+//       let view_rgidx = INT_NULL;
+
+//       if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
+
+//          const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//          Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//          view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
+//             render_groupidx: new_render_groupidx,
+//             start: 0,
+//             num_faces: num_faces,
+//             meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//          });
+
+//          mesh.gfx.vb.render_groupidx = new_render_groupidx;
+
+//       }
+//       else {
+         
+//          const found_match = View_render_group_find_match_from_parent_recursive(mesh, mesh.parent);
+//          if (found_match !== INT_NULL) {
+//             view_rgidx = found_match;
+//             mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+//             view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
+//             Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
+//          }
+//          else {
+
+//             const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//             Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//             view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
+//                render_groupidx: new_render_groupidx,
+//                start: 0,
+//                num_faces: num_faces,
+//                meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//             });
+
+//             mesh.gfx.vb.render_groupidx = new_render_groupidx;
+//          }
+
+//       }
+
+//       // else { // Else use mesh's stored .gfx.vb.render_groupidx
+//       //    // console.log('USE EXISTING', mesh.name, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx)
+//       //    mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+//       //    view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
+//       //    Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
+//       // }
+//       const view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
+//       return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
+
+//    }
+//    else { // Else if not found, create new View.
+
+//       const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
+
+//       const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//       Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//       const view_rgidx = render_groups.Add({
+//          render_groupidx: new_render_groupidx,
+//          start: 0,
+//          num_faces: num_faces,
+//          meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//       });
+
+
+//       view_vbidx = view.vb.Add({
+//          vb_groupidx: vb_groupidx,
+//          rg: render_groups,
+//       });
+
+//       const view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
+
+//       mesh.gfx.vb.render_groupidx = new_render_groupidx;
+
+//       return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
+
+//    }
+
+// }
+// /** SAVE */
+// function View_add_mesh(groupidx, mesh) {
+// // TODO: Comment logic
+//    const mesh_bufferidx = mesh.mesh_bufferidx;
+//    const num_faces = mesh.geom.num_faces;
+//    const vb_groupidx = mesh.gfx.vb.groupidx;
+//    const render_groupidx = mesh.gfx.vb.render_groupidx;
+
+//    const view = _view_buffer.buffer[groupidx];
+
+//    // console.log(mesh.name, mesh.gfx.vb)
+
+
+//    // Find meshidxs for vertex buffer, if exists
+//    let view_vbidx = View_vb_exists(groupidx, vb_groupidx);
+
+//    if (view_vbidx !== INT_NULL) { // Vb buffer found
+
+//       // HERE:
+//       // 1. if NEW->create new rg
+//       // 2. else
+//       //    1. search
+//       //       1. if found
+//       //          use
+//       //       2. else create new
+
+
+//       let view_rgidx = View_render_group_find_match_from_parent_recursive(mesh, mesh.parent);
+      
+//       if(view_rgidx === INT_NULL) {
+
+//          view_rgidx = View_render_group_exists(groupidx, view_vbidx, render_groupidx);
+//       }
+
+//       if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
+
+//          const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//          Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//          view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
+//             render_groupidx: new_render_groupidx,
+//             start: 0,
+//             num_faces: num_faces,
+//             meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//          });
+
+//          mesh.gfx.vb.render_groupidx = new_render_groupidx;
+
+//       }
+//       else if (view_rgidx === INT_NULL) {
+
+//          const found_match = View_render_group_find_match(groupidx, view_vbidx);
+//          if (found_match !== INT_NULL) {
+//             view_rgidx = found_match;
+//             mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+//             view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
+//             Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
+//          }
+//          else {
+
+//             const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//             Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//             view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
+//                render_groupidx: new_render_groupidx,
+//                start: 0,
+//                num_faces: num_faces,
+//                meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//             });
+
+//             mesh.gfx.vb.render_groupidx = new_render_groupidx;
+
+//          }
+
+
+
+//       }
+//       else { // Else use mesh's stored .gfx.vb.render_groupidx
+//          // console.log('USE EXISTING', mesh.name, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx)
+//          mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+//          view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
+//          Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
+//       }
+
+//       const view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
+//       return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
+
+//    }
+//    else { // Else if not found, create new View.
+
+//       const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
+
+//       const new_render_groupidx = Vertex_buffer_render_group_create(vb_groupidx, num_faces);
+//       Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
+
+//       const view_rgidx = render_groups.Add({
+//          render_groupidx: new_render_groupidx,
+//          start: 0,
+//          num_faces: num_faces,
+//          meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
+//       });
+
+
+//       view_vbidx = view.vb.Add({
+//          vb_groupidx: vb_groupidx,
+//          rg: render_groups,
+//       });
+
+//       const view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
+
+//       mesh.gfx.vb.render_groupidx = new_render_groupidx;
+
+//       return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
+
+//    }
+
+// }
 
 
 

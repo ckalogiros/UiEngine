@@ -63,7 +63,7 @@ const TEXTURE_PATHS = [
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
-	{ // 3
+	{ // 2
 		img_path: 'fonts/atlas_variants/consola',
 		img_name: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA,
 		img_type: 'png',
@@ -71,7 +71,7 @@ const TEXTURE_PATHS = [
 	},
 	/***************************************************************************************************/
 	// Atlas textures variant font sizes
-	{ // 4
+	{ // 3
 		img_path: 'fonts/symbols',
 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 		img_type: 'png',
@@ -79,7 +79,7 @@ const TEXTURE_PATHS = [
 	},
 	/***************************************************************************************************/
 	// Textures
-	{
+	{ // 4
 		img_path: 'textures',
 		img_name: TEXTURE_SMOKE1,
 		img_type: 'png',
@@ -198,7 +198,7 @@ export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, va
 		 * If we deal with texture variant, one texture atlas has many font sizes,
 		 * and if the texture is loaded, we need to check if the asked font variant is loaded.
 		 * If it is not, we need to create the metrics and uvmap of the variant,
-		 * else if it is loaded simplyreturn the metrics index for the metrics and uvmap 
+		 * else if it is loaded simply return the metrics index for the metrics and uvmap 
 		 * 
 		 * Solution for one texture many metrics_idxs, is to have a buffer of metrics indexes.
 		 * Check if the texture is of type VARIANT_FONT, and make use of the variant_idx 

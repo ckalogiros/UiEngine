@@ -71,12 +71,10 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
          const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pad:next_pad, pos:[0, 0, 1], col:_, text_pad:[14, 3], layout:LAYOUT.HORIZONTAL}));// [2, 3]);
          Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, });
-         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
          panel_scale.AddItem(l);
 
          
          next_pad = [(size+scale)*2 - l.geom.dim[0]*2 + space_between, 10]
-         // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
          slope *= 2;
       }
 
@@ -89,7 +87,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
          const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
          const ret = Demo_clbk_animations_scale(0x0, true, 0, 100, size, 0.01, slope, scale, color, layout, pad_x);
          const anim_mesh =ret.target_mesh;
-         anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
+         // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
          panel_scale.AddItem(anim_mesh);
          temp_buffer_animated.push(anim_mesh); // HACK: We need to Align the meshes scaled, and before Render to scale them down
 
@@ -100,7 +98,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
       
       // Render
-      panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       panel.GenGfxCtx();
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size+scale; temp_buffer_animated[i].geom.dim[1] = size+scale; }
       
@@ -154,7 +151,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
          const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pad:next_pad, pos:[0, 0, 1], col:_, text_pad:[14, 3], layout:LAYOUT.HORIZONTAL}));// [2, 3]);
          Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: rcorners, });
-         l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
          panel_scale.AddItem(l);
 
          
@@ -171,7 +167,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
          let color = Get_fasma_color(i, color_width, num_colors);
          const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
          const anim_mesh = Demo_clbk_animations_rotate(0x0, true, 0, 0, size, 0.01, slope, angle, color, layout, pad_x).target_mesh;
-         anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
          
          panel_scale.AddItem(anim_mesh);
          temp_buffer_animated.push(anim_mesh); // HACK: We need to Align the meshes scaled, and before Render to scale them down
@@ -183,19 +178,13 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       
       
       // Render
-      panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       panel.GenGfxCtx();
       Align_nested_sections_pre(panel);
       Align_expand(panel);
 
-      // HACK: Scale down before render
-      // for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
-                  
       View_build_NEW_IMPLEMENTATION(panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
-      
-
 
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
@@ -205,92 +194,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
 
       total_height += panel.geom.dim[1] * 2;
    }
-
-   // Rotation Animations
-   // {
-   //    let ypos = y, xpos = x;
-   //    let slope = 0.05;
-   //    const angle = Math.PI / 2
-
-   //    const panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, ypos + total_height + 10, 0], col:GREY[1]}));
-   //    Widget_gfx_ready_enable({mesh:panel, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[2], GREY[6])});
-   //    panel.SetLayout(LAYOUT.VERTICAL | SECTION.RESIZE_SELF);
-   //    panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   //    panel.SetName('Animations-Rotation');
-
-
-   //    ypos = 0;
-   //    ypos += pad2;
-
-
-   //    const text = 'Rotation Animations\nEach rectangle uses different value\nto shape the slope\nof a logarithmic function.\nSmaller values constitute steeper slope.';
-   //    const label = Create_widget_label(Style_label_default_properties({text:text, pos:[10, 10, 1], col:GREENL[5]}));
-   //    Widget_gfx_ready_enable({mesh:label, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[2], GREEN[5]), });
-   //    label.SetLayout(LAYOUT.HORIZONTAL);
-   //    panel.AddItem(label);
-
-   //    ypos += label.geom.dim[1] * 2 + pad2;
-
-   //    const panel_rot = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[xpos, ypos, 0], col:GREY[3]}));
-   //    Widget_gfx_ready_enable({mesh:panel_rot, enable_sdf_rect: rcorners, enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(GREY[3], GREY[2])});
-   //    panel_rot.SetLayout(LAYOUT.VERTICAL | SECTION.RESIZE_SELF);
-   //    panel.AddItem(panel_rot);
-
-
-   //    xpos += 10;
-
-   //    let s_height = 0;
-   //    let inner_panel_width = 0;
-
-   //    const rot_mesh_size = size * 2.;
-   //    scale = 0
-
-   //    for (let i = 0; i < num_meshes; i++) {
-
-   //       const xxx = (rot_mesh_size * 2 + pad * 2) * i;
-
-   //       const l = Create_widget_label(Style_label_default_properties({text:`${slope.toFixed(2)}`, pos:[xpos + xxx, ypos + pad, 1], col:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), text_pad:[2, 3]}));
-   //       Widget_gfx_ready_enable({mesh:l, enable_sdf_rect: 4, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREEN[9], GREEN[3]), });
-   //       l.SetLayout(LAYOUT.HORIZONTAL);
-   //       l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, panel_rot.gfx_ctx_parent, true);
-   //       panel_rot.AddItem(l);
-
-
-   //       let color = Get_fasma_color(i, color_width, num_colors);
-   //       const anim_mesh = Demo_clbk_animations_rotate(0x0, _, xpos + xxx, pad2 + ypos + l.geom.dim[1] * 2, rot_mesh_size, _, slope, angle, color).target_mesh;
-   //       anim_mesh.GfxEnableAttr(MESH_ENABLE.GFX.ATTR_ANGLE);
-   //       anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, panel_rot.gfx_ctx_parent, true);
-   //       panel_rot.AddItem(anim_mesh);
-
-   //       const anim_mesh_width = rot_mesh_size + pad;
-   //       inner_panel_width += anim_mesh_width;
-   //       s_height = l.geom.dim[1] + rot_mesh_size + pad;
-
-   //       // Increment slope factor for each mesh. // NOTE: Min-Max values are [0,1], so calculate slope accordingly to the number of meshes
-   //       slope *= 2;
-   //    }
-
-
-   //    panel_rot.geom.dim[0] = inner_panel_width + pad;
-   //    panel_rot.geom.dim[1] = s_height + pad;
-   //    panel.geom.dim[0] = ((panel_rot.geom.dim[0] > label.geom.dim[0]) ? panel_rot.geom.dim[0] : label.geom.dim[0]) + 10;
-   //    panel.geom.dim[1] = label.geom.dim[1] + panel_rot.geom.dim[1] + 20;
-
-   //    // Align_nested_sections_pre(panel);
-
-   //    // Render
-   //    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
-   //    panel.GenGfxCtx();
-   //    panel.Render();
-
-
-   //    Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-   //    Construct_listen_events_from_mesh_tree(panel);
-   //    Construct_listen_events_relations_from_mesh_tree(panel);
-   //    panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
-
-   //    total_height += panel.geom.dim[1] * 2;
-   // }
 
    return total_height;
 
@@ -341,7 +244,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    const angle = Math.PI;
    color = Get_fasma_color(offset, num_items, 2);
    const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
-   ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
+   // ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
    ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
    ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
    panel.AddItem(ret2.slider_mesh);
@@ -461,15 +364,13 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       Align_nested_sections_pre(panel);
       Align_expand(panel);
 
-      panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
+      // panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       panel.GenGfxCtx();
    
-                  
       View_build_NEW_IMPLEMENTATION(panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
-      
-   
+
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
       Construct_listen_events_relations_from_mesh_tree(panel);
@@ -1063,7 +964,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
    }
 
-   controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
    /****************************************************************************************************************/
    // Render 
@@ -1071,7 +972,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
       Align_nested_sections_pre(controls_section);
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
+      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
       controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
 
@@ -1112,7 +1013,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    Widget_gfx_ready_enable({mesh:mesh1, enable_sdf_rect: 6});
    section.AddItem(mesh1)
 
-   section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
 
 
@@ -1147,55 +1048,59 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    animation_properties.digit1_mesh = mesh1;
    animation_properties.digit2_mesh = mesh2;
 
-   // { // One time call
+   //  const slope_params_pointer = Demo_clbk_animations_create_transition_slope(_, slope, speed);
+    
+    let cnt = 0;
 
-   //    if (cnt > 9) cnt = 0;
-   //    const text_substitution = `${cnt++}`;
-      
-   //    let limit = 0;
-   //    if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
-   //    else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) limit = Texture_metrics_get_sub_tex_height(mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
-   //    else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) limit = Texture_metrics_get_line_height(mesh.text_mesh.mat.metrics_idx) * mesh.text_mesh.geom.dim[0];
+    { // One time call
 
-   //    const times_to_run = -1;
-   //    const wait_time = 500; // In miliseconds
-      
-   //    Demo_clbk_animations_text_create(mesh, slope_params_pointer, limit, clbk_anim_flag, font_size, times_to_run, cnt, wait_time, text_substitution, 'TESTETESTTEST', );
-   // }
+        if (cnt > 9) cnt = 0;
+        const text_substitution = `${cnt++}`;
+        
+        let limit = 0;
+        if (clbk_anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(animation_properties.digit2_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+        else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_SQUEEZE_Y) limit = Texture_metrics_get_sub_tex_height(animation_properties.digit2_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+        else if (clbk_anim_flag & CLBK_ANIMATIONS.TEXT_TRANSLATE_Y) limit = Texture_metrics_get_line_height(animation_properties.digit2_mesh.text_mesh.mat.metrics_idx) * animation_properties.digit2_mesh.text_mesh.geom.dim[0];
 
-   Time_intervals_create(1000, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
-      (params) => {
+        const times_to_run = -1;
+        const wait_time = 500; // In miliseconds
+        
+        Demo_clbk_animations_text_create(animation_properties.digit2_mesh, slope_params_pointer, limit, clbk_anim_flag, font_size, times_to_run, cnt, wait_time, text_substitution, 'TESTETESTTEST', );
+    }
 
-         const anim_flag = params.params.anim_flag;
+   // Time_intervals_create(1000, 'TEST_text_animation', TIME_INTERVAL_REPEAT_ALWAYS,
+   //    (params) => {
 
-         if (params.params.counter1 > 9) {
+   //       const anim_flag = params.params.anim_flag;
 
-            const digit2_mesh = params.params.digit2_mesh;
+   //       if (params.params.counter1 > 9) {
 
-            let limit_ = 0;
-            const text_substitution_ = `${params.params.counter2++}`
-            if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Texture_metrics_get_sub_tex_width(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-            else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Texture_metrics_get_sub_tex_height(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+   //          const digit2_mesh = params.params.digit2_mesh;
 
-            const anim_idx = Demo_clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
-            params.params.counter1 = 0;
-         }
+   //          let limit_ = 0;
+   //          const text_substitution_ = `${params.params.counter2++}`
+   //          if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit_ = Texture_metrics_get_sub_tex_width(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+   //          else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit_ = Texture_metrics_get_sub_tex_height(digit2_mesh.text_mesh.mat.metrics_idx, text_substitution_.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+
+   //          const anim_idx = Demo_clbk_animations_text_create(digit2_mesh, slope_params_pointer, limit_, 'TEST_text_animation_2', anim_flag, text_substitution_);
+   //          params.params.counter1 = 0;
+   //       }
 
 
-         const digit1_mesh = params.params.digit1_mesh;
-         if (params.params.counter2 > 9) { params.params.counter2 = 0; }
+   //       const digit1_mesh = params.params.digit1_mesh;
+   //       if (params.params.counter2 > 9) { params.params.counter2 = 0; }
 
-         const text_substitution = `${params.params.counter1++}`
+   //       const text_substitution = `${params.params.counter1++}`
 
-         let limit = 0;
-         if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
-         else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_sub_tex_height(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
+   //       let limit = 0;
+   //       if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_X | CLBK_ANIMATIONS.TEXT_TRANSLATE_X)) limit = Texture_metrics_get_sub_tex_width(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) / 2;
+   //       else if (anim_flag & (CLBK_ANIMATIONS.TEXT_SQUEEZE_Y | CLBK_ANIMATIONS.TEXT_TRANSLATE_Y)) limit = Texture_metrics_get_sub_tex_height(digit1_mesh.text_mesh.mat.metrics_idx, text_substitution.charCodeAt(0) - CHAR_ARRAY_START_OFFSET) * font_size;
 
-         const anim_idx = Demo_clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
-      },
+   //       const anim_idx = Demo_clbk_animations_text_create(digit1_mesh, slope_params_pointer, limit, 'TEST_text_animation_1', anim_flag, text_substitution);
+   //    },
 
-      animation_properties,
-   );
+   //    animation_properties,
+   // );
 
 
    return {
@@ -1225,7 +1130,7 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8});
       
       slider.SetInitialValue(slope_params_pointer.GetSlope());
-      slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      // slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       slider.SetLayout(LAYOUT.HORIZONTAL);
       
       contols_buffer.push(slider);
@@ -1246,7 +1151,7 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
       // Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8, enable_col_per_vertex:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2])});
       Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect: 8});
       slider.SetInitialValue(slope_params_pointer.GetSlope());
-      slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      // slider.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       slider.SetLayout(LAYOUT.VERTICAL);
 
       contols_buffer.push(slider);

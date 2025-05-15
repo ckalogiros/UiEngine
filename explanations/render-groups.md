@@ -25,7 +25,7 @@
 # Decision: Where new render group is created from flags set by the user
    -> MeshBufferViews.js
    -> View_add_mesh()
-   -> if (view_rgidx === INT_NULL || mesh.gfx_ctx_flags & GFX_CTX_FLAGS.NEW_RENDER_GROUP)
+   -> if (view_rgidx === INT_NULL || mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW)
 
 # Decision: Where the first render group (default) is created
    * There is an else if render group does not exist

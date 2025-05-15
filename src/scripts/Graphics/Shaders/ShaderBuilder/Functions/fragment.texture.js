@@ -72,7 +72,7 @@ vec4 Msdf(vec2 v_tex_coord) {
   vec4 texel = texture(u_sampler0, v_tex_coord);
   float dist = median(texel.r, texel.g, texel.b);
   // float bold = .5;
-  float bold = .4; // Bolder
+  float bold = .5; // Bolder
   float pxDist = screenPxRange(v_tex_coord) * (dist - bold);
   // float opacity = clamp(pxDist + 0.5, 0.0, 1.0);
   float opacity = clamp(pxDist + .5, 0.0, 1.0);
@@ -85,9 +85,9 @@ vec4 Msdf(vec2 v_tex_coord) {
 
   // return Glow(dist, opacity);
   
-  // vec4 alpha = vec4((opacity+.4) * v_col4_w); 
-  float tex_alpha = texel.a * (2.0 - texel.a);
-  vec4 alpha = vec4((opacity+.2) * tex_alpha * v_col4_w); 
+  vec4 alpha = vec4((opacity+.0) * v_col4_w); 
+  // float tex_alpha = texel.a * (2.0 - texel.a);
+  // vec4 alpha = vec4((opacity+.9) * tex_alpha * v_col4_w); // Play with the opacity
   return alpha; 
 }
 `;

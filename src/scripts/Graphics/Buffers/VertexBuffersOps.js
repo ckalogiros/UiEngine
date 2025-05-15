@@ -52,8 +52,7 @@ export function Gl_set_rgb(gfx, color, num_faces = 1) {
    }
 
    Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-      Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_set_rgb_specific_index(gfx, color, num_faces = 1, start_face) {
 
@@ -81,7 +80,7 @@ export function Gl_set_rgb_specific_index(gfx, color, num_faces = 1, start_face)
    }
 
    Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_set_rgba(gfx, color, num_faces = 1) {
 
@@ -111,7 +110,7 @@ export function Gl_set_rgba(gfx, color, num_faces = 1) {
    }
 
    Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -141,7 +140,7 @@ export function Gl_set_alpha(gfx, alpha, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -177,7 +176,7 @@ export function Gl_set_rgba_per_vertex(gfx, color, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -215,7 +214,7 @@ export function Gl_set_rgba_per_vertex_specify_vertex(gfx, color, num_faces = 1,
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -255,7 +254,7 @@ export function Gl_set_rgba_specify_attribute(gfx, value, num_faces = 1, vertex_
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -294,7 +293,7 @@ export function Gl_add_wpos_xy(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -326,7 +325,7 @@ export function Gl_add_wpos_x(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -358,7 +357,7 @@ export function Gl_add_wpos_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -391,7 +390,7 @@ export function Gl_set_wpos_xy(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -423,7 +422,7 @@ export function Gl_set_wpos_x(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -454,7 +453,7 @@ export function Gl_set_wpos_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -506,7 +505,7 @@ export function Gl_set_vpos_xy(gfx, x, y, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /**
  * ISSUE:
@@ -550,7 +549,7 @@ export function Gl_set_vpos_x(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_set_vpos_y(gfx, y, num_faces = 1) {
 
@@ -587,7 +586,7 @@ export function Gl_set_vpos_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -630,7 +629,7 @@ export function Gl_add_vpos_xy(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_vpos_x(gfx, x, num_faces = 1) {
 
@@ -668,7 +667,7 @@ export function Gl_add_vpos_x(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_vpos_y(gfx, y, num_faces = 1) {
 
@@ -705,7 +704,7 @@ export function Gl_add_vpos_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -752,7 +751,7 @@ export function Gl_add_vpos_xy_right(gfx, x, y, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_vpos_xy_left(gfx, x, y, num_faces = 1) {
 
@@ -796,7 +795,7 @@ export function Gl_add_vpos_xy_left(gfx, x, y, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_vpos_xy_diag_1(gfx, x, y, num_faces = 1) {
 
@@ -841,7 +840,7 @@ export function Gl_add_vpos_xy_diag_1(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 export function Gl_add_vpos_x_right(gfx, x, num_faces = 1) {
@@ -880,7 +879,7 @@ export function Gl_add_vpos_x_right(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_vpos_x_left(gfx, x, num_faces = 1) {
 
@@ -918,7 +917,7 @@ export function Gl_add_vpos_x_left(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -958,7 +957,7 @@ export function Gl_set_dim_xy(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_set_dim_x(gfx, x, num_faces = 1) {
 
@@ -987,7 +986,7 @@ export function Gl_set_dim_x(gfx, x, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_set_dim_y(gfx, y, num_faces = 1) {
 
@@ -1015,7 +1014,7 @@ export function Gl_set_dim_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1046,7 +1045,7 @@ export function Gl_add_dim_xy(gfx, x, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_dim_x(gfx, x, num_faces = 1) {
 
@@ -1074,7 +1073,7 @@ export function Gl_add_dim_x(gfx, x, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 export function Gl_add_dim_y(gfx, y, num_faces = 1) {
 
@@ -1102,7 +1101,7 @@ export function Gl_add_dim_y(gfx, y, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1159,7 +1158,7 @@ export function Gl_set_uv(gfx, uvs, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1201,7 +1200,7 @@ export function Gl_set_uv(gfx, uvs, num_faces = 1) {
 //    }
 
 //       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 // }
 
 
@@ -1234,7 +1233,7 @@ export function Gl_set_attr_round_corners(gfx, r, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1266,7 +1265,7 @@ export function Gl_set_attr_feather(gfx, val, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1299,7 +1298,7 @@ export function Gl_set_angle(gfx, val, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1332,7 +1331,7 @@ export function Gl_add_angle(gfx, val, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1365,7 +1364,7 @@ export function Gl_set_time(gfx, val, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1398,7 +1397,7 @@ export function Gl_add_time(gfx, val, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1441,7 +1440,7 @@ export function Gl_set_generic2(gfx, geom, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1478,7 +1477,7 @@ export function Gl_add_generic2(gfx, geom, num_faces = 1) {
    }
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1512,7 +1511,7 @@ export function Gl_rotate_z_2d(gfx, dim, angle, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 export function Gl_rotate_add_z_2d(gfx, dim, angle, num_faces = 1) {
@@ -1541,7 +1540,7 @@ export function Gl_rotate_add_z_2d(gfx, dim, angle, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 
@@ -1578,7 +1577,7 @@ export function Gl_rotate_y_2d(gfx, dim, angle, num_faces = 1) {
 
 
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-   Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 
 

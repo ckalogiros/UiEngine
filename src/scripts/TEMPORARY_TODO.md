@@ -1,5 +1,12 @@
 TODO
 
+# Implement uniforms and u_wpos for each render group 
+
+# IMIDIATELY:  Fix Resize rect function
+# IMIDIATELY:  Remove all the crap for buffer data full update from the Draw loop
+      1. Use  of a command buffer
+      2. HACK: us a one time interval
+      3. In Darw, but updates only for NEEDS_UPDATE_FROM_REALLOC, and once on vb construction
 
 # View groups
  * implement set vertex buffer initial size, to match the mesh data

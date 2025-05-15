@@ -58,12 +58,18 @@ export function Components_create_scroller_component(width = 12, height = 100, m
 
    const pos = [0, 0, 20];
 
-   const bar = Create_rect_mesh(Style_rect_default_properties({ pos: pos, dim: [width, height], col: col_bar, name: 'ScrollBar' }));
-   Widget_gfx_ready_enable({ mesh: bar, enable_sdf_rect: bar.geom.dim[0] / 2, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } })
-   // Widget_gfx_ready_enable({mesh:bar, enable_sdf_rect:bar.geom.dim[0]/2, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP, Clbk:bar.OnClick}})
+   const bar = Create_rect_mesh(Style_rect_default_properties({ pos: pos, dim: [width, height], col: col_bar, name: 'ScrollBar', layout: LAYOUT.FIXED_WIDTH | LAYOUT.FIXED_HEIGHT | LAYOUT.HORIZONTAL }));
+   Widget_gfx_ready_enable({ 
+      mesh: bar, enable_sdf_rect: bar.geom.dim[0] / 2, 
+      listener: { type: LISTEN_EVENT_TYPES.CLICK_UP }, 
+      gfx_ctx_flags:
+            GFX_CTX_FLAGS.PRIVATE 
+            | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL 
+            | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW
+            | GFX_CTX_FLAGS.RENDER_GROUP_NEW
+            // | GFX_CTX_FLAGS.ABSOLUTE_POSITION
+   })
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
-
-   bar.align.flags = LAYOUT.FIXED_WIDTH | LAYOUT.FIXED_HEIGHT;
 
    // bar.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
    // bar.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
