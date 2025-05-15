@@ -1,5 +1,8 @@
 TODO
 
+# Should we unite gfx context creation with render groups creation???
+   Since both run for each mesh
+
 # Implement uniforms and u_wpos for each render group 
 
 # IMIDIATELY:  Fix Resize rect function

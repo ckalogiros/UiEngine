@@ -361,38 +361,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
                   if (mesh.root_posidx !== vb_groupidx)
                      alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
-
-                  /**SAVE*/
-                  // if(mesh.mesh_bufferidx === mesh.root_bufferidx || mesh.root_bufferidx === INT_NULL) { 
-                  //    COPY_MESH_POS = true
-                  // }
-                  // else if(mesh.root_bufferidx !== INT_NULL) { 
-                     
-                  //    const root_mesh_idx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
-                  //    if(mesh.mesh_bufferidx !== root_mesh_idx) {
-                  //       const root_mesh = Mesh_buffer_get_mesh_byidx(root_mesh_idx);
-                  //       // if(Sid_check_match(mesh.sid, root_mesh.sid)) // Checking if mesh and root mesh are on different vertex buffers
-                  //       if(vb_groupidx === root_mesh.gfx.vb.groupidx) // Checking if mesh and root mesh are on the same vertex buffer. If yes, the mesh will 'get' one wpos, from one vb, so it is necessary to copy
-                  //          COPY_MESH_POS = true
-                  //    }
-
-                  // }
-
-                  // if(mesh.root_bufferidx !== INT_NULL) {
-
-                  //    const root_mesh_idx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx);
-
-                  //    if(mesh.mesh_bufferidx === root_mesh_idx) { 
-                  //       COPY_MESH_POS = true;
-                  //    }
-                  //    else {
-                  //       const root_mesh = Mesh_buffer_get_mesh_byidx(root_mesh_idx);
-                  //       if(vb_groupidx === root_mesh.gfx.vb.groupidx) // Checking if mesh and root mesh are on the same vertex buffer. If yes, the mesh will 'get' one wpos, from one vb, so it is necessary to copy
-                  //          COPY_MESH_POS = true;
-                  //    }
-                  // }
-                  // else COPY_MESH_POS = true;
-               }
+                  }
             }
          }
 

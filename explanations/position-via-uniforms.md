@@ -9,7 +9,7 @@ one for rendering the root and the labels VB0 and a second one for rendering the
 
 * Now each vertex buffer (by default) has a uniform position. 
 That uniform gets updated every frame by the main loop,
-and in the vrtex shader that uniform is added to all the vertices of the vrtex buffer.
+and in the vertex shader that uniform is added to all the vertices of the vertex buffer.
 
 * That is very efficient, because we can move all meshes of the same vertex buffer with one uniform update.
 
