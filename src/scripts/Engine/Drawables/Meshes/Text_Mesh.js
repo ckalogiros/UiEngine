@@ -13,6 +13,7 @@ import { Uv_get_uv_coords, Texture_metrics_get_sub_tex_width, Msdf_Uv_get_sub_te
 import { Geometry2D_Text } from "../Geometry/Geometry.js";
 import { Mesh_get_name } from "../Operations/MeshPropertiesFunctions.js";
 import { Set_color_rgb } from "../Operations/MeshAttributesFunctions.js";
+import { View_add_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -101,6 +102,9 @@ export class Text_Mesh extends Mesh {
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
 
       return this.gfx;
    }

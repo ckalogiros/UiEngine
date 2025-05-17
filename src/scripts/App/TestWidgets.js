@@ -1,7 +1,7 @@
 "use strict";
 import { FloorArr2, FloorArr3, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
-import { View_build_group_from_root_mesh, View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from '../Engine/Core/Views/MeshBufferViews.js';
+import { View_build_group_from_root_mesh, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
@@ -41,7 +41,7 @@ import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Tetris } from './Demo/Games/Tetris/Tetris.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
 import { Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
-import { Color_theme_slider_1, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
+import { Color_theme_label_auto, Color_theme_slider_1, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
 import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
@@ -70,7 +70,7 @@ export function TestWidgetsGeneric() {
 
     { // Statistics
         let yy = 0, pp = 23;
-        const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
+        // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
@@ -100,31 +100,28 @@ export function TestWidgetsGeneric() {
     //         // red.RenderToNewRenderGroup();
     //         section.AddItem(red);
 
-    //         // {
-    //         //     const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-    //         //     Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-    //         //     red.AddItem(s1); 
-    //         //     {
-    //         //         const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
-    //         //         Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-                    
-    //         //         const l = Create_widget_label(Style_label_default_properties({ text: `123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-    //         //         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-    //         //         s2.AddItem(l);
-    //         //     }
-    //         // }
     //         {
     //             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
     //             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
     //             red.AddItem(s1); 
-    //             s1.RenderToNewRenderGroup();
+    //             // s1.RenderToNewRenderGroup();
     //             {
-    //                 const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
-    //                 Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //                 // {
+    //                 //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
+    //                 //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //                 // }
+    //                 // {
+    //                 //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
+    //                 //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //                 // }
+    //                 // {
+    //                 //     const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
+    //                 //     Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //                 // }
                     
     //                 const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
     //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-    //                 s2.AddItem(l);
+    //                 s1.AddItem(l);
 
     //                 const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
     //                 Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
@@ -184,14 +181,13 @@ export function TestWidgetsGeneric() {
 
 
     //     { // Render
-    //         section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    //         section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //         // section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //         section.GenGfxCtx();
             
-    //         Align_nested_sections_pre(section);
             
-    
-    //         View_build_NEW_IMPLEMENTATION(section);
+    //         // View_build_all_group_from_root_mesh(section);
     //         Vertex_buffer_calculate_render_group_starts();
+    //         Align_nested_sections_pre(section);
     //         View_render_from_view_NEW(section.group_bufferidxs[0]);
             
     //         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -225,7 +221,7 @@ export function TestWidgetsGeneric() {
 
 
 
-    // Demo_page();
+    Demo_page();
     // Demos_welcome_menu();
 
     { // Games
@@ -370,9 +366,8 @@ export function TestWidgetsGeneric() {
         /* Test change color of a mesh using the colorpicker */
         // {
         //     const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: [10, 380, 0], dim: [200, 80], col: TRANSPARENCY(GREEN[2], 1.), name: 'ColorPicker' }));
-        //     rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         //     Widget_gfx_ready_enable({mesh:rect, enable_sdf_rect:15,});
-        //     rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        //     rect.GenGfxCtx();
         //     rect.Render();
         //     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
         //     rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx)
@@ -503,7 +498,6 @@ export function TestWidgetsGeneric() {
             // { // Create the button for going to the top
 
             //     const btn = Create_widget_button(ROOT_WIDGETS.CREATE_ROOT, 'Up', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 0], _, GREY[10], TRANSPARENCY(BLUEL[7], 1.), [5, 5], .5, [0, 24, 1.8], TEXTURES.CONSOLAS_32px);
-            //     btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
             //     btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
             //     btn.Bind(
@@ -533,7 +527,7 @@ export function TestWidgetsGeneric() {
 
 
             //     btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-            //     btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            //     btn.GenGfxCtx();
             //     btn.Render()
             //     Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
 
@@ -584,14 +578,10 @@ export function TestWidgetsGeneric() {
     { // Coloring
 
         // Test_hsv_color_sequence_from_integer_input();
-
         // Theme_color_hsv_sample();
-
         // Theme_color_hsv_sample_widget_slider();
         // Theme_color_hsv_sample_widget_slider_auto();
-
         // Theme_testing();
-
         // Theme_color_correction();
 
         {
@@ -850,8 +840,11 @@ function Theme_color_hsv_sample() {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+   
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -989,9 +982,12 @@ function Theme_color_hsv_sample() {
 
 
         
-        slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        slider_section.GenGfxCtx();
         Align_nested_sections_pre(slider_section);
-        slider_section.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(slider_section.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
         Construct_listen_events_from_mesh_tree(slider_section)
         Construct_listen_events_relations_from_mesh_tree(slider_section);
@@ -1042,8 +1038,11 @@ function Theme_color_hsv_sample_widget_slider() {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+            
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -1171,9 +1170,12 @@ function Theme_color_hsv_sample_widget_slider() {
     slider_section.AddItem(Create_sliders_per_mesh(value_text, LAYOUT.HORIZONTAL));
 
     
-    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    slider_section.GenGfxCtx();
     Align_nested_sections_pre(slider_section);
-    slider_section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(slider_section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(slider_section)
     Construct_listen_events_relations_from_mesh_tree(slider_section);
@@ -1244,8 +1246,11 @@ function Theme_color_hsv_sample_widget_slider_auto() {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -1388,9 +1393,12 @@ function Theme_color_hsv_sample_widget_slider_auto() {
     slider_section.AddItem(Create_sliders_per_mesh(LAYOUT.HORIZONTAL));
     
     
-    slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    slider_section.GenGfxCtx();
     Align_nested_sections_pre(slider_section);
-    slider_section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(slider_section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(slider_section)
     Construct_listen_events_relations_from_mesh_tree(slider_section);
@@ -1469,8 +1477,11 @@ function Theme_testing() {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -1554,8 +1565,11 @@ function Theme_color_correction() {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -1705,9 +1719,12 @@ function Theme_color_correction() {
 
 
         
-        slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        slider_section.GenGfxCtx();
         Align_nested_sections_pre(slider_section);
-        slider_section.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(slider_section.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
         Construct_listen_events_from_mesh_tree(slider_section)
         Construct_listen_events_relations_from_mesh_tree(slider_section);
@@ -1830,8 +1847,11 @@ function Multi_color_multi_vertex_mesh(color_buffer, x = 0, y = 0,) { // TEST MU
 
     slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
 
-    slider_hue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    slider_hue.Render();
+    slider_hue.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(slider_hue.group_bufferidxs[0]);
+
 
     Root_group_activate_all_vbs_in_renderqueue(slider_hue.root_bufferidx);
     slider_hue.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider_hue.gfx.vb.groupidx);
@@ -1932,7 +1952,7 @@ function Test_resize_fill_space_layout() {
 
     section.GenGfxCtx();
 
-    View_build_NEW_IMPLEMENTATION(section);
+    View_build_all_group_from_root_mesh(section);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -2011,7 +2031,7 @@ function Test_resize_fill_space_layout() {
 
     //     Align_nested_sections_pre(slider_section);
 
-    //     slider_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    //     slider_section.GenGfxCtx();
     //     slider_section.Render();
     //     Root_group_activate_all_vbs_in_renderqueue(slider_section.root_bufferidx);
     //     Construct_listen_events_from_mesh_tree(slider_section)
@@ -2135,8 +2155,11 @@ function Test_resize_fill_space_layout_nested(x = 0, y = 0) {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2247,8 +2270,11 @@ function Test_resize_fill_space_layout_nested_with_widgets(x = 0, y = 0) {
     TEMP_Calculate_layout_grow_count(section);
     Align_pre_simple___with_grow_containers(section);
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    section.Render();
+    section.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2266,7 +2292,6 @@ function Test_reload_app() {
 
     const reload_btn = Create_widget_button(Style_button_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: 'Reload', pos: [VIEWPORT.RIGHT - 140, 10, 0], text_col: GREY[10], col: TRANSPARENCY(BLUEL[7], 1.), text_pad: [5, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10 }));
     Widget_gfx_ready_enable({ mesh: reload_btn, enable_sdf_rect: 10, });
-    reload_btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     reload_btn.Bind(
         (params) => {
@@ -2292,8 +2317,11 @@ function Test_reload_app() {
 
 
     reload_btn.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-    reload_btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    reload_btn.Render()
+    reload_btn.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(reload_btn.root_bufferidx);
 
     reload_btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, reload_btn.gfx.vb.groupidx)
@@ -2323,34 +2351,55 @@ function Test_hsv_color_sequence_from_integer_input() {
     const fonst_size = 10;
     const col_width = 10;
 
+    const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10, 10], pos:[0, 0, 3], dim:[0, 0], col:GREY[3], name:'Section', style:[0, 10, 2], layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect: 10, });
+
+
     let y = 10, x = 0, i = 2;
-    const label = CreateLabel(ROOT_WIDGETS.CREATE_ROOT, text, TEXTURES.MTSDF_CONSOLAS_1024, _, 30, y, RGB(i, col_width), _, _, fonst_size); y += label.geom.dim[1] * 2; i++;
+    // const label = CreateLabel(ROOT_WIDGETS.CREATE_ROOT, text, TEXTURES.MTSDF_CONSOLAS_1024, _, 30, y, RGB(i, col_width), _, _, fonst_size); y += label.geom.dim[1] * 2; i++;
     y -= 10;
-    const vb_groupidx = label.gfx.vb.groupidx, text_vb_groupidx = label.text_mesh.gfx.vb.groupidx;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
-    CreateLabel(_, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), vb_groupidx, text_vb_groupidx, fonst_size); y += label.geom.dim[1] * 2; i++;
+    // const vb_groupidx = label.gfx.vb.groupidx, text_vb_groupidx = label.text_mesh.gfx.vb.groupidx;
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+    {const label = CreateLabel(0x0, text, TEXTURES.MTSDF_CONSOLAS_1024, _, x, y, RGB(i, col_width), _, _, fonst_size); i++; section.AddItem(label); }
+
+        
+    // Render
+    section.GenGfxCtx();
+
+    Align_nested_sections_pre(section);
+
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
+    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+
+    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
+
+    Construct_listen_events_from_mesh_tree(section)
+    Construct_listen_events_relations_from_mesh_tree(section);
+
 }
 
 function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_y = 6, font_size = 20, clbk_anim_flag = CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, speed = 10, slope = .1) {
@@ -2365,9 +2414,8 @@ function Test_text_clbk_animations_with_counter(x, y, text_pad_x = 10, text_pad_
     // Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_col_per_vertex: COLOR_GRADIENT_VERTICAL(BLUEL[3], BLUEL[9]), layout:LAYOUT.HORIZONTAL })
     Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, layout:LAYOUT.HORIZONTAL, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
-    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    mesh.GenGfxCtx();
 
-    View_build_NEW_IMPLEMENTATION(mesh);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(mesh.group_bufferidxs[0]);
 
@@ -2441,7 +2489,6 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [x, y, 0], col: GREY[1] }));
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, enable_col_per_vertex: COLOR_GRADIENT_HORIZONTAL(GREY[1], GREY[4]) });
     section.align.flags = (LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
 
     const mesh2 = Widget_ready_label(_, '_', _, _, _, 10, _, _, _, false);
@@ -2456,9 +2503,12 @@ function Test_text_clbk_animations_counter_2_text_meshes(x, y, text_pad_x = 10, 
 
 
     
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render()
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
     Construct_listen_events_from_mesh_tree(section);
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2517,10 +2567,11 @@ function CreateSimpleWidgetText(x, y) {
 
     /********************************************************************************************************************************************************/
     // Render
-    widget_text.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    widget_text.GenGfxCtx();
 
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(widget_text.group_bufferidxs[0]);
 
-    widget_text.Render();
     Root_group_activate_all_vbs_in_renderqueue(widget_text.root_bufferidx);
     widget_text.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, widget_text.gfx.vb.groupidx);
 }
@@ -2568,9 +2619,12 @@ function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget te
     
     /********************************************************************************************************************************************************/
     // Render
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
+
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2581,7 +2635,6 @@ function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget te
 }
 function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text from widget text directly to a section or stand alone. ABLE TO create layout with VERTICAL alignment via the new implementation
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pos: [50, 250, 0], col: TRANSPARENCY(GREY[7], .5) }));
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
     section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
     section.align.flags = LAYOUT.RESIZE_SELF;
@@ -2630,9 +2683,12 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
     
     /********************************************************************************************************************************************************/
     // Render
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -2646,7 +2702,6 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
     { // Create contols
         const ctrl_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [0, 50, 0], col: GREY[7], pad: [20, 20], layout: LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL }));
         Widget_gfx_ready_enable({ mesh: ctrl_panel, enable_sdf_rect: 10, })
-        ctrl_panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
         const ctrl = Controls_create_slider_controls_from_shader_uniform_buffer(info1, [120, 20], [.2, 1.], 'u_generic_controls');
         for (let i = 0; i < ctrl.length; i++) {
@@ -2657,9 +2712,12 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         
         /********************************************************************************************************************************************************/
         // Render
-        ctrl_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        ctrl_panel.GenGfxCtx();
         Align_nested_sections_pre(ctrl_panel);
-        ctrl_panel.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(ctrl_panel.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(ctrl_panel.root_bufferidx);
         Construct_listen_events_from_mesh_tree(ctrl_panel)
         Construct_listen_events_relations_from_mesh_tree(ctrl_panel);
@@ -2685,7 +2743,10 @@ function TexturedRect(is_root = 0x0, name = 'TexturedRect', x = 0, y = 0, dim = 
 
         section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
         section.GenGfxCtx();
-        section.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(section.group_bufferidxs[0]);
+
 
         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
         Construct_listen_events_from_mesh_tree(section);
@@ -2734,7 +2795,9 @@ Also the sdf rect shader operation uses the folowng code for rotations:
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
     section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -2798,7 +2861,10 @@ function Rotatable_section_with_rcorners_via_attribute_rotation(pos) {
     section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
     section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
 
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
@@ -2848,8 +2914,10 @@ function SectionResizable(pos) {
     section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    section.Render();
+    section.GenGfxCtx();
+
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
 
@@ -2862,8 +2930,7 @@ function SectionResizable(pos) {
 function CreateSectionedButtons(pos, name = 'NO NAME') {
 
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [10, 10], pos: pos, dim: [0, 0], col: GREY[1], name: name, }));
-    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, })
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
 
     // Add widgets
@@ -2871,7 +2938,8 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
         const btn = Create_widget_button(Style_button_default_properties({
             is_root: 0x0,
             pos: [0, 0, 1],
-            col: GREENL[6],
+            theme: Color_theme_label_auto(.57, .8, .28, .0),
+            // col: GREENL[6],
             text_pad: [12, 7],
             text: 'Button',
             texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
@@ -2883,7 +2951,6 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             is_debug_mesh: false,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         section.AddItem(btn);
     }
     {
@@ -2902,7 +2969,6 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             is_debug_mesh: false,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         section.AddItem(btn);
     }
     {
@@ -2921,17 +2987,17 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             is_debug_mesh: false,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
-        btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         section.AddItem(btn);
     }
 
 
     
     // Render
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
 
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
@@ -2954,6 +3020,7 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
         variant_idx: variant_idx,
         font_size: font_size,
         text_col: _,
+        layout:LAYOUT.VERTICAL,
         is_debug_mesh: false,
     }));
     Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } });
@@ -2967,9 +3034,8 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
     if (is_root === ROOT_WIDGETS.CREATE_ROOT) {
 
         if (vb_groupidx !== INT_NULL) label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
-        else label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        else label.GenGfxCtx();
 
-        View_build_NEW_IMPLEMENTATION(label);
         Vertex_buffer_calculate_render_group_starts();
         View_render_from_view_NEW(label.group_bufferidxs[0]);
 
@@ -2997,17 +3063,17 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
 function CreateButton(x = 20, y = 400, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     const btn = Create_widget_button(is_root, 'Button', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [x, y, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    // btn.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-    btn.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
 
     // btn.Bind(()=>{console.log('HI')}, )
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        btn.Render();
+        btn.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(btn.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
         btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
 
@@ -3041,8 +3107,11 @@ function CreateSwitchSimple(pos, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-        switch1.Render();
+        switch1.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(switch1.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
 
         switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
@@ -3059,14 +3128,15 @@ function CreateSwitch() {
     let ypos = 500
     // const switch1 = Create_widget_switch_button(ROOT_WIDGETS.CREATE_ROOT, 'switch on', 'switch off', [100, ypos, 0], fontsize, GREY[1], WHITE, [5, 5], .5);
     const switch1 = Create_widget_switch_button(Style_switch_button_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text_on: 'switch on', text_off: 'switch off', pos: [100, ypos, 0], font_size: fontsize, col: GREY[1], text_col: WHITE, text_pad: [5, 5], }));
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-    switch1.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1] });
 
     switch1.Bind(function () { console.log('CALLBACK FROM USER !!!!!!!!!!!!!!!!!!!!!!!!!!!') })
 
-    switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-    switch1.Render();
+    switch1.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(switch1[0]);
+
 
     Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
 
@@ -3087,8 +3157,11 @@ function CreateSliderSimple(is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        slider.Render();
+        slider.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(slider.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
@@ -3121,13 +3194,15 @@ function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-        slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        slider.GenGfxCtx();
 
-        View_build_NEW_IMPLEMENTATION(slider);
         Vertex_buffer_calculate_render_group_starts();
         View_render_from_view_NEW(slider.group_bufferidxs[0]);
         
-        slider.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(slider.group_bufferidxs[0]);
+
         
         Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
@@ -3150,9 +3225,8 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
 
     // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
-    line.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    line.GenGfxCtx();
 
-    View_build_NEW_IMPLEMENTATION(line);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(line.group_bufferidxs[0]);
 
@@ -3191,7 +3265,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     { // Many dps
 
         const sub_dp1_count = 1;
-        const sub_dp2_count = 2;
+        const sub_dp2_count = 1;
 
         const col = YELLOWR[7];
         for (let i = 0; i < sub_dp1_count; i++) {
@@ -3227,7 +3301,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
             Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
             dpsub1.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
             // dpsub1.gfx_ctx_flags = (GFX_CTX_FLAGS.RENDER_GROUP_NEW);
-            dpsub1.RenderToNewRenderGroup();
+            // dpsub1.RenderToNewRenderGroup();
             dp.AddToMenu(dpsub1);
             
             const col1 = TRANSPARENCY(PURPLEB[6], 1.);
@@ -3249,6 +3323,19 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                     dpsub2.AddToMenu(dpsub3);
 
                     { // Label
+      
+                        const d = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'dp4' }));
+                        Widget_gfx_ready_enable({ mesh: d, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                        d.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+                        // d.RenderToNewRenderGroup();
+                        dpsub3.AddToMenu(d);
+                        
+                        const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
+                        Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                        d.AddToMenu(l);
+                        l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+
+                    { // Label
                         const count = 4; const brightness_increments = 1/count; let brightness =  0;
                         for (let i = 0; i < count; i++) {
                             const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
@@ -3257,6 +3344,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                             l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
                             brightness += brightness_increments;
                         }
+                    }
                     }
 
                     // const col3 = TRANSPARENCY(YELLOW[6], 1.)
@@ -3278,6 +3366,25 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                     //     }
                     // }
                 }
+                for (let k = 0; k < sub_dp2_count; k++) {
+                    
+                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'dp4' }));
+                    Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+                    dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+                    // dpsub3.RenderToNewRenderGroup();
+                    dpsub2.AddToMenu(dpsub3);
+
+                    { // Label
+                        const count = 4; const brightness_increments = 1/count; let brightness =  0;
+                        for (let i = 0; i < count; i++) {
+                            const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:'label' }));
+                            Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                            dpsub3.AddToMenu(l);
+                            l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+                            brightness += brightness_increments;
+                        }
+                    }
+                }
             }
         }
     }
@@ -3286,10 +3393,9 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         
-        dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        dp.GenGfxCtx();
         Align_nested_sections_pre(dp);
-        
-        View_build_NEW_IMPLEMENTATION(dp);
+
         Vertex_buffer_calculate_render_group_starts();
         View_render_from_view_NEW(dp.group_bufferidxs[0]);
 
@@ -3417,18 +3523,18 @@ function CreateDropdownTreeHorizontalLayout(pos = [0, 0, 0], is_root = ROOT_WIDG
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         
-        dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        dp.GenGfxCtx();
         Align_nested_sections_pre(dp);
-        dp.Render()
+
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
 
         Construct_listen_events_from_mesh_tree(dp)
         Construct_listen_events_relations_from_mesh_tree(dp);
-
-        // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-        View_build_group_from_root_mesh(dp);
     }
 
     return dp;
@@ -3445,7 +3551,11 @@ function TestAlignNew(pos = [0, 0, 0]) {
         s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL
 
         {
-            { const l = CreateLabel(0x0, 'Hi', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); s.AddItem(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.HORIZONTAL; }
+            { 
+                const l = CreateLabel(0x0, 'Hi', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); 
+                s.AddItem(l); 
+                Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.HORIZONTAL; 
+            }
             { const l = CreateLabel(0x0, 'This is', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); s.AddItem(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.HORIZONTAL; }
             { const l = CreateLabel(0x0, 'a sample', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); s.AddItem(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.VERTICAL; }
             { const l = CreateLabel(0x0, 'of labels', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); s.AddItem(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.VERTICAL; }
@@ -3500,9 +3610,12 @@ function TestAlignNew(pos = [0, 0, 0]) {
     Dropdown_roots_set_root(dp, dp);
 
 
+    // const w = widgets_construct();
+    // dp.AddToMenu(w);
 
-    const sub_dp1_count = 2;
-    const sub_dp2_count = 2;
+
+    const sub_dp1_count = 1;
+    const sub_dp2_count = 1;
     let zpos = 1
 
 
@@ -3520,13 +3633,11 @@ function TestAlignNew(pos = [0, 0, 0]) {
             Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER);
         }
 
-
         col = GetSequencedColor(6)
         for (let j = 0; j < sub_dp2_count; j++) {
 
             const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos++], col: col, menu_col: GREY[1], text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
             Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-            // dpsub2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
             dpsub1.AddToMenu(dpsub2);
 
 
@@ -3536,7 +3647,7 @@ function TestAlignNew(pos = [0, 0, 0]) {
                 const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}${k}`, pos: [0, 0, zpos++], col: col2, menu_col: GREY[1], text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
                 Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dpsub3.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
-                dpsub3.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
+                dpsub3.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF
                 dpsub2.AddToMenu(dpsub3);
 
 
@@ -3548,6 +3659,7 @@ function TestAlignNew(pos = [0, 0, 0]) {
                     const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}${k}${n}`, pos: [0, 0, zpos++], col: col3, menu_col: GREY[1], text_col: WHITE, text_pad: text_pad, pad: pad, font_size: font_size }));
                     Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     // dpsub4.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, dp_rcorners, menu_rcorners, btn_rcorners);
+                    dpsub4.align.flags = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF
                     dpsub3.AddToMenu(dpsub4);
 
                     const s = Widget_ready_label(_, 'sk1');
@@ -3558,14 +3670,12 @@ function TestAlignNew(pos = [0, 0, 0]) {
                     dpsub4.AddToMenu(w2);
 
                 }
-
             }
         }
-
     }
 
 
-    /** Mny Labels */
+    /** Many Labels */
     {
         { const l = CreateLabel(0x0, 'Hi', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); dp.AddToMenu(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.HORIZONTAL; }
         { const l = CreateLabel(0x0, 'This is', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700, GREY[4], _, _, 12); dp.AddToMenu(l); Mesh_listener_create(l, LISTEN_EVENT_TYPES.HOVER); l.align.flags = LAYOUT.HORIZONTAL; }
@@ -3587,29 +3697,28 @@ function TestAlignNew(pos = [0, 0, 0]) {
         { const switch1 = Widget_ready_switch(); switch1.align.flags = LAYOUT.VERTICAL; dp.AddToMenu(switch1); }
         { const switch1 = Widget_ready_switch(); switch1.SetLayout(LAYOUT.VERTICAL); dp.AddToMenu(switch1); }
     }
-    /** Test: Scroller */
-    {
-        const scroller = CreateScrollerClampAlphaTest(0x0,);
-        scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-        dp.AddToMenu(scroller);
-    }
-    {
-        const scroller = CreateScrollerClampAlphaTest(0x0,);
-        scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-        dp.AddToMenu(scroller);
-    }
-    {
-        const scroller = CreateScrollerClampAlphaTest(0x0,);
-        scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-        dp.AddToMenu(scroller);
-    }
+    // /** Test: Scroller */
+    // {
+    //     const scroller = CreateScrollerClampAlphaTest(0x0,);
+    //     scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
+    //     dp.AddToMenu(scroller);
+    // }
+    // {
+    //     const scroller = CreateScrollerClampAlphaTest(0x0,);
+    //     scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
+    //     dp.AddToMenu(scroller);
+    // }
+    // {
+    //     const scroller = CreateScrollerClampAlphaTest(0x0,);
+    //     scroller.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
+    //     dp.AddToMenu(scroller);
+    // }
 
 
     
     dp.GenGfxCtx();
     Align_nested_sections_pre(dp)
 
-    View_build_NEW_IMPLEMENTATION(dp);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(dp.group_bufferidxs[0]);
 
@@ -3619,9 +3728,6 @@ function TestAlignNew(pos = [0, 0, 0]) {
 
     Construct_listen_events_from_mesh_tree(dp)
     Construct_listen_events_relations_from_mesh_tree(dp);
-
-    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-    // View_build_group_from_root_mesh(dp);
 
     return dp;
 }
@@ -3760,13 +3866,12 @@ function Render_font_symbols_atlas_texture(x, y) {
     
     /********************************************************************************************************************************************************/
     // Render
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
 
-    View_build_NEW_IMPLEMENTATION(section);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(section.group_bufferidxs[0]);
-    
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -3901,9 +4006,12 @@ function CreateManySections(scene) {
 
 
     
-    blu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    blu.GenGfxCtx();
     Align_nested_sections_pre(blu);
-    blu.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(blu.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(blu.root_bufferidx);
     blu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, blu.gfx.vb.groupidx);
 
@@ -3997,7 +4105,6 @@ function Test_align_many_sliders() {
         //     r1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //     r1.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //     r1.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //     r1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //     // r1.align.flags = LAYOUT.HORIZONTAL;
         //     r1.align.flags = LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF;
         //     // r1.align.flags = LAYOUT.RESIZE_SELF;
@@ -4012,7 +4119,6 @@ function Test_align_many_sliders() {
         //         r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //         r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //         r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //         r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         r2.align.flags = LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF;
         //         r2.SetName('ORANGER-1')
         //         r2.StylesSetPad([25,25])
@@ -4029,7 +4135,6 @@ function Test_align_many_sliders() {
         //         r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //         r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //         r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //         r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         r2.align.flags = LAYOUT.VERTICAL;
         //         r2.SetName('ORANGER-1')
         //         r1.AddItem(r2)
@@ -4039,7 +4144,6 @@ function Test_align_many_sliders() {
         //         r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //         r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //         r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //         r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         r2.align.flags = LAYOUT.VERTICAL;
         //         r2.SetName('ORANGER-1')
         //         r1.AddItem(r2)
@@ -4049,7 +4153,6 @@ function Test_align_many_sliders() {
         //         r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //         r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //         r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //         r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         r2.align.flags = LAYOUT.VERTICAL;
         //         r2.SetName('ORANGER-1')
         //         r1.AddItem(r2)
@@ -4059,7 +4162,6 @@ function Test_align_many_sliders() {
         //         r2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         //         r2.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
         //         r2.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-        //         r2.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //         r2.align.flags = LAYOUT.VERTICAL;
         //         r2.SetName('ORANGER-1')
         //         r1.AddItem(r2)
@@ -4226,7 +4328,6 @@ function Test_align_many_sliders() {
 
     root.GenGfxCtx();
 
-    View_build_NEW_IMPLEMENTATION(root);
     Vertex_buffer_calculate_render_group_starts();
     View_render_from_view_NEW(root.group_bufferidxs[0]);
 
@@ -4245,11 +4346,11 @@ function Test_performance_align_functions() {
     // Widget_gfx_ready_enable({ mesh: section1, enable_sdf_rect: 10, });
     {
         const fps_label = Create_widget_label(Style_label_default_properties({ text: '0000000', pos: [0, 0, 1], fontsize: fontsize, col: BLUEL[1], text_pad: [20, 10], }));
-        Widget_gfx_ready_enable({ mesh: fps_label, enable_sdf_rect: 10, }); fps_label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
+        Widget_gfx_ready_enable({ mesh: fps_label, enable_sdf_rect: 10, }); 
         section1.AddItem(fps_label);
 
 
-        section1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+        section1.GenGfxCtx();
         /********************************************************************************************************************************************************/
         Align
         const update = function (params) {
@@ -4269,7 +4370,10 @@ function Test_performance_align_functions() {
 
         // update({params:{ mesh: section1 }})
         // Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section1 });
-        section1.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(section1.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(section1.root_bufferidx);
         section1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section1.gfx.vb.groupidx);
 
@@ -4285,10 +4389,9 @@ function Test_performance_align_functions() {
     //     const fps_label = Create_widget_label(_, '0000000', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [0, 0, 1], fontsize, PURPLER[1], WHITE, [20, 10], .5,);
     //     Widget_gfx_ready_enable({ mesh: fps_label, enable_sdf_rect: 10, });
     //     {
-    //         fps_label.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     //         section2.AddItem(fps_label);
     //         // fps_label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //         // fps_label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    //         // fps_label.GenGfxCtx();
     //         // fps_label.Render();
     //         // fps_label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, fps_label.gfx.vb.groupidx);
     //         // Construct_listen_events_from_mesh_tree(fps_label)
@@ -4317,7 +4420,7 @@ function Test_performance_align_functions() {
     //     Time_intervals_create(1, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, update, { mesh: section2, fps_label: fps_label });
 
     //     section2.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    //     section2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    //     section2.GenGfxCtx();
 
     //     section2.Render();
     //     // Root_group_activate_all_vbs_in_renderqueue(section2.root_bufferidx);
@@ -4524,11 +4627,9 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
         section.GenGfxCtx();
         Align_nested_sections_pre(section)
 
-        View_build_NEW_IMPLEMENTATION(section);
         Vertex_buffer_calculate_render_group_starts();
         View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-        // View_build_group_from_root_mesh(section);
         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
         section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -4626,7 +4727,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 
         
 //         dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, _, true)
-//         // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+//         // dp.GenGfxCtx();
 //         // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
 //         dp.GenGfxCtx();
 //         Align_nested_sections_pre(dp)
@@ -4638,8 +4739,6 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 //         Construct_listen_events_from_mesh_tree(dp)
 //         Construct_listen_events_relations_from_mesh_tree(dp);
 
-//         // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-//         View_build_group_from_root_mesh(dp);
 //     }
 
 
@@ -4750,11 +4849,14 @@ function TestNewScrollerWithDropdown(pos = [250, 100, 0], is_root = ROOT_WIDGETS
 
         
         dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, _, true)
-        // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        // dp.GenGfxCtx();
         // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
         dp.GenGfxCtx();
         Align_nested_sections_pre(dp)
-        dp.Render()
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
 
         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
@@ -4762,8 +4864,6 @@ function TestNewScrollerWithDropdown(pos = [250, 100, 0], is_root = ROOT_WIDGETS
         Construct_listen_events_from_mesh_tree(dp)
         Construct_listen_events_relations_from_mesh_tree(dp);
 
-        // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-        View_build_group_from_root_mesh(dp);
     }
 
 
@@ -4844,9 +4944,12 @@ function TestNewScrollerWithLabel(pos = [20, 300, 0], is_root = ROOT_WIDGETS.CRE
 
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.GenGfxCtx();
     Align_nested_sections_pre(section);
-    section.Render();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
@@ -4932,7 +5035,6 @@ function Help() {
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
     // scene.StoreMesh(section)
     const s1 = Create_rect_mesh(_, LAYOUT.VERTICAL, [10, 10], [0, 0, 0], [0, 0], TRANSPARENCY(GREY[3], .6));
@@ -4949,7 +5051,6 @@ function Help() {
         label.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
         label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 8);
-        label.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
 
         s1.AddItem(label)
 
@@ -4963,19 +5064,17 @@ function Help() {
     section.AddItem(s1)
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.GenGfxCtx();
 
 
 
     section.Calc_no_gfx_update();
+        
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(dp.group_bufferidxs[0]);
 
-
-    section.Render()
 
     section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-    View_build_group_from_root_mesh(section)
-
 
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
@@ -5028,8 +5127,6 @@ function MeshInfo() {
     const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
     // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [100, 100], GREY[1], 'MeshInfoUiTip');
     section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
     section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
     section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
@@ -5039,7 +5136,6 @@ function MeshInfo() {
     const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREEN[4], .7), WHITE, 'Info tip', [10, 6],);
     // const menu = Create_widget_menubar(_, [80, 200, 1], [30,10], GREEN[9], WHITE, 'Info tip', [10, 6],);
     menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    menu.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     menu.AddMinimizeButton(_, section);
     section.AddItem(menu);
 
@@ -5067,9 +5163,12 @@ function MeshInfo() {
     // infomesh.Align_pre(infomesh, TEXT_ALIGN.VERTICAL)
 
 
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
+    section.GenGfxCtx();
     section.Calc_no_gfx_update();
-    section.Render();
+        
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(dp.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -5228,9 +5327,11 @@ function Test_shaders_test1() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    rect.GenGfxCtx();
+      
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(dp.group_bufferidxs[0]);
 
-    rect.Render();
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5294,7 +5395,6 @@ function Test_shaders_test3() { // Shaders Tests
     const dim = 200
     const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [dim, dim], BLACK, 'TEST-SHADERS',);
     // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-    rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
     rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
     rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
@@ -5305,9 +5405,11 @@ function Test_shaders_test3() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-    rect.Render();
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5375,7 +5477,6 @@ function Test_shaders_test2() { // Shaders Tests
         // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
         // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], YELLOW[9], 'TEST-SHADERS',);
         const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[1], 'TEST-SHADERS',);
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
@@ -5386,9 +5487,11 @@ function Test_shaders_test2() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        rect.GenGfxCtx();
+    
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5406,7 +5509,6 @@ function Test_shaders_test2() { // Shaders Tests
         // const dim=300
         const dim = 180
         const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 400, 0], [100, 70], PURPLE[1], 'TEST-SHADERS',);
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
@@ -5417,9 +5519,11 @@ function Test_shaders_test2() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        rect.GenGfxCtx();
+           
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5491,7 +5595,6 @@ function Test_shaders_test4() { // Shaders Tests
         // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[9], 'TEST-SHADERS',);
         // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], WHITE, 'TEST-SHADERS',);
         const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 300, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
         rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
         // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
@@ -5505,9 +5608,11 @@ function Test_shaders_test4() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        rect.GenGfxCtx();
+    
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5622,7 +5727,6 @@ function Test_shader_operations_all_with_uncomment() {
         const ratio = 75 / 40
         const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [, VIEWPORT.HEIGHT - dim * 2, 0], dim: [20 * ratio, 20], col: BLUEL[9], name: 'Test_shaders_Shadow_specular', }));
         Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 10, enable_unif_scale: true, enable_src_color_in_main: true, })
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
         // rect.sid.pass |= SID.ATTR.WPOS3;
         // rect.sid.pass |= SID.ATTR.VPOS2;
@@ -5649,8 +5753,11 @@ function Test_shader_operations_all_with_uncomment() {
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+            
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
         rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
@@ -5675,16 +5782,17 @@ function Test_shaders_operations_inner_shadow_rect() { // Shaders Tests
     {
         const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 400, 0], dim: [200, 100], col: BLUEL[9], name: 'TEST-SHADERS', }));
         Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 30, })
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
         rect.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
         rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        rect.GenGfxCtx();
+            
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
@@ -5702,7 +5810,6 @@ function Test_shaders_operations_inner_shadow_rect() { // Shaders Tests
     {
         const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [420, 400, 0], dim: [200, 100], col: BLUEL[9], name: 'TEST-SHADERS', }));
         Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 100, })
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
 
         rect.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
         rect.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
@@ -5710,9 +5817,11 @@ function Test_shaders_operations_inner_shadow_rect() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
@@ -5765,7 +5874,10 @@ function Test_shaders_inner_shadow_rhomboid_effect_MANY_BLENDINGS() { // Shaders
         const label = Create_widget_label(Style_label_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, text: blend_name[i], pos: [x, y, 0], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 }));
         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 10 });
         label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE) | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
-        label.Render();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(label.group_bufferidxs[0]);
+
         label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx);
 
         y += label.geom.dim[1] * 2;
@@ -5778,8 +5890,11 @@ function Test_shaders_inner_shadow_rhomboid_effect_MANY_BLENDINGS() { // Shaders
         rect.GfxEnableFn(SID.SHAD.FN_INNER_SHADOW, { blend_mode: flag++ });
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
         rect.GfxUniformSetAndUpdate('u_generic_controls', [4, 1, 1]);
@@ -5819,8 +5934,11 @@ function Test_shaders_Shadow_specular() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 7);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
         rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
         rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1, 1]);
@@ -5854,8 +5972,11 @@ function Test_shaders_bubble_flare() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
 
@@ -5886,8 +6007,11 @@ function Test_shaders_bubble_flare() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
         rect.GfxUniformSetAndUpdate('u_scale2', [1, 1,]);
@@ -5917,8 +6041,11 @@ function Test_shaders_bubble_flare() { // Shaders Tests
         rect.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
 
         // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-        rect.Render();
+        rect.GenGfxCtx();
+        
+        Vertex_buffer_calculate_render_group_starts();
+        View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
         Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
         rect.GfxUniformSetAndUpdate('u_scale2', [1, 1,]);
@@ -5954,8 +6081,11 @@ function Shader_color_functions_worley_1_noise() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -5984,8 +6114,11 @@ function Shader_color_functions_worley_2_noise() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -6020,8 +6153,11 @@ function Shader_color_functions_worley_3_types_noise() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -6055,8 +6191,11 @@ function Shader_color_functions_worley_3D() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -6090,8 +6229,11 @@ function Shader_color_functions_voronoi_1_noise() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -6125,8 +6267,11 @@ function Shader_color_functions_voronoi_2_noise() { // Shaders Tests
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
-    rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    rect.Render();
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
     Construct_listen_events_from_mesh_tree(rect);
     Construct_listen_events_relations_from_mesh_tree(rect);
@@ -6142,7 +6287,7 @@ function Shader_color_functions_voronoi_2_noise() { // Shaders Tests
 // Glow Shaders
 function Shader_color_functions_explosion_circle(x = 20, y = 300, w = 200, h = 200, color = BLUEL[9]) {
 
-    const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
+    const mesh = Create_rect_mesh(Style_rect_default_properties({ is_root:ROOT_WIDGETS.CREATE_ROOT, pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
     // Widget_gfx_ready_enable({ mesh: mesh, enable_src_color_in_main: false, });
     const scale_down = 1.;
     Widget_gfx_ready_enable({mesh:mesh, enable_unif_scale:[scale_down, 1], });
@@ -6150,8 +6295,11 @@ function Shader_color_functions_explosion_circle(x = 20, y = 300, w = 200, h = 2
     mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .2, generic: { a: .0, b: .2 } });
 
     // Render
-    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    mesh.Render();
+    mesh.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+
 
     mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
     mesh.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1.0]);
@@ -6164,16 +6312,19 @@ function Shader_color_functions_explosion_circle(x = 20, y = 300, w = 200, h = 2
 }
 function Shader_color_functions_explosion_glow(x = 20, y = 300, w = 200, h = 200, color = BLUEL[9]) {
 
-    const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
+    const mesh = Create_rect_mesh(Style_rect_default_properties({ is_root:ROOT_WIDGETS.CREATE_ROOT, pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
     Widget_gfx_ready_enable({ mesh: mesh, enable_src_color_in_main: false, });
     
     mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_GLOW, {time:0});
-    const generic_parameters = [.78, .6, .86];
+   const generic_parameters = [.78, .6, .86];
     mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_parameters.length);
 
     // Render
-    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    mesh.Render();
+    mesh.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+
 
     mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
     mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_parameters);
@@ -6194,8 +6345,11 @@ function Shader_color_functions_simple_glow(x = 20, y = 300, w = 200, h = 200, c
     mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_parameters.length);
 
     // Render
-    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    mesh.Render();
+    mesh.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+
 
     mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
     mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_parameters);
@@ -6208,7 +6362,7 @@ function Shader_color_functions_simple_glow(x = 20, y = 300, w = 200, h = 200, c
 }
 function Shader_color_functions_glow_sphere(x = 20, y = 300, w = 200, h = 200, color = BLUEL[9]) {
 
-    const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
+    const mesh = Create_rect_mesh(Style_rect_default_properties({ is_root:ROOT_WIDGETS.CREATE_ROOT, pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
     Widget_gfx_ready_enable({ mesh: mesh, });
     
     mesh.GfxEnableFn(SID.SHAD.FN_GLOW_SPHERE);
@@ -6216,8 +6370,11 @@ function Shader_color_functions_glow_sphere(x = 20, y = 300, w = 200, h = 200, c
     mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_parameters.length);
 
     // Render
-    mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-    mesh.Render();
+    mesh.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+
 
     mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
     mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_parameters);
@@ -6232,81 +6389,74 @@ function Shader_color_functions_glow_sphere(x = 20, y = 300, w = 200, h = 200, c
 // UN-REIMPLEMENTED
 function Shader_color_functions_blend_simple_noise_with_voronoi() { // Shaders Tests
 
-    {
-        const dim = 200
-        const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 200, 0], dim: [dim, dim], col: YELLOW[7], name: 'SHADER_FN:WORLEY-2-NOISE', }));
-        Widget_gfx_ready_enable({ mesh: rect, enable_unif_time: true, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
+    const dim = 200
+    const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 200, 0], dim: [dim, dim], col: YELLOW[7], name: 'SHADER_FN:WORLEY-2-NOISE', }));
+    Widget_gfx_ready_enable({ mesh: rect, enable_unif_time: true, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
-        rect.GfxEnableFn(SID.SHAD.FN_NOISE, { time: .3, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
-        rect.GfxEnableFn(SID.SHAD.FN_NOISE_VORONOI_2, { blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ALPHA });
+    rect.GfxEnableFn(SID.SHAD.FN_NOISE, { time: .3, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
+    rect.GfxEnableFn(SID.SHAD.FN_NOISE_VORONOI_2, { blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ALPHA });
 
-        const control_values = [1, 1, 0, 1, 1, 1, 1]
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
+    const control_values = [1, 1, 0, 1, 1, 1, 1]
+    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
-        // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    // Render
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
-        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
-        Construct_listen_events_from_mesh_tree(rect);
-        Construct_listen_events_relations_from_mesh_tree(rect);
+    Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+    Construct_listen_events_from_mesh_tree(rect);
+    Construct_listen_events_relations_from_mesh_tree(rect);
 
-        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
-
-    }
+    rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+    rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
     Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(rect, slider_dim, control_values, 'u_generic_controls', ROOT_WIDGETS.CREATE_ROOT, 10, 0);
 }
 function Shader_color_functions_noise_test() { // Shaders Tests
 
-    {
-        // const dim=300
-        const dim = 200
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [10, 200, 0], [dim, dim], YELLOW[7], 'SHADER_FN:WORLEY-2-NOISE',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [120, 420, 0], [50, 30], BLUEL[9], 'SHADER_FN:WORLEY-2-NOISE',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [120, 420, 0], [80, 60], BLUEL[9], 'SHADER_FN:WORLEY-2-NOISE',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [120, 420, 0], [180, 120], BLUEL[9], 'SHADER_FN:WORLEY-2-NOISE',);
-        rect.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // const dim=300
+    const dim = 200
+    const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 200, 0], dim: [dim, dim], col: YELLOW[7], name: 'SHADER_FN:WORLEY-2-NOISE', }));
+    
+    rect.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-        rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+    rect.GfxEnableAttr(SID.ATTR.DIM2);
 
-        // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 1);
-        // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 2);
-        // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 3);
-        // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 1);
-        // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 2);
+    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 1);
+    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 2);
+    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 3);
+    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 1);
+    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 2);
 
-        rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME, 0);
-        // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfx(SID.SHAD.FN_NOISE, 2);
-        rect.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+    rect.GfxEnableAttr(MESH_ENABLE.GFX.ATTR_TIME, 0);
+    // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
+    rect.GfxEnableFn(SID.SHAD.FN_NOISE, { time: .3, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
+    rect.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
-        rect.EnableGfx(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MASK);
+    // rect.EnableGfx(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MASK);
 
 
-        // Use u_time to quicly establish a uniform for the testing
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_controls', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+    // Use u_time to quicly establish a uniform for the testing
+    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_controls', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
 
-        // Render
-        rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    // Render
+    rect.GenGfxCtx();
+    
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
-        rect.Render();
-        Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
+    Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
 
-        Construct_listen_events_from_mesh_tree(rect);
-        Construct_listen_events_relations_from_mesh_tree(rect);
+    Construct_listen_events_from_mesh_tree(rect);
+    Construct_listen_events_relations_from_mesh_tree(rect);
 
 
-        rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
-        rect.GfxUniformSetAndUpdate('u_generic_controls', [.0, .02, .1]);
-        // rect.GfxUniformSetAndUpdate('u_noise_params', [.0, 1, .13, 1]);
-
-    }
-
+    rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx);
+    rect.GfxUniformSetAndUpdate('u_generic_controls', [.0, .02, .1]);
+    // rect.GfxUniformSetAndUpdate('u_noise_params', [.0, 1, .13, 1]);
 
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
@@ -6349,14 +6499,12 @@ function Window_menu() {
         // {
         //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._28);
         //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //     btn1.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT; 
         //     menu.AddItem(btn1); 
         // }
         // {
         //     const btn1 = Create_rect_mesh(0x0, _, [5,5], [0,0,0], [size, size], WHITE, 'circle_1',_, _, TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS._25);
         //     btn1.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-        //     btn1.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
         //     btn1.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT; 
         //     menu.AddItem(btn1); 
         // }
@@ -6367,8 +6515,6 @@ function Window_menu() {
     //     // const panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], TRANSPARENCY(RGB(0, 0, 4.5, .35), 1.))
     //     // const panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], RGB(0, 0, 4.5, .3))
     //     const panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [10, 10], [0, 0, 0], [0, 100], Interpolate_rgb_to_01(10, 44, 129, 1))
-    //     panel.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-    //     // section.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
     //     panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 1);
     //     panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
     //     // section.align.flags = LAYOUT.RESIZE_SELF|LAYOUT.FIXED_WIDTH;
@@ -6400,12 +6546,14 @@ function Window_menu() {
     
     /********************************************************************************************************************************************************/
     // Render
-    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+    section.GenGfxCtx();
     
     Align_nested_sections_pre(section);
     Align_expand(section, section.align.flags,)
 
-    section.Render();
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(section.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
     Construct_listen_events_from_mesh_tree(section)
     Construct_listen_events_relations_from_mesh_tree(section);
@@ -6470,7 +6618,10 @@ function Window_menu_2() {
 
     window_menu.GenGfxCtx();
     Align_nested_sections_pre(window_menu);
-    window_menu.Render()
+
+    Vertex_buffer_calculate_render_group_starts();
+    View_render_from_view_NEW(window_menu.group_bufferidxs[0]);
+
     Root_group_activate_all_vbs_in_renderqueue(window_menu.root_bufferidx);
 
     window_menu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, window_menu.gfx.vb.groupidx)
@@ -6478,7 +6629,6 @@ function Window_menu_2() {
     Construct_listen_events_from_mesh_tree(window_menu)
     Construct_listen_events_relations_from_mesh_tree(window_menu);
 
-    View_build_group_from_root_mesh(window_menu);
 }
 
 

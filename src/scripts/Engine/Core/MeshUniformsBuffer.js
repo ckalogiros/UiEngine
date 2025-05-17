@@ -89,7 +89,6 @@ export function Mesh_unif_wpos_get_size() { return _per_vb_mesh_unif_wpos.size; 
 // Each element(world position uniform) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_wpos'. 
 /** */
 export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, progidx, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, COPY_MESH_POS) {
-   // const mesh_bufferidx = mesh.mesh_bufferidx, mesh_pos = mesh.geom.pos, mesh_type = mesh.type, mesh_nameidx = mesh.nameidx, mesh_parent = mesh.parent;
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
    let meshidx = mesh_bufferidx;
@@ -141,7 +140,7 @@ export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_typ
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
    
    
-   // Store the uniform's index, for updating the uuniforms on position change
+   // Store the uniform's index, for updating the uniforms on position change
    const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
    if(wpos_ubidx_idx !== idx) alert('unif wpos idx does not match the ubidx wpos idx');
    

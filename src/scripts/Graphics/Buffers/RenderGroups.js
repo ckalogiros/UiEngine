@@ -1,6 +1,7 @@
 "use starict";
 
 import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
+import { Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
 
 
 
@@ -36,14 +37,12 @@ export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_face
          start:0, 
          count:0, 
          size:0, 
-         num_faces:num_faces, 
+         num_faces:num_faces,  // !!! We cannot trust the 'num_faces'. Insted use them from View_group structure
          draw_count:0, 
          index_offset:0,
          vb_data_idx:vb_data_idx, // TODO: For now it gets the vertex buffer group index. On "buffer instances" implementation should take the vb_info or vb_data index.
          state:0x0,
 
-
-         debug_vbidx:INT_NULL,
          debug_is_reseted:true,
 
       }
@@ -83,9 +82,15 @@ export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx,
 //    _render_groups.buffer[render_groupidx].start = start;
 // }
 /** */
-// export function Vertex_buffer_render_group_set_draw_count(render_groupidx, draw_count) { 
-//    _render_groups.buffer[render_groupidx].draw_count = draw_count;
-// }
+export function Vertex_buffer_render_group_reset_draw_count(render_groupidx) { 
+   _render_groups.buffer[render_groupidx].draw_count = 0;
+   _render_groups.buffer[render_groupidx].count = 0;
+}
+export function Vertex_buffer_render_group_set_draw_count_from_num_faces(render_groupidx, num_faces) { 
+   const vb_groupidx = _render_groups.buffer[render_groupidx].vb_data_idx;
+   const attribs_per_face = Vertex_buffer_group_get_attributes_per_face(vb_groupidx);
+   _render_groups.buffer[render_groupidx].draw_count = num_faces * attribs_per_face;
+}
 /** */
 // export function Vertex_buffer_render_group_set_size(render_groupidx, size) { 
 //    _render_groups.buffer[render_groupidx].size = size;
@@ -120,7 +125,7 @@ export function Vertex_buffer_render_group_print_loop() {
       const g = _render_groups.buffer[i];
       
       console.log( 
-         'vbidx', g.debug_vbidx,
+         'vbidx', g.vb_data_idx,
          'rgidx', i,
          'start:', g.start,
          'count:', g.count,
@@ -136,7 +141,7 @@ export function Vertex_buffer_render_group_print_render_group(render_groupidx) {
    const g = _render_groups.buffer[render_groupidx];
    console.log(
       '----- Vertex Buffer Render Group -----\n',
-      'vbidx', g.debug_vbidx,
+      'vbidx', g.vb_data_idx,
       'rgidx', render_groupidx,
       'start:', g.start,
       'count:', g.count,

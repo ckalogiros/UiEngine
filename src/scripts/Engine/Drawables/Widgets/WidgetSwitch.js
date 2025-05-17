@@ -12,6 +12,8 @@ import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timer
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { View_add_mesh, View_remove_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 /**
@@ -86,6 +88,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
          switch_handle.root_bufferidx = this.root_bufferidx;
+         
+         // Create view group
+         this.group_bufferidxs[0] = View_create_new_group(this);
+         switch_handle.group_bufferidxs[0] = this.group_bufferidxs[0];
       }
 
    }
@@ -105,16 +111,21 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    Activate() {
 
       this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
       this.children.buffer[0].state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
    }
-
-
+   
+   
    Deactivate() {
-
+      
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-      this.children.buffer[0].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-   }
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
 
+      this.children.buffer[0].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.children.buffer[0].group_bufferidxs, this.children.buffer[0].geom.num_faces);
+   }
+      
    StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
@@ -146,6 +157,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
       this.children.buffer[0].root_bufferidx = root_bufferidx;
       Root_group_view_buffer_add_mesh(this.children.buffer[0].root_bufferidx, this.children.buffer[0].mesh_bufferidx);
+   }
+   
+   SetViewGroupIndex(view_groupidx) {
+         
+      this.group_bufferidxs[0] = view_groupidx;
+      this.children.buffer[0].group_bufferidxs[0] = view_groupidx;
    }
 
 
@@ -229,10 +246,15 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
-      this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx);
-
-      return gfx;
+      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
+      
+      this.children.buffer[0].gfx = Gfx_generate_context(FLAGS, this.children.buffer[0], specific_vb_groupidx);
+      // Add to view group
+      View_add_mesh(this.children.buffer[0].group_bufferidxs[0], this.children.buffer[0]);
+      
+      return this.gfx;
    }
 
 

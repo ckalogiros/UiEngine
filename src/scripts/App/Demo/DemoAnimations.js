@@ -20,7 +20,7 @@ import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y
 import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_x } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Align_expand, Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.js";
-import { View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 
@@ -107,11 +107,8 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       // HACK: Scale down before render
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
             
-      View_build_NEW_IMPLEMENTATION(panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
-      
-
 
       Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
@@ -182,7 +179,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       Align_nested_sections_pre(panel);
       Align_expand(panel);
 
-      View_build_NEW_IMPLEMENTATION(panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
@@ -262,7 +258,6 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    Align_nested_sections_pre(panel);
    ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
                
-   View_build_NEW_IMPLEMENTATION(panel);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(panel.group_bufferidxs[0]);
    
@@ -303,18 +298,14 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true, font_
    /**********************************************************************************************************/
    // Render
 
-   Align_nested_sections_pre(panel);
-
+   
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
 
+   Align_nested_sections_pre(panel);
 
-               
-   View_build_NEW_IMPLEMENTATION(panel);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(panel.group_bufferidxs[0]);
-   
-
 
    Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(panel);
@@ -360,14 +351,14 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
    // Render
    if(root_widget) {
 
+      
+      // panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
+      panel.GenGfxCtx();
+      
       // Align_nested_sections_pre(panel, panel.geom.pos[0], panel.geom.pos[1]);
       Align_nested_sections_pre(panel);
       Align_expand(panel);
-
-      // panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
-      panel.GenGfxCtx();
    
-      View_build_NEW_IMPLEMENTATION(panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
@@ -449,18 +440,15 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
    /*************************************************************************************************/
    // Render Menu 
    if(root_widget) {
+      
+      menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
+      menu_panel.GenGfxCtx();
 
       Align_nested_sections_pre(menu_panel);
       Align_expand(menu_panel);
 
-      menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
-      menu_panel.GenGfxCtx();
-
-                  
-      View_build_NEW_IMPLEMENTATION(menu_panel);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
-      
    
       Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(menu_panel);
@@ -634,7 +622,6 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
             
-         View_build_NEW_IMPLEMENTATION(slider);
          Vertex_buffer_calculate_render_group_starts();
          View_render_from_view_NEW(slider.group_bufferidxs[0]);
       
@@ -644,13 +631,12 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
          Construct_listen_events_from_mesh_tree(slider)
          Construct_listen_events_relations_from_mesh_tree(slider);
       }
-
-      Align_nested_sections_pre(mesh);
-
+      
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
+
+      Align_nested_sections_pre(mesh);
             
-      View_build_NEW_IMPLEMENTATION(mesh);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
       
@@ -808,7 +794,6 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
                      
-         View_build_NEW_IMPLEMENTATION(slider);
          Vertex_buffer_calculate_render_group_starts();
          View_render_from_view_NEW(slider.group_bufferidxs[0]);
       
@@ -819,14 +804,14 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
          Construct_listen_events_relations_from_mesh_tree(slider);
       }
 
-      Align_nested_sections_pre(mesh);
-
+      
       Mesh_set_wpos_y(mesh.geom.pos[1], y);
-
+      
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
+
+      Align_nested_sections_pre(mesh);
             
-      View_build_NEW_IMPLEMENTATION(mesh);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
       
@@ -969,14 +954,13 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    /****************************************************************************************************************/
    // Render 
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
-
-      Align_nested_sections_pre(controls_section);
-
+      
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
       controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
 
-      View_build_NEW_IMPLEMENTATION(controls_section);
+      Align_nested_sections_pre(controls_section);
+      
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
       
@@ -1026,7 +1010,6 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       
-      View_build_NEW_IMPLEMENTATION(section);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(section.group_bufferidxs[0]);
       

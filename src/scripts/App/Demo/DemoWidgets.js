@@ -1,7 +1,7 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
-import { View_build_group_from_root_mesh, View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
+import { View_build_group_from_root_mesh, View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { Root_group_activate_all_vbs_in_renderqueue } from '../../Engine/Core/Views/RootView.js';
 import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
@@ -107,13 +107,13 @@ pressing the \"p\" key on the keyboard.\
 
    /**************************************************************************************************************************************************/
    // Render
-   Align_nested_sections_pre(section);
-   Align_expand(section);
-
+   
    // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
+   Align_nested_sections_pre(section);
+   Align_expand(section);
+
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -199,14 +199,13 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    // Render
 
-   Align_nested_sections_pre(section);
-
+   
    section.GenGfxCtx();
-
+   
+   Align_nested_sections_pre(section);
 
    // View_build_group_from_root_mesh(scrolled_section);
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -535,13 +534,12 @@ nested layouts with well-aligned items.\
 
    /***********************************************************************************************************************************************************/
    // Render
+   
+   root_s.GenGfxCtx();
+   // View_build_group_from_root_mesh(root_s);
 
    Align_nested_sections_pre(root_s);
 
-   root_s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   // View_build_group_from_root_mesh(root_s);
-
-   View_build_NEW_IMPLEMENTATION(root_s);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(root_s.group_bufferidxs[0]);
 
@@ -817,13 +815,12 @@ ensuring they remain accessible when reopening a parent dropdown.\
       }
    }
 
-
-   Align_nested_sections_pre(section);
-
+   
    // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
+   Align_nested_sections_pre(section);
+
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1033,13 +1030,12 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
 
    /**************************************************************************************************************************************************/
    // Render
-
-   Align_nested_sections_pre(section);
-
+   
    // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
+   Align_nested_sections_pre(section);
+
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1116,11 +1112,10 @@ WIDGET: COLOR-PICKER\
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      section.GenGfxCtx();
 
       Align_nested_sections_pre(section);
 
-      View_build_NEW_IMPLEMENTATION(section);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1189,56 +1184,47 @@ Adjust the font size using the slider.
 
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [20, 20], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[3], .9), name:'Msdf_text_info' }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pad: [20, 20], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[3], .9), name:'Msdf_text_info', layout:LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
-
 
 
 
 
    /** Create the info for the user */
-   const s = Create_rect_mesh(Style_rect_default_properties({ options: SECTION.VERTICAL, pad: [10, 10], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[1], .4), name:'Msdf_text_info_sub_section' }));
+   const s = Create_rect_mesh(Style_rect_default_properties({ options: SECTION.VERTICAL, pad: [10, 10], pos: [x + l_pad, y + t_pad, 0], dim: [0, 0], col: TRANSPARENCY(GREY[1], .4), name:'Msdf_text_info_sub_section', layout: LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL}));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: 4, });
-   s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    section.AddItem(s);
 
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = 10;
-   const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
+   const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND}));
    Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
-   info1.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info1);
 
-   const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
+   const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info2, enable_sdf_rect: 4, });
-   info2.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info2);
 
-   const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
+   const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: 4, });
-   info3.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info3);
 
-   const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, }));
+   const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: 4, });
-   info4.align.flags = LAYOUT.VERTICAL | LAYOUT.EXPAND;
    s.AddItem(info4);
 
 
-   /********************************************************************************************************************************************************/
+   
+   
+   
+   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
+   section.GenGfxCtx();
+   
    // Align
    Align_nested_sections_pre(section);
    Align_expand(section)
-
-
-   /**************************************************************************************************************************************************/
+   
    // Render
-
-   // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, section.mesh_bufferidx, true);
-   section.GenGfxCtx();
-
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1343,7 +1329,6 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
       picker.GenGfxCtx();
       Align_nested_sections_pre(picker);
 
-      View_build_NEW_IMPLEMENTATION(picker);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(picker.group_bufferidxs[0]);
 
@@ -1446,7 +1431,7 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
 
       //    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       //    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-      //    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      //    section.GenGfxCtx();
 
 
 
@@ -1454,7 +1439,6 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
       const clbk = () => {
          // View_build_group_from_root_mesh(section);
 
-         // section.Render();
          Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
          // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
@@ -1629,10 +1613,9 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
 
 
    
-   dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   dp.GenGfxCtx();
    Align_nested_sections_pre(dp)
 
-   View_build_NEW_IMPLEMENTATION(dp);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(dp.group_bufferidxs[0]);
 

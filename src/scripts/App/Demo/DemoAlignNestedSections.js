@@ -10,7 +10,7 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../En
 import { Widget_ready_label, Widget_ready_slider } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { Mesh_get_name, Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
-import { View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
 
 
@@ -1278,7 +1278,6 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
    // Render
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1366,7 +1365,6 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
    // Render
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1481,7 +1479,6 @@ with right to left order`;
    // Render
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1626,7 +1623,6 @@ function Create_triangle_structure(x = 50, y = 50) {
    // Render
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
@@ -1927,7 +1923,6 @@ function Test_slider_control_pad(x, y) {
       // Render
       ss.GenGfxCtx();
 
-      View_build_NEW_IMPLEMENTATION(ss);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(ss.group_bufferidxs[0]);
 
@@ -1945,7 +1940,6 @@ function Test_slider_control_pad(x, y) {
    // Render
    section.GenGfxCtx();
 
-   View_build_NEW_IMPLEMENTATION(section);
    Vertex_buffer_calculate_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 

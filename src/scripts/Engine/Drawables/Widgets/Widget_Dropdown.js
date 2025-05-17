@@ -5,7 +5,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidget.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_add_to_group, View_remove_from_group, View_render_from_view_all_buffers, View_render_from_view_specific_render_group_NEW, View_reset_from_view_all_buffers, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
+import { View_activate_rg, View_add_mesh, View_add_to_group, View_deactivate_rg, View_remove_from_group, View_remove_mesh, View_build_all_group_from_root_mesh, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_from_view_all_buffers, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -123,6 +123,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       this.menu.StylesSetPad(properties.menu.pad);
+      // this.menu.RenderToNewRenderGroup();
       
       
       this.dp_symbols = ['+', '-'];
@@ -141,10 +142,20 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       this.menu_active = false;
 
+      
+      if (properties.dp.is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
+         // Store view group index
+         const btn = this.children.buffer[0];
+         btn.SetViewGroupIndex(this.group_bufferidxs[0]);
+         
+         // Store view group index
+         this.menu.SetViewGroupIndex(this.group_bufferidxs[0]);
+      }
+
       Mesh_set_name(btn, `Dp_Btn[${btn.mesh_bufferidx}]{${properties.btn.text}}`);
       Mesh_set_name(this.menu, `Dp_Menu[${this.menu.mesh_bufferidx}]{${properties.btn.text}}`);
       Mesh_set_name(this, `${properties.dp.name}:Dp[${this.mesh_bufferidx}]`);
-      // Mesh_set_name(this, `Dp[${this.mesh_bufferidx}]{${properties.btn.text}}`);
 
    }
    /** */
@@ -161,15 +172,19 @@ export class Widget_Dropdown extends Rect_Mesh {
    Activate() {
 
       this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
       this.children.buffer[0].Activate(); // Button
+
       if(this.isOn & DP_MENU_STATE.ON){
          this.menu.Activate(); // Button
       }
    }
    /** */
    Deactivate() {
-
+      
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
+
       this.children.buffer[0].Deactivate(); // Button
       if(this.isOn & DP_MENU_STATE.ON){
          this.menu.Deactivate(); // Button
@@ -238,6 +253,18 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.menu.AddToWidgetRootBuffer(root_bufferidx);
    }
    /** */
+   SetViewGroupIndex(view_groupidx) {
+      
+      this.group_bufferidxs[0] = view_groupidx;
+      
+      // Store view group index
+      const btn = this.children.buffer[0];
+      btn.SetViewGroupIndex(view_groupidx);
+      
+      // Store view group index
+      this.menu.SetViewGroupIndex(view_groupidx);
+   }
+   /** */
    SetGfxEnable(which, params) {
       alert('777\nSetGfxEnableAttributes\nWidgetDropdown')
    }
@@ -248,9 +275,13 @@ export class Widget_Dropdown extends Rect_Mesh {
       // NOTE: The dp's button is inserted to the widget root buffer by the constructor:  'this.AddItem(btn)'
 
       if ((this.isOn & DP_MENU_STATE.ON) === 0) {
-         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE)
+         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
+         // Disable all children meshes
+         for(let i=0; i<=mesh.children.boundary; i++) {
+            const child = mesh.children.buffer[i];
+            child.StateDisable(MESH_STATE_FLAGS.ACTIVE);
+         }
       }
-
 
       if (mesh.type & MESH_TYPE.WIDGET_DROP_DOWN) {
 
@@ -260,7 +291,7 @@ export class Widget_Dropdown extends Rect_Mesh {
              * With the current implementation we must add dropdown widgets to dropdown menus as items 
              * in the order of the tree representation. That means each dropdown that adds another dropdown must
              * already been added to a higher order in the tree dropdown, so that it has the 'rootidx' index.
-             * ALL DROPDOWNS THAT ARE PART OF THE TREE STRUCT HAVE ONE ROOT DROPDOWN WIDGET 
+             * ALL DROPDOWNS THAT ARE PART OF THE TREE STRUCT HAVE ONE DROPDOWN ROOT WIDGET 
              */
             // Also store to the root dropdown a rootidx of its self
             this.rootidx = Dropdown_roots_set_root(this, mesh);
@@ -270,12 +301,15 @@ export class Widget_Dropdown extends Rect_Mesh {
          }
       }
 
-
-
       if (this.root_bufferidx !== INT_NULL && this.menu.root_bufferidx === INT_NULL) {
 
          this.menu.root_bufferidx = this.root_bufferidx;
          Root_group_view_buffer_add_mesh(this.menu.root_bufferidx, this.menu.mesh_bufferidx);
+      }
+
+      // Store view group index
+      if(this.group_bufferidxs[0] !== INT_NULL) {
+         mesh.SetViewGroupIndex(this.group_bufferidxs[0]);
       }
 
       mesh.idx = this.menu.AddItem(mesh);
@@ -412,20 +446,15 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      // this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
       const temp = (this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW) ? INT_NULL : specific_vb_groupidx
       this.gfx = Gfx_generate_context(FLAGS, this, temp);
-
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
+      
       const btn = this.children.buffer[0];
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 
-      // btn.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC); // Set button's area gfx same with dropDown mesh 
       
       this.menu.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx)
-      // console.log(this.menu.name, this.menu.gfx.vb.groupidx)
-      // this.menu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC); // Set button's area gfx same with dropDown mesh 
-      // this.menu.GenGfxCtx()
-      // console.log('menu', this.menu.name, this.menu)
-      if (this.group_bufferidxs[0] !== INT_NULL) console.error('TRUE:', Mesh_get_name(this))
 
       return this.gfx;
    }
@@ -440,11 +469,11 @@ alert('00000111119999922222')
       const btn = this.children.buffer[0];
       btn.Render();
 
-      // if (this.isOn & DP_MENU_STATE.ON) {
+      if (this.isOn & DP_MENU_STATE.ON) {
          for (let i = 0; i <= this.children.boundary; i++) {
             if(this.children.buffer[i]) this.children.buffer[i].Render();
          }
-      // }
+      }
 
       if(this.menu.scroller_comp) {
 
@@ -478,6 +507,7 @@ alert('00000111119999922222')
       }
 
    }
+   /** */
    EnableScroller(scroller_params) {
 
       Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this.menu, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
@@ -778,6 +808,11 @@ alert('00000111119999922222')
       this.menu_active = false; // Set state to active.
 
       const menu = dp.menu;
+               
+      // Set opened/closed dp text
+      const btn = this.children.buffer[0];
+      btn.text_mesh.SliceText(0, 1);
+      btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
 
       if (dp.isOn & DP_MENU_STATE.ON) {
          for (let j = 0; j <= menu.children.boundary; j++) {
@@ -836,77 +871,55 @@ alert('00000111119999922222')
    DpDeactivateMenu() {
 
       const menu = this.menu;
-      const root = Dropdown_roots_get_root_by_idx(this.rootidx);
-
-      // Reset vertex buffers from group
-      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
-      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
-
-      // Remove menu and all its items from the group view
-      // if (menu.group_bufferidxs[0] !== INT_NULL) {
-      //    View_remove_from_group(menu);
-      // }
-
+      
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
 
-      const btn = this.children.buffer[0];
-      btn.text_mesh.SliceText(0, 1);
-      btn.text_mesh.SetTextAtIndex(this.dp_symbols[0], 0);
-
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-
-      /********************************************************************************************************************/
-      // Calculate all meshes sizes from the root widget dropdown
-      if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-      if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
+      // Re-calculate layout
+      Align_nested_sections_pre(widget_root);
+      Align_expand(menu);
       
-      // Calculate positions for dropdown
-      const cur_pos = [0,0];
-      cur_pos[0] = this.geom.pos[0]; 
-      cur_pos[1] = this.geom.pos[1]; 
-      
-
-      Align_nested_sections_pre(widget_root)
-
-      /********************************************************************************************************************/
       // Re-create listen events 
-      Construct_listen_events_from_mesh_tree(widget_root)
-      Construct_listen_events_relations_from_mesh_tree(widget_root);
+      Construct_listen_events_from_mesh_tree(menu);
+      Construct_listen_events_relations_from_mesh_tree(menu);
       
-      
-
-      // // TODO: deactivate/dontShow scroller
-      if(widget_root.has_children_scrollers) {
-         for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
-            const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
-            // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+      // Re-calculate scrollers
+      if(menu.has_children_scrollers) {
+         for(let i=0; i <= menu.children_scrollers_buffer.boundary; i++) {
+            const scroller_comp = Components_get_scroller_component(menu.children_scrollers_buffer.buffer[i]);
+            Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
-            // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_section.gfx.vb.groupidx);
-
-            // console.log('y', this.menu.geom.pos[1], 'dim', this.menu.geom.dim[1], scroller_comp.geom.pos)
+            // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
          }
       }
-      
 
-      /********************************************************************************************************************/
-      // Re-render   
-      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
-      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0])
+      if(menu.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) { // for fast activation
+         // Activate specific render groups
+         View_deactivate_rg(menu.gfx.vb.render_groupidx);
+      }
+      else { // Render the whole buffer mesh by mesh for each render group
+         
+         View_reset_to_index_from_view_group_NEW(menu.group_bufferidxs[0]);
+         View_render_from_view_NEW(menu.group_bufferidxs[0]);
+      }
 
    }
 
 
    /** */
    #ActivateMenu() {
-      // TODO: SEE ### Dropdown Remove
-      // Must remove listener
 
       const menu = this.menu;
       this.menu_active = true; // Set state to active.
 
       menu.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+               
+      // Set opened/closed dp text
+      const btn = this.children.buffer[0];
+      btn.text_mesh.SliceText(0, 1);
+      btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
 
       // Activate menu's items, recursively
       for (let i = 0; i <= menu.children.boundary; i++) {
@@ -941,80 +954,46 @@ alert('00000111119999922222')
    DpActivateMenu() {
 
       const menu = this.menu;
-      const root = Dropdown_roots_get_root_by_idx(this.rootidx);
-
-
-      // Case its the first time this menu will be rendered
-      if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
-         menu.gfx.vb.render_groupidx = this.gfx.vb.render_groupidx; // #181716
-         View_add_to_group(menu, this.group_bufferidxs[0]);
-         Vertex_buffer_calculate_render_group_starts();
-      }
-
-
-      // IMPORTANT: ONLY IF MENU IS IN ITS OWN GROUP
-      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
-      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
 
       this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
-
-      
-      this.#ActivateMenu(); // Add dropdown to gfx buffers.
-
-      
-      const btn = this.children.buffer[0];
-      btn.text_mesh.SliceText(0, 1);
-      btn.text_mesh.SetTextAtIndex(this.dp_symbols[1], 0);
+      this.#ActivateMenu(); // Set all menu item's as 'active'
 
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
-
-      /********************************************************************************************************************/
-      // Calculate all meshes sizes from the root widget dropdown
-      if (widget_root.options & SECTION.FIXED_W) widget_root.max_size[0] = widget_root.geom.dim[0];
-      if (widget_root.options & SECTION.FIXED_H) widget_root.max_size[1] = widget_root.geom.dim[1];
-      
-      
-      // Calculate positions for dropdown
-      const cur_pos = [0,0];
-      cur_pos[0] = this.geom.pos[0]; 
-      cur_pos[1] = this.geom.pos[1]; 
-      
-
+      // Re-calculate layout
       Align_nested_sections_pre(widget_root);
-      Align_expand(this.menu);
+      Align_expand(menu);
       
-      /********************************************************************************************************************/
       // Re-create listen events 
-      Construct_listen_events_from_mesh_tree(this.menu)
-      Construct_listen_events_relations_from_mesh_tree(this.menu);
+      Construct_listen_events_from_mesh_tree(menu);
+      Construct_listen_events_relations_from_mesh_tree(menu);
       
-      
-      // if(widget_root.has_children_scrollers) {
-      //    for(let i=0; i <= widget_root.children_scrollers_buffer.boundary; i++) {
-      //       const scroller_comp = Components_get_scroller_component(widget_root.children_scrollers_buffer.buffer[i]);
-      //       // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
-      //       Scroller_component_calculate_handle_pos_dim(scroller_comp);
-      //       // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
-      //       console.log('y', scroller_comp.scrolled_section.geom.pos[1], 'dim', scroller_comp.scrolled_section.geom.dim[1])
-      //    }
-      // }
-      if(this.menu.has_children_scrollers) {
-         for(let i=0; i <= this.menu.children_scrollers_buffer.boundary; i++) {
-            const scroller_comp = Components_get_scroller_component(this.menu.children_scrollers_buffer.buffer[i]);
+      // Re-calculate scrollers
+      if(menu.has_children_scrollers) {
+         for(let i=0; i <= menu.children_scrollers_buffer.boundary; i++) {
+            const scroller_comp = Components_get_scroller_component(menu.children_scrollers_buffer.buffer[i]);
             Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
             // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
-            console.log('y', scroller_comp.scrolled_section.geom.pos[1], 'dim', scroller_comp.scrolled_section.geom.dim[1])
          }
       }
 
-      /********************************************************************************************************************/
-      // Re-render   
-      // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0]);
-      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0]);
-
+      if(menu.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) { // for fast activation
+         if(menu.is_gfx_inserted) {
+            // Activate specific render groups
+            View_activate_rg(menu.group_bufferidxs);
+         }
+         else { // First time menu is rendered
+            // Render menu's rendergroup
+            // TODO: Render the rest of the render groups that belong to the menu...
+            View_render_from_view_specific_render_group_NEW(menu.group_bufferidxs);
+         }
+      }
+      // Slower
+      else { // Render the whole buffer mesh by mesh for each render group
+         View_reset_to_index_from_view_group_NEW(menu.group_bufferidxs[0]);
+         View_render_from_view_NEW(menu.group_bufferidxs[0]);
+      }
 
    }
 

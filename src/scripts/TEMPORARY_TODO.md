@@ -1,10 +1,18 @@
 TODO
 
+# IMIDIATELY:  Render multi vertex color
+
+# IMIDIATELY:  Remove calling "Mesh_listener_create()" instaed use from widgetEnableProperties
+
+# IMIDIATELY:  In Dropdown: the menu is added/removed from dp's children.
+   Do we need to set active/deactive all of the menu's children??????
+
 # Should we unite gfx context creation with render groups creation???
    Since both run for each mesh
 
 # Implement uniforms and u_wpos for each render group 
 
+# IMIDIATELY:  I think '_per_vb_mesh_unif_wpos_ubidxs' is unused and must  be deleted
 # IMIDIATELY:  Fix Resize rect function
 # IMIDIATELY:  Remove all the crap for buffer data full update from the Draw loop
       1. Use  of a command buffer

@@ -7,13 +7,14 @@ import { GREY, ORANGE, PURPLE, YELLOW } from "../../Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventFunctions.js";
 import { Slider_connect } from "../WidgetSlider.js";
-import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_get_uniform_from_name } from "../../../../Graphics/ShaderPrograms.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_default_properties } from "./WidgetEnableProperties.js";
 import { Align_nested_sections_pre } from "../../Operations/AlignNestedSections.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Color_theme_slider_auto } from "../../Material/Themes.js";
 import { Gl_set_generic2, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import { View_render_from_view_NEW } from "../../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -298,12 +299,14 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
    // Render 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
+      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
 
       Align_nested_sections_pre(controls_section);
+            
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
 
-      controls_section.Render();
       Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
 
 

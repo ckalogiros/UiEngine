@@ -274,7 +274,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    if (vb_groupidx === INT_NULL) {
 
       // First look the gfx pool for any matching vertex buffer
-
       // Avoid searching vb for scrollers, because it is specific and it would have been found earlier
       if ((flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0) {
 

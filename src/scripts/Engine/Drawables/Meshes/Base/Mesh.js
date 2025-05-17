@@ -59,44 +59,47 @@ export class Mesh {
 
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
     idx;        // Value: This is the index of the mesh in the parents's children buffer.
-    sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
-    fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
-    root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
-    per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
     mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
-    batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
     group_bufferidxs; // Array[3]: The [0] is the index of the group in the group buffer. The [1] is the index to the elem of the array representing the vertex buffer of this mesh, and [2] is the index of the buffer this mesh's index is stored to. 
-
+    
     parent;     // Pointer: to the parent mesh.
     children;   // Buffer: of pointers to children mesh.
-
+    
     geom;   // Class: Geometry: position, dimentions, ...
     mat;    // Class: Material: color, texture coordinates, ...
     gfx;    // Class: Graphics: start index, attributes count, vertexbuffer, shader program, ...
-
+    
     is_gfx_inserted; // Bool: A way to tell if the mesh has been inserted to the graphics buffers.
     isFramebufferRendered; // Value: Stores the index of the framebuffer the mesh is rendered to. Else INT_NULL for no framebuffer rendering for this mesh.
-
-    uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
+    
     shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
-
+    
     listeners;      // Buffer: Indexes to the EventListeners class.
     event_clbks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
     current_event_callback_idx; // Index: A way to choose between different event callback functions.
     timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
-
-    root_posidx; // An index to the root position buffer. 
-
+    
     scroller_comp;  // Pointer to scroller mesh.
     scroller_comp_idx;  // An index to scroller buffer.
     children_scrollers_buffer; // A buffer to store all scrollers this mesh is the root for. (For Move() functionality etc) 
     has_children_scrollers; // A quick way to check if any children scroller exists
     components;     // BitField: Type of 'COMPONENTS'. // TODO: Later implement more components other than scrollers.
-
+    
     debug_info;         // Struct: Debug_info_ui.
-
-    name; // String:
+    
     nameidx; // Index to Str buffer:
+    
+    /** UNUSED */
+    sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
+    fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
+    
+    /** TO BE DELETED */
+    uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
+    root_posidx; // An index to the root position buffer. 
+    per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
+    root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
+    batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
+    name; // String:
 
 
     constructor(geom = null, mat = null) {

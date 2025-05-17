@@ -12,6 +12,8 @@ import { Max } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../Operations/MeshAttributesFunctions.js";
+import { View_render_from_view_NEW } from "../../../Core/Views/MeshBufferViews.js";
+import { Vertex_buffer_calculate_render_group_starts } from "../../../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -35,8 +37,11 @@ export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      slider.Render();
+      slider.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(slider.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
       slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
@@ -69,8 +74,11 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      slider.Render();
+      slider.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(slider.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
       slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
@@ -101,9 +109,11 @@ export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4],
 
    if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      switch1.Render();
-   
+      switch1.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(switch1.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
    
       Construct_listen_events_from_mesh_tree(switch1)
@@ -136,9 +146,11 @@ export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], f
 
    if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      switch1.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      switch1.Render();
-   
+      switch1.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(switch1.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
    
       Construct_listen_events_from_mesh_tree(switch1)
@@ -180,12 +192,14 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
    // Render
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      label.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      label.Render()
+      label.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(label.group_bufferidxs[0]);
 
       label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
 
-      if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
+      Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
       Construct_listen_events_from_mesh_tree(label);
       Construct_listen_events_relations_from_mesh_tree(label);
    }
@@ -231,8 +245,10 @@ export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim
    // Render
    if (render) {
 
-      rect.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      rect.Render()
+      rect.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(rect.group_bufferidxs[0]);
 
       rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx)
 
@@ -312,9 +328,13 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      if (vb_groupidx !== INT_NULL) msdf_text.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
-      else msdf_text.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      msdf_text.Render()
+      // if (vb_groupidx !== INT_NULL) msdf_text.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, vb_groupidx, text_vb_groupidx);
+      // else msdf_text.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      msdf_text.GenGfxCtx();
+
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(msdf_text.group_bufferidxs[0]);
+
 
       msdf_text.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, msdf_text.gfx.vb.groupidx)
 

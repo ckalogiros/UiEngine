@@ -517,6 +517,14 @@ export function Vertex_buffer_group_get_vertices_per_face(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].vertices_per_face;
 }
 /** */
+export function Vertex_buffer_group_get_attributes_per_vertex(vb_groupidx) {
+    return _vertex_buffer_groups.buffer[vb_groupidx].attribs_info.count;
+}
+/** */
+export function Vertex_buffer_group_get_attributes_per_face(vb_groupidx) {
+    return _vertex_buffer_groups.buffer[vb_groupidx].vertices_per_face * _vertex_buffer_infos.buffer[vb_groupidx].attribs_info.count;
+}
+/** */
 export function Vertex_buffer_group_get_render_groupidxs(vb_groupidx) {
     return _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs;
 }
@@ -1104,7 +1112,7 @@ export function Vertex_buffer_print() {
 
 //     // const indices_per_face = Index_buffer_info_get_indices_per_face(vb_group.ibidx);
 //     // vb_group.draw_count = num_faces * indices_per_face;
-//     // // Vertex_buffer_render_group_set_draw_count(num_faces * indices_per_face);
+//     // // Vertex_buffer_render_group_reset_draw_count(num_faces * indices_per_face);
 
 
 //     vb_group.needs_any_update = true;

@@ -2,7 +2,7 @@
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
-import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
+import { View_build_group_from_root_mesh, View_render_from_view_NEW } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
@@ -13,7 +13,7 @@ import { Components_create_scroller_component, Scoller_component_gengfx_and_rend
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set, Scene_store_window_resized_meshes } from "../Engine/Scenes.js";
-import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
 import { Create_comet_particles, Create_glow_particles, Create_particles_controls, Comet_create_controls, Create_smoke_particles, Create_explosion_particles, Create_smoke_particles_controls, Demo_glow_particles_sparkles_effect } from "./Demo/DemoParticles.js";
@@ -484,7 +484,9 @@ Explore the demos and discover the possibilities!`;
    menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
    Align_nested_sections_pre(menu_panel);
-   menu_panel.Render();
+      
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
 
 
    Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
@@ -630,10 +632,14 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    {
       window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, _, true);
 
+      
+      window_menu.GenGfxCtx();
+      
       Align_nested_sections_pre(window_menu);
 
-      window_menu.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-      window_menu.Render()
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(window_menu.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(window_menu.root_bufferidx);
 
       window_menu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, window_menu.gfx.vb.groupidx)
@@ -641,7 +647,6 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
       Construct_listen_events_from_mesh_tree(window_menu)
       Construct_listen_events_relations_from_mesh_tree(window_menu);
 
-      View_build_group_from_root_mesh(window_menu);
    }
 
 
@@ -692,7 +697,10 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
 
       btn.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.ABSOLUTE_POSITION | GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
       btn.GenGfxCtx();
-      btn.Render()
+      
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(btn.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(btn.root_bufferidx);
 
       btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
@@ -785,8 +793,9 @@ function Create_menu_popup(params) {
    menu_panel.GenGfxCtx();
    Align_nested_sections_pre(menu_panel);
    Align_expand(menu_panel);
-   menu_panel.Render();
-
+      
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
 
    Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(menu_panel);
@@ -923,8 +932,10 @@ function Options_menu_callback(params) {
       // controls_section.MoveNoGfxUpdate(center, ypos); ypos += controls_section.geom.dim[1] * 2 + 10;
 
    }
+      
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
 
-   menu_panel.Render();
 
    Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(menu_panel);

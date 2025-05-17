@@ -800,9 +800,11 @@ const MESH_TYPE = {
 
 	WIDGET_LABEL: _CNT <<= 1,
 	WIDGET_BUTTON: _CNT <<= 1,
-	WIDGET_SWITCH: _CNT <<= 1,
 	WIDGET_TEXT: _CNT <<= 1,
 	WIDGET_TEXT_DYNAMIC: _CNT <<= 1,
+
+	WIDGET_SWITCH: _CNT <<= 1,
+	WIDGET_SWITCH_HANDLE: _CNT <<= 1,
 
 	WIDGET_SLIDER: _CNT <<= 1,
 	WIDGET_SLIDER_BAR: _CNT <<= 1,
@@ -828,7 +830,11 @@ const MESH_TYPE = {
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
 
+	MAX_BIT:_CNT,
 };
+
+console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{ MESH_TYPE }}}}}}}}}}}}}}}}}}}}}}}}}}}', MESH_TYPE);
+if(MESH_TYPE.MAX_BIT===0) console.error('MESH_TYPE BIT FLAGS OVERFLOW\nValue exceeded int 32');
 
 
 

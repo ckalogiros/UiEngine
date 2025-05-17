@@ -19,7 +19,7 @@ import { Components_create_scroller_component, Scoller_component_gengfx, Scoller
 import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
-import { View_build_NEW_IMPLEMENTATION } from "../../Core/Views/MeshBufferViews.js";
+import { View_add_mesh, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -48,6 +48,7 @@ export class Rect_Mesh extends Mesh {
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+         this.group_bufferidxs[0] = View_create_new_group(this);
       }
 
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
@@ -73,20 +74,18 @@ export class Rect_Mesh extends Mesh {
       mesh.idx = idx;
       mesh.parent = this;
 
-
-      if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
-         mesh.AddToWidgetRootBuffer(this.root_bufferidx)
+      // Add to view group
+      if(this.group_bufferidxs[0] !== INT_NULL) {
+         mesh.SetViewGroupIndex(this.group_bufferidxs[0]);
       }
 
-      mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
+      if (this.root_bufferidx !== INT_NULL && mesh.root_bufferidx === INT_NULL) {
+         mesh.AddToWidgetRootBuffer(this.root_bufferidx);
+      }
 
-      // If it is the first child, then HORIZONTAL layout must be applied.
-      // if (mesh.align.flags & LAYOUT.VERTICAL && idx === 0) {
-      //    mesh.align.flags &= ~LAYOUT.VERTICAL ;
-      //    mesh.align.flags |= LAYOUT.HORIZONTAL;
-      // }
+      if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) 
+         mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
 
-      // console.error(Mesh_get_name(this), 'horr', this.align.TEMP_children_hor, 'vert', this.align.TEMP_children_vert)
       return idx;
    }
    /** */
@@ -122,6 +121,7 @@ export class Rect_Mesh extends Mesh {
    Activate() {
 
       this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Activate();
       }
@@ -130,6 +130,8 @@ export class Rect_Mesh extends Mesh {
    Deactivate() { // TODO: ADD to all widget-Mesh classes
 
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
+
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
@@ -158,6 +160,19 @@ export class Rect_Mesh extends Mesh {
 
          const child = this.children.buffer[i];
          if (child) child.AddToWidgetRootBuffer(root_bufferidx);
+      }
+
+   }
+   /** */
+   SetViewGroupIndex(view_groupidx) {
+
+      this.group_bufferidxs[0] = view_groupidx;
+
+      for (let i = 0; i <= this.children.boundary; i++) {
+
+         // Store view group index
+         const child = this.children.buffer[i];
+         if (child) child.SetViewGroupIndex(view_groupidx);
       }
 
    }
@@ -224,6 +239,10 @@ export class Rect_Mesh extends Mesh {
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
+
+
       for (let i = 0; i <= this.children.boundary; i++) {
 
          const child = this.children.buffer[i];
@@ -236,23 +255,6 @@ export class Rect_Mesh extends Mesh {
       }
 
    }
-   // NewRender(run_for_children = true) {
-
-   //    if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
-   //       this.AddToGfx();
-   //    }
-
-   //    if (this.scroller_comp) {
-
-   //       Scoller_component_render(this.scroller_comp);
-   //       // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
-   //       const aaa = this.scroller_comp.base_unif_wpos ? this.scroller_comp.base_unif_wpos : this
-   //       Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
-   //       this.AddChildScrollerIdx(this.scroller_comp_idx);
-
-   //    }
-
-   // }
    Render(run_for_children = true) {
 
       if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) {
@@ -537,11 +539,14 @@ export class Rect_Mesh extends Mesh {
          // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
          // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
-         Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
+         // Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
+         View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
 
          const mouse_dif = Mouse_get_pos_dif()
          const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
-         Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         // Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         View_render_from_view_NEW(root.group_bufferidxs[0]);
+
       }
    }
    Bind(EventClbk = null, targetBindingFunctions = _, params, click_flags) {

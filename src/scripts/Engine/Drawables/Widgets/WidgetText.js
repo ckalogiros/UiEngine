@@ -9,6 +9,8 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Mesh_add_wpos_xy, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { View_add_mesh, View_create_new_group } from "../../Core/Views/MeshBufferViews.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 
 
 
@@ -34,6 +36,9 @@ export class Widget_Text extends Text_Mesh {
 
 		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+			
+            // Create view group
+            this.group_bufferidxs[0] = View_create_new_group(this);
 		}
 	}
 
@@ -89,7 +94,11 @@ export class Widget_Text extends Text_Mesh {
 		this.root_bufferidx = root_bufferidx;
 		Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 	}
+    /** */
+    SetViewGroupIndex(view_groupidx) {
 
+        this.group_bufferidxs[0] = view_groupidx;
+    }
 
 	GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
@@ -366,7 +375,17 @@ export class Widget_Multi_Text extends Widget_Text {
 			}
 		}
 	}
+    /** */
+    SetViewGroupIndex(view_groupidx) {
 
+        this.group_bufferidxs[0] = view_groupidx;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) {
+				child.group_bufferidxs[0] = view_groupidx;
+			}
+		}
+    }
 
 	Activate() {
 
@@ -469,8 +488,12 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
-		super.GenGfxCtx(FLAGS, specific_vb_groupidx);
-
+		this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		
+		// Add to view group
+		View_add_mesh(this.group_bufferidxs[0], this);
+		
+		// super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 		// We know that the 'this' is of type text, so we use the same gfx buffer index for all children texts
 		FLAGS |= GFX_CTX_FLAGS.SPECIFIC;
 		const vb_groupidx = this.gfx.vb.groupidx;
@@ -666,6 +689,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		Widget_gfx_ready_enable({mesh:new_text, enable_attr_dim:false,});
 
+		new_text.SetViewGroupIndex(this.group_bufferidxs[0]);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 		new_text.align.flags = align_NEW;
 		// new_text.StylesSetPad(pad);

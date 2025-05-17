@@ -15,6 +15,7 @@ import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_simple_default_properties } from './Helpers/WidgetEnableProperties.js';
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from '../../../GlobalFunctions.js';
 import { Mesh_event_callback_create, Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
+import { View_add_mesh, View_create_new_group, View_remove_mesh } from '../../Core/Views/MeshBufferViews.js';
 
 
 
@@ -81,6 +82,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
          handle.root_bufferidx = this.root_bufferidx;
          Root_group_view_buffer_add_mesh(handle.root_bufferidx, handle.mesh_bufferidx);
+         
+         // Create view group
+         this.group_bufferidxs[0] = View_create_new_group(this);
+         handle.group_bufferidxs[0] = this.group_bufferidxs[0];
       }
 
       Mesh_set_name(handle, 'Slider handle');
@@ -106,14 +111,19 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    Activate() {
 
       this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
       this.children.buffer[0].state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
    }
-
-
+   
+   
    Deactivate() {
-
+      
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
+
       this.children.buffer[0].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.children.buffer[0].group_bufferidxs, this.children.buffer[0].geom.num_faces);
    }
 
 
@@ -184,6 +194,15 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
    }
 
+   /** */
+   SetViewGroupIndex(view_groupidx) {
+
+      this.group_bufferidxs[0] = view_groupidx;
+      const handle = this.children.buffer[0];
+      handle.group_bufferidxs[0] = view_groupidx;
+
+   }
+
 
    // EnableGfx(which, bar_params = null, handle_params = null) {
 
@@ -242,10 +261,14 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
-
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
+      
       const handle = this.children.buffer[0];
       handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
-
+      // Add to view group
+      View_add_mesh(handle.group_bufferidxs[0], handle);
+      
       return this.gfx;
    }
 
@@ -916,6 +939,13 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          Root_group_view_buffer_add_mesh(value_text.root_bufferidx, value_text.mesh_bufferidx);
 
          bar.AddToWidgetRootBuffer(this.root_bufferidx);
+
+         // Create view group
+         this.group_bufferidxs[0] = View_create_new_group(this);
+         name_text.group_bufferidxs[0] = this.group_bufferidxs[0];
+         value_text.group_bufferidxs[0] = this.group_bufferidxs[0];
+         bar.group_bufferidxs[0] = this.group_bufferidxs[0];
+         handle.group_bufferidxs[0] = this.group_bufferidxs[0];
       }
 
       Mesh_set_name(value_text, Mesh_get_name(this) + ' - value_text');
@@ -967,6 +997,22 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       const bar = this.children.buffer[this.bar_idx];
       bar.AddToWidgetRootBuffer(root_bufferidx);
+
+   }
+   
+   SetViewGroupIndex(view_groupidx) {
+      
+      this.group_bufferidxs[0] = view_groupidx;
+      
+      const name_text = this.text_mesh;
+      name_text.group_bufferidxs[0] = view_groupidx;
+      
+      const value_text = this.children.buffer[this.value_text_idx];
+      value_text.group_bufferidxs[0] = view_groupidx;
+      
+      const bar = this.children.buffer[this.bar_idx];
+      value_text.group_bufferidxs[0] = view_groupidx;
+      bar.SetViewGroupIndex(view_groupidx);
 
    }
 
@@ -1043,36 +1089,41 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    Activate() {
 
       this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-
+      
       const name_text = this.text_mesh;
       name_text.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-
+      
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-
+      
       const bar = this.children.buffer[this.bar_idx];
       bar.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-
+      
       const handle = bar.children.buffer[0];
       handle.state.mask |= MESH_STATE_FLAGS.ACTIVE;
    }
-
-
+   
+   
    Deactivate() {
-
+      
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
+      
       const bar = this.children.buffer[this.bar_idx];
       bar.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-
+      // View_remove_mesh(name_text.group_bufferidxs, name_text.geom.num_faces);
+      
       const name_text = this.text_mesh;
       name_text.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-
+      // View_remove_mesh(value_text.group_bufferidxs, value_text.geom.num_faces);
+      
       const handle = bar.children.buffer[0];
       handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-
+      // View_remove_mesh(bar.group_bufferidxs, bar.geom.num_faces);
+      
       const value_text = this.children.buffer[this.value_text_idx];
       value_text.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(handle.group_bufferidxs, handle.geom.num_faces);
    }
 
 
@@ -1212,21 +1263,30 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
-
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this);
+      
 
       const name_text = this.text_mesh;
       name_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, name_text,);
+      // Add to view group
+      View_add_mesh(name_text.group_bufferidxs[0], name_text);
       const text_igfx = name_text.gfx.vb.groupidx;
 
       const bar = this.children.buffer[this.bar_idx];
       bar.gfx = Gfx_generate_context(FLAGS, bar, rect_igfx);
+      // Add to view group
+      View_add_mesh(bar.group_bufferidxs[0], bar);
 
       const handle = bar.children.buffer[0];
       handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      // Add to view group
+      View_add_mesh(handle.group_bufferidxs[0], handle);
 
       const value_text = this.children.buffer[this.value_text_idx];
-
       value_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
+      // Add to view group
+      View_add_mesh(value_text.group_bufferidxs[0], value_text);
 
       return this.gfx;
    }

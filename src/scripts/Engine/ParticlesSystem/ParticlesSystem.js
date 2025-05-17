@@ -12,6 +12,7 @@ import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
 import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
+import { View_add_mesh } from "../Core/Views/MeshBufferViews.js";
 import { Material, Material_Texture } from "../Drawables/Material/Material.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
@@ -838,7 +839,9 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    // emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, specific_vb_groupidx,);
    emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true);
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
-
+   // Add to view group
+   View_add_mesh(emitter.group_bufferidxs[0], emitter);
+   
    // emitter.per_vb_bufferidx = Mesh_per_vb_store_mesh(emitter.gfx.vb.groupidx, emitter.mesh_bufferidx);
 
 

@@ -14,6 +14,7 @@ import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } f
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_listener_add, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { View_add_mesh, View_create_new_group, View_remove_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -32,6 +33,7 @@ export class Widget_Label extends Rect_Mesh {
         const text_mesh = Create_text_mesh({ text: text, pos: [text_pos_x, text_pos_y, properties.pos[2] + 1], col: properties.text_col, pad: properties.text_pad, font_size: properties.font_size, texture_id: properties.texture_id, sub_texture_id: properties.sub_texture_id, variant_idx: properties.variant_idx, is_debug_mesh: properties.is_debug_mesh });
         Widget_gfx_ready_enable({ mesh: text_mesh, enable_attr_dim: false, });
         text_mesh.StylesSetPad(properties.text_pad);
+
 
         // Create equal x pad for the ratio dif of w/h
         // properties.text_pad[0] += text_mesh.geom.dim[0] * 1.1708984375/2
@@ -73,6 +75,10 @@ export class Widget_Label extends Rect_Mesh {
             this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
             this.text_mesh.root_bufferidx = this.root_bufferidx;
             Root_group_view_buffer_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+
+            // Create view group
+            this.group_bufferidxs[0] = View_create_new_group(this);
+            text_mesh.group_bufferidxs[0] = this.group_bufferidxs[0];
         }
 
     }
@@ -96,14 +102,19 @@ export class Widget_Label extends Rect_Mesh {
     Activate() {
 
         this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+        
         this.text_mesh.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+        
     }
-
-
+    
+    
     Deactivate() {
-
+        
         this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+        // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
+
         this.text_mesh.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+        // View_remove_mesh(this.text_mesh.group_bufferidxs, this.text_mesh.geom.num_faces);
     }
 
 
@@ -148,6 +159,12 @@ export class Widget_Label extends Rect_Mesh {
         Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
         this.text_mesh.root_bufferidx = root_bufferidx;
         Root_group_view_buffer_add_mesh(this.text_mesh.root_bufferidx, this.text_mesh.mesh_bufferidx);
+    }
+    /** */
+    SetViewGroupIndex(view_groupidx) {
+
+        this.group_bufferidxs[0] = view_groupidx;
+        this.text_mesh.group_bufferidxs[0] = view_groupidx;
     }
 
 
@@ -211,24 +228,34 @@ export class Widget_Label extends Rect_Mesh {
         if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
         this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
+        
+        // Add to view group
+        View_add_mesh(this.group_bufferidxs[0], this);
+        
+        
+        this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
+        // Add to view group
+        View_add_mesh(this.text_mesh.group_bufferidxs[0], this.text_mesh);
 
-        if (this.text_mesh.gfx_ctx_flags) {
+        // if (this.text_mesh.gfx_ctx_flags) {
 
-            if (text_specific_vb_groupidx !== INT_NULL) {
-                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
-            }
-            else {
+        //     if (text_specific_vb_groupidx !== INT_NULL) {
+        //         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
+        //     }
+        //     else {
 
-                this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
-            }
-        }
-        else {
+        //         this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh);
+        //     }
+        // }
+        // else {
 
-            if (text_specific_vb_groupidx !== INT_NULL) {
-                this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
-            }
-            else this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
-        }
+        //     if (text_specific_vb_groupidx !== INT_NULL) {
+        //         this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh, text_specific_vb_groupidx);
+        //     }
+        //     else this.text_mesh.gfx = Gfx_generate_context(FLAGS, this.text_mesh);
+        // }
+        
+      
 
         return this.gfx;
     }

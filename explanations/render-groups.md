@@ -76,3 +76,24 @@
    Finally we call render from group, where for each mesh we check if it is already 'is_gfx_inserted'
    and call accordingly.
 
+
+# Sub-Groups
+   Currently a sub-group is a new view, added as a sub-group to the root view.
+   An array of indexes is used to point to all su-groups(via index) of a view group
+
+
+
+# ####################################
+*  Effects  with the dropdown widget
+   2 ways of a dp to reset and re-render
+   1. from root
+   2. from current dp menu render group
+
+   The first option does not need any render group to work properly, 
+   as it resets the whole dp tree from its view group (all render groups)
+   and re-renders the whole view group (all render groups)
+
+   The second aproach is faster, since it deals with the clicked dp-menu
+   it resets only the render group the menu belongs to
+   and re-renders that render group
+   BUG: Problem arises when another dp is part of the render group of that dp-menu.
