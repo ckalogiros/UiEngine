@@ -59,8 +59,6 @@ export function Create_rect_mesh(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
 /**
  * This function calculates the area of a rectangle.
  * @param {*} properties { pos, dim, col, pad, text, font_size, texture_id, sub_texture_id, variant_idx, is_debug_mesh, }
@@ -81,8 +79,7 @@ export function Create_text_mesh(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
+/** */
 export function Create_widget_text(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -98,8 +95,7 @@ export function Create_widget_text(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
+/** */
 export function Create_widget_multi_text(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -115,8 +111,7 @@ export function Create_widget_multi_text(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
+/** */
 export function Create_widget_label(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -130,9 +125,7 @@ export function Create_widget_label(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_button(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -144,9 +137,7 @@ export function Create_widget_button(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_switch_button(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -158,8 +149,7 @@ export function Create_widget_switch_button(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
+/** */
 export function Create_widget_switch_simple(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -171,7 +161,6 @@ export function Create_widget_switch_simple(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
 /**
  * @param {*} properties { is_root, pos, dim, col, hover_margin, handle_pos, handle_dim, handle_col, is_debug_mesh, } 
  * @see {@link Widget_Slider_Simple}
@@ -187,9 +176,7 @@ export function Create_widget_slider_simple(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_slider(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -201,9 +188,7 @@ export function Create_widget_slider(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_scroller(is_root = 0x0, scrolled_section, dim, col, scroller_margin, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -215,9 +200,7 @@ export function Create_widget_scroller(is_root = 0x0, scrolled_section, dim, col
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_dropdown(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -229,9 +212,7 @@ export function Create_widget_dropdown(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, text, pad, bold, style, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -244,10 +225,7 @@ export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, te
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
-// export function Create_widget_close_btn(is_root = 0x0, root, text, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+/** */
 export function Create_widget_close_btn(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -259,9 +237,7 @@ export function Create_widget_close_btn(properties) {
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -273,11 +249,7 @@ export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, 
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
-
-// It does not store mesh's name to str_buffer
+/** */
 export function Create_widget_text_for_debug_ui_only(is_root = 0x0, text, pos, font_size, col, bold, pad, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();
@@ -295,9 +267,7 @@ export function Create_widget_text_for_debug_ui_only(is_root = 0x0, text, pos, f
 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
-
-
-
+/** */
 export function Create_widget_color_picker(is_root = 0x0, margin, pos, dim, col, name, style, is_debug_mesh = 0x0) {
 
    const _mesh_buffer = Mesh_buffer_get();

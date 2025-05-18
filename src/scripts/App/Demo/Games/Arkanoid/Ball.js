@@ -2,7 +2,7 @@
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
@@ -87,7 +87,9 @@ export class Ball {
 
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, vb_groupidx);
 
-      mesh.Render();
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+   
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 
       this.mesh = mesh;

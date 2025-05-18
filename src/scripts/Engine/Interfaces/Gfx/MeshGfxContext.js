@@ -339,28 +339,28 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
                   Program_stgore_blend_mode_ubidx(progidx, ubidx);
                }
 
-               // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
-               if (uniforms[i].name === 'u_wposxy') {
+               // // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
+               // if (uniforms[i].name === 'u_wposxy') {
 
 
-                  const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-                  // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
-                  const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
+               //    const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+               //    // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
+               //    const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
                   
-                  let COPY_MESH_POS = false;
+               //    let COPY_MESH_POS = false;
 
 
-                  // TODO: Decide if the mesh's position will be stored to the wposition uniform. As consequence all meshes of this vb will get the uniform position and the mesh's position is going to be set [0,0]
-                  if(!temp_is_particle_system) 
-                     COPY_MESH_POS = true; 
+               //    // TODO: Decide if the mesh's position will be stored to the wposition uniform. As consequence all meshes of this vb will get the uniform position and the mesh's position is going to be set [0,0]
+               //    if(!temp_is_particle_system) 
+               //       COPY_MESH_POS = true; 
 
 
-                  // Create the uniform position that will update the vertexbuffer's uniform
-                  mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+               //    // Create the uniform position that will update the vertexbuffer's uniform
+               //    mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
 
-                  if (mesh.root_posidx !== vb_groupidx)
-                     alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
-                  }
+               //    if (mesh.root_posidx !== vb_groupidx)
+               //       alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
+               // }
             }
          }
 

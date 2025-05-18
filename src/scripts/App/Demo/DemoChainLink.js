@@ -7,7 +7,7 @@ import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Get_fasma_color, WHITE } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Style_rect_default_properties, Widget_gfx_ready_enable } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";

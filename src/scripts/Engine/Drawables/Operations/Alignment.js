@@ -53,10 +53,6 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
     
 
 }
-
-
-
-
 /**
  * 
  */
@@ -88,12 +84,6 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
         second_mesh.pos[1] = first_mesh.pos[1];
     }
 }
-
-
-
-
-
-
 /**
  * Align only to the top-bottom, left-right relative to src_mesh rectangle
  * @param {BIT_FIELD} flags type of struct TEXT_ALIGN
@@ -101,8 +91,6 @@ export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0]
  * @param {dst_mesh.geom} dst_mesh type of: Geometry2D
  * @param {arr[2]} pad type of: int arr[2] | default values if not set:[0,0]
  */
-
-// TODO: Rename the function name to something representative
 export function Align_self_get_dif(flags, src_mesh, dst_mesh, pad = [0, 0], advancex=1, src_pad) {
 
     const pos = [0,0];

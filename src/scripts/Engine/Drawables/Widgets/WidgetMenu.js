@@ -2,7 +2,7 @@
 
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
-import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "./Helpers/CreateWidget.js";
+import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";

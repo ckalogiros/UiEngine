@@ -1,6 +1,6 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple } from "./CreateWidget.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple } from "./CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../Core/Views/RootView.js";
 import { BLUEL, GREY, WHITE, YELLOW } from "../../Material/Colors.js";
@@ -12,8 +12,8 @@ import { Max } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../Operations/MeshAttributesFunctions.js";
-import { View_render_from_view_NEW } from "../../../Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_render_group_starts } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Widget_render } from "./WidgetRender.js";
 
 
 
@@ -33,7 +33,7 @@ export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_
       handle_col: handle_col,
    }));
 
-   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE}, });
+   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE }, });
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
@@ -68,100 +68,79 @@ export function Widget_ready_slider(is_root = 0x0, x = 0, y = 0, initial_val = .
    }));
 
    // Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 8, });
-   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect:8, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}});
+   Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: 8, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } });
 
    slider.SetInitialValue(initial_val);
 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       slider.GenGfxCtx();
+      Widget_render(slider);
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(slider.group_bufferidxs[0]);
-
-      Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-      slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-
-      Construct_listen_events_from_mesh_tree(slider)
-      Construct_listen_events_relations_from_mesh_tree(slider);
    }
 
    return slider
 
 }
 /** */
-export function Widget_ready_switch(is_root=0x0, x=0, y=0, size=20, col=GREY[4], handle_col=GREY[7], hover_margin=[6,6], on_click_clbk=null) {
+export function Widget_ready_switch(is_root = 0x0, x = 0, y = 0, size = 20, col = GREY[4], handle_col = GREY[7], hover_margin = [6, 6], on_click_clbk = null) {
 
    const pos = [x, y, 0];
-   const switch1 = Create_widget_switch_simple(Style_switch_default_properties({ 
-      is_root: is_root, 
-      pos: pos, 
-      col: col, 
-      size:size,
-      handle_col:handle_col,
-      hover_margin:hover_margin,
+   const switch1 = Create_widget_switch_simple(Style_switch_default_properties({
+      is_root: is_root,
+      pos: pos,
+      col: col,
+      size: size,
+      handle_col: handle_col,
+      hover_margin: hover_margin,
    }));
 
-   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
+   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: switch1.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER }, });
 
-   if(on_click_clbk) switch1.Bind(on_click_clbk);
-   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
+   if (on_click_clbk) switch1.Bind(on_click_clbk);
+   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------') });
 
-   if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       switch1.GenGfxCtx();
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(switch1.group_bufferidxs[0]);
-
-      Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
-   
-      Construct_listen_events_from_mesh_tree(switch1)
-      Construct_listen_events_relations_from_mesh_tree(switch1);
-      switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
+      Widget_render(switch1);
    }
 
    return switch1;
 }
 /** */
-export function Widget_ready_switch_button(is_root=0x0, x=0, y=0, col=GREY[3], font_size=8, text_pad=[12, 6], on_click_clbk=null) {
+export function Widget_ready_switch_button(is_root = 0x0, x = 0, y = 0, col = GREY[3], font_size = 8, text_pad = [12, 6], on_click_clbk = null) {
 
    const pos = [x, y, 0];
-   const switch1 = Create_widget_switch_button(Style_switch_button_default_properties({ 
-      is_root: is_root, 
-      text_on: 'switch on', 
-      text_off: 'switch off', 
-      pos: pos, 
-      font_size: font_size, 
-      col: col, 
-      text_col: WHITE, 
-      text_pad: text_pad, 
+   const switch1 = Create_widget_switch_button(Style_switch_button_default_properties({
+      is_root: is_root,
+      text_on: 'switch on',
+      text_off: 'switch off',
+      pos: pos,
+      font_size: font_size,
+      col: col,
+      text_col: WHITE,
+      text_pad: text_pad,
    }));
 
-   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: 6, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
+   Widget_gfx_ready_enable({ mesh: switch1, enable_sdf_rect: 6, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER }, });
 
 
-   if(on_click_clbk) switch1.Bind(on_click_clbk);
-   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------')});
+   if (on_click_clbk) switch1.Bind(on_click_clbk);
+   else switch1.Bind(function () { console.log('--------------------------- CALLBACK FROM USER ---------------------------') });
 
-   if(is_root & ROOT_WIDGETS.CREATE_ROOT) {
+   if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       switch1.GenGfxCtx();
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(switch1.group_bufferidxs[0]);
-
-      Root_group_activate_all_vbs_in_renderqueue(switch1.root_bufferidx);
-   
-      Construct_listen_events_from_mesh_tree(switch1)
-      Construct_listen_events_relations_from_mesh_tree(switch1);
-      switch1.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, switch1.gfx.vb.groupidx)
+      Widget_render(switch1);
    }
 
    return switch1;
 }
 /** */
-export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEXTURES.MTSDF_CONSOLAS_1024, x = 0, y = 0, font_size = 10, color = GREY[3], text_pad = [10, 6], color_text = WHITE, event_hover=true, event_move=false) {
+export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = TEXTURES.MTSDF_CONSOLAS_1024, x = 0, y = 0, font_size = 10, color = GREY[3], text_pad = [10, 6], color_text = WHITE, event_hover = true, event_move = false) {
 
    const pos = [x, y, 0];
 
@@ -181,8 +160,8 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
 
 
    Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, });
-   if(event_move) Mesh_listener_create(label, LISTEN_EVENT_TYPES.MOVE)
-   if(event_hover) Mesh_listener_create(label, LISTEN_EVENT_TYPES.HOVER);
+   if (event_move) Mesh_listener_create(label, LISTEN_EVENT_TYPES.MOVE)
+   if (event_hover) Mesh_listener_create(label, LISTEN_EVENT_TYPES.HOVER);
 
    // label.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE | MESH_STATE_FLAGS.IS_RESIZEABLE);
    // label.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
@@ -194,14 +173,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
 
       label.GenGfxCtx();
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(label.group_bufferidxs[0]);
-
-      label.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, label.gfx.vb.groupidx)
-
-      Root_group_activate_all_vbs_in_renderqueue(label.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(label);
-      Construct_listen_events_relations_from_mesh_tree(label);
+      Widget_render(label);
    }
 
    { // abilities
@@ -226,7 +198,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id=TEX
    return label;
 }
 /** */
-export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim=[20,20], col = BLUEL[5], pad=[10,10]) {
+export function Widget_ready_rect(render = false, is_root = 0x0, x = 0, y = 0, dim = [20, 20], col = BLUEL[5], pad = [10, 10]) {
 
    const pos = [x, y, 0];
    const rect = Create_rect_mesh(Style_rect_default_properties({
@@ -234,11 +206,11 @@ export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim
       pos: pos,
       dim: dim,
       col: col,
-      pad:pad,
+      pad: pad,
    }));
 
 
-   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 4, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}, });
+   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER }, });
 
 
    /********************************************************************************************************************************************************/
@@ -246,15 +218,7 @@ export function Widget_ready_rect(render=false, is_root = 0x0, x = 0, y = 0, dim
    if (render) {
 
       rect.GenGfxCtx();
-
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(rect.group_bufferidxs[0]);
-
-      rect.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, rect.gfx.vb.groupidx)
-
-      if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(rect.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(rect);
-      Construct_listen_events_relations_from_mesh_tree(rect);
+      Widget_render(rect);
    }
 
    return rect;
@@ -318,7 +282,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
       text_col: WHITE,
       is_debug_mesh: false,
    }));
-   Widget_gfx_ready_enable({mesh:msdf_text, enable_sdf_rect:4});
+   Widget_gfx_ready_enable({ mesh: msdf_text, enable_sdf_rect: 4 });
 
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(msdf_text, LISTEN_EVENT_TYPES.MOVE);
    Mesh_listener_create(msdf_text, LISTEN_EVENT_TYPES.HOVER);
@@ -332,15 +296,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
       // else msdf_text.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       msdf_text.GenGfxCtx();
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(msdf_text.group_bufferidxs[0]);
-
-
-      msdf_text.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, msdf_text.gfx.vb.groupidx)
-
-      if (is_root & ROOT_WIDGETS.CREATE_ROOT) Root_group_activate_all_vbs_in_renderqueue(msdf_text.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(msdf_text);
-      Construct_listen_events_relations_from_mesh_tree(msdf_text);
+      Widget_render(msdf_text);
 
       { // abilities
          // Shader_bit_flags_print_enabled_attributes(msdf_text.sid.attr, `ATTR:  ${msdf_text.GetName()}`)

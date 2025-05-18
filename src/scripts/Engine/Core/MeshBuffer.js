@@ -2,7 +2,7 @@
 
 import { Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
 import { BLUEL, GREEN, GREY } from "../Drawables/Material/Colors.js";
-import { Create_widget_button, Create_widget_dropdown, Create_widget_text } from "../Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_widget_button, Create_widget_dropdown, Create_widget_text } from "../Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";

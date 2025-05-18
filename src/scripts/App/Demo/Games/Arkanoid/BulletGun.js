@@ -2,7 +2,7 @@
 
 import { Callback_animations_create, Callback_animations_get_byidx } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
@@ -121,8 +121,12 @@ function Gun_create(x, y, vb_groupidx) {
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
-   mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-   mesh.Render();
+   // mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+   mesh.GenGfxCtx();
+
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+   
    mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 
 
@@ -137,8 +141,12 @@ function Gun_create(x, y, vb_groupidx) {
    Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
-   mesh2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-   mesh2.Render();
+   // mesh2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+   mesh2.GenGfxCtx();
+
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(mesh2.group_bufferidxs[0]);
+   
    mesh2.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh2.gfx.vb.groupidx);
    Gl_set_alpha(mesh2.gfx, 0);
 
@@ -185,8 +193,9 @@ export class Bullet {
       mesh.geom.pos[0] = x;
       mesh.geom.pos[1] = y;
 
-
-      mesh.Render();
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+   
 
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 

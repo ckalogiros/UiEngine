@@ -5,7 +5,7 @@ import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed }
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { Create_rect_mesh, Create_widget_label, Create_widget_slider_simple } from "./Helpers/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_slider_simple } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";

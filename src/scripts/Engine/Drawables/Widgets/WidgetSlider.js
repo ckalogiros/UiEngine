@@ -5,7 +5,7 @@ import { Mouse_get_pos_dif } from '../../Controls/Input/Mouse.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
 import { Gfx_generate_context } from '../../Interfaces/Gfx/MeshGfxContext.js';
 import { CopyArr4 } from '../../../Helpers/Math/MathOperations.js';
-import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from './Helpers/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_slider_simple, Create_widget_text } from './Helpers/CreateWidgetInterface.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices_from_render_group } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';

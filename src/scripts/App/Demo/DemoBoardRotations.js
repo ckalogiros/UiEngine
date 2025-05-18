@@ -2,7 +2,7 @@
 
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
 import { Mesh_animations_create } from "../../Engine/Animations/MeshAnimations.js";
-import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUE, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Colors.js";

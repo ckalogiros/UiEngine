@@ -1,7 +1,7 @@
 'use strict';
 
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle, Effects_create_explosion_glow } from "../../../../Engine/Drawables/Effects/Effects.js";
@@ -84,7 +84,9 @@ class Coin {
       mesh.geom.pos[0] = x;
       mesh.geom.pos[1] = y;
 
-      mesh.Render()
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+   
 
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx)
 

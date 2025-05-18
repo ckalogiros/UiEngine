@@ -10,7 +10,7 @@ import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQ
 import { Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Components_get_scroller_component } from "../Widgets/ScrollerComponent.js";
 
-
+/** */
 export function Mesh_find_unif_idx_from_unif_name(mesh_unif_buffer, unif_name) {
 
     const len = mesh_unif_buffer.length;
@@ -22,7 +22,7 @@ export function Mesh_find_unif_idx_from_unif_name(mesh_unif_buffer, unif_name) {
 
     alert('Find_mesh_ubidx_from_unif_name(ubidx, unif_name)\nNo uniform found with name:', unif_name, mesh_unif_buffer)
 }
-
+/** */
 export function Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, unif_name) {
 
     const len = uniforms.length;
@@ -35,14 +35,14 @@ export function Mesh_set_uniform_ubidx_from_name(uniforms, ubidx, unif_name) {
 
     alert('Mesh_set_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
-
+/** */
 export function Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_val, val_idx) {
 
     const ubidx = Program_find_uniform_ubidx_from_name(progidx, 'u_wposxy');
     Vertex_buffer_set_and_update_uniform(vb_groupidx, ubidx, unif_val, val_idx);
     // console.error('ubidx', ubidx, 'progidx', progidx, 'vbidx', vb_groupidx)
 }
-
+/** */
 export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
 
     const len = uniforms_buffer.length;
@@ -55,7 +55,7 @@ export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
     console.error('unif_name', unif_name, '\nuniforms_buffer', uniforms_buffer);
     alert('Mesh_get_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
-
+/** */
 export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshidx_w, meshidx_h) {
 
     const root_vb_groupidxs = Root_group_vbidx_view_get(root_bufferidx);
@@ -79,7 +79,7 @@ export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshid
         Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
     }
 }
-
+/** */
 export function Mesh_calc_pos_dif(mesh1, mesh2) {
 
     const m1_posx = mesh1.geom.pos[0] + mesh1.geom.dim[0];
@@ -91,8 +91,7 @@ export function Mesh_calc_pos_dif(mesh1, mesh2) {
         m1_posy - m2_posy,
     ];
 }
-
-// export function Mesh_set_root_in_focus(mesh, root_bufferidx) {
+/** */
 export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_NULL) {
 
     // Get all vertex buffers of all the root grouped meshes.
@@ -166,7 +165,7 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
     // Set the global state
     State_mesh_set_focused(root);
 }
-
+/** */
 export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border = 0) {
 
     return {
@@ -175,13 +174,13 @@ export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border 
         border: border,
     };
 }
-   
+/** */
 export function Mesh_remove_time_interval(mesh, idx) {
-      const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[idx];
-      if(intervalIdx===-1){
-         console.error('intervalIdx', intervalIdx, 'mesh.timeIntervalsIdxBuffer.buffer', mesh.timeIntervalsIdxBuffer.buffer)
-         alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
-      }
-      Time_intervals_destroy_byidx(intervalIdx);
-      mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(idx);
-   }
+    const intervalIdx = mesh.timeIntervalsIdxBuffer.buffer[idx];
+    if (intervalIdx === -1) {
+        console.error('intervalIdx', intervalIdx, 'mesh.timeIntervalsIdxBuffer.buffer', mesh.timeIntervalsIdxBuffer.buffer)
+        alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
+    }
+    Time_intervals_destroy_byidx(intervalIdx);
+    mesh.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(idx);
+}

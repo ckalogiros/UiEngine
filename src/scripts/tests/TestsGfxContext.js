@@ -5,7 +5,7 @@ import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBuffer
 import { Root_group_activate_all_vbs_in_renderqueue } from "../Engine/Core/Views/RootView.js";
 import { Color_hsv_to_rgb_calibrated } from "../Engine/Drawables/Material/Colors.js";
 import { Align_nested_sections_pre } from "../Engine/Drawables/Operations/AlignNestedSections.js";
-import { Create_rect_mesh, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Style_label_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Events/EventFunctions.js";
 

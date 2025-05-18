@@ -2,7 +2,7 @@
 
 
 
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidget.js';
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
 import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';

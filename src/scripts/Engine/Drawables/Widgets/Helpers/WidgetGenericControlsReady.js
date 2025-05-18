@@ -1,6 +1,6 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_slider } from "./CreateWidget.js";
+import { Create_rect_mesh, Create_widget_slider } from "./CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../Core/MeshUniformsBuffer.js";
 import { Root_group_activate_all_vbs_in_renderqueue } from "../../../Core/Views/RootView.js";
 import { GREY, ORANGE, PURPLE, YELLOW } from "../../Material/Colors.js";

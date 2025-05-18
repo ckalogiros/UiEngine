@@ -3,7 +3,7 @@
 import { New_generic_buffer } from "../../Core/Buffers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
-import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_activate_rg, View_add_mesh, View_add_to_group, View_deactivate_rg, View_remove_from_group, View_remove_mesh, View_build_all_group_from_root_mesh, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_from_view_all_buffers, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
@@ -141,6 +141,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       this.AddItem(btn);
 
       this.menu_active = false;
+      this.menu.Deactivate();
 
       
       if (properties.dp.is_root & ROOT_WIDGETS.CREATE_ROOT) {
@@ -187,7 +188,7 @@ export class Widget_Dropdown extends Rect_Mesh {
 
       this.children.buffer[0].Deactivate(); // Button
       if(this.isOn & DP_MENU_STATE.ON){
-         this.menu.Deactivate(); // Button
+         this.menu.Deactivate();
       }
    }
    /** */
@@ -311,6 +312,10 @@ export class Widget_Dropdown extends Rect_Mesh {
       if(this.group_bufferidxs[0] !== INT_NULL) {
          mesh.SetViewGroupIndex(this.group_bufferidxs[0]);
       }
+
+      
+      if((this.menu.state.mask & MESH_STATE_FLAGS.ACTIVE)===0) 
+         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
 
       mesh.idx = this.menu.AddItem(mesh);
 

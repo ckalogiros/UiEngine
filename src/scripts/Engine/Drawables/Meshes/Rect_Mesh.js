@@ -83,8 +83,11 @@ export class Rect_Mesh extends Mesh {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx);
       }
 
-      if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) 
-         mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
+      // if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) 
+      //    mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
+            
+      if((this.state.mask & MESH_STATE_FLAGS.ACTIVE)===0) 
+         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
 
       return idx;
    }

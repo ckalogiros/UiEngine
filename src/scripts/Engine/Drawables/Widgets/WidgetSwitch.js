@@ -3,7 +3,7 @@
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
-import { Create_rect_mesh } from "./Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";

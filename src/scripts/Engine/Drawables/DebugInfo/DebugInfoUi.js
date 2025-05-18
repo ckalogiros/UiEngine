@@ -2,7 +2,7 @@
 
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
-import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_text } from "../Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_text } from "../Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
 import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";

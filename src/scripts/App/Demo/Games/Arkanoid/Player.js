@@ -1,7 +1,7 @@
 "use strict";
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
-import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidget.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
@@ -43,9 +43,12 @@ export class Player {
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, _);
-
-      mesh.Render();
+      // mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, _);
+      mesh.GenGfxCtx();
+            
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(player.group_bufferidxs[0]);
+      
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
 
       this.in_scale_animation = false;
