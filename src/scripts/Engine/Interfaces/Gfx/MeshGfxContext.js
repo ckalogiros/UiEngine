@@ -4,7 +4,7 @@
 import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_set_name_for_debuging, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_group_state_enable, Vertex_buffer_group_get_vertices_per_face, } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
-import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
+import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Progarm_get_webgl_program_object, Program_store_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../../Scenes.js";
@@ -15,12 +15,12 @@ import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer 
 import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
-import { Mesh_unif_create_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_create_rg_root_wpos, Mesh_unif_create_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
 
-
+/** */
 export class GfxInfoMesh {
 
    constructor(gfx = {}) {
@@ -102,10 +102,7 @@ export class GfxInfoMesh {
    }
 
 }
-
-
-
-
+/** */
 function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1, render_groupidx) {
 
    const prog = Progarm_get_program(progidx);
@@ -118,8 +115,8 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.sid = sid;
    gfx_ctx.sceneidx = sceneidx;
    gfx_ctx.num_faces = num_faces;
-   gfx_ctx.vertsPerRect = Vertex_buffer_group_get_vertices_per_face(vb_groupidx);;
-   gfx_ctx.attribsPerVertex =  Shader_attributes_get_attribs_per_vertex(prog.attribsidx);;
+   gfx_ctx.vertsPerRect = Vertex_buffer_group_get_vertices_per_face(vb_groupidx);
+   gfx_ctx.attribsPerVertex =  Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
 
    gfx_ctx.vao = vb_group.vao;
 
@@ -162,12 +159,6 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
 
    return gfx_ctx;
 }
-
-
-
-
-
-
 /**
  * Change for program groups:
  * I the group in sid is set, then create a new group for the vertex buffers
@@ -322,45 +313,66 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
          /*******************************************************************************************************************/
-         // Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
-         // console.log('vb_groupidx', vb_groupidx)
+         // // Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
+         // // console.log('vb_groupidx', vb_groupidx)
+         // for (let i = 0; i < uniforms.length; i++) {
+
+         //    if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
+
+         //       const shader_program = Progarm_get_webgl_program_object(progidx);
+         //       const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
+
+
+         //       uniforms[i].ubidx = ubidx;
+         //       // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
+               
+         //       if (uniforms[i].name === 'u_blend_mode') {
+         //          Program_store_blend_mode_ubidx(progidx, ubidx);
+         //       }
+
+         //       // // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
+         //       // if (uniforms[i].name === 'u_wposxy') {
+
+
+         //       //    const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+         //       //    // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
+         //       //    const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
+                  
+         //       //    let COPY_MESH_POS = false;
+
+
+         //       //    // TODO: Decide if the mesh's position will be stored to the wposition uniform. As consequence all meshes of this vb will get the uniform position and the mesh's position is going to be set [0,0]
+         //       //    if(!temp_is_particle_system) 
+         //       //       COPY_MESH_POS = true; 
+
+
+         //       //    // Create the uniform position that will update the vertexbuffer's uniform
+         //       //    mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+
+         //       //    if (mesh.root_posidx !== vb_groupidx)
+         //       //       alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
+         //       // }
+         //    }
+         // }
+         
+         /*******************************************************************************************************************/
+         /** NEW IMPLEMENTATION-WITH RENDER GROUPS */
+         // Create uniforms for each new vertex buffer
          for (let i = 0; i < uniforms.length; i++) {
-
-            if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
-
+         
+            if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) { // Create ONLY for non-block uniforms
+         
                const shader_program = Progarm_get_webgl_program_object(progidx);
                const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
-
-
+         
+         
                uniforms[i].ubidx = ubidx;
                // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
                
                if (uniforms[i].name === 'u_blend_mode') {
-                  Program_stgore_blend_mode_ubidx(progidx, ubidx);
+                  Program_store_blend_mode_ubidx(progidx, ubidx);
                }
-
-               // // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
-               // if (uniforms[i].name === 'u_wposxy') {
-
-
-               //    const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-               //    // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
-               //    const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
-                  
-               //    let COPY_MESH_POS = false;
-
-
-               //    // TODO: Decide if the mesh's position will be stored to the wposition uniform. As consequence all meshes of this vb will get the uniform position and the mesh's position is going to be set [0,0]
-               //    if(!temp_is_particle_system) 
-               //       COPY_MESH_POS = true; 
-
-
-               //    // Create the uniform position that will update the vertexbuffer's uniform
-               //    mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
-
-               //    if (mesh.root_posidx !== vb_groupidx)
-               //       alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
-               // }
+       
             }
          }
 

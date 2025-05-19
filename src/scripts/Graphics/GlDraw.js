@@ -69,10 +69,12 @@ export function Gl_draw(gl) {
 
         for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
 
-            const render_group = Vertex_buffer_render_group_get_render_group(vb_group.render_groupidxs.buffer[j]);
+            const rgidx = vb_group.render_groupidxs.buffer[j];
+            const render_group = Vertex_buffer_render_group_get_render_group(rgidx);
 
             // TODO: Distinguish uniforms that will update with uniforms with constant value
-            Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx); // OLD: Update via Vertex buffer
+            Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, rgidx);
+            // Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, j); 
 
             if (vb_group.has_scissorbox) {
                 gl.enable(gl.SCISSOR_TEST);

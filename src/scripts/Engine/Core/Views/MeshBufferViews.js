@@ -4,13 +4,13 @@ import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_render_group_create, Vertex_buffer_render_group_reset_draw_count, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces } from "../../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
-import { Progarm_get_webgl_program_object, Program_stgore_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
+import { Progarm_get_webgl_program_object, Program_store_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_mesh } from "../MeshBuffer.js";
-import { Mesh_unif_create_vb_root_wpos } from "../MeshUniformsBuffer.js";
+import { Mesh_unif_create_rg_root_wpos, Mesh_unif_create_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
 
 
 
@@ -284,7 +284,37 @@ export function View_build_group_from_root_mesh(mesh) {
 
 
 
+/** Create uniforms from rendergroups */
+function View_group_create_uniforms_for_render_group(mesh) {
 
+   const uniforms = mesh.uniforms;
+   const flags = mesh.gfx_ctx_flags;
+   
+   /*******************************************************************************************************************/
+   // Set up the uniform positioning per render group system
+   for (let i = 0; i < uniforms.length; i++) {
+   
+      if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) { // Create ONLY for non-block uniforms
+   
+         const ubidx = uniforms[i].ubidx;
+
+         if (uniforms[i].name === 'u_wposxy') {
+   
+            const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
+            // const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
+            const HAS_STICKY_POS = 0x0;
+            
+            let COPY_MESH_POS = false;
+   
+            // Create a position for each render group to update the uniform position (for each render group draw call) of a vertex buffer
+            mesh.root_posidx = Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
+            // Set the update callback function, along with the position index to be used for the uniform update
+            mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.render_groupidx)
+   
+         }
+      }
+   }
+}
 
 
 
@@ -495,6 +525,9 @@ export function View_render_from_view_NEW(view_groupidx) {
                   mesh.AddToGfx();
                   // if (!mesh.is_gfx_inserted) mesh.AddToGfx();
                   // else mesh.AddToGfxFromReset();
+               }
+               else { // DEBUG
+                  console.log('DEBUG->Insert->Mesh INACTIVE', mesh.name, 'rgidx', mesh.gfx.vb.render_groupidx)
                }
             }
          }
@@ -926,61 +959,7 @@ export function View_activate_all_vbs(group_bufferidxs, activate_flag) {
 
 
 // UNUSED
-/** Create uniforms from rendergroups */
-function View_group_create_uniforms_for_render_group(mesh) {
 
-   // Cash
-   
-   const uniforms = mesh.uniforms;
-   const flags = mesh.gfx_ctx_flags;
-   const progidx = mesh.gfx.prog.idx;
-   const vb_groupidx = mesh.gfx.vb.groupidx;
-   
-   /*******************************************************************************************************************/
-   // Here we connect each mesh uniform index 'ubidx', with the ubidx from the uniforms block buffer.
-   // console.log('vb_groupidx', vb_groupidx)
-   for (let i = 0; i < uniforms.length; i++) {
-   
-      if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) {
-   
-         const shader_program = Progarm_get_webgl_program_object(progidx);
-         const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
-   
-   
-         uniforms[i].ubidx = ubidx;
-         // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
-         
-         if (uniforms[i].name === 'u_blend_mode') {
-            Program_stgore_blend_mode_ubidx(progidx, ubidx);
-         }
-   
-         // HACK: The u_wposxy is a kind of generic uniform for all meshes, and is set up differently, so for convinience we set up the callback here
-         if (uniforms[i].name === 'u_wposxy') {
-   
-   
-            const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-            // Pass the meshes info for creating 'sticky' behavior, on the vb's uniform position
-            // const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
-            const HAS_STICKY_POS = 0x0;
-            
-            let COPY_MESH_POS = false;
-   
-   
-            // // TODO: Decide if the mesh's position will be stored to the wposition uniform. As consequence all meshes of this vb will get the uniform position and the mesh's position is going to be set [0,0]
-            // if(!temp_is_particle_system) 
-            //    COPY_MESH_POS = true; 
-   
-   
-            // Create the uniform position that will update the vertexbuffer's uniform
-            mesh.root_posidx = Mesh_unif_create_vb_root_wpos(mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, progidx, vb_groupidx, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_MESH_POS);
-   
-            // if (mesh.root_posidx !== vb_groupidx)
-            //    alert(`root_posidx is NOT equal to vbidx.\nMaybe u_wposxy uniform is not enabled for this root mesh.\nvb_groupidx:${vb_groupidx}, mesh:${mesh.name}`);
-            // }
-         }
-      }
-   }
-}
 
 /** */
 // function View_render_group_find_match(groupidx, view_vbidx) {

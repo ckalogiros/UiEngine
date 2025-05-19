@@ -49,7 +49,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          dim: properties.dim,
          col: properties.col,
          pad: properties.pad,
-         name: properties.text,
+         name: properties.name,
          num_faces: properties.num_faces,
          is_debug_mesh: properties.is_debug_mesh,
       }));
@@ -70,7 +70,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          dim:[properties.size - pad, properties.size - pad], 
          col:properties.handle.col, 
          hover_margin:properties.handle.hover_margin, 
-         name:'switch',
+         name:properties.handle.name,
          is_debug_mesh:properties.is_debug_mesh
       }));
       Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:properties.size * (1 - ratio)});
@@ -78,7 +78,7 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
 
       switch_handle.mat.style.rcorners = properties.size - pad;
-      switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
       this.AddChild(switch_handle);
       this.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE);

@@ -26,6 +26,11 @@ that belong to separate vertex buffers but have  a relationship.
 A position variable accumulates all positions of every 'parent' uniform,
 and sets the current vertex buffer's uniform to the sum of all its 'parent' vertex buffers.  
 
+# Hacking the root_wpos.
+    In order to upadate each u_wpos for each rendergroup, we send the rgidx from Draw() to Vertex_buffer_set_and_update_uniforms_no_vao_binding() and from there we pass it as param to
+    the Clbk() which is the Mesh_unif_get_vb_root_wpos().
+    In Mesh_unif_get_vb_root_wpos we set the previously used vb_groupidx to rgidx,
+    by checking if rgidx is not called from any other function (undefined)
 
 # More questions to explain
 * 

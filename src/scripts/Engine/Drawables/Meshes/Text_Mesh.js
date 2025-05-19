@@ -58,38 +58,41 @@ export class Text_Mesh extends Mesh {
 
       this.SetLayout(properties.layout);
    }
-
+   /** */
    SetLayout(align_flags) {
 
       this.align.flags = align_flags;
    }
-
+   /** */
    AddLayout(align_flags) {
 
       this.align.flags |= align_flags;
    }
-
+   /** */
    StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
    }
-
-
+   /** */
    StateDisable(MASK = 0x0) {
 
       this.state.mask &= ~MASK;
    }
-
-
+   /** */
    SetTypeDebug() {
       this.type |= MESH_TYPE.DEBUG_MESH;
    }
+   /** */
+   GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
-
-   // RemoveFromMeshPerVbBuffer() {
-   //    Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-   // }
-
+      // FIXME: The clbk_params for unif_wpos is the vb_groupidx, BUT instead is passed recursively from the 'section.GfxUniformsSetClbk()'
+      // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
+      this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+      // for (let i = 0; i <= this.children.boundary; i++) {
+      //    const child = this.children.buffer[i];
+      //    if (child && child.gfx) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      // }
+   }
 
 
 
@@ -97,8 +100,7 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
    // Graphics
    /*******************************************************************************************************************************************************/
-
-
+   /** */
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
@@ -108,8 +110,7 @@ export class Text_Mesh extends Mesh {
 
       return this.gfx;
    }
-
-
+   /** */
    AddToGfx() {
 
       this.#Render_text();
@@ -125,8 +126,7 @@ export class Text_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
    }
-
-
+   /** */
    AddToGfxFromReset() {
 
       Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AddToGfxText)
@@ -148,20 +148,6 @@ export class Text_Mesh extends Mesh {
    }
 
 
-   // TODO:Use it
-   UpdateGfx() {
-
-      this.#Render_text()
-
-      // KEEP TRACK OF THE MAXIMUM CHARACTERS INSERTED IN GFX.
-      // This is important so that we know the length of the faces we must remove from the vertex buffer on text.Destroy
-      if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
-         this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
-
-      this.is_gfx_inserted = true;
-
-   }
-
 
 
 
@@ -170,8 +156,7 @@ export class Text_Mesh extends Mesh {
    /*******************************************************************************************************************************************************/
    // Transformations
    /*******************************************************************************************************************************************************/
-
-
+   /** */
    MoveNoGfxUpdate(x, y) {
 
       this.geom.pos[0] += x;
@@ -182,8 +167,7 @@ export class Text_Mesh extends Mesh {
       }
 
    }
-
-
+   /** */
    MoveYNoGfxUpdate(y) {
 
       this.geom.pos[1] += y;
@@ -193,8 +177,7 @@ export class Text_Mesh extends Mesh {
       }
 
    }
-
-
+   /** */
    MoveXNoGfxUpdate(x) {
 
       this.geom.pos[0] += x;
@@ -204,7 +187,7 @@ export class Text_Mesh extends Mesh {
       }
 
    }
-
+   /** */
    TEMP_recalc(x, y) {
 
       this.geom.pos[0] = x;
@@ -214,8 +197,7 @@ export class Text_Mesh extends Mesh {
          if (child) child.TEMP_recalc(x, y);
       }
    }
-
-
+   /** */
    SetPosXYNoGfxUpdate(x, y) {
       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
          Mesh_unif_set_vb_root_wpos(this.root_posidx, x, y);
@@ -225,8 +207,7 @@ export class Text_Mesh extends Mesh {
          this.geom.pos[1] = y;
       }
    }
-
-
+   /** */
    SetPosXNoGfxUpdate(x) {
 
       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -234,8 +215,7 @@ export class Text_Mesh extends Mesh {
       }
       else this.geom.pos[0] = x;
    }
-
-
+   /** */
    SetPosYNoGfxUpdate(y) {
 
       if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -243,13 +223,11 @@ export class Text_Mesh extends Mesh {
       }
       else this.geom.pos[1] = y;
    }
-
-
+   /** */
    SetPosZNoGfxUpdate(val) {
       this.geom.pos[2] = val;
    }
-
-
+   /** */
    SetText(str) {
 
       this.mat.char_buffer.Reset();
@@ -271,8 +249,7 @@ export class Text_Mesh extends Mesh {
 
       this.mat.text = str;
    }
-
-
+   /** */
    ClipX(limit) {
 
       const text_len = this.mat.text.length;
@@ -317,34 +294,27 @@ export class Text_Mesh extends Mesh {
    // Setters-Getters
    /*******************************************************************************************************************************************************/
 
-   // GetMaxWidth() { return (this.geom.dim[0] * this.advancex) * (this.geom.num_faces); }
+   /** */
    GetMaxWidth() { return this.text_width; }
-
-
+   /** */
    GetMaxHeight() { return this.text_height; }
-
-
+   /** */
    GetCenterPosX() { return this.geom.pos[0] + this.GetMaxWidth() - this.geom.dim[0]; }
-
-
+   /** */
    GetTextLeft_A() { return this.GetCenterPosX() - this.GetMaxWidth(); }
-
-
+   /** */
    GetTextRight_A() { return this.GetCenterPosX() + this.GetMaxWidth(); }
-
-
+   /** */
    SetColorRGB(col, char_len = 0) {
       const num_face = (char_len) ? char_len : this.geom.num_faces;
       Set_color_rgb(this, col);
    }
-
-
+   /** */
    SetColorRGBSpecificIndex(col, char_start, char_len = 0) {
       const num_faces = (char_len) ? char_len : this.geom.num_faces;
       Gl_set_rgb_specific_index(this.gfx, col, num_faces, char_start);
    }
-
-
+   /** */
    SetFrameBufferIdx(fbidx) {
       this.isFramebufferRendered = fbidx;
    }
@@ -373,7 +343,7 @@ export class Text_Mesh extends Mesh {
          else this.mat.char_buffer.Add(' ');
       }
    }
-
+   /** */
    SetTextAtIndex(str, start) {
 
       /**DEBUG */ if (start > this.mat.char_buffer.size) console.error('ERROR @SetTextAtIndex().\n start greater than buffer size.\nstart=', start);
@@ -385,8 +355,7 @@ export class Text_Mesh extends Mesh {
          this.mat.char_buffer.AddAtIndex(i, str[i]);
       }
    }
-
-
+   /** */
    SliceText(_start = 0, _count = _) {
       const count = (_count === _ || _count > this.mat.char_buffer.size) ? this.mat.char_buffer.active_count : _count;
       const start = (_start > this.mat.char_buffer.boundary) ? this.mat.char_buffer.boundary : _start;
@@ -396,7 +365,7 @@ export class Text_Mesh extends Mesh {
       }
 
    }
-
+   /** */
    ScaleText(scale) {
 
       if (!this.gfx) {
@@ -470,17 +439,14 @@ export class Text_Mesh extends Mesh {
          // this.#Render_text(value);
       }
    }
-
-
+   /** */
    RenderTextFromString(text) {
       if (text.constructor === String) {
          this.SetText(text);
          this.RenderText(text);
       }
    }
-
-
-
+   /** */
    RenderText() {
       if (!this.gfx) { // Case there is a timeInterval or some callback calling to render text before its 'root' widget called the '.Render()' function
          return; 
@@ -555,8 +521,6 @@ export class Text_Mesh extends Mesh {
       this.gfx.vb.starts.buffer[0] = store_start;
 
    }
-
-
    /** Update a specific character in text char array */
    UpdateTextCharacter(_text, idx) {
 
@@ -587,8 +551,7 @@ export class Text_Mesh extends Mesh {
       Gl_set_uv(this.gfx, this.mat.uv);
 
    }
-
-
+   /** */
    ResetText(new_text) {
 
       const len = new_text.length;
@@ -599,8 +562,7 @@ export class Text_Mesh extends Mesh {
       this.geom.text = new_text;
       this.geom.num_faces = new_text.length;
    }
-
-
+   /** */
    #Render_text() {
 
       const geom_copy = { // Copy first character's mesh geometry, so we can make changes to it on calculating the rest of the characters position and dimentions.

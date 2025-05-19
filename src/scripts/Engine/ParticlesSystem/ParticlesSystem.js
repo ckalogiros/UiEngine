@@ -12,7 +12,7 @@ import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
 import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/Buffers.js";
 import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
-import { View_add_mesh } from "../Core/Views/MeshBufferViews.js";
+import { View_add_mesh, View_create_new_group } from "../Core/Views/MeshBufferViews.js";
 import { Material, Material_Texture } from "../Drawables/Material/Material.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
@@ -274,6 +274,8 @@ class Emitter {
       // this.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
       // this.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
 
+      this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
+      this.group_bufferidxs[0] = View_create_new_group(this);
 
       this.num_particles_per_frame = num_particles_per_frame;
       this.has_intermidiate_emission = false;
@@ -307,7 +309,7 @@ class Emitter {
          time: this.particles_buffer.buffer[particle_idx].time,
          generic: this.particles_buffer.buffer[particle_idx].generic,
       }
-allert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
+// alert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
       // const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
       // const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);

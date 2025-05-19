@@ -22,6 +22,7 @@ import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_d
 import { Mesh_add_wpos_xy } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Align_nested_sections_pre } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Color_theme_label_auto, Color_theme_slider_auto, Color_theme_switch_auto } from '../../Engine/Drawables/Material/Themes.js';
+import { Widget_render } from '../../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
 
 
 const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
@@ -217,14 +218,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
       Align_nested_sections_pre(controls_section);
 
-      controls_section.Render();
-      Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
-      Construct_listen_events_from_mesh_tree(controls_section);
-      Construct_listen_events_relations_from_mesh_tree(controls_section);
-
+      Widget_render(controls_section);
    }
 
    return {

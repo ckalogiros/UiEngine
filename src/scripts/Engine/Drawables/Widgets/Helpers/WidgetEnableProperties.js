@@ -466,13 +466,15 @@ export function Style_switch_default_properties(user_properties) {
       // pad:user_properties.pad !== undefined ? user_properties.pad : 0,
       pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
       style:user_properties.style !== undefined ? user_properties.style : style,
-            
+      name: user_properties.name !== undefined ? user_properties.name : 'Switch UNAMED',
+      
       layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
 
       handle: {
          
          col: user_properties.handle_col !== undefined ? user_properties.handle_col : GREY[8],
          hover_margin: user_properties.hover_margin !== undefined ? user_properties.hover_margin : 7,
+         name: 'Switch handle',
       },
 
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,

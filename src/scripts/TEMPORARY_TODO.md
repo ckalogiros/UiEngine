@@ -1,5 +1,17 @@
 TODO
 
+# IMIDIATELY:  Check the uniform_bindings for each vb to be equal to 1 per uniform and not 1 per uniform per RG
+   because I think I found 3 u_wpos bindings for 1 vb.
+   And also we are gonna need to pass the argidx from the bindings update to all Clbk's
+   and handle which values should get at the Clbk site 
+
+# Correct the root_posidx. The idx value is the same with rgidx
+   Should the Mesh store the root_posidx???
+
+# IMIDIATELY:  Mesh per vb is DEPRECATED
+
+# IMIDIATELY:  Mesh root_widget is DEPRECATED ????????
+
 # IMIDIATELY:  Render multi vertex color
 
 # IMIDIATELY:  Remove calling "Mesh_listener_create()" instaed use from widgetEnableProperties

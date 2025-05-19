@@ -683,8 +683,11 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
     for (let i = 0; i <= uniform_bindings.boundary; i++) {
 
+        if (uniform_bindings.buffer[i].unif_name === unif_name) {
+            return;
+        }
         // Check all uniforms of this vertex buffer group, if any mathces found, skip adding and update the found 
-        if (uniform_bindings.buffer[i].ubidx === ubidx) {
+        else if (uniform_bindings.buffer[i].ubidx === ubidx) {
             uniform_bindings.buffer[i].Clbk = Clbk;
             uniform_bindings.buffer[i].params = params;
 
@@ -700,6 +703,14 @@ export function Vertex_buffer_set_uniform_value_callback(vb_groupidx, Clbk, para
         unif_name: unif_name,
     });
 
+    console.log(
+        'UNIFORM BINDINGS CREATE:',
+        '  Clbk,:', Clbk,
+        '  params,:', params,
+        '  ubidx,:', ubidx,
+        '  unif_name,:', unif_name,
+    )
+
 }
 /** */
 function Vertex_buffer_remove_uniforms(vb_groupidx) {
@@ -713,14 +724,21 @@ function Vertex_buffer_remove_uniforms(vb_groupidx) {
 
 }
 /** */
-export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, debug_progidx) {
+export function Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, debug_progid, rgidx) {
 
     const uniform_bindings = _vertex_buffer_groups.buffer[vb_groupidx].uniform_bindings;
     for (let i = 0; i <= uniform_bindings.boundary; i++) {
 
         const params = uniform_bindings.buffer[i].params;
-        const val = uniform_bindings.buffer[i].Clbk(params);
+        const val = uniform_bindings.buffer[i].Clbk(params, rgidx);
         const ubidx = uniform_bindings.buffer[i].ubidx;
+        if(uniform_bindings.buffer[i].unif_name === 'u_wposxy') 
+        // console.log(
+        //     'vb:', vb_groupidx,
+        //     'val:', val[1], 
+        //     'rg:', rgidx
+        // )
+        // console.log(rgidx)
 
         Uniforms_buffer_set_uniform_val_from_index(ubidx, val, params.val_idx);
         Uniforms_buffer_update_uniform(ubidx);

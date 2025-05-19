@@ -66,24 +66,16 @@ export function Components_create_scroller_component(width = 12, height = 100, m
             GFX_CTX_FLAGS.PRIVATE 
             | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL 
             | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW
-            | GFX_CTX_FLAGS.RENDER_GROUP_NEW
+            // | GFX_CTX_FLAGS.RENDER_GROUP_NEW
             // | GFX_CTX_FLAGS.ABSOLUTE_POSITION
    })
    bar.type |= MESH_TYPE.WIDGET_SCROLLER_BAR;
-
-   // bar.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
-   // bar.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
 
    bar.OnClick = Scroller_component_onClick;
    bar.ListenEventConstruct = Scroller_component_listen_event_construct;
    bar.GfxUniformsSetClbk = Scroller_component_gfx_uniforms_set_clbk;
 
-   // bar.parent = parent;
-
-   bar.base_unif_wpos = parent
-
-
-   // const handle_pad = [3, 3];
+   // Handle
    const handle_pad = [0, 0];
    const handle_width = bar.geom.dim[0] - handle_pad[0];
    const handle_height = bar.geom.dim[1] - handle_pad[1];
@@ -91,14 +83,16 @@ export function Components_create_scroller_component(width = 12, height = 100, m
    const handle = Create_rect_mesh(Style_rect_default_properties({ pos: handle_pos, dim: [handle_width, handle_height], col: col_handle, name: 'Handle' }));
    Widget_gfx_ready_enable({ mesh: handle, enable_sdf_rect: bar.geom.dim[0] / 2, })
    handle.StylesSetPad(handle_pad);
-
-
-   // HACK: We replace the scrollers uniform wposition (of the vb all the scrollers are inserted to) with the meshes unif wpos, what ever that is(maybe the mesh has a root widget from which it takes its unif wpos). 
-   bar.root_posidx = mesh.root_posidx;
-
-
    bar.AddChild(handle);
-   bar.scrolled_section = mesh;
+   
+   
+   // HACK: We replace the scrollers uniform wposition (of the vb all the scrollers are inserted to) with the meshes unif wpos, what ever that is(maybe the mesh has a root widget from which it takes its unif wpos). 
+   // bar.base_unif_wpos = parent
+   // bar.root_posidx = mesh.root_posidx;
+
+
+   // bar.scrolled_section = mesh;
+   bar.scrolled_section = null;
 
    const idx = _scrollers_buffer.Add(bar);
    mesh.scroller_comp_idx = idx;
@@ -106,6 +100,17 @@ export function Components_create_scroller_component(width = 12, height = 100, m
    mesh.components |= COMPONENTS.SCROLLER;
 
    return bar;
+
+}
+/** */
+export function Scoller_component_add_scrolled_section(bar, scrolled_section, scroller_comp_idx) {
+
+   // bar.base_unif_wpos = parent
+   // bar.root_posidx = scrolled_section.root_posidx;
+   bar.scrolled_section = scrolled_section;
+   // scrolled_section.scroller_comp_idx = scroller_comp_idx;
+   // scrolled_section.scroller_comp = bar;
+   // scrolled_section.components |= COMPONENTS.SCROLLER;
 
 }
 /** */
@@ -130,8 +135,10 @@ export function Scoller_component_gengfx_and_render(bar, mesh, gfx_flags = 0x0, 
    bar.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC | GFX_CTX_FLAGS.SCROLLER_VB);
 
    // Set positions after 'GenGfxCtx' so that the bar's
-   bar.geom.pos[0] = Mesh_get_real_pos_x(mesh) + mesh.geom.dim[0] * 2
-   bar.geom.pos[1] = Mesh_get_real_pos_y(mesh);
+   // bar.geom.pos[0] = Mesh_get_real_pos_x(mesh) + mesh.geom.dim[0] * 2
+   // bar.geom.pos[1] = Mesh_get_real_pos_y(mesh);
+   bar.geom.pos[0] = 0
+   bar.geom.pos[1] = 0;
 
    // Set handle pos
    const handle = bar.children.buffer[0];
@@ -238,7 +245,7 @@ export function Scroller_component_calculate_handle_pos_dim(bar) {
 
    /* Set bar position */
    const x = Mesh_get_real_pos_x(scrolled_section) + scrolled_section.geom.dim[0] * 2;
-   Mesh_set_and_copy_wpos_x(bar, x);
+   // Mesh_set_and_copy_wpos_x(bar, x);
    const clean_bar_height = bar.geom.dim[1];
 
    /* Set handle size */
@@ -270,9 +277,9 @@ export function Scroller_component_set_pos_from_scrolled_section(bar) {
    const scrolled_section = bar.scrolled_section;
 
    // Set positions after 'GenGfxCtx' so that the bar's
-   bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section) + scrolled_section.geom.dim[0] * 2;
+   // bar.geom.pos[0] = Mesh_get_real_pos_x(scrolled_section) + scrolled_section.geom.dim[0] * 2;
    bar.geom.pos[1] = Mesh_get_real_pos_y(scrolled_section);
-   console.log(bar.geom.pos[1])
+   // console.log(bar.geom.pos[1])
    // Gl_set_dim_y(bar.gfx, bar.geom.dim[1], 1);
    Mesh_update_set_wpos_y(bar,);
 
@@ -329,12 +336,13 @@ function Scroller_component_update_handle_pos_from_scrolled_section(scrolled_sec
 
 
 
-/** This ois the callback for the scrolling fuunction */
+/** This is the callback for the scroll function */
 function Scroller_component_on_update_handle(_params) {
 
    const bar = _params.params;
    const handle = bar.children.buffer[0];
 
+   // Remove OnScroll if the handle is an-grabed
    if (Mesh_state_check(bar, MESH_STATE_FLAGS.IN_GRAB) === 0 && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
       // If bar out of hover, delete the timeInterval for moving the handle
@@ -402,10 +410,10 @@ function Scroller_component_gfx_uniforms_set_clbk(unif_name, Clbk, clbk_params) 
 
    // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
    this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-   for (let i = 0; i <= this.children.boundary; i++) {
-      const child = this.children.buffer[i];
-      if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-   }
+   // for (let i = 0; i <= this.children.boundary; i++) {
+   //    const child = this.children.buffer[i];
+   //    if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+   // }
 }
 
 
@@ -482,7 +490,8 @@ function Scroller_component_update_scrolled_section_pos_from_handle(scrolled_sec
    // const ydif = (posy - scrolled_posy);
 
    // Add the move difference to all vb's root positions.
-   Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);
+   // Mesh_unif_add_vb_root_wposy(scrolled_section.root_posidx, ydif);
+   Mesh_unif_add_vb_root_wposy(scrolled_section.gfx.vb.render_groupidx, ydif);
    // console.log(
    //    'ydif', Floor(ydif), 'pos_dim_ratio', Floor(pos_dim_ratio), 'clean_size', Floor(clean_size), 
    //    'barpos', Floor(bar.geom.pos[1]), 

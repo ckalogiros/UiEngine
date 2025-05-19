@@ -20,6 +20,7 @@ import { Mesh_set_and_copy_wpos_x, Mesh_set_wpos_relative_x, Mesh_set_wpos_x } f
 import { Align_nested_sections_pre, Align_expand } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Mesh_listener_create } from '../../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 import { Vertex_buffer_calculate_render_group_starts } from '../../Graphics/Buffers/VertexBuffers.js';
+import { Widget_render } from '../../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
 
 
 
@@ -1409,42 +1410,18 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
 
       const section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], dim: [20, 20], col: TRANSPARENCY(GREY[0], 1.) }));
       Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 15, listener:{type:LISTEN_EVENT_TYPES.MOVE} });
-      // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 15);
-      // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-
-
 
       for (let i = 0; i < num_items; i++) {
 
          const label = Create_widget_label(Style_label_default_properties({ text: `${i}`, font_size: font_size, col: TRANSPARENCY(colors[i], .8), text_pad: [6, 4] }))
          Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 15,  });
-         // label.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         // label.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
          label.align.flags = LAYOUT.VERTICAL;
          section.AddItem(label);
       }
 
-      // if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-      //    Align_nested_sections_pre(section)
-
-      //    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      //    section.options = SECTION.VERTICAL | SECTION.INHERIT | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
-      //    section.GenGfxCtx();
-
-
-
-      // const clbk = ()=>{console.error('09093089348938948973')}
       const clbk = () => {
-         // View_build_group_from_root_mesh(section);
-
-         Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-
-         // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-         // Construct_listen_events_from_mesh_tree(section)
-         // Construct_listen_events_relations_from_mesh_tree(section);
 
          const scroller_height = 40;
          const scroller_component = Components_create_scroller_component(10, scroller_height, section);
@@ -1469,9 +1446,6 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
          //    Root_group_reset_gfxs(section.root_bufferidx);
          //    Root_group_rerender_from_root_reconstruct_listeners(section.root_bufferidx);
       }
-
-
-      // }
 
       return { scroller: section, clbk: clbk };
    }
@@ -1616,15 +1590,7 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
    dp.GenGfxCtx();
    Align_nested_sections_pre(dp)
 
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(dp.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
-
-   dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-
-   Construct_listen_events_from_mesh_tree(dp)
-   Construct_listen_events_relations_from_mesh_tree(dp);
+   Widget_render(dp);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
    // View_build_group_from_root_mesh(dp);

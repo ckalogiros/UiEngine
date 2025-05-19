@@ -304,7 +304,7 @@ class Gl_Program {
 // 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
 // }
 /** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access throug Program */
-export function Program_stgore_blend_mode_ubidx(progidx, ubidx) {
+export function Program_store_blend_mode_ubidx(progidx, ubidx) {
 	const prog = _programs.buffer[progidx];
 	prog.blend_mode_ubidx = ubidx;
 }

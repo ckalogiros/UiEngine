@@ -218,10 +218,10 @@ export class Rect_Mesh extends Mesh {
       // FIXME: The clbk_params for unif_wpos is the vb_groupidx, BUT instead is passed recursively from the 'section.GfxUniformsSetClbk()'
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-      for (let i = 0; i <= this.children.boundary; i++) {
-         const child = this.children.buffer[i];
-         if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
-      }
+      // for (let i = 0; i <= this.children.boundary; i++) {
+      //    const child = this.children.buffer[i];
+      //    if (child && child.gfx) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+      // }
    }
    /** */
    SetIsGfxInserted(flag) {
@@ -252,10 +252,10 @@ export class Rect_Mesh extends Mesh {
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
 
-      if (this.scroller_comp) {
+      // if (this.scroller_comp) {
 
-         Scoller_component_gengfx(this.scroller_comp,);
-      }
+      //    Scoller_component_gengfx(this.scroller_comp,);
+      // }
 
    }
    Render(run_for_children = true) {
@@ -273,22 +273,22 @@ export class Rect_Mesh extends Mesh {
 
       if (this.scroller_comp) {
 
-         Scoller_component_render(this.scroller_comp);
-         // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
-         const aaa = this.scroller_comp.base_unif_wpos ? this.scroller_comp.base_unif_wpos : this
-         Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
-         this.AddChildScrollerIdx(this.scroller_comp_idx);
+         // Scoller_component_render(this.scroller_comp);
+         // // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(this.root_posidx, this.scroller_comp.root_posidx)
+         // const aaa = this.scroller_comp.base_unif_wpos ? this.scroller_comp.base_unif_wpos : this
+         // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
+         // this.AddChildScrollerIdx(this.scroller_comp_idx);
 
          // Scroller_component_calculate_handle_pos_dim(this.scroller_comp);
 
-         if(0) { // TODO: Scroller component should store if it has scissor box enabled
-            // Set scissor box
-            const mx = this.mesh_bufferidx;
-            const my = this.scroller_comp.mesh_bufferidx;
-            const mw = this.mesh_bufferidx;
-            const mh = this.scroller_comp.mesh_bufferidx;
-            Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
-         }
+         // if(0) { // TODO: Scroller component should store if it has scissor box enabled
+         //    // Set scissor box
+         //    const mx = this.mesh_bufferidx;
+         //    const my = this.scroller_comp.mesh_bufferidx;
+         //    const mw = this.mesh_bufferidx;
+         //    const mh = this.scroller_comp.mesh_bufferidx;
+         //    Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
+         // }
       }
 
    }
@@ -314,13 +314,14 @@ export class Rect_Mesh extends Mesh {
       // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
-
+   /** */
    EnableScroller(scroller_params) {
 
       const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
+      // const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, scroller_params.scrolled_section, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
 
-      this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
-      this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
+      // this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
+      // this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
       // this.AddChild(scroller);
       this.AddItem(scroller);
