@@ -164,7 +164,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
  * I the group in sid is set, then create a new group for the vertex buffers
  * Else default to the default group
  */
-export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL, temp_is_particle_system=false) {
+export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL, temp_is_particle_system=false, vb_aprox_size) {
 
 
    // Cash
@@ -291,7 +291,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       if (vb_groupidx === INT_NULL) {
 
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
-         vb_group = Vertex_buffer_create(sid, _, progidx, is_private);
+         vb_group = Vertex_buffer_create(sid, vb_aprox_size, progidx, is_private);
 
          // For debugging only 
          Vertex_buffer_set_name_for_debuging(vb_group.idx, Mesh_get_name(mesh));

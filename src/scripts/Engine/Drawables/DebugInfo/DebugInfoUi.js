@@ -900,7 +900,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
 // Generic Stats
 /************************************************************************************************************************************************/
 
-// These functions are used only as for callbacks
+// These functions are used only as callbacks
 function Get_debug_info_structs_generic_buffer_get_num_buffers() { return DEBUG_INFO_STRUCTS.BUFFER.GENERIC.NUM_BUFFERS; }
 function Get_debug_info_structs_int8_buffer_get_num_buffers() { return DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS; }
 function Get_debug_info_structs_int16_buffer_get_num_buffers() { return DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS; }

@@ -333,10 +333,22 @@ export class Rect_Mesh extends Mesh {
    // Alignment
    AlignNEW(pos_x, pos_y) {
 
+      const dif_y = pos_y - this.geom.pos[1];
+      
       const pad_x = this.StylesGetPad(STYLES.AXIS.X);
       const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
       this.geom.pos[0] = pos_x + pad_x;
       this.geom.pos[1] = pos_y + pad_y;
+      
+      // TEMPORARY
+      // HACK: TODO: Implement AlignNEW() in scroller
+      if(this.type & MESH_TYPE.WIDGET_SCROLLER_BAR) {
+         
+         const handle = this.children.buffer[0];
+         const handle_pad = handle.StylesGetPad();
+         handle.geom.pos[0] = this.geom.pos[0] + handle_pad[0];
+         handle.geom.pos[1] = handle.geom.pos[1]+dif_y;
+      }
 
       return {
          dim_x: this.geom.dim[0],

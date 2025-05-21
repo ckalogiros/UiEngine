@@ -330,7 +330,7 @@ const TEXT_ALIGN = {
 _CNT = 0x1;
 const LAYOUT = {
 
-	HORIZONTAL: _CNT <<= 0x1,
+	HORIZONTAL: _CNT = 0x1,
 	VERTICAL: _CNT <<= 0x1,
 	RESIZE_SELF: _CNT <<= 0x1,
 	FIXED_WIDTH: _CNT <<= 0x1,
@@ -339,10 +339,8 @@ const LAYOUT = {
 	EXPAND: _CNT <<= 0x1,
 	// PRESERVE_SELF_POS: _CNT <<= 0x1,
 
-
 	GROW_HORIZONTAL: _CNT <<= 0x1, // Takes up any space from parent's fixed width
 	GROW_VERTICAL: _CNT <<= 0x1, // Takes up any space from parent's fixed height
-
 
 	// Create some kind of types, in order to denote what align layout function to be used
 	TYPE_GROW_CONTAINER: _CNT <<= 0x1, 

@@ -6,6 +6,7 @@ import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/Unifor
 import { Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Progarm_get_webgl_program_object, Program_store_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Scroller_component_calculate_handle_pos_dim } from "../../Drawables/Widgets/ScrollerComponent.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
@@ -45,6 +46,10 @@ export const VIEW_INFO = {
 
 const _view_buffer = New_generic_buffer(_, 'Mesh buffer Views');
 
+/** */
+export function View_get_group(groupidx) {
+   return _view_buffer.buffer[groupidx];
+}
 /** */
 export function View_create_new_group(mesh) {
 
@@ -391,7 +396,7 @@ export function View_add_mesh(groupidx, mesh) {
          const found_match = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
          if (found_match !== INT_NULL) {
             view_rgidx = found_match;
-            mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
+         mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
             view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
             Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
          }
@@ -522,12 +527,24 @@ export function View_render_from_view_NEW(view_groupidx) {
 
                const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
                if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
+
                   mesh.AddToGfx();
-                  // if (!mesh.is_gfx_inserted) mesh.AddToGfx();
-                  // else mesh.AddToGfxFromReset();
+                  if (mesh.scroller_comp) {
+
+                     // Scroller_component_calculate_handle_pos_dim(mesh.scroller_comp);
+
+                     // if(0) { // TODO: Scroller component should store if it has scissor box enabled
+                     //    // Set scissor box
+                     //    const mx = this.mesh_bufferidx;
+                     //    const my = this.scroller_comp.mesh_bufferidx;
+                     //    const mw = this.mesh_bufferidx;
+                     //    const mh = this.scroller_comp.mesh_bufferidx;
+                     //    Vertex_buffer_group_create_scissorbox(this.gfx.vb.groupidx, mx, my, mw, mh);
+                     // }
+                  }
                }
                else { // DEBUG
-                  console.log('DEBUG->Insert->Mesh INACTIVE', mesh.name, 'rgidx', mesh.gfx.vb.render_groupidx)
+                  // console.log('DEBUG->Insert->Mesh INACTIVE', mesh.name, 'rgidx', mesh.gfx.vb.render_groupidx)
                }
             }
          }

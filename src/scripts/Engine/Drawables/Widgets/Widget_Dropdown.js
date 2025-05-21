@@ -515,10 +515,9 @@ alert('00000111119999922222')
    /** */
    EnableScroller(scroller_params) {
 
-      Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this.menu, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
-
-      this.menu.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
-      this.menu.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
+      // Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this.menu, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
+      const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
+      this.AddItem(scroller);
    }  
 
 
@@ -793,8 +792,8 @@ alert('00000111119999922222')
       return {
          dim_x: this.geom.dim[0],
          dim_y: this.geom.dim[1],
-         pad_x: pad_x / 2,
-         pad_y: pad_y / 2,
+         // pad_x: pad_x / 2,
+         // pad_y: pad_y / 2,
       };
    }
 
@@ -884,7 +883,7 @@ alert('00000111119999922222')
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
       // Re-calculate layout
       Align_nested_sections_pre(widget_root);
-      Align_expand(menu);
+      // Align_expand(menu);
       
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(menu);
@@ -894,7 +893,7 @@ alert('00000111119999922222')
       if(menu.has_children_scrollers) {
          for(let i=0; i <= menu.children_scrollers_buffer.boundary; i++) {
             const scroller_comp = Components_get_scroller_component(menu.children_scrollers_buffer.buffer[i]);
-            Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+            // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
             // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
          }
@@ -905,10 +904,10 @@ alert('00000111119999922222')
          View_deactivate_rg(menu.gfx.vb.render_groupidx);
       }
       else { // Render the whole buffer mesh by mesh for each render group
-         
          View_reset_to_index_from_view_group_NEW(menu.group_bufferidxs[0]);
          View_render_from_view_NEW(menu.group_bufferidxs[0]);
       }
+
 
    }
 
@@ -967,7 +966,7 @@ alert('00000111119999922222')
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
       // Re-calculate layout
       Align_nested_sections_pre(widget_root);
-      Align_expand(menu);
+      // Align_expand(menu);
       
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(menu);
@@ -977,9 +976,10 @@ alert('00000111119999922222')
       if(menu.has_children_scrollers) {
          for(let i=0; i <= menu.children_scrollers_buffer.boundary; i++) {
             const scroller_comp = Components_get_scroller_component(menu.children_scrollers_buffer.buffer[i]);
-            Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+            // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
             Scroller_component_calculate_handle_pos_dim(scroller_comp);
             // Vertex_buffer_group_update_scissorbox(scroller_comp.scrolled_gsection.gfx.vb.groupidx);
+            console.log(menu.scroller_comp_idx, scroller_comp.geom.pos[1])
          }
       }
 

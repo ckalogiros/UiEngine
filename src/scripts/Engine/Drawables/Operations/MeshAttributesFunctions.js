@@ -211,7 +211,8 @@ export function Set_color_a(mesh, alpha) {
 /** */
 export function Mesh_get_real_pos_xy(mesh) {
 
-   const p = Mesh_unif_get_vb_root_wpos(mesh.root_posidx);
+   // const p = Mesh_unif_get_vb_root_wpos(mesh.root_posidx);
+   const p = Mesh_unif_get_vb_root_wpos(mesh.gfx.vb.render_groupidx);
    let pos = [p[0], p[1], 0];
 
    pos[0] += mesh.geom.pos[0];
@@ -221,13 +222,13 @@ export function Mesh_get_real_pos_xy(mesh) {
 /** */
 export function Mesh_get_real_pos_x(mesh,) {
 
-   let p = Mesh_unif_get_vb_root_wposx(mesh.root_posidx);
+   let p = Mesh_unif_get_vb_root_wposx(mesh.gfx.vb.render_groupidx);
    return p + mesh.geom.pos[0];
 }
 /** */
 export function Mesh_get_real_pos_y(mesh,) {
 
-   let p = Mesh_unif_get_vb_root_wposy(mesh.root_posidx);
+   let p = Mesh_unif_get_vb_root_wposy(mesh.gfx.vb.render_groupidx);
    return p + mesh.geom.pos[1];
 }
 // export function Mesh_get_real_pos_xy_no_screen_wpos(mesh) {

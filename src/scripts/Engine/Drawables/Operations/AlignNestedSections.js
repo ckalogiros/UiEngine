@@ -57,6 +57,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
 
          const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad);
+         // if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) console.log('RESIZE_SELF', cur_mesh.name, ret.dim_y);
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
 
@@ -72,7 +73,8 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          accum_row_size_x += ret.dim_x + cur_pad_x;
 
          cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
-         cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
+         if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) cur_mesh.geom.dim[1] = ret.dim_y;
+         else cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
 
 
          const next_mesh = mesh.children.buffer[i + 1];
@@ -92,8 +94,11 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       }
       else {
 
+         if(cur_mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR)
+            console.log()
+
          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
-         // console.log(cur_mesh.name, ret.dim_y)
+         // if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) console.log('WIDGET', cur_mesh.name, ret.dim_y);
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
             row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
@@ -141,7 +146,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       dim_x: size_x,
       dim_y: size_y,
    }
-
 
 }
 /** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */

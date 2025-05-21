@@ -471,18 +471,14 @@ class Vertex_Buffer_Group {
     }
 }
 
+/** */
 const _vertex_buffer_groups = New_generic_buffer(_, 'GFX Vertex Buffer Groups');
-
-
 
 /** */
 export function Vertex_buffer_group_reset() {
     Gl_vertex_buffer_group_vbo_delete_all()
     _vertex_buffer_groups.ResetFull();
 }
-
-
-
 /** */
 export function Vertex_buffer_group_get_shader_attributes_index(vb_groupidx) {
     const progidx = _vertex_buffer_groups.buffer[vb_groupidx].progidx;
@@ -500,8 +496,6 @@ export function Vertex_buffer_group_store_render_groupidx(vb_groupidx, render_gr
 /****************************************************************************************************************************************************/
 // GETTERS-SETTERS 
 /****************************************************************************************************************************************************/
-
-
 /** */
 export function Vertex_buffer_group_get() { return _vertex_buffer_groups; }
 /** */
@@ -862,7 +856,6 @@ export function Vertex_buffer_build_index_buffer_all() {
         Index_buffer_build_indices_from_render_group(vb_group.ibidx, vb_group.render_groupidxs, attribs_per_vertex, vb_group.vertices_per_face);
     }
 }
-
 /** */
 export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
     
@@ -935,7 +928,6 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     return 0;
 
 }
-
 /** Reset Vertex Buffer to specific mesh start index */
 export function Vertex_buffer_reset_to_index_NEW(vb_groupidx, render_groupidx) {
 

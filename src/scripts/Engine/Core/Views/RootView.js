@@ -869,14 +869,13 @@ export function Root_group_buffer_print_w1() {
          let root_name = Mesh_get_name(root_mesh);
          if(root_name.length > MAX_NAME_LENGTH) 
             root_name = root_name.slice(0, MAX_NAME_LENGTH);
-         console.log('root:', root_name,
-            'size:', root_group_view_buffer.buffer[i].size,
-            'boun:', root_group_view_buffer.buffer[i].boundary,
-            'coun:', root_group_view_buffer.buffer[i].active_count,
-         );
+            console.log('root:', root_name,
+               'size:', root_group_view_buffer.buffer[i].size,
+               'boun:', root_group_view_buffer.buffer[i].boundary,
+               'coun:', root_group_view_buffer.buffer[i].active_count,
+            );
 
          for (let j = 0; j <= root_group_view_buffer.buffer[i].boundary; j++) {
-
 
             if (root_group_view_buffer.buffer[i].buffer[j] !== INT_NULL) {
                const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[i].buffer[j]);
@@ -907,6 +906,7 @@ export function Root_group_buffer_print_w1() {
                      'rposidx', mesh.root_posidx,
                      // 'INDEPENDENT', (mesh.options && (mesh.options & SECTION.INDEPENDENT)) ? 'YES' : 'NO',
                      // 'state', mesh.state.mask,
+                     'fixedHeigght', mesh.align.flags&LAYOUT.FIXED_HEIGHT,
                      'start', mesh.gfx.vb.starts.buffer[0],
                      'realpos', Floor(Mesh_get_real_pos_x(mesh)), Floor(Mesh_get_real_pos_y(mesh)),
                      'pos', Floor(mesh.geom.pos[0]), Floor(mesh.geom.pos[1]),

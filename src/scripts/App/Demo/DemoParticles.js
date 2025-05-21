@@ -656,7 +656,8 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    /****************************************************************************************************************/
    // Add the emitter here, because it needs a parent mesh to pass as param
-   Particles_gen_gfx_ctx(emitter, controls_section);
+   // Particles_gen_gfx_ctx(emitter, controls_section);
+   Particles_gen_gfx_ctx(emitter, _);
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
    emitter.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
@@ -699,16 +700,19 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
       controls_section.GenGfxCtx();
-
       Align_nested_sections_pre(controls_section);
+      Widget_render(controls_section);
+      // controls_section.GenGfxCtx();
 
-      controls_section.Render();
-      Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
+      // Align_nested_sections_pre(controls_section);
 
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
+      // controls_section.Render();
+      // Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
 
-      Construct_listen_events_from_mesh_tree(controls_section);
-      Construct_listen_events_relations_from_mesh_tree(controls_section);
+      // controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
+
+      // Construct_listen_events_from_mesh_tree(controls_section);
+      // Construct_listen_events_relations_from_mesh_tree(controls_section);
 
    }
 
@@ -1086,19 +1090,9 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    // Render 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-
       Align_nested_sections_pre(controls_section);
-
-      controls_section.Render();
-      Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-
-
-      Construct_listen_events_from_mesh_tree(controls_section);
-      Construct_listen_events_relations_from_mesh_tree(controls_section);
-
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
+      Widget_render(controls_section);
 
    }
 

@@ -39,6 +39,7 @@ export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_face
          size:0, 
          num_faces:num_faces,  // !!! We cannot trust the 'num_faces'. Insted use them from View_group structure
          draw_count:0, 
+         draw_hint:gfxCtx.gl.STATIC_DRAW,
          index_offset:0,
          vb_data_idx:vb_data_idx, // TODO: For now it gets the vertex buffer group index. On "buffer instances" implementation should take the vb_info or vb_data index.
          state:0x0,

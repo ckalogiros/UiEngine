@@ -3,7 +3,7 @@
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
@@ -45,9 +45,14 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
  * implementation of particle direction. Maybe create some flag for 'EXPOSION' 
  * and create the direction conditionaly from a function.
  * 
- * 
  */
 
+/**
+ * Particles number aproximation
+ * 
+ * aprox: particle/frame * lifetime/frame
+ * Then add some more: Floor(1.1*aprox) + 1
+ */
 
 const speed = 4;
 const speed_ratio = .01
@@ -152,16 +157,19 @@ class Particle {
 
       }
    }
-
    SetGfxStart(start) {
       this.start = start;
    }
-
    SetSelfIdx(idx) {
       this.idx = idx;
    }
 }
 
+function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles_per_frame) {
+
+   const particles_per_frame = (life_time / t_step) * num_particles_per_frame;
+   return Floor(particles_per_frame)+1;
+}
 
 class Emitter {
 
@@ -289,17 +297,16 @@ class Emitter {
       this.Particle_update_scale = Particle_update_scale_empty;
       this.Particle_update_fade = Particle_update_fade_empty;
 
+      this.vb_aprox_size = TEMP_number_of_particles_aproximation(life_time, t_step, num_particles_per_frame)
+
+      console.log('#### Perticles-Size aproximation', this.vb_aprox_size );
+
    }
-
-
    Reset() {
 
       this.particles_buffer.ResetFull();
       this.free_particles_idxs_buffer.Reset();
    }
-
-
-
    ParticleAddToGfx(particle_idx) {
 
       // Must create geom struct to pass to the GlAdd...() fuunction
@@ -309,23 +316,20 @@ class Emitter {
          time: this.particles_buffer.buffer[particle_idx].time,
          generic: this.particles_buffer.buffer[particle_idx].generic,
       }
-// alert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
+      // alert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
       // const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
       // const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
+      const start = Vertex_buffer_add_vertices_from_render_group(this.gfx, geom, this.mat, _, Mesh_get_name(this));
       this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
 
 
       return start;
    }
-
-
    SetDir(xdir = 0, ydir = 0) {
 
       if (xdir !== 0) this.dir[0] = GetSign(xdir);
       if (ydir !== 0) this.dir[1] = GetSign(ydir);
    }
-
-
    SetConeOfDirection(xdir_pos, xdir_neg, ydir_pos, ydir_neg) {
 
       this.variation_emission.xdir_pos = xdir_pos;
@@ -333,13 +337,6 @@ class Emitter {
       this.variation_emission.ydir_pos = ydir_pos;
       this.variation_emission.ydir_neg = ydir_neg;
    }
-
-
-   /**
-    * Enable shader properties.
-    * In order for a mesh to be drawn in a certain way, specific shaders must be build.
-    * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
-   */
    /**
     * Enable shader properties.
     * In order for a mesh to be drawn in a certain way, specific shaders must be build.
@@ -446,56 +443,56 @@ class Emitter {
    }
    GfxEnableFn(flags, params) {
 
-        
+
       // Enable shader function calls (from shader main())
       if (flags === SID.SHAD.FN_GLOW) {
-          if(params===undefined) alert('Enable shader FN_GLOW needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_GLOW needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       // TODO: See if attr enable and passes are required, It seems NOT
       if (flags === SID.SHAD.FN_INNER_SHADOW) {
-          this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-          if(params===undefined) alert('Enable shader FN_EXPLOSION_CIRCLE needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_EXPLOSION_CIRCLE needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-          if(params===undefined) alert('Enable shader FN_EXPLOSION_GLOW needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              // generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_EXPLOSION_GLOW needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            // generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_GLOW_SPHERE) {
-          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE) {
-          if(params===undefined) alert('Enable shader FN_NOISE needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_NOISE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_NOISE needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_NOISE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
@@ -505,9 +502,9 @@ class Emitter {
       if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
 
       if (params !== undefined) {
-          if (params.blend_mode !== undefined) {
-              this.sid.blend_options |= params.blend_mode;
-          }
+         if (params.blend_mode !== undefined) {
+            this.sid.blend_options |= params.blend_mode;
+         }
       }
 
       // TODO
@@ -516,77 +513,7 @@ class Emitter {
       // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-  }
-   // GfxEnableFn(flags, params) {
-
-   //    // Enable shader function calls (from shader main())
-   //    if (flags === SID.SHAD.FN_GLOW) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_GLOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    // TODO: See if attr enable and passes are required, It seems NOT
-   //    if (flags === SID.SHAD.FN_INNER_SHADOW) {
-   //       this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-   //       const param = { // Create default attribs values
-   //           time: params.time !== undefined ? params.time : 0,
-   //           generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-   //       // this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       // this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //   }
-   //    if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-   //       this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_NOISE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3_TYPES) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3D) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3D; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
-
-   //    if (params !== undefined) {
-   //       if (params.blend_mode !== undefined) {
-   //          this.sid.blend_options |= params.blend_mode;
-   //       }
-   //    }
-
-   //    // TODO
-   //    // case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-   // }
+   }
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
@@ -732,9 +659,6 @@ class Emitter {
       }
 
    }
-
-
-
    EnableProperties(which, params = null) {
 
       switch (which) {
@@ -781,12 +705,7 @@ class Emitter {
          }
       }
    }
-
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
-
-
-
-
    GetName() {
       return Str_buffer_get_by_idx(this.nameidx);
    }
@@ -801,11 +720,8 @@ export function Particles_system_reset() { return _emitters.ResetFull(); }
 
 
 
-
+/** */
 export function Particles_get_particle_system(idx) { return _emitters.buffer[idx]; }
-
-
-
 /**
  * 
  * @param {*} emitteridx 
@@ -828,10 +744,7 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
    }
    emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
 }
-
-
-
-
+/** */
 export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupidx) {
 
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
@@ -839,11 +752,11 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    emitter.parent = parent;
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
    // emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, specific_vb_groupidx,);
-   emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true);
+   emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true, emitter.vb_aprox_size);
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
    // Add to view group
    View_add_mesh(emitter.group_bufferidxs[0], emitter);
-   
+
    // emitter.per_vb_bufferidx = Mesh_per_vb_store_mesh(emitter.gfx.vb.groupidx, emitter.mesh_bufferidx);
 
 
@@ -874,6 +787,7 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
 
 
+/** */
 // TODO: pass an already created sid, for selecting from a gama of shader particles
 export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down) {
 
@@ -886,11 +800,7 @@ export function Particle_system_create_emitter(name, col, pos, dim, t_step, life
 
    return idx;
 }
-
-
-
-
-
+/** */
 export function Particle_system_emitt(params) {
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles);
@@ -1073,7 +983,7 @@ export function Particle_system_emitt(params) {
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles);
 
 }
-
+/** */
 export function Particle_system_update() {
 
    if (_emitters.active_count === 0) return;
@@ -1226,7 +1136,7 @@ export function Particle_system_update() {
 
       // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
       if (needs_update) Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-      
+
 
 
    }
@@ -1236,6 +1146,7 @@ export function Particle_system_update() {
 
 }
 
+/** */
 // Emitter function pointers to update particle functions. It is to replace any if statements inside the 'Update loop'
 function Particle_update_position(emitter, particle) {
    const speed = emitter.speed * particle.accel;
@@ -1247,6 +1158,7 @@ function Particle_update_position(emitter, particle) {
 
    particle.accel *= emitter.deccel;
 }
+/** */
 function Particle_update_jiggle(emitter, particle) {
 
    // TODO: Make jiggle slower. Must include time, expand the jiggle through frames
@@ -1298,6 +1210,7 @@ function Particle_update_jiggle(emitter, particle) {
       //    // particle.pos[1] += (y-particle.pos[1])*.02;
    }
 }
+/** */
 function Particle_update_rotation(emitter, particle) {
    let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
       ? (emitter.life_time - (particle.time + .8) * .9) * .1
@@ -1305,6 +1218,7 @@ function Particle_update_rotation(emitter, particle) {
    if (rotspeed > 0) particle.angle -= rotspeed * 1.;
    particle.rot = Rotation_z_get_2D_matrix(particle.angle);
 }
+/** */
 function Particle_update_scale(emitter, particle) {
    // For smoke enlarge effect 
    particle.dim[0] *= particle.scale * .0055 + 1;
@@ -1314,33 +1228,43 @@ function Particle_update_scale(emitter, particle) {
       particle.scale *= .98;
    }
 }
+/** */
 function Particle_update_fade(emitter, particle) {
    const random = Math.random() * .4 + .5;
    if (particle.time > random) {
       particle.col[3] *= .85;
    }
 }
+/** */
 function Particle_update_position_empty() { }
+/** */
 function Particle_update_jiggle_empty() { }
+/** */
 function Particle_update_rotation_empty() { }
+/** */
 function Particle_update_scale_empty() { }
+/** */
 function Particle_update_fade_empty() { }
 
 
+/** */
 export function Particle_system_emitter_set_size(emitter_idx, size) {
 
    _emitters.buffer[emitter_idx].geom.dim[0] = size;
    _emitters.buffer[emitter_idx].geom.dim[1] = size;
 }
+/** */
 export function Particle_system_emitter_add_size_xy(emitter_idx, sizex, sizey) {
 
    _emitters.buffer[emitter_idx].geom.dim[0] += sizex;
    _emitters.buffer[emitter_idx].geom.dim[1] += sizey;
 }
+/** */
 export function Particle_system_emitter_get_size(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].geom.dim[0];
 }
+/** */
 export function Particle_system_emitter_set_position_xy(emitter_idx, x, y) {
 
    // _emitters.buffer[emitter_idx].prev_pos[0] = _emitters.buffer[emitter_idx].pos[0];
@@ -1348,18 +1272,22 @@ export function Particle_system_emitter_set_position_xy(emitter_idx, x, y) {
    _emitters.buffer[emitter_idx].geom.pos[0] = x;
    _emitters.buffer[emitter_idx].geom.pos[1] = y;
 }
+/** */
 export function Particle_system_emitter_set_position_x(emitter_idx, x) {
    _emitters.buffer[emitter_idx].geom.pos[0] = x;
 }
+/** */
 export function Particle_system_emitter_set_prev_position_xy(emitter_idx) {
 
    _emitters.buffer[emitter_idx].geom.prev_pos[0] = _emitters.buffer[emitter_idx].geom.pos[0];
    _emitters.buffer[emitter_idx].geom.prev_pos[1] = _emitters.buffer[emitter_idx].geom.pos[1];
 }
+/** */
 export function Particle_system_emitter_get_position_xy(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].geom.pos;
 }
+/** */
 export function Particle_system_emitter_enable_intermidiate_emission(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].has_intermidiate_emission = true;
@@ -1369,9 +1297,11 @@ export function Particle_system_emitter_enable_intermidiate_emission(emitter_idx
 
 /****************************************************************************************************************************************************************/
 // Function Pointers
+/** */
 function Emitter_particles_set_direction_emission(emitter) {
 
 }
+/** */
 function Emitter_particles_set_direction_explosio(emitter) {
 
 }

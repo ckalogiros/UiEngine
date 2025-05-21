@@ -912,8 +912,6 @@ function Options_menu_callback(params) {
    /*************************************************************************************************/
    // Render menu panel
 
-   // Layout_calculate_grow_children_count_layout(menu_panel);
-   // Align_pre_simple___with_grow_containers(menu_panel);
    Align_nested_sections_pre(menu_panel);
    Align_expand(menu_panel);
 

@@ -1,8 +1,8 @@
 "use strict";
 import { FloorArr2, FloorArr3, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_build_group_from_root_mesh, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from '../Engine/Core/Views/MeshBufferViews.js';
-import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender } from '../Engine/Core/Views/RootView.js';
+import { View_build_group_from_root_mesh, View_get_group, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from '../Engine/Core/Views/MeshBufferViews.js';
+import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_view_buffer_get } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
@@ -11,7 +11,7 @@ import { Test_alignment } from './Demo/DemoAlignNestedSections.js';
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_slider_simple, Widget_ready_switch } from '../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx } from '../Engine/Core/MeshUniformsBuffer.js';
-import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_add_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
+import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_set_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
 import { Vertex_buffer_build_index_buffer_all, Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox, } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
@@ -46,6 +46,7 @@ import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
 import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
 import { Widget_render } from '../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
+import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
 
 
 
@@ -244,7 +245,6 @@ export function TestWidgetsGeneric() {
         // Test_rotate_section_with_round_corners();
     }
 
-    // Window_menu_2();
 
 
     /*************************************************************************************************************************/
@@ -356,11 +356,13 @@ export function TestWidgetsGeneric() {
     { // Widget: Scroller
 
         // const scroller = CreateScrollerClampAlphaTest(_, 30, 100, 10, 16);
-        CreateScrollerManyWidgets(_, 30, 100, 10, 16);
+        // CreateScrollerManyWidgets(_, 30, 100, 10, 16);
+        // CreateScrollerDeepNested(_, 30, 100, 10, 16);
+        // CreateDropdownWithScroller(_, 30, 100, 10, 16);
+        // const widget = CreateDropdownWithScrollerManyDps(_, 30, 100, 10, 10);
+        
+        // Create_mesh_info_ui(_, 230, 100, 10, 10, widget.group_bufferidxs[0]);
 
-        // TestNewScrollerWithDropdown();
-
-        // TestNewScrollerWithLabel();
     }
 
     { // Widget: Colorpicker
@@ -401,8 +403,8 @@ export function TestWidgetsGeneric() {
     }
 
     { // Window menu
-        // TODO:UN_IMPLEMENTED -> The symbol texture is not a part of root window menu
         // Window_menu();
+        // Window_menu_2();
     }
 
     { // Annimations
@@ -454,7 +456,7 @@ export function TestWidgetsGeneric() {
 
             // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
 
-            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
+            Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
 
             // Create_smoke_particles();
 
@@ -2989,9 +2991,8 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
     const menu_col = GREY[2];
 
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: is_root, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: is_root, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
-    dp.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
     // dp.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
 
 
@@ -3036,17 +3037,14 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
             // }
 
-            const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp2' }));
+            const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp2' }));
             Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            dpsub1.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
-            // dpsub1.gfx_ctx_flags = (GFX_CTX_FLAGS.RENDER_GROUP_NEW);
-            // dpsub1.RenderToNewRenderGroup();
             dp.AddToMenu(dpsub1);
 
             const col1 = TRANSPARENCY(PURPLEB[6], 1.);
             for (let j = 0; j < sub_dp1_count; j++) {
 
-                const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp3' }));
+                const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp3' }));
                 Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                 dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
                 dpsub1.AddToMenu(dpsub2);
@@ -3055,7 +3053,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
                 for (let k = 0; k < sub_dp2_count; k++) {
 
-                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
                     Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                     dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
                     // dpsub3.RenderToNewRenderGroup();
@@ -3063,7 +3061,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
                     { // Label
 
-                        const d = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+                        const d = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
                         Widget_gfx_ready_enable({ mesh: d, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                         d.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
                         // d.RenderToNewRenderGroup();
@@ -3089,7 +3087,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                     // const col3 = TRANSPARENCY(YELLOW[6], 1.)
                     // for (let n = 0; n < sub_dp2_count; n++) {
 
-                    //     const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+                    //     const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
                     //     Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                     //     dpsub4.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
                     //     dpsub3.AddToMenu(dpsub4);
@@ -3097,7 +3095,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                     //     const col4 = TRANSPARENCY(PURPLER[6], 1.)
                     //     for (let m = 0; m < 10; m++) {
 
-                    //         const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+                    //         const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
                     //         Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                     //         dpsub5.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
                     //         dpsub4.AddToMenu(dpsub5);
@@ -3107,7 +3105,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
                 }
                 for (let k = 0; k < sub_dp2_count; k++) {
 
-                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+                    const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
                     Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                     dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
                     // dpsub3.RenderToNewRenderGroup();
@@ -3131,10 +3129,8 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-
         dp.GenGfxCtx();
         Align_nested_sections_pre(dp);
-
         Widget_render(dp);
 
         // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
@@ -4322,7 +4318,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
     }
     
     const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
-    Scoller_component_add_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
+    Scoller_component_set_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
     Scroller_component_set_pos_from_scrolled_section(scroller_comp);
     Scroller_component_calculate_handle_pos_dim(scroller_comp);
 
@@ -4360,19 +4356,18 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
 }
 function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
 
+    const section_height = 120;
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
     const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 120], 
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
         col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), 
         layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
-        scroller: { width: 10, max_height: 100, },
+        scroller: { width: 10, max_height: section_height, },
     });
-    // section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
-
 
     // Create scrolled section.
     const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
@@ -4385,19 +4380,103 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
     // Create scrolled section items
     const count = num_items;
     // const count = 1;
-    let label = null;
     const brightness_increments = 1 / count;
     let brightness = 0;
     for (let i = 0; i < count; i++) {
         
-        // const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: Color_hsv_to_rgb_calibrated(0.7, 1., .8, 1, brightness, .0), text_pad: [6, 4], layout: LAYOUT.VERTICAL }))
-        // Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-        // scrolled_section.AddItem(l);
-        
-        // const s = Widget_ready_slider(_, _, _, _, 'Ready Slider', _, );
-        // scrolled_section.AddItem(s);
-
+        let cnt = 0;
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+        scrolled_section.AddItem(s1); 
+        // s1.RenderToNewRenderGroup();
         {
+            // const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
+            // Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+            // const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` }));
+            // Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            // s2.AddItem(l);
+
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            s1.AddItem(sw);
+
+            const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+            s1.AddItem(sl);
+        }
+
+        brightness += brightness_increments;
+    }
+
+
+    // Render
+    if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section)
+        Widget_render(section);
+        
+        const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
+        Scoller_component_set_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
+        Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+        Scroller_component_calculate_handle_pos_dim(scroller_comp);
+    }
+
+    return section;
+}
+function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
+    
+    
+    const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
+    const section = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+    }));
+    Widget_gfx_ready_enable({
+        mesh: section, enable_sdf_rect: 15,
+        listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        // scroller: { width: 10, max_height: section_height, },
+    });
+
+    
+    const count = num_items;
+    // const count = 3;
+    let scroller1 = null,
+        scroller2 = null;
+    // Scroll sample 1
+    {
+        // Scroller parent
+        const section_height = 120;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            listener: { type: LISTEN_EVENT_TYPES.MOVE },
+            scroller: { width: 10, max_height: section_height, },
+        });
+        section.AddItem(s);
+        scroller1 = s;
+        
+    
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(s.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
             let cnt = 0;
             const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
             Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
@@ -4419,9 +4498,469 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
                 // Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
                 // s1.AddItem(sl);
             }
+    
+            brightness += brightness_increments;
         }
+    }
+    // Scroll sample 2
+    {
+        // Scroller parent
+        const section_height = 160;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            listener: { type: LISTEN_EVENT_TYPES.MOVE },
+            scroller: { width: 10, max_height: section_height, },
+        });
+        section.AddItem(s);
+        scroller2 = s;
+    
+    
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(s.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            {
+                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-        brightness += brightness_increments;
+                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s2.AddItem(l);
+
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(sw);
+
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                s1.AddItem(sl);
+            }
+    
+            brightness += brightness_increments;
+        }
+    }
+
+
+
+    // Render
+    if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section)
+        Widget_render(section);
+
+        Scroller_component_calculate_handle_pos_dim(scroller1.scroller_comp);
+        Scroller_component_calculate_handle_pos_dim(scroller2.scroller_comp);
+    }
+    
+    return section;
+}
+function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
+    
+    
+    const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
+    const section = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+    }));
+    Widget_gfx_ready_enable({
+        mesh: section, enable_sdf_rect: 15,
+        listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        // scroller: { width: 10, max_height: section_height, },
+    });
+
+    
+    const text_pad = [12, 6],
+          pad = [6, 6],
+          dp_rcorners = 7,
+          dp_col = GREY[4],
+          menu_col = GREY[2];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
+    Dropdown_roots_set_root(dp, dp);
+    section.AddItem(dp);
+
+
+
+    const count = num_items;
+    let scroller1 = null,
+        scroller2 = null,
+        scroller3 = null,
+        scroller4 = null;
+    // Scroll sample 1
+    {
+        // Scroller parent
+        const section_height = 110;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            scroller: { width: 10, max_height: section_height, },
+        });
+        dp.AddToMenu(s);
+        scroller1 = s;
+
+        dp.menu.AddChildScrollerIdx(scroller1.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
+
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(scroller1.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
+                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
+                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(l);
+
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
+                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(sw);
+
+                // const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+                // Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                // s1.AddItem(sl);
+            }
+    
+            brightness += brightness_increments;
+        }
+    }
+    // Scroll sample 2
+    {
+        // Scroller parent
+        const section_height = 110;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            scroller: { width: 10, max_height: section_height, },
+        });
+        dp.AddToMenu(s);
+        scroller2 = s;
+
+        dp.menu.AddChildScrollerIdx(scroller2.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
+
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(scroller2.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            s1.AddItem(sw);
+    
+            brightness += brightness_increments;
+        }
+    }
+    // Scroll sample 3
+    {
+        // Scroller parent
+        const section_height = 110;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            scroller: { width: 10, max_height: section_height, },
+        });
+        dp.AddToMenu(s);
+        scroller3 = s;
+
+        dp.menu.AddChildScrollerIdx(scroller3.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
+
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(scroller3.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
+                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
+                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(l);
+
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
+                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(sw);
+                
+                const sl = Create_widget_slider(Style_slider_default_properties({ 
+                    pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', 
+                    theme: Color_theme_slider_auto(.57, .8, .18, 0), 
+                    layout:LAYOUT.VERTICAL 
+                }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                s1.AddItem(sl);
+            }
+    
+            brightness += brightness_increments;
+        }
+    }
+    // Scroll sample 4
+    {
+        // Scroller parent
+        const section_height = 110;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            scroller: { width: 10, max_height: section_height, },
+        });
+        dp.AddToMenu(s);
+        scroller4 = s;
+
+        dp.menu.AddChildScrollerIdx(scroller4.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
+
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(scroller4.scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            s1.AddItem(sw);
+    
+            brightness += brightness_increments;
+        }
+    }
+
+    // Render
+    if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section)
+        Widget_render(section);
+
+        Scroller_component_calculate_handle_pos_dim(scroller1.scroller_comp);
+        Scroller_component_calculate_handle_pos_dim(scroller2.scroller_comp);
+        Scroller_component_calculate_handle_pos_dim(scroller3.scroller_comp);
+        Scroller_component_calculate_handle_pos_dim(scroller4.scroller_comp);
+    }
+    
+    return section;
+}
+function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
+    
+    
+    const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
+    const section = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+    }));
+    Widget_gfx_ready_enable({
+        mesh: section, enable_sdf_rect: 15,
+        listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        // scroller: { width: 10, max_height: section_height, },
+    });
+
+    
+    const text_pad = [12, 6],
+          pad = [6, 6],
+          dp_rcorners = 7,
+          dp_col = GREY[4],
+          menu_col = GREY[2];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
+    Dropdown_roots_set_root(dp, dp);
+    section.AddItem(dp);
+
+
+
+    const num_scrollers = 5;
+    const scrollers = [];
+    // Scroll sample 1
+    for (let dps = 0; dps < num_scrollers; dps++){
+
+        const count = num_items;
+        
+        const dp_sub1 = Create_widget_dropdown(Style_dropdown_default_properties({ 
+            is_root: 0x0, text: `dp_sub${dps}`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
+            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`dp_sub${dps}`
+        }));
+        Widget_gfx_ready_enable({ mesh: dp_sub1, enable_sdf_rect: dp_rcorners, });
+        dp.AddToMenu(dp_sub1);
+
+        // Scroller parent
+        const section_height = 110;
+        const s = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name:'FIXED'
+        }));
+        Widget_gfx_ready_enable({
+            mesh: s, enable_sdf_rect: 15,
+            scroller: { width: 10, max_height: section_height, },
+        });
+        dp_sub1.AddToMenu(s);
+        scrollers.push(s);
+
+        dp_sub1.menu.AddChildScrollerIdx(scrollers[dps].scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
+
+        // Create scrolled section.
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ScrolledSection' 
+        }));
+        Widget_gfx_ready_enable({
+            mesh: scrolled_section, enable_sdf_rect: 15,
+        });
+        scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+        s.AddItem(scrolled_section);
+        Scoller_component_set_scrolled_section(scrollers[dps].scroller_comp, scrolled_section);
+        
+        // Create scrolled section items
+        const brightness_increments = 1 / count;
+        let brightness = 0;
+        for (let i = 0; i < count; i++) {
+            
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
+                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
+                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+            scrolled_section.AddItem(s1); 
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(l);
+
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
+                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                s1.AddItem(sw);
+
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                s1.AddItem(sl);
+            }
+    
+            brightness += brightness_increments;
+        }
     }
 
 
@@ -4431,315 +4970,204 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
         section.GenGfxCtx();
         Align_nested_sections_pre(section)
         Widget_render(section);
+
+        for (let i = 0; i < num_scrollers; i++)
+            Scroller_component_calculate_handle_pos_dim(scrollers[i].scroller_comp);
+        // Scroller_component_calculate_handle_pos_dim(scroller2.scroller_comp);
+        // Scroller_component_calculate_handle_pos_dim(scroller3.scroller_comp);
+        // Scroller_component_calculate_handle_pos_dim(scroller4.scroller_comp);
     }
     
-    const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
-    Scoller_component_add_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
-    Scroller_component_set_pos_from_scrolled_section(scroller_comp);
-    Scroller_component_calculate_handle_pos_dim(scroller_comp);
-
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.PORTION_DIMENTION, scroller.scrolled_section);
-    // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scroller.scrolled_section);
-
-
-    // { // Add more items to the scroller's scrolled section, to debug the correct behavior of the scroller's re-size and reposition.
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, [], []);
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-    // {
-    //     const l = Create_widget_label(_, 'Label 123 DDSDSDSfsdsdsdsds', TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, [400, 300, 0], 4, TRANSPARENCY(ORANGE_240_160_10, .7), WHITE, [7, 6], .5, undefined, [0, 4, 3]);
-    //     l.GenGfxCtx();
-    //     scroller.AddItemToScrolledSection(l);
-    // }
-
     return section;
 }
-// function TestNewScrollerWithDropdown(pos = [250, 100, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
-
-//     const text_pad = [12, 6];
-//     const pad = [6, 6];
-//     const font_size = 8;
-//     const dp_rcorners = 7;
-//     const dp_col = GREY[4];
-//     const menu_col = GREY[2];
-
-
-//     const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: is_root, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-//     Widget_gfx_ready_enable({
-//         mesh: dp, enable_sdf_rect: dp_rcorners,
-//         listener: { type: LISTEN_EVENT_TYPES.MOVE },
-//         scroller: { width: 10, max_height: 100,  },
-//     })
-
-
-//     Dropdown_roots_set_root(dp, dp);
-
-//     let zpos = 0;
-
-//     zpos++
-
-//     { // Many dps
-//         const col = YELLOWR[7];
-
-//         const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `scrolled section`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-//         Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-//         dp.AddToMenu(dpsub1);
-
-//         const col1 = TRANSPARENCY(PURPLEB[6], 1.);
-//         for (let j = 0; j < 2; j++) {
-
-//             const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-//             Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-//             dpsub1.AddToMenu(dpsub2);
-
-//             const col4 = TRANSPARENCY(PURPLER[6], 1.)
-//             for (let m = 0; m < 10; m++) {
-
-//                 const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${m}sdkaslkdalsdjaksjdkjksjdkjskd`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-//                 Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-//                 dpsub2.AddToMenu(dpsub5);
-
-//             }
-//         }
-//     }
 
 
 
-//     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
+/** */
+function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8, view_groupidx) {
 
-
-//         dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, _, true)
-//         // dp.GenGfxCtx();
-//         // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-//         dp.GenGfxCtx();
-//         Align_nested_sections_pre(dp)
-//         dp.Render()
-//         Root_group_activate_all_vbs_in_renderqueue(dp.root_bufferidx);
-
-//         dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-
-//         Construct_listen_events_from_mesh_tree(dp)
-//         Construct_listen_events_relations_from_mesh_tree(dp);
-
-//     }
-
-
-//     return dp;
-// }
-function TestNewScrollerWithDropdown(pos = [250, 100, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
-
-    const text_pad = [12, 6];
-    const pad = [6, 6];
-    const font_size = 8;
-    const dp_rcorners = 7;
-    const dp_col = GREY[4];
-    const menu_col = GREY[2];
-
-
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: is_root, text: `ROOT`, pos: pos, col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+        
+    const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
+    const section = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+    }));
     Widget_gfx_ready_enable({
-        mesh: dp, enable_sdf_rect: dp_rcorners,
+        mesh: section, enable_sdf_rect: 15,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
-        // scroller: { width: 10, max_height: 100,  },
-    })
+    });
 
+    
+    const text_pad = [12, 6],
+          pad = [6, 6],
+          dp_rcorners = 7,
+          dp_col = GREY[2],
+          menu_col = GREY[1];
 
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
+        text: `Meshes`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], 
+        text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'Meshes', 
+    }));
+    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
     Dropdown_roots_set_root(dp, dp);
+    section.AddItem(dp);
 
-    let zpos = 0;
 
-    zpos++
+    
+    
+    
 
-    { // Many dps
-        const col = YELLOWR[7];
+    // const meshes = Mesh_buffer_get();
+    const root_view = Root_group_view_buffer_get();
+    const scrollers = [];
+    
+    const mesh_idxs = root_view.buffer[view_groupidx];
+    const num_meshes = mesh_idxs.boundary;
 
-        const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `scrolled section`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-        // Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-        Widget_gfx_ready_enable({
-            mesh: dpsub1, enable_sdf_rect: dp_rcorners,
-            listener: { type: LISTEN_EVENT_TYPES.hover },
-            scroller: { width: 10, max_height: 100, },
-        })
-        dp.AddToMenu(dpsub1);
+    const dp_roots = Create_widget_dropdown(Style_dropdown_default_properties({ 
+        is_root: 0x0, text: `root`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
+        btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`root`
+    }));
+    Widget_gfx_ready_enable({ mesh: dp_roots, enable_sdf_rect: dp_rcorners, });
+    dp.AddItem(dp_roots);
+    
+    // Scroller parent
+    const section_height = 110;
+    const s = Create_rect_mesh(Style_rect_default_properties({ 
+        pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
+        col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name:'FIXED'
+    }));
+    Widget_gfx_ready_enable({
+        mesh: s, enable_sdf_rect: 15,
+        scroller: { width: 10, max_height: section_height, },
+    });
+    dp_roots.AddToMenu(s);
+    scrollers.push(s);
 
-        if (dpsub1.menu.scroller_comp) {
-            const scrolled_section = dpsub1.menu;
-            // Scoller_component_render(scrolled_section.scroller_comp)
-            // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(dpsub1.root_posidx, scrolled_section.scroller_comp.root_posidx)
-            scrolled_section.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
+    dp_roots.menu.AddChildScrollerIdx(scrollers[0].scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
 
-        }
+    // Create scrolled section.
+    const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
+        pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+        col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ScrolledSection' 
+    }));
+    Widget_gfx_ready_enable({
+        mesh: scrolled_section, enable_sdf_rect: 15,
+    });
+    scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+    s.AddItem(scrolled_section);
+    Scoller_component_set_scrolled_section(scrollers[0].scroller_comp, scrolled_section);
 
-        const col1 = TRANSPARENCY(PURPLEB[6], 1.);
-        for (let j = 0; j < 2; j++) {
 
-            const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-            Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-            dpsub1.AddToMenu(dpsub2);
+    for (let j = 0; j <= num_meshes; j++){
+        
+        const meshidx = mesh_idxs.buffer[j];
+        const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
-            const col4 = TRANSPARENCY(PURPLER[6], 1.)
-            for (let m = 0; m < 10; m++) {
+        const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({ 
+            is_root: 0x0, text: `${meshidx}: ${mesh.name}`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
+            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`${mesh.name}}`
+        }));
+        Widget_gfx_ready_enable({ mesh: dp_mesh, enable_sdf_rect: dp_rcorners, });
+        scrolled_section.AddItem(dp_mesh);
 
-                const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${m}sdkaslkdalsdjaksjdkjksjdkjskd`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-                Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-                dpsub2.AddToMenu(dpsub5);
-
+        { // COLLECT MESH INFO
+            let cnt = 0;
+            const l_text_pad = [16, 8];
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `IsActive: ${mesh.state.mask&MESH_STATE_FLAGS.ACTIVE}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                // dp_mesh.AddToMenu(l);
+                scrolled_section.AddItem(l);
             }
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `VBidx: ${mesh.gfx.vb.groupidx}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                // dp_mesh.AddToMenu(l);
+                scrolled_section.AddItem(l);
+            }
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `RGidx: ${mesh.gfx.vb.render_groupidx}`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                // dp_mesh.AddToMenu(l);
+                scrolled_section.AddItem(l);
+            }
+            {
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `Pos: [x:${mesh.geom.pos[0]}, y:${mesh.geom.pos[0]}]`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: l_text_pad, layout:LAYOUT.VERTICAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                // dp_mesh.AddToMenu(l);
+                scrolled_section.AddItem(l);
+            }
+            { // LAYOUT
+                const l = Create_widget_label(Style_label_default_properties({ 
+                    theme: Color_theme_label_auto(.58, 1., .03, .0),
+                    text: `Layout:`, pos: [0, 0, 1], font_size: font_size-2, 
+                    text_pad: l_text_pad, layout:LAYOUT.VERTICAL, name:`l${cnt++}` 
+                }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                // dp_mesh.AddToMenu(l);
+                scrolled_section.AddItem(l);
+                {
+                    const l = Create_widget_label(Style_label_default_properties({ 
+                        theme: Color_theme_label_auto(.58, 1., .03, .0),
+                        text: `Resize-self: ${mesh.align.flags&LAYOUT.RESIZE_SELF}`, pos: [0, 0, 1], font_size: font_size-2, 
+                        text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    // dp_mesh.AddToMenu(l);
+                    scrolled_section.AddItem(l);
+                }
+                {
+                    const l = Create_widget_label(Style_label_default_properties({ 
+                        theme: Color_theme_label_auto(.58, 1., .03, .0),
+                        text: `Fixed-height: ${mesh.align.flags&LAYOUT.FIXED_HEIGHT}`, pos: [0, 0, 1], font_size: font_size-2, 
+                        text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    // dp_mesh.AddToMenu(l);
+                    scrolled_section.AddItem(l);
+                }
+            }
+
         }
     }
-    // { // Many dps
-    //     const col = PURPLEB[7];
-
-    //     const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `scrolled section`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-    //     // Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-    //     Widget_gfx_ready_enable({
-    //         mesh: dpsub1, enable_sdf_rect: dp_rcorners,
-    //         listener: { type: LISTEN_EVENT_TYPES.hover },
-    //         scroller: { width: 10, max_height: 100,  },
-    //     })
-    //     dp.AddToMenu(dpsub1);
-
-    //     if(dpsub1.menu.scroller_comp) {
-    //         const scrolled_section = dpsub1.menu;
-    //         // Scoller_component_render(scrolled_section.scroller_comp)
-    //         // Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(dpsub1.root_posidx, scrolled_section.scroller_comp.root_posidx)
-    //         scrolled_section.AddChildScrollerIdx(scrolled_section.scroller_comp_idx);
-
-    //     }
-
-    //     const col1 = TRANSPARENCY(PURPLEB[6], 1.);
-    //     for (let j = 0; j < 2; j++) {
-
-    //         const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-    //         Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-    //         dpsub1.AddToMenu(dpsub2);
-
-    //         const col4 = TRANSPARENCY(PURPLER[6], 1.)
-    //         for (let m = 0; m < 10; m++) {
-
-    //             const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${m}sdkaslkdalsdjaksjdkjksjdkjskd`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
-    //             Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-    //             dpsub2.AddToMenu(dpsub5);
-
-    //         }
-    //     }
-    // }
 
 
+    // Render
+    if (_is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
-    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section)
+        Widget_render(section);
 
-
-        dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC, _, true)
-        // dp.GenGfxCtx();
-        // dp.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-        dp.GenGfxCtx();
-        Align_nested_sections_pre(dp)
-        Widget_render(dp);
-
+        // for (let i = 0; i < scrollers.length; i++)
+        //     Scroller_component_calculate_handle_pos_dim(scrollers[i].scroller_comp);
     }
-
-
-    return dp;
-}
-function TestNewScrollerWithLabel(pos = [20, 300, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
-
-    const tr = 1.;
-    const rcorners1 = 10;
-
-    const section = Create_rect_mesh(Style_rect_default_properties({
-        is_root: ROOT_WIDGETS.CREATE_ROOT, name: 'Root', pad: [10, 10], pos: pos, dim: [100, 100], col: TRANSPARENCY(BLUEL[7], tr),
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
-    }));
-    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE }, })
-
-
-    const s2 = Create_rect_mesh(Style_rect_default_properties({
-        pad: [10, 10], pos: [0, 0, 0], dim: [10, 10], col: TRANSPARENCY(REDL[7], tr), name: 's2',
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
-    }));
-    Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-    section.AddItem(s2);
-
-
-    {
-        const s3 = Create_rect_mesh(Style_rect_default_properties({
-            pad: [15, 15], pos: [0, 0, 1], dim: [20, 20], col: TRANSPARENCY(BLACK, tr), name: 'scrolled 1',
-            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF,
-            listener: { type: LISTEN_EVENT_TYPES.HOVER },
-        }));
-        Widget_gfx_ready_enable({ mesh: s3, enable_sdf_rect: rcorners1, scroller: { enable: true, width: 12, max_height: 50 }, })
-        s2.AddItem(s3);
-
-
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-
-    }
-    {
-        const s3 = Create_rect_mesh(Style_rect_default_properties({
-            pad: [15, 15], pos: [0, 0, 1], dim: [20, 20], col: TRANSPARENCY(BLACK, tr), name: 'scrolled 2',
-            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF,
-            listener: { type: LISTEN_EVENT_TYPES.HOVER },
-        }));
-        Widget_gfx_ready_enable({ mesh: s3, enable_sdf_rect: rcorners1, scroller: { enable: true, }, })
-        s2.AddItem(s3);
-
-        s3.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
-        s3.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
-
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-        { const l = Create_widget_label(Style_label_default_properties({ text: 'label', col: YELLOWL[6], text_pad: [15, 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 10, name: 'l2', listener: { type: LISTEN_EVENT_TYPES.HOVER }, layout: LAYOUT.VERTICAL, })); Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: rcorners1, }); s3.AddItem(l); }
-
-
-    }
-
-
-
-
-
-    section.GenGfxCtx();
-    Align_nested_sections_pre(section);
-    Widget_render(section);
-
+    
     return section;
 }
-
 
 
 
@@ -6130,7 +6558,7 @@ function Window_menu_2() {
     const dp_col = GREY[6];
     const menu_col = GREY[3];
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Menu`, pos: [0, 0, 0], col: dp_col, menu_col: menu_col, btn_col: GREY[3], text_col: WHITE, pad: pad, text_pad: text_pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Menu`, pos: [0, 0, 0], col: dp_col, menu_col: menu_col, btn_col: GREY[3], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners })
     window_menu.AddItem(dp);
     Dropdown_roots_set_root(dp, dp);
