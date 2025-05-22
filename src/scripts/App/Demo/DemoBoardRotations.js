@@ -13,6 +13,8 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../En
 import { Mesh_rotate_z } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { Vertex_buffer_calculate_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -152,8 +154,13 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    /****************************************************************************************************************/
    // Render
    Align_nested_sections_pre(section);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-   section.Render();
+   section.GenGfxCtx();
+      
+
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
+
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 

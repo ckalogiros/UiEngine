@@ -1625,16 +1625,15 @@ function FILL_VERTEX_BUFFER_COL4PERVERTEX_VPOS2_RCORNERS_FEATHER(vb_data, geom, 
    return attribs_count;
 
 }
-function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset, _, vCount) {
-   alert('8877166541009. vCount params has been deprecated from function parameters. CHECK THIS FUNCTION')
+function FILL_VERTEX_BUFFER_COL4PERVERTEX_WPOS3_VPOS2_DIM2_RCORNERS(vb_data, geom, mat, start, num_faces, stride, verts_per_face, a_vpos_offset) {
+
    let attribs_count = 0;
    let index = start;
    let k = 0;
-   const len = num_faces * verts_per_face+2;
+   const len = num_faces * verts_per_face *1;
    const col_len = mat.col.length - 1;
 
-   // for (let i = 0; i < len; i++) {
-   for (let i = 0; i < vCount; i++) {
+   for (let i = 0; i < len; i++) {
 
       // Case some meshes have one color for all vertices, but still use color per vertex buffer.
       const col = (mat.col[k].constructor === Float32Array) ? mat.col[k] : mat.col;

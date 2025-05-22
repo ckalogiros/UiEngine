@@ -186,8 +186,8 @@ const SID = {
 
 
 // TODO: Create a smaller buffer that ca resize its self
-const MAX_VERTEX_BUFFER_SIZE = 100000;
-const MAX_INDEX_BUFFER_SIZE = 10000;
+const MAX_VERTEX_BUFFER_SIZE = 300;
+const MAX_INDEX_BUFFER_SIZE = 1000;
 const INDICES_PER_RECT = 6;
 const VERTS_PER_RECT = 6;
 const VERTS_PER_RECT_INDEXED = 4;
@@ -316,8 +316,9 @@ const GFX_CTX_FLAGS = {
 
 
     // Render groups
-    NEW_RENDER_GROUP: _CNT<<=0x1,
-    PRIVATE_RENDER_GROUP: _CNT<<=0x1, // Enable the explicit usage of the current render group
+    RENDER_GROUP_NEW: _CNT<<=0x1,
+    RENDER_GROUP_FROM_NEW: _CNT<<=0x1, // Stop search at parent new group, and create new group for the mesh
+    RENDER_GROUP_FROM_ALL: _CNT<<=0x1, // Dont stop search until the whole view group is searched
 
 
     // UNUSED
@@ -335,17 +336,33 @@ const GFX_CTX_FLAGS = {
 
 
 
+
 _CNT = 0x1;
 const BUFFER_STATE = {
 
     // SHOW: _CNT,
     NEEDS_UPDATE: _CNT,
-    NEEDS_UPDATE_FROM_REALLOC: _CNT,
+    NEEDS_UPDATE_FROM_REALLOC: _CNT <<= 0x1,
     // IS_PRIVATE: _CNT <<= 0x1,
     IS_ACTIVE: _CNT <<= 0x1,
     IS_PRIVATE: _CNT <<= 0x1,
 };
 
+
+
+
+
+
+
+
+_CNT = 0x1;
+const RENDER_GROUP_STATE = {
+
+    NEEDS_UPDATE: _CNT,
+    NEEDS_UPDATE_FROM_REALLOC: _CNT <<= 0x1,
+    IS_ACTIVE: _CNT <<= 0x1,
+    IS_PRIVATE: _CNT <<= 0x1,
+};
 
 
 

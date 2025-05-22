@@ -10,6 +10,8 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../En
 import { Widget_ready_label, Widget_ready_slider } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { Mesh_get_name, Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { View_build_NEW_IMPLEMENTATION, View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { Vertex_buffer_calculate_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -1274,10 +1276,12 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
 
    /********************************************************************************************************************************************************/
    // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -1360,10 +1364,12 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
 
    /********************************************************************************************************************************************************/
    // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -1473,10 +1479,12 @@ with right to left order`;
 
    /********************************************************************************************************************************************************/
    // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -1616,10 +1624,12 @@ function Create_triangle_structure(x = 50, y = 50) {
 
    /********************************************************************************************************************************************************/
    // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -1915,10 +1925,12 @@ function Test_slider_control_pad(x, y) {
 
       /********************************************************************************************************************************************************/
       // Render
-      ss.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+      ss.GenGfxCtx();
 
+      View_build_NEW_IMPLEMENTATION(ss);
+      Vertex_buffer_calculate_render_group_starts();
+      View_render_from_view_NEW(ss.group_bufferidxs[0]);
 
-      ss.Render();
       Root_group_activate_all_vbs_in_renderqueue(ss.root_bufferidx);
       Construct_listen_events_from_mesh_tree(ss)
       Construct_listen_events_relations_from_mesh_tree(ss);
@@ -1931,10 +1943,12 @@ function Test_slider_control_pad(x, y) {
 
    /********************************************************************************************************************************************************/
    // Render
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+   section.GenGfxCtx();
 
+   View_build_NEW_IMPLEMENTATION(section);
+   Vertex_buffer_calculate_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.Render();
    Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);

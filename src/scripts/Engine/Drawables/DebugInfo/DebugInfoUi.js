@@ -295,10 +295,10 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
       Align_nested_sections_pre(section);
       section.GenGfxCtx();
 
-      // section.Render();
       View_build_NEW_IMPLEMENTATION(section);
       Vertex_buffer_calculate_render_group_starts();
       View_render_from_view_NEW(section.group_bufferidxs[0]);
+
       Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)

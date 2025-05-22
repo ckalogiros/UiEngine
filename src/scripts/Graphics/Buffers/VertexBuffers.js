@@ -294,13 +294,11 @@ class Vertex_Buffer_Info {
     }
 
 
-    // TODO: This must be moved to VertexBufferInfo class
-    // EFFICIENCY: Can pass an aproximation of all the meshes count (extra_size) from the root caller where the widget is constructed
     Realloc(extra_size = 0) {
 
         const new_size = this.#CalculateMemoryPaddedSize(this.count, extra_size);
-        const size_dif = new_size - this.size;
-        this.size = new_size;
+        // const size_dif = new_size - this.size;
+        this.size = new_size + this.size;
 
         const new_data = Typed_array_create_from_type(this.type, this.size);
 
@@ -317,7 +315,7 @@ class Vertex_Buffer_Info {
         _vertex_buffers_data.buffer[this.vbidx] = new_data;
 
         if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!');
-        return size_dif;
+        // return size_dif;
     }
 
 
@@ -358,12 +356,6 @@ export function Vertex_buffer_info_reset() {
 
 // TODO: Abstarct to a file VertexBufferObject.js
 /** */
-function Gl_vertex_buffer_group_vbo_delete(ibidx) {
-
-    const vao = _vertex_buffer_infos.buffer[ibidx];
-    gfxCtx.gl.deleteBuffer(vao);
-}
-/** */
 function Gl_vertex_buffer_group_vbo_delete_all() {
 
     for (let i = 0; i <= _vertex_buffer_infos.boundary; i++) {
@@ -373,11 +365,15 @@ function Gl_vertex_buffer_group_vbo_delete_all() {
         gfxCtx.gl.deleteBuffer(vbo);
     }
 }
+/** */
+export function VBI_get_vbo(vb_info_idx) {
+    return _vertex_buffer_infos.buffer[vb_info_idx].vbo;
+}
 
 /** */
-export function VBI_get_byidx(vb_infoidx) {
+export function VBI_get_byidx(vb_info_idx) {
     // TODO: Check for valid buffer element
-    return _vertex_buffer_infos.buffer[vb_infoidx];
+    return _vertex_buffer_infos.buffer[vb_info_idx];
 }
 /** */
 function Vertex_buffer_info_gl_destroy(gl) {
@@ -797,6 +793,8 @@ export function Vertex_buffer_calculate_render_group_starts() {
         const attribs_per_vertex = vb_info.attribs_info.count;
         const vertices_per_face = vb_group.vertices_per_face;
 
+        let total_size = 0;
+
         for(let j=0; j<=vb.render_groupidxs.boundary; j++) {
 
             const rgidx = vb.render_groupidxs.buffer[j];
@@ -814,6 +812,16 @@ export function Vertex_buffer_calculate_render_group_starts() {
 
             start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
 
+            total_size += rg.size;
+        }
+
+        // Reallocate vb according to render groups total size
+        if(total_size >  vb_info.size) {
+            
+            const extra_size = total_size - vb_info.size;
+            const size_dif = vb_info.Realloc(extra_size);
+            console.error('REALLOC',vb_info.size)
+            vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
         }
     }
 }
@@ -885,6 +893,7 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
         vb_group.needs_any_update = true;
+        render_group.state |= RENDER_GROUP_STATE.NEEDS_UPDATE;
         
         render_group.draw_count += num_faces * INDICES_PER_RECT;
         

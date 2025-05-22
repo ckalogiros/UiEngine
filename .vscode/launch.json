@@ -7,7 +7,7 @@
             "reAttach": true,
             "name": "Launch localhost",
             "url": "http://localhost:6001/src",
-            "firefoxExecutable": "C:\\UserPrograms\\Internet\\Firefox\\firefox.exe",
+            "firefoxExecutable": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
             "webRoot": "${workspaceFolder}/src",
             "pathMappings": [
                 {

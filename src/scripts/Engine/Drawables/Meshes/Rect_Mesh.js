@@ -37,7 +37,6 @@ export class Rect_Mesh extends Mesh {
 
 
       super(geom, mat);
-      // console.log(properties.name, properties.col)
 
       this.sid.unif |= SID.UNIF.ROOT_WPOS2;
 
@@ -128,11 +127,19 @@ export class Rect_Mesh extends Mesh {
       }
    }
    /** */
-   Deactivate() {
+   Deactivate() { // TODO: ADD to all widget-Mesh classes
 
       this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
+      }
+   }
+   /** */
+   SetRenderGroup(render_groupidx) {
+
+      this.gfx.vb.render_groupidx = render_groupidx; // #181716
+      for (let i = 0; i <= this.children.boundary; i++) {
+         if (this.children.buffer[i]) this.children.buffer[i].SetRenderGroup(render_groupidx);
       }
    }
    /** */
@@ -202,6 +209,10 @@ export class Rect_Mesh extends Mesh {
    SetIsGfxInserted(flag) {
       if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
    }
+   /** */
+   RenderToNewRenderGroup() {
+      this.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
+   }
 
 
 
@@ -263,6 +274,8 @@ export class Rect_Mesh extends Mesh {
          Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(aaa.root_posidx, this.scroller_comp.root_posidx)
          this.AddChildScrollerIdx(this.scroller_comp_idx);
 
+         // Scroller_component_calculate_handle_pos_dim(this.scroller_comp);
+
          if(0) { // TODO: Scroller component should store if it has scissor box enabled
             // Set scissor box
             const mx = this.mesh_bufferidx;
@@ -305,7 +318,7 @@ export class Rect_Mesh extends Mesh {
       this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
 
       // this.AddChild(scroller);
-      // this.AddItem(scroller);
+      this.AddItem(scroller);
    }
 
 

@@ -7,7 +7,7 @@ import { Texture_init_texture_storage_buffer } from '../Engine/Loaders/Textures/
 
 import { Detect_host_platform, Device_set_up, Input_create_user_input_listeners } from '../Engine/Controls/Input/Input.js';
 import { TestWidgetsGeneric } from './TestWidgets.js';
-import { Time_intervals_destroy, Time_intervals_init_time, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
+import { Time_intervals_destroy_all, Time_intervals_init_time, Time_intervals_initialize } from '../Engine/Timers/TimeIntervals.js';
 import { Dbg_ui_info_all_reset } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Performance_timers_init_all } from '../Engine/Timers/PerformanceTimers.js';
 import { Listener_init_event_storage_buffers, Listener_reset_event_storage_buffers_dealocate } from '../Engine/Events/EventListeners.js';
@@ -71,7 +71,7 @@ export function AppInit() {
     Renderqueue_init();
     
     Performance_timers_init_all();
-    Time_intervals_initialize();                // Time_intervals_destroy()
+    Time_intervals_initialize();                // Time_intervals_destroy_all()
     Listener_init_event_storage_buffers();      // Listener_reset_event_storage_buffers()
     Notifications_initialize();                 // Notifications_reset()
     Callback_animations_initialize();           // Callback_animations_destroy()
@@ -107,7 +107,7 @@ export function App_reset(){
     
     /** RESET
      * 
-     *  Time_intervals_destroy()
+     *  Time_intervals_destroy_all()
      *  Listener_reset_event_storage_buffers()
      *  Notifications_reset()
      *  Callback_animations_destroy()
@@ -126,7 +126,7 @@ export function App_reset(){
 
     Root_group_destroy_meshes_buffer_alocations();
    
-    Time_intervals_destroy();
+    Time_intervals_destroy_all();
     // Listener_reset_event_storage_buffers();
     Listener_reset_event_storage_buffers_dealocate();
     Notifications_reset();

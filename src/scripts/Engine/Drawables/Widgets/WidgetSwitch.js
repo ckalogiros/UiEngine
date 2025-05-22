@@ -41,7 +41,16 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       properties.style.rcorners = properties.size;
       properties.dim = switch_dim;
 
-      super(mesh_bufferidx, properties)
+      super(mesh_bufferidx, Style_rect_default_properties({
+         is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
+         pos: properties.pos,
+         dim: properties.dim,
+         col: properties.col,
+         pad: properties.pad,
+         name: properties.text,
+         num_faces: properties.num_faces,
+         is_debug_mesh: properties.is_debug_mesh,
+      }));
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, properties.col);

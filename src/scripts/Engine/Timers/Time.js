@@ -54,13 +54,13 @@ class Time {
 
 const _g_timer = new Time();
 
-export function TimeGet() { return _g_timer; }
+export function Time_get() { return _g_timer; }
 
 
 
-export function TimeUpdate() { _g_timer.Update(); }  // HOT-PATH
+export function Time_update() { _g_timer.Update(); }  // HOT-PATH
 
 
 
-export function TimeSample() { _g_timer.Sample(); }  // HOT-PATH
+export function Time_sample() { _g_timer.Sample(); }  // HOT-PATH
 
