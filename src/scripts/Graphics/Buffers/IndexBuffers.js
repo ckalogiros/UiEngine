@@ -398,17 +398,7 @@ export function Index_buffer_build_indices_from_render_group(ibidx, render_group
 export function Index_buffer_add_indices_from_render_group(ibidx, render_groupidx, attribs_per_vertex, vertices_per_face, num_faces) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];
-   const rg = Vertex_buffer_render_group_get_render_group(render_groupidx);
-
-   let offset = 0;
-   // let k = rg.index_offset + (vertex_offset / vertices_per_face);
-   // let k = (rg.count / attribs_per_vertex) / vertices_per_face;
    let k = ib_info.vCount;
-   let total_attribs_size = 0;
-
-
-
-   // const num_faces = (rg.count / attribs_per_vertex) / vertices_per_face;
 
    // Check for buffer realloc
    const total_draw_count = (num_faces*INDICES_PER_RECT)+ib_info.count;

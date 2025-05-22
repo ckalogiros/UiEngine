@@ -928,6 +928,57 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     return 0;
 
 }
+/** */
+export function Vertex_buffer_init_vertices_for_particles(gfx, texidx, _num_faces = 0) {
+    
+    const progidx = gfx.prog.idx;
+    const vb_groupidx = gfx.vb.groupidx;
+    const prog = Progarm_get_program(progidx);
+    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+    
+    const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
+    
+    const render_groupidx = gfx.vb.render_groupidx;
+    const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
+    const start_attribute_index = render_group.start + render_group.count;
+
+    // Run for every vertex buffer of the group.
+    for (let i = 0; i <= vb_group.vb_idxs.boundary; i++) {
+        
+        const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[i]);
+        const attribs_per_vertex = vb_info.attribs_info.count;
+        
+        const verts_per_face = (gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) ? 2 : vb_group.vertices_per_face;
+        let total_attribs = 0;
+        if(gfx.sid.shad & SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X) {
+            total_attribs = vb_info.attribs_info.count * ((verts_per_face * num_faces) + 2); 
+        }
+        else total_attribs = attribs_per_vertex * verts_per_face * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
+        
+        // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
+        Index_buffer_add_indices_from_render_group(vb_group.ibidx, render_groupidx, attribs_per_vertex, verts_per_face, num_faces);
+
+        render_group.count += total_attribs;
+        vb_info.count = render_group.count;
+        vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
+        
+        // prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
+        // vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+        // vb_group.needs_any_update = true;
+        // render_group.state |= RENDER_GROUP_STATE.NEEDS_UPDATE;
+        
+        // render_group.draw_count += num_faces * INDICES_PER_RECT;
+        
+        // Store the texture index in the vertex
+        vb_info.texidx = texidx;
+        gfx.vb.counts.buffer[i] = total_attribs;
+        // gfx.vb.starts.buffer[i] = start_attribute_index;
+        
+    }
+
+    return start_attribute_index;
+
+}
 /** Reset Vertex Buffer to specific mesh start index */
 export function Vertex_buffer_reset_to_index_NEW(vb_groupidx, render_groupidx) {
 

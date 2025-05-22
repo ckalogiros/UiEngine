@@ -12,7 +12,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
+import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx, Particle_system_init_particles } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Time_intervals_create } from '../../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer, Timer_get_global_timer_cycle } from '../../Engine/Timers/Timers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
@@ -503,6 +503,8 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
    /****************************************************************************************************************/
    // Add the emitter here, because it needs a parent mesh to pass as param
    Particles_gen_gfx_ctx(emitter, controls_section);
+
+   Particle_system_init_particles(emitter);
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
    emitter.GfxUniformsSetClbk('u_blend_mode', () => { return emitter.sid.blend_options; }, emitter.gfx.vb.groupidx);
@@ -658,6 +660,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    // Add the emitter here, because it needs a parent mesh to pass as param
    // Particles_gen_gfx_ctx(emitter, controls_section);
    Particles_gen_gfx_ctx(emitter, _);
+   Particle_system_init_particles(emitter);
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
    emitter.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
@@ -1023,6 +1026,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
 
 
    Particles_gen_gfx_ctx(emitter);
+   Particle_system_init_particles(emitter);
 
    emitter.GfxUniformSetAndUpdate('u_generic_controls', [.2, 1.]);
 

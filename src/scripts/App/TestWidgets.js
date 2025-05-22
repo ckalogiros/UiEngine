@@ -456,9 +456,9 @@ export function TestWidgetsGeneric() {
 
             // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
 
-            Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
+            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
 
-            // Create_smoke_particles();
+            Create_smoke_particles();
 
             // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
 

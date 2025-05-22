@@ -68,8 +68,8 @@ export function Vertex_buffer_render_group_get_size(render_groupidx) {
    return _render_groups.buffer[render_groupidx].size;
 }
 
-// SETTERS
 
+// SETTERS
 /** */
 export function Vertex_buffer_render_group_set_num_faces(render_groupidx, num_faces) { 
    _render_groups.buffer[render_groupidx].num_faces = num_faces;

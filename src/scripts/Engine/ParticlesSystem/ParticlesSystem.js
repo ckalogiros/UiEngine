@@ -1,9 +1,9 @@
 "use strict";
 
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
-import { Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
+import { Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_init_vertices_for_particles } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
@@ -60,6 +60,76 @@ const max = 210;
 const interpolate = 1 / max;
 
 const initial_scale = 10;
+
+
+class Int32_Buffer_Reversed {
+
+   constructor(size) {
+      this.buffer = new Int32Array(size);
+      this.size = size;
+      this.count = 0;
+      // this.boundary = size-1;
+      this.pos = 0;
+
+      for(let i=0; i<=this.size-1; i++) {
+         this.buffer[i] = INT_NULL;
+      }
+   }
+   AddFree(idx) {
+
+      const freeidx = this.pos;
+      this.buffer[freeidx] = idx;
+      this.pos++;
+      this.count++;
+   }
+   GiveBackFree(idx) {
+      
+      this.pos--;
+      this.buffer[this.pos] = idx;
+      this.count--;
+   }
+   GetNextFree() {
+
+      const freeidx = this.pos;
+      this.pos++;
+      this.count++;
+      return this.buffer[freeidx];
+   }
+}
+/**SAVE */
+// class Int32_Buffer_Reversed {
+
+//    constructor(size) {
+//       this.buffer = new Int32Array(size);
+//       this.size = size;
+//       this.count = 0;
+//       this.boundary = size-1;
+
+//       for(let i=this.boundary; i>=0; i--) {
+//          this.buffer[i] = INT_NULL;
+//       }
+//    }
+//    Add(idx) {
+
+//       const freeidx = this.boundary;
+//       this.buffer[freeidx] = idx;
+//       this.boundary--;
+//       this.count++;
+//    }
+//    GetNextFree() {
+
+//       const freeidx = this.boundary;
+//       this.boundary--;
+//       this.count++;
+//       return this.buffer[freeidx];
+//    }
+//    GiveBackFree(idx) {
+      
+//       this.buffer[this.boundary] = idx;
+//       this.boundary++;
+//       this.count--;
+//    }
+// }
 
 
 
@@ -219,10 +289,14 @@ class Emitter {
          ydir_neg: 0, // Upper quadrant
       }
 
-      this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      this.free_particles_idxs_buffer = New_int32_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
-      this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
+      this.vb_aprox_size = TEMP_number_of_particles_aproximation(life_time, t_step, num_particles_per_frame);
 
+      this.particles_buffer = New_generic_buffer(this.vb_aprox_size, 'Particles - particles_buffer');
+      // this.free_particles_idxs_buffer = New_int32_buffer(vb_aprox_size, 'ParticlesSystem-free_particles_idxs_buffer');
+      
+      this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
+      
+      this.free_particles_idxs_buffer = new Int32_Buffer_Reversed(this.vb_aprox_size);
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
@@ -297,16 +371,14 @@ class Emitter {
       this.Particle_update_scale = Particle_update_scale_empty;
       this.Particle_update_fade = Particle_update_fade_empty;
 
-      this.vb_aprox_size = TEMP_number_of_particles_aproximation(life_time, t_step, num_particles_per_frame)
-
       console.log('#### Perticles-Size aproximation', this.vb_aprox_size );
 
    }
-   Reset() {
+   // Reset() {
 
-      this.particles_buffer.ResetFull();
-      this.free_particles_idxs_buffer.Reset();
-   }
+   //    this.particles_buffer.ResetFull();
+   //    this.free_particles_idxs_buffer.Reset();
+   // }
    ParticleAddToGfx(particle_idx) {
 
       // Must create geom struct to pass to the GlAdd...() fuunction
@@ -797,8 +869,27 @@ export function Particle_system_create_emitter(name, col, pos, dim, t_step, life
 
    _emitters.buffer[idx].idx = idx;
 
-
    return idx;
+}
+/** */
+export function Particle_system_init_particles(emitter) {
+   
+   // Pre_init particles
+   for(let i=0; i < emitter.vb_aprox_size; i++) {
+
+      const particle = new Particle(emitter);
+      const particle_idx = emitter.particles_buffer.Add(particle);
+      // particle.is_alive = true;
+
+      const start = Vertex_buffer_init_vertices_for_particles(emitter.gfx, emitter.mat.texidx, emitter.geom.num_faces = 0)
+      emitter.particles_buffer.buffer[particle_idx].SetGfxStart(start);
+      // console.log(i, start);
+
+      // Add to free particles
+      emitter.free_particles_idxs_buffer.AddFree(particle_idx);
+   }
+   console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[',emitter.free_particles_idxs_buffer)
+   const x = 0
 }
 /** */
 export function Particle_system_emitt(params) {
@@ -810,10 +901,12 @@ export function Particle_system_emitt(params) {
 
       const emitter_idx = params.params.target_params[i]
       const emitter = _emitters.buffer[emitter_idx];
-      let last_elem = emitter.free_particles_idxs_buffer.boundary;
 
+      // Get next free particle via the free particles buffer
+      // let next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary;
+      
       const has_intermidiate_emission = emitter.has_intermidiate_emission;
-
+      
       // Case emitter has been deactivated (if all of its particles animations have been stoped)
       if (!emitter.is_active) {
 
@@ -821,7 +914,7 @@ export function Particle_system_emitt(params) {
          Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
       }
 
-
+      
       /**
        * 'has_intermidiate_emission'
        * Fill big position gaps (created by great movement speed) with particles
@@ -865,124 +958,102 @@ export function Particle_system_emitt(params) {
       }
 
 
-
-
       const stored_pos = [emitter.geom.pos[0], emitter.geom.pos[1]]; // Store the emitters's pos to re-set it
 
       // Choise: If has intermidiate_emission, calculate the num particles from the prev_pos-pos magnitude. Else use the 'num_particles_per_frame' variable
       const num_particles = has_intermidiate_emission ? intermediate_num_particles : emitter.num_particles_per_frame;
-
-
+      
+      
       for (let j = 0; j < num_particles; j++) {
-
-
+         
          if (has_intermidiate_emission) {
-
+            
             const new_pos = [(mag_partition * Math.sin(angle)), (mag_partition * Math.cos(angle))];
             emitter.geom.pos[0] = stored_pos[0] + new_pos[0];
             emitter.geom.pos[1] = stored_pos[1] + new_pos[1];
             emitter.geom.time = emitter.t_step * j;
          }
+         
+         let next_free_particle_idx = emitter.free_particles_idxs_buffer.GetNextFree();
+         // const particle_idx = emitter.free_particles_idxs_buffer.buffer[next_free_particle_idx];
+         const particle = emitter.particles_buffer.buffer[next_free_particle_idx];
 
-         if (last_elem === INT_NULL) {
+         if (particle !== undefined) {
 
-            const particle = new Particle(emitter);
-            const particle_idx = emitter.particles_buffer.Add(particle);
             particle.is_alive = true;
 
-            emitter.ParticleAddToGfx(particle_idx);
+            // particle.accel = emitter.accel;
+            particle.deccel = emitter.deccel;
+            particle.grav = emitter.gravity;
 
+            // particle.scale = initial_scale;
+            particle.scale = emitter.max_scale;
+
+            if (has_intermidiate_emission) particle.time = emitter.t_step * j;
+            // else particle.time = 0;
+            else particle.time = emitter.geom.time;
+            // particle.col[3] -= .2*j;
+
+            particle.pos[0] = emitter.geom.pos[0];
+            particle.pos[1] = emitter.geom.pos[1];
+
+            particle.dim[0] = emitter.geom.dim[0];
+            particle.dim[1] = emitter.geom.dim[1];
+
+            particle.col[0] = emitter.mat.col[0];
+            particle.col[1] = emitter.mat.col[1];
+            particle.col[2] = emitter.mat.col[2];
+            particle.col[3] = emitter.mat.col[3];
+
+            particle.generic.a = emitter.geom.generic.a;
+            particle.generic.b = emitter.geom.generic.b;
+
+            if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
+
+               const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
+               particle.dirx = dir.x;
+               particle.diry = dir.y;
+               particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
+
+            }
+            if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
+
+               const dir = Polar_coordinates()
+               particle.dirx = dir.x;
+               particle.diry = dir.y;
+
+               particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
+               // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
+
+            }
+
+            // emitter.free_particles_idxs_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
+            // next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary
          }
          else {
-
-            const particle_idx = emitter.free_particles_idxs_buffer.buffer[last_elem];
-            const particle = emitter.particles_buffer.buffer[particle_idx];
-
-            if (particle !== undefined) {
-
-               particle.is_alive = true;
-
-               // particle.accel = emitter.accel;
-               particle.deccel = emitter.deccel;
-               particle.grav = emitter.gravity;
-
-               // particle.scale = initial_scale;
-               particle.scale = emitter.max_scale;
-
-               if (has_intermidiate_emission) particle.time = emitter.t_step * j;
-               // else particle.time = 0;
-               else particle.time = emitter.geom.time;
-               // particle.col[3] -= .2*j;
-
-               particle.pos[0] = emitter.geom.pos[0];
-               particle.pos[1] = emitter.geom.pos[1];
-
-               particle.dim[0] = emitter.geom.dim[0];
-               particle.dim[1] = emitter.geom.dim[1];
-
-               particle.col[0] = emitter.mat.col[0];
-               particle.col[1] = emitter.mat.col[1];
-               particle.col[2] = emitter.mat.col[2];
-               particle.col[3] = emitter.mat.col[3];
-
-               particle.generic.a = emitter.geom.generic.a;
-               particle.generic.b = emitter.geom.generic.b;
-
-               if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
-
-                  const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
-                  particle.dirx = dir.x;
-                  particle.diry = dir.y;
-                  particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
-
-               }
-               if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
-
-                  const dir = Polar_coordinates()
-                  particle.dirx = dir.x;
-                  particle.diry = dir.y;
-
-                  particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
-                  // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
-
-               }
-
-               // emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
-               emitter.free_particles_idxs_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
-               last_elem = emitter.free_particles_idxs_buffer.boundary
-            }
-            else {
-               console.error('0099890099889 UNDEFINED')
-            }
+            console.error('0099890099889 UNDEFINED')
          }
 
          // increment to the next position
          mag_partition += dist;
       }
 
-
-      // emitter.left_over += mag;
-      // emitter.left_over += mag-mag_partition;
-
-
       emitter.geom.pos[0] = stored_pos[0];
       emitter.geom.pos[1] = stored_pos[1];
       emitter.geom.prev_pos[0] = emitter.geom.pos[0];
       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-      // if (is_particle_created) {
 
-      //    emitter.geom.pos[0] = stored_pos[0];
-      //    emitter.geom.pos[1] = stored_pos[1];
 
-      //    emitter.geom.prev_pos[0] = emitter.geom.pos[0];
-      //    emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-      // }
+      Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, num_particles);
+      // Set DrawCount in the renderBuffer
+      Vertex_buffer_render_group_set_draw_count_from_num_faces(emitter.gfx.vb.render_groupidx, num_particles);
 
    }
 
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles);
 
 }
+
 /** */
 export function Particle_system_update() {
 
@@ -1122,11 +1193,16 @@ export function Particle_system_update() {
                // Reset particle for reuse
                particle.is_alive = false;
                particle.time = emitter.geom.time;
-               emitter.free_particles_idxs_buffer.Add(j);
-               if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
-                  emitter.is_active = false;
-                  Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-               }
+               // emitter.free_particles_idxs_buffer.Add(j);
+               // if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
+               //    emitter.is_active = false;
+               //    Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
+               // }
+               emitter.free_particles_idxs_buffer.AddFree(j);
+               // if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
+               //    emitter.is_active = false;
+               //    Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
+               // }
 
             }
 
@@ -1372,7 +1448,189 @@ export function Particle_system_print_info() {
 
 
 
+/**SAVE */
+// export function Particle_system_emitt(params) {
 
+//    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles);
+
+//    const len = params.params.target_params.length;
+//    for (let i = 0; i < len; i++) {
+
+//       const emitter_idx = params.params.target_params[i]
+//       const emitter = _emitters.buffer[emitter_idx];
+//       let next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary;
+
+//       const has_intermidiate_emission = emitter.has_intermidiate_emission;
+
+//       // Case emitter has been deactivated (if all of its particles animations have been stoped)
+//       if (!emitter.is_active) {
+
+//          emitter.is_active = true;
+//          Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
+//       }
+
+
+//       /**
+//        * 'has_intermidiate_emission'
+//        * Fill big position gaps (created by great movement speed) with particles
+//        * 
+//        * Calculate the magnitude of the prev and curent pos
+//        * if the difference is greater than a preffered distance:
+//        *    reduce the magnitude by a threshold distance
+//        *    the angle is calculated from atan2(x,y)
+//        *    calculate the particle position with pos = [magnitude*sin(angle), magnitude*cos(angle)]
+//        *    create new particle at that position
+//        *    repeat until the magnitude-distance is 0
+//        * 
+//       */
+
+//       let mag = 0, // The vector magnitude of the difference of the previous and current emitter position
+//          angle = 0,
+//          intermediate_num_particles = 0, // Store the number of total particles to be created in a frame
+//          dist = 0, // A minimum distance in which a particle must be created
+//          mag_partition = 0; // This will cary the next reduced magnitude distance
+
+//       if (has_intermidiate_emission) {
+
+//          const y = emitter.geom.pos[1]
+//          const x = emitter.geom.pos[0]
+//          const pos_dif = [emitter.geom.prev_pos[0] - x, emitter.geom.prev_pos[1] - y];
+//          angle = Math.atan2(pos_dif[0], pos_dif[1])
+//          mag = Magnitude(pos_dif[0], pos_dif[1]);
+
+//          mag += emitter.left_over;
+
+//          // const dist = 2;
+//          dist = emitter.geom.dim[0] / 6;
+//          const ratio = mag / dist;
+//          intermediate_num_particles = Floor(ratio);
+//          emitter.left_over = ratio - intermediate_num_particles; // Save any fraction value of the distance magnitude for later use
+
+//          if (intermediate_num_particles === 0) intermediate_num_particles = 1; // Emitt a particle at least once per frame
+
+//          // emitter.mat.col = GetSequencedColor();
+
+//       }
+
+
+
+
+//       const stored_pos = [emitter.geom.pos[0], emitter.geom.pos[1]]; // Store the emitters's pos to re-set it
+
+//       // Choise: If has intermidiate_emission, calculate the num particles from the prev_pos-pos magnitude. Else use the 'num_particles_per_frame' variable
+//       const num_particles = has_intermidiate_emission ? intermediate_num_particles : emitter.num_particles_per_frame;
+
+
+//       for (let j = 0; j < num_particles; j++) {
+
+
+//          if (has_intermidiate_emission) {
+
+//             const new_pos = [(mag_partition * Math.sin(angle)), (mag_partition * Math.cos(angle))];
+//             emitter.geom.pos[0] = stored_pos[0] + new_pos[0];
+//             emitter.geom.pos[1] = stored_pos[1] + new_pos[1];
+//             emitter.geom.time = emitter.t_step * j;
+//          }
+
+//          if (next_free_particle_idx === INT_NULL) {
+
+//             const particle = new Particle(emitter);
+//             const particle_idx = emitter.particles_buffer.Add(particle);
+//             particle.is_alive = true;
+
+//             emitter.ParticleAddToGfx(particle_idx);
+
+//          }
+//          else {
+
+//             const particle_idx = emitter.free_particles_idxs_buffer.buffer[next_free_particle_idx];
+//             const particle = emitter.particles_buffer.buffer[particle_idx];
+
+//             if (particle !== undefined) {
+
+//                particle.is_alive = true;
+
+//                // particle.accel = emitter.accel;
+//                particle.deccel = emitter.deccel;
+//                particle.grav = emitter.gravity;
+
+//                // particle.scale = initial_scale;
+//                particle.scale = emitter.max_scale;
+
+//                if (has_intermidiate_emission) particle.time = emitter.t_step * j;
+//                // else particle.time = 0;
+//                else particle.time = emitter.geom.time;
+//                // particle.col[3] -= .2*j;
+
+//                particle.pos[0] = emitter.geom.pos[0];
+//                particle.pos[1] = emitter.geom.pos[1];
+
+//                particle.dim[0] = emitter.geom.dim[0];
+//                particle.dim[1] = emitter.geom.dim[1];
+
+//                particle.col[0] = emitter.mat.col[0];
+//                particle.col[1] = emitter.mat.col[1];
+//                particle.col[2] = emitter.mat.col[2];
+//                particle.col[3] = emitter.mat.col[3];
+
+//                particle.generic.a = emitter.geom.generic.a;
+//                particle.generic.b = emitter.geom.generic.b;
+
+//                if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
+
+//                   const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
+//                   particle.dirx = dir.x;
+//                   particle.diry = dir.y;
+//                   particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
+
+//                }
+//                if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
+
+//                   const dir = Polar_coordinates()
+//                   particle.dirx = dir.x;
+//                   particle.diry = dir.y;
+
+//                   particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
+//                   // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
+
+//                }
+
+//                // emitter.free_particles_idxs_buffer.RemoveByIdx(next_free_particle_idx);
+//                emitter.free_particles_idxs_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
+//                next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary
+//             }
+//             else {
+//                console.error('0099890099889 UNDEFINED')
+//             }
+//          }
+
+//          // increment to the next position
+//          mag_partition += dist;
+//       }
+
+
+//       // emitter.left_over += mag;
+//       // emitter.left_over += mag-mag_partition;
+
+
+//       emitter.geom.pos[0] = stored_pos[0];
+//       emitter.geom.pos[1] = stored_pos[1];
+//       emitter.geom.prev_pos[0] = emitter.geom.pos[0];
+//       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
+//       // if (is_particle_created) {
+
+//       //    emitter.geom.pos[0] = stored_pos[0];
+//       //    emitter.geom.pos[1] = stored_pos[1];
+
+//       //    emitter.geom.prev_pos[0] = emitter.geom.pos[0];
+//       //    emitter.geom.prev_pos[1] = emitter.geom.pos[1];
+//       // }
+
+//    }
+
+//    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles);
+
+// }
 
 
 
