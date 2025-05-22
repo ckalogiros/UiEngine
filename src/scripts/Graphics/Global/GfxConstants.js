@@ -186,8 +186,8 @@ const SID = {
 
 
 // TODO: Create a smaller buffer that ca resize its self
-const MAX_VERTEX_BUFFER_SIZE = 3048;
-const MAX_INDEX_BUFFER_SIZE = 64;
+const MAX_VERTEX_BUFFER_SIZE = 100000;
+const MAX_INDEX_BUFFER_SIZE = 10000;
 const INDICES_PER_RECT = 6;
 const VERTS_PER_RECT = 6;
 const VERTS_PER_RECT_INDEXED = 4;

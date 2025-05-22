@@ -380,8 +380,9 @@ export function View_render_from_view_specific_render_group_NEW(view_groupidx) {
 
                const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
                if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-                  mesh.AddToGfxFromReset();
-                  console.log(mesh.name)
+                  if (!mesh.is_gfx_inserted) mesh.AddToGfx();
+                  else mesh.AddToGfxFromReset();
+                  // console.log(mesh.name)
                }
             }
          }

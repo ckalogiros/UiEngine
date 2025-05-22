@@ -280,7 +280,7 @@ export class Rect_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       return this.gfx.vb.start;
    }
@@ -293,7 +293,7 @@ export class Rect_Mesh extends Mesh {
       this.is_gfx_inserted = true;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
    }
 

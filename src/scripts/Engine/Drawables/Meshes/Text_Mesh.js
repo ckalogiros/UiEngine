@@ -116,7 +116,7 @@ export class Text_Mesh extends Mesh {
          this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.size;
 
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
 
       this.is_gfx_inserted = true;
 
@@ -136,7 +136,7 @@ export class Text_Mesh extends Mesh {
 
       
       // Add entry to Gfx Buffer
-      this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
+      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
       
       this.is_gfx_inserted = true;
 

@@ -118,7 +118,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       
       properties.dp.pos[2] += 1;
       this.menu = Create_rect_mesh(properties.menu);
-      Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10,})
+      Widget_gfx_ready_enable({mesh:this.menu, enable_sdf_rect:10, });
       this.menu.type |= MESH_TYPE.DROP_DOWN_MENU;
       this.menu.parent = this;
       this.menu.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
@@ -131,13 +131,24 @@ export class Widget_Dropdown extends Rect_Mesh {
       Widget_gfx_ready_enable({mesh:btn, enable_sdf_rect:10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP }})
       btn.align.flags = LAYOUT.VERTICAL
       btn.StylesSetPad(properties.btn.pad);
-
+      
       this.menu.geom.pos[1] = btn.geom.dim[1];
       
-
+      
       btn.debug_info.type |= INFO_LISTEN_EVENT_TYPE.LISTENERS;
-
+      
       this.AddItem(btn);
+
+
+
+
+      this.menu.gfx_ctx_flags = this.menu.gfx_ctx_flags;
+      btn.gfx_ctx_flags = this.menu.gfx_ctx_flags;
+      btn.text_mesh.gfx_ctx_flags = this.menu.gfx_ctx_flags;
+
+
+
+
 
       this.menu_active = false;
 
@@ -815,13 +826,13 @@ alert('00000111119999922222')
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
       // Reset vertex buffers from group
-      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]);
-      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
 
       // Remove menu and all its items from the group view
-      if (menu.group_bufferidxs[0] !== INT_NULL) {
-         View_remove_from_group(menu);
-      }
+      // if (menu.group_bufferidxs[0] !== INT_NULL) {
+      //    View_remove_from_group(menu);
+      // }
 
       this.#DeactivateMenu();
       this.RemoveChildByIdx(menu.idx); // Rememove menu from drop down
@@ -868,8 +879,8 @@ alert('00000111119999922222')
 
       /********************************************************************************************************************/
       // Re-render   
-      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0])
 
    }
 
@@ -919,29 +930,23 @@ alert('00000111119999922222')
       const menu = this.menu;
       const root = Dropdown_roots_get_root_by_idx(this.rootidx);
 
-      // HACK: In current implementation the menu is never  Rendered(). It is only GfxGenerated(). The problem comes from any scroller that the dp.menu has, since the Render() handles the scroller's render too.
-      // FIXME: Is this the best way to  implement dp.menu rendering?
-      // if (!this.menu.is_gfx_inserted) {
-      //    this.menu.Render()
-      // }
-
-
-      // this.isOn |= DP_MENU_STATE.ON;
-      // this.isOn &= ~DP_MENU_STATE.OFF;
-
-      // View_reset_from_view_all_buffers(root.group_bufferidxs[0]); // Reset the vertex buffer and the mesh_per_vb, before the adition of the 'menu's' meshes to the view group
-      View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
-
-      this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
-
 
       // Case its the first time this menu will be rendered
       if (menu.group_bufferidxs[0] === INT_NULL && this.group_bufferidxs[0] !== INT_NULL) {
          View_add_to_group(menu, this.group_bufferidxs[0]);
          Vertex_buffer_calculate_render_group_starts();
       }
+
+
+// IMPORTANT: ONLY IF MENU IS IN ITS OWN GROUP
+      // View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
+      View_reset_to_index_from_view_group_NEW(this.menu.group_bufferidxs[0]);
+
+      this.AddItem(menu); // Add the menu, which is a storage of Widget_Dropdown only, as a child to the drop_down
+
       
       this.#ActivateMenu(); // Add dropdown to gfx buffers.
+
       
       const btn = this.children.buffer[0];
       btn.text_mesh.SliceText(0, 1);
@@ -993,8 +998,8 @@ alert('00000111119999922222')
       /********************************************************************************************************************/
       // Re-render   
       // FIXME: For the first time a menu is rendered must call Render() and not Re-render in order to create the vb starts for each mesh
-      // View_render_from_view_all_buffers(root.group_bufferidxs[0], false);
-      View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0])
+      // View_render_from_view_specific_render_group_NEW(root.group_bufferidxs[0]);
+      View_render_from_view_specific_render_group_NEW(this.menu.group_bufferidxs[0]);
 
 
    }
