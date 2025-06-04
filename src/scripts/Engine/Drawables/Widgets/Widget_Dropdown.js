@@ -5,18 +5,18 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_activate_rg, View_add_mesh, View_add_to_group, View_deactivate_rg, View_remove_from_group, View_remove_mesh, View_build_all_group_from_root_mesh, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_from_view_all_buffers, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
+import { View_activate_rg, View_add_mesh, View_deactivate_rg, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx, Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx } from "../../Core/Views/RootView.js";
 import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { Sid_check_match, State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
-import { Align_expand, Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
+import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from "./ScrollerComponent.js";
-import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -407,18 +407,18 @@ export class Widget_Dropdown extends Rect_Mesh {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      if(unif_name === 'u_wposxy'){
+      // if(unif_name === 'u_wposxy'){
 
-         // Call for each root mesh in every vertex buffer
-         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
-         const len = root_meshes.length;
-         for(let i=1; i < len; i++){
+      //    // Call for each root mesh in every vertex buffer
+      //    const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
+      //    const len = root_meshes.length;
+      //    for(let i=1; i < len; i++){
       
-            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
+      //       const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
+      //       root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
       
-         }
-      }
+      //    }
+      // }
 
    }
    /** */

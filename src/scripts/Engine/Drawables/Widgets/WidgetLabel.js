@@ -186,7 +186,7 @@ export class Widget_Label extends Rect_Mesh {
 
         // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
         this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-        this.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
+        // this.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
     }
 
 

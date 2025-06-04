@@ -4,7 +4,6 @@ import { Callback_animations_create } from "../../Engine/Animations/CallbackAnim
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from "../../Engine/Animations/CallbackAnimationsReadyAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Color_hsv_to_rgb_calibrated, Get_fasma_color, GREEN, GREENL, GREY, PURPLEB, PURPLER, RED, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
@@ -21,7 +20,7 @@ import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh
 import { Align_expand, Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.js";
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
-import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
 
 
@@ -107,10 +106,10 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       // HACK: Scale down before render
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
             
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
-      Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
       Construct_listen_events_relations_from_mesh_tree(panel);
       panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
@@ -179,10 +178,10 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       Align_nested_sections_pre(panel);
       Align_expand(panel);
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
-      Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
       Construct_listen_events_relations_from_mesh_tree(panel);
       panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
@@ -258,11 +257,11 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    Align_nested_sections_pre(panel);
    ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
                
-   Vertex_buffer_calculate_render_group_starts();
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(panel.group_bufferidxs[0]);
    
 
-   Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+   // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(panel);
    Construct_listen_events_relations_from_mesh_tree(panel);
    panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
@@ -304,10 +303,10 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true, font_
 
    Align_nested_sections_pre(panel);
 
-   Vertex_buffer_calculate_render_group_starts();
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
-   Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+   // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(panel);
    Construct_listen_events_relations_from_mesh_tree(panel);
    panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
@@ -359,10 +358,10 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       Align_nested_sections_pre(panel);
       Align_expand(panel);
    
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(panel.group_bufferidxs[0]);
 
-      Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(panel);
       Construct_listen_events_relations_from_mesh_tree(panel);
       panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
@@ -447,10 +446,10 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
       Align_nested_sections_pre(menu_panel);
       Align_expand(menu_panel);
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
    
-      Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
       Construct_listen_events_from_mesh_tree(menu_panel);
       Construct_listen_events_relations_from_mesh_tree(menu_panel);
    
@@ -622,7 +621,7 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
             
-         Vertex_buffer_calculate_render_group_starts();
+         Vertex_buffer_calculate_vertexbuffer_render_group_starts();
          View_render_from_view_NEW(slider.group_bufferidxs[0]);
       
          // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
@@ -637,11 +636,11 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
 
       Align_nested_sections_pre(mesh);
             
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
       
 
-      Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
       Construct_listen_events_from_mesh_tree(mesh);
       Construct_listen_events_relations_from_mesh_tree(mesh);
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
@@ -794,10 +793,10 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
                      
-         Vertex_buffer_calculate_render_group_starts();
+         Vertex_buffer_calculate_vertexbuffer_render_group_starts();
          View_render_from_view_NEW(slider.group_bufferidxs[0]);
       
-         Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
+         // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
          slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
 
          Construct_listen_events_from_mesh_tree(slider)
@@ -812,12 +811,12 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
       Align_nested_sections_pre(mesh);
             
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
       
 
 
-      Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
       Construct_listen_events_from_mesh_tree(mesh);
       Construct_listen_events_relations_from_mesh_tree(mesh);
       mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
@@ -961,10 +960,10 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
       Align_nested_sections_pre(controls_section);
       
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
       
-      Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
       Construct_listen_events_from_mesh_tree(controls_section);
       Construct_listen_events_relations_from_mesh_tree(controls_section);
 
@@ -1010,13 +1009,13 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(section.group_bufferidxs[0]);
       
       section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       Construct_listen_events_from_mesh_tree(section);
       Construct_listen_events_relations_from_mesh_tree(section);
-      Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
       total_height += section.geom.dim[1] * 2;
 

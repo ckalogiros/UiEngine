@@ -7,7 +7,6 @@ export function Align_nested_sections_pre(mesh, pos_x = 0, pos_y = 0, pad = [10,
    const x = mesh.geom.pos[0], y = mesh.geom.pos[1];
    const ret = Align_pre_simple___(mesh, x, y, pad);
    // const ret = Align_pre_simple___(mesh, pos_x, pos_y, pad);
-   
    // const ret = Align_pre_simple___with_scroller(mesh, pos_x, pos_y, pad);
 
    if (mesh.align.flags & LAYOUT.RESIZE_SELF) {
@@ -148,40 +147,78 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
    }
 
 }
-/** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
-export function Layout_calculate_grow_children_count_layout(root) {
+/** Expand width of all children meshes to the widest width dimention */
+export function Align_expand(parent, min_width = 0) {
 
-   let hor_count = 1;
-   let vert_count = 1;
+   let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
+   if (width < min_width) width = min_width;
 
-   // Calculate 
-   for (let i = root.children.boundary; i >= 0; i--) {
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
+      const cur_mesh = parent.children.buffer[i];
 
-      const child = root.children.buffer[i];
+      if (cur_mesh) {
 
-      if (child.children.boundary >= 0) {
-         Layout_calculate_grow_children_count_layout(child);
+         const pad = cur_mesh.StylesGetPad();
+
+         if (cur_mesh.align.flags & LAYOUT.EXPAND) {
+            cur_mesh.geom.dim[0] = width;
+            cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+            // console.log('000000000000000000', cur_mesh.name)
+         }
+         // if (cur_mesh.align.flags & LAYOUT.FLOAT_RIGHT) {
+
+         // }
+
+         // if (align.flags & LAYOUT.INHERIT) opt = parent.align.flags;
+
+         // if (cur_mesh.type & MESH_TYPE.WIDGET_LABEL) {
+         //    // // For other than section widgets, the parent should control cur_mesh expansion 
+         //    if (align.flags & LAYOUT.EXPAND) {
+         //       cur_mesh.geom.dim[0] = width;
+         //       cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+         //    }
+         // }
+         // else if (cur_mesh.type & MESH_TYPE.SECTION_MESH) {
+         //    // For section widgets, the cur_mesh's align.flags should control cur_mesh expansion 
+
+         //    // if (opt & LAYOUT.VERTICAL) {
+         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
+         //          cur_mesh.geom.dim[0] = width;
+         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+         //       }
+         //    // }
+         //    // else if (opt & LAYOUT.HORIZONTAL) {
+         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
+         //          cur_mesh.geom.dim[0] = width;
+         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+         //       }
+         //    // }
+
+         //    // Align_expand(cur_mesh, opt, width);
+         //    width = Align_expand(cur_mesh, opt, width);
+         //    // if(width < min_width) width = min_width;
+         // }
+         // else {
+
+         //    if (opt & LAYOUT.VERTICAL) {
+         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
+         //          cur_mesh.geom.dim[0] = width;
+         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+         //       }
+         //    }
+         //    else if (opt & LAYOUT.HORIZONTAL) {
+         //       // width -= cur_mesh.geom.dim[0] *2
+         //       // cur_mesh.geom.dim[0] = width;
+         //       // cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
+         //    }
+         // }
+
+         Align_expand(cur_mesh)
       }
-
-      if (child.align.flags & LAYOUT.HORIZONTAL) {
-
-         child.align.hor_grow_count = hor_count;
-         hor_count++;
-         child.align.vert_grow_count = vert_count;
-      }
-      else if (child.align.flags & LAYOUT.VERTICAL) {
-
-         child.align.vert_grow_count = vert_count;
-         vert_count++;
-         child.align.hor_grow_count = hor_count;
-         hor_count = 1;
-      }
-
-      //  console.log(Mesh_get_name(child), child.align.hor_grow_count, child.align.vert_grow_count)
-
    }
 
+   return width
 }
 /** */
 // TODO: We need a GROW_SELF that will grow based on its children size and an GROW for sharing with other sections
@@ -320,6 +357,10 @@ export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y =
 
 
 }
+
+
+
+/** NOT IMPLEMENTED */
 /** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
 function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
@@ -468,86 +509,45 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
 
 
 }
-/**
- * ONLY FOR ALIGN2.SELF_RESIZE sectionS for now.
- * // TODO: Add support for widgets
- * @param {*} parent 
- * @param {*} align.flags 
- * @param {*} min_width 
- * @returns 
- */
-export function Align_expand(parent, align_flags, min_width = 0) {
 
-   let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
-   if (width < min_width) width = min_width;
 
-   for (let i = 0; i <= parent.children.boundary; i++) {
 
-      const cur_mesh = parent.children.buffer[i];
+/** Unused */
+/** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
+// export function Layout_calculate_grow_children_count_layout(root) {
 
-      if (cur_mesh) {
+//    let hor_count = 1;
+//    let vert_count = 1;
 
-         const pad = cur_mesh.StylesGetPad();
+//    // Calculate 
+//    for (let i = root.children.boundary; i >= 0; i--) {
 
-         if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-            cur_mesh.geom.dim[0] = width;
-            cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-            // console.log('000000000000000000', cur_mesh.name)
-         }
-         // if (cur_mesh.align.flags & LAYOUT.FLOAT_RIGHT) {
 
-         // }
+//       const child = root.children.buffer[i];
 
-         // if (align.flags & LAYOUT.INHERIT) opt = parent.align.flags;
+//       if (child.children.boundary >= 0) {
+//          Layout_calculate_grow_children_count_layout(child);
+//       }
 
-         // if (cur_mesh.type & MESH_TYPE.WIDGET_LABEL) {
-         //    // // For other than section widgets, the parent should control cur_mesh expansion 
-         //    if (align.flags & LAYOUT.EXPAND) {
-         //       cur_mesh.geom.dim[0] = width;
-         //       cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //    }
-         // }
-         // else if (cur_mesh.type & MESH_TYPE.SECTION_MESH) {
-         //    // For section widgets, the cur_mesh's align.flags should control cur_mesh expansion 
+//       if (child.align.flags & LAYOUT.HORIZONTAL) {
 
-         //    // if (opt & LAYOUT.VERTICAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    // }
-         //    // else if (opt & LAYOUT.HORIZONTAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    // }
+//          child.align.hor_grow_count = hor_count;
+//          hor_count++;
+//          child.align.vert_grow_count = vert_count;
+//       }
+//       else if (child.align.flags & LAYOUT.VERTICAL) {
 
-         //    // Align_expand(cur_mesh, opt, width);
-         //    width = Align_expand(cur_mesh, opt, width);
-         //    // if(width < min_width) width = min_width;
-         // }
-         // else {
+//          child.align.vert_grow_count = vert_count;
+//          vert_count++;
+//          child.align.hor_grow_count = hor_count;
+//          hor_count = 1;
+//       }
 
-         //    if (opt & LAYOUT.VERTICAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    }
-         //    else if (opt & LAYOUT.HORIZONTAL) {
-         //       // width -= cur_mesh.geom.dim[0] *2
-         //       // cur_mesh.geom.dim[0] = width;
-         //       // cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //    }
-         // }
+//       //  console.log(Mesh_get_name(child), child.align.hor_grow_count, child.align.vert_grow_count)
 
-         Align_expand(cur_mesh)
-      }
-   }
+//    }
 
-   return width
-}
+// }
 // TODO - Implement Align_nested_sections_post
 /** Align nested sections in Horizontal/Vertical manner, with vertex buffers update. */
 // export function Align_nested_sections_post(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {

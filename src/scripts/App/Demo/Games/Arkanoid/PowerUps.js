@@ -11,7 +11,7 @@ import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/Re
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_get_panel_dim_x } from "./Arkanoid.js";
-import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoisConstants.js";
+import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoidConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
 import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
@@ -76,7 +76,7 @@ class Powup {
       mesh.geom.pos[0] = x;
       mesh.geom.pos[1] = y;
           
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
 
@@ -153,7 +153,7 @@ export function Powup_init_buffer(group_idx, parent_root_posidx, parent_mesh_buf
       vb_groupidx = powup.mesh.gfx.vb.groupidx;
 
       // Add to View Group
-      View_add_to_group(powup.mesh, group_idx);
+      // View_add_to_group(powup.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(powup.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

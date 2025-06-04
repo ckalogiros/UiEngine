@@ -2,7 +2,7 @@
 
 import { Create_rect_mesh, Create_widget_label, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue, Root_group_buffer_print_w1, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
+import { Root_group_buffer_print_w1, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
@@ -159,7 +159,6 @@ export function Sattelite_rotation(x = 0, y = 0) {
    
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(section)
@@ -350,7 +349,6 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
    //    info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    //    info_section.Render();
-   //    Root_group_activate_all_vbs_in_renderqueue(info_section.root_bufferidx);
 
    //    info_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section.gfx.vb.groupidx)
 
@@ -633,7 +631,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    
    section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
    
@@ -753,7 +750,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    
    //    info_section_panel.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
    //    info_section_panel.Render();
-   //    Root_group_activate_all_vbs_in_renderqueue(info_section_panel.root_bufferidx);
    
    //    info_section_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section_panel.gfx.vb.groupidx);
    
@@ -817,7 +813,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
          Align_nested_sections_pre(controls_section);
          
          controls_section.Render();
-         Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
          
          controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
          

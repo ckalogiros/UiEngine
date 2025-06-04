@@ -4,7 +4,6 @@ import { Callback_animations_create } from "../../Engine/Animations/CallbackAnim
 import { Mesh_animations_create } from "../../Engine/Animations/MeshAnimations.js";
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUE, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -14,7 +13,7 @@ import { Mesh_rotate_z } from "../../Engine/Drawables/Operations/MeshAttributesF
 import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
-import { Vertex_buffer_calculate_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
 
 
 
@@ -83,46 +82,46 @@ let rotation = 0;
 
 
 
-export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create = true) {
+export function Board_rotations(x = 0, y = 0, root_widget = 0x0, transparency = 1, rows=12, columns=5, rect_size=25, controls_create = true) {
 
    let total_height = 10;
 
-   const size = 25;
+   const size = rect_size;
    const scale_down = .5;
    const rcorners = size/2;
+   // const transparency = .06;
 
    let controls_section = null;
-
+   
 
    const pad = 10;
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: GREY[1], name:'BoardRotationsPanel' }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: TRANSPARENCY(GREY[1], transparency*.0), name:'BoardRotationsPanel' }));
    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE} })
    section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
 
 
-
    const dim = [size, size]
-   let color_arr = [RED[8], BLUE[9], YELLOW[7], GREEN[6],];
+   let color_arr = [TRANSPARENCY(RED[8], transparency), TRANSPARENCY(BLUE[9], transparency), TRANSPARENCY(YELLOW[7], transparency), TRANSPARENCY(GREEN[6], transparency),];
    const color = [color_arr[0], color_arr[1], color_arr[2], color_arr[3],]
    let k = 0;
-   const cols = 5, rows = 12;
    const inner_pad = [size/8, size/16];
    let align = LAYOUT.HORIZONTAL
-   for (let i = 0; i < cols * rows; i++) {
+   for (let i = 0; i < columns * rows; i++) {
 
       k += 1; if (k >= 4) k = 0;
       color[0] = color_arr[k++]; if (k >= 4) k = 0;
       color[1] = color_arr[k++]; if (k >= 4) k = 0;
       color[2] = color_arr[k++]; if (k >= 4) k = 0;
       color[3] = color_arr[k++]; if (k >= 4) k = 0;
+      // color[3] = 1.; k++; if (k >= 4) k = 0;
 
-      if (i % cols === 0) inner_pad[0] = 0
+      if (i % columns === 0) inner_pad[0] = 0
       else inner_pad[0] = size/3;
 
       
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pad: inner_pad, dim: dim, col: color }));
       Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
-      mesh.align.flags = (i % cols === 0) ? LAYOUT.VERTICAL : align;
+      mesh.align.flags = (i % columns === 0) ? LAYOUT.VERTICAL : align;
       section.AddItem(mesh);
 
       const equalize = 4;
@@ -157,10 +156,9 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
    
    Align_nested_sections_pre(section);
 
-   Vertex_buffer_calculate_render_group_starts();
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(section)

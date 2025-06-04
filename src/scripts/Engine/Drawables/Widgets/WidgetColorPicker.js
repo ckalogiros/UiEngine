@@ -6,9 +6,7 @@ import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_ver
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Create_rect_mesh, Create_widget_label, Create_widget_slider_simple } from "./Helpers/CreateWidgetInterface.js";
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -339,19 +337,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-
-      if (unif_name === 'u_wposxy') {
-
-         // Call for each root mesh in every vertex buffer
-         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
-         const len = root_meshes.length;
-         for (let i = 1; i < len; i++) {
-
-            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
-
-         }
-      }
 
    }
 

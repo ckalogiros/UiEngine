@@ -3,7 +3,7 @@
 1. A root mesh to hold all others
 2. Labels inside the root
 
-The root is a rect mesh, so is the labels.
+The root is a rect mesh, so are the labels.
 The graphics context generation will create 2 vertex buffers,
 one for rendering the root and the labels VB0 and a second one for rendering the text of the labels VB1.
 

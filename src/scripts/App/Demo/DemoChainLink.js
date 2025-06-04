@@ -4,7 +4,6 @@
 
 import { Mouse_get_pos } from "../../Engine/Controls/Input/Mouse.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { Get_fasma_color, WHITE } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
@@ -62,7 +61,6 @@ export function Demo_chain_link(x=0, y=0) {
    head.GenGfxCtx();
    head.Render();
    
-   Root_group_activate_all_vbs_in_renderqueue(head.root_bufferidx);
    Construct_listen_events_from_mesh_tree(head);
    Construct_listen_events_relations_from_mesh_tree(head);
    head.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, head.gfx.vb.groupidx);

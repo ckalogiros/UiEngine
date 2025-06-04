@@ -30,7 +30,7 @@ export const ARK_STATE = {
    IS(flag) { return flag & this.state; }
 };
 
-ARK_STATE.RESET(ARK_STATE.START);
+// ARK_STATE.RESET(ARK_STATE.START);
 // ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
 
@@ -106,7 +106,7 @@ Mult_arr3_scalar(ARKANOID_COLORS.green, color_brightness_ctrl_val.green)
 /************************************************************************************************/
 // Stages mock-up
 
-export function Arkanoid_initialize_stages() {
+export function Arkanoid_initialize_stages_schema() {
    
    // abcdefghijklmnopqrstuvwxyz
    // abcdefgh COLORS

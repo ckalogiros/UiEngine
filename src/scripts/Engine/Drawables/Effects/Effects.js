@@ -12,7 +12,7 @@
 
 "use strict";
 
-import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoisConstants.js";
+import { ARK_STATE } from "../../../App/Demo/Games/Arkanoid/ArkanoidConstants.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
 import { Gl_set_dim_xy, Gl_set_generic2, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
@@ -56,14 +56,15 @@ export const EFFECTS_TYPES = {
 
 class Effect_Mesh_Explosion_Circle {
 
-   constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, ring_diameter, intensity) {
+   constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, group_idx = INT_NULL, ring_diameter, intensity) {
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshCircle',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false, });
 
 
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:0, generic:{a:.01, b:0}});
-
+      
+      mesh.SetViewGroupIndex(group_idx);
       
       // Render
       mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
@@ -138,11 +139,11 @@ export function Effects_explosion_circle_init_buffer(group_idx, parent_root_posi
    
    for(let i=0; i<num_effect_meshes; i++) {
 
-      effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_groupidx); 
+      effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_groupidx, group_idx); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
       // Add to View Group
-      View_add_to_group(effect.mesh, group_idx);
+      // View_add_to_group(effect.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 
@@ -268,7 +269,7 @@ const _free_effect_explosion_glow_idx_buffer = New_int8_buffer(PRE_INITIALIZED_E
 
 class Effect_Mesh_Explosion_Glow {
 
-   constructor(x=0, y=0, w=35, h=35, color=GREY[7], vb_groupidx=INT_NULL) {
+   constructor(x=0, y=0, w=35, h=35, color=GREY[7], vb_groupidx=INT_NULL, group_idx = INT_NULL) {
 
       this.timer = 0;
       this.timer_limit = 0;
@@ -278,6 +279,8 @@ class Effect_Mesh_Explosion_Glow {
       Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false});
 
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_GLOW, {time:0});
+
+      mesh.SetViewGroupIndex(group_idx);
 
 
       // const 
@@ -343,11 +346,11 @@ export function Effects_explosion_glow_init_buffer(group_idx, parent_root_posidx
 
    for(let i=0; i<num_effect_meshes; i++) {
 
-      effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_groupidx); 
+      effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_groupidx, group_idx); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
       // Add to View Group
-      View_add_to_group(effect.mesh, group_idx);
+      // View_add_to_group(effect.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

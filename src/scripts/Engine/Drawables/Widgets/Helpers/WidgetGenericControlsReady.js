@@ -1,20 +1,17 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_slider } from "./CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../../Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../../Core/Views/RootView.js";
 import { GREY, ORANGE, PURPLE, YELLOW } from "../../Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventFunctions.js";
 import { Slider_connect } from "../WidgetSlider.js";
-import { Vertex_buffer_calculate_render_group_starts, Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_get_uniform_from_name } from "../../../../Graphics/ShaderPrograms.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_default_properties } from "./WidgetEnableProperties.js";
 import { Align_nested_sections_pre } from "../../Operations/AlignNestedSections.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Color_theme_slider_auto } from "../../Material/Themes.js";
 import { Gl_set_generic2, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { View_render_from_view_NEW } from "../../../Core/Views/MeshBufferViews.js";
+import { Widget_render } from "./WidgetRender.js";
 
 
 
@@ -148,7 +145,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer(targe
    return controls_buffer;
 }
 
-export function Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(target_mesh, controls_size, parameters = null, uniform_name=null, is_root = false, x = 0, y = 0) {
+export function Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(target_mesh, controls_size, parameters = null, uniform_name=null, is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
       const slider = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(.09, .8, .18, 0), dim: slider_dim, col: color, name: name, layout: LAYOUT.VERTICAL, texture_id: texture_id }));
@@ -166,7 +163,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
 
    /*************************************************************************************************************** */
    // Create Particles Control Panel
-   const controls_section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [x, y, 1], col: TRANSPARENCY(GREY[1], .5), name: 'Auto-Controls Panel', }));
+   const controls_section = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: [10, 10], pos: [x, y, 1], col: TRANSPARENCY(GREY[1], .5), name: 'Auto-Controls Panel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF }));
    Widget_gfx_ready_enable({ mesh: controls_section, enable_sdf_rect: rcorners, })
    Mesh_listener_create(controls_section, LISTEN_EVENT_TYPES.MOVE);
 
@@ -299,22 +296,10 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
    // Render 
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
-      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
+      // // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-
       Align_nested_sections_pre(controls_section);
-            
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
-
-      Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-
-
-      Construct_listen_events_from_mesh_tree(controls_section);
-      Construct_listen_events_relations_from_mesh_tree(controls_section);
-
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
+      Widget_render(controls_section);
 
    }
 

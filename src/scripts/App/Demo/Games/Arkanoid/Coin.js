@@ -13,7 +13,7 @@ import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } fr
 import { Abs } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_coin_counter_add } from "./Arkanoid.js";
-import { ARK_STATE } from "./ArkanoisConstants.js";
+import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top } from "./Player.js";
 import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_mesh_byidx } from "./ScoreMod.js";
 
@@ -84,7 +84,7 @@ class Coin {
       mesh.geom.pos[0] = x;
       mesh.geom.pos[1] = y;
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
 
@@ -238,7 +238,7 @@ export function Coin_init_buffer(group_idx, parent_root_posidx, parent_mesh_buff
       vb_groupidx = coin.mesh.gfx.vb.groupidx;
 
       // Add to View Group
-      View_add_to_group(coin.mesh, group_idx);
+      // View_add_to_group(coin.mesh, group_idx);
       Coin_remove_byidx(coin.idx);
    }
 
@@ -289,7 +289,7 @@ export function Coin_create(x, y, w = COIN_SIZE, h = COIN_SIZE, w_src = 0, h_src
       coin.SetDependenciesStruct(game_panel_posx, game_panel_dimx, brick_posx, brick_dimx);
 
       // Add to View Group
-      View_add_to_group(coin.mesh, coins_view_group_idx);
+      // View_add_to_group(coin.mesh, coins_view_group_idx);
    }
 
    // Start by animating the coin 'fall'

@@ -34,7 +34,7 @@ export class Text_Mesh extends Mesh {
    /**
     * @param {*} properties { pos, dim, col, pad, text, font_size, texture_id, sub_texture_id, variant_idx, is_debug_mesh, } 
     */
-   constructor(properties) {
+   constructor(mesh_bufferidx, properties) {
 
       const sdfouter = CalculateSdfOuterFromDim(properties.font_size);
       if (sdfouter + properties.bold > 1) properties.bold = 1 - sdfouter;
@@ -44,7 +44,8 @@ export class Text_Mesh extends Mesh {
       const geom = new Geometry2D_Text(properties.pos, properties.text, size);
       
       super(geom, mat);
-
+      
+		this.mesh_bufferidx = mesh_bufferidx;
       this.last_charidx = properties.text.length;
       
       this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;

@@ -63,7 +63,7 @@ const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget..
 const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
-const MAX_NAME_LENGTH = 8;
+const MAX_NAME_LENGTH = 13;
 
 
 
@@ -339,10 +339,11 @@ const LAYOUT = {
 	EXPAND: _CNT <<= 0x1,
 	// PRESERVE_SELF_POS: _CNT <<= 0x1,
 
+	// These flags take effect in the "grow" function
 	GROW_HORIZONTAL: _CNT <<= 0x1, // Takes up any space from parent's fixed width
 	GROW_VERTICAL: _CNT <<= 0x1, // Takes up any space from parent's fixed height
-
-	// Create some kind of types, in order to denote what align layout function to be used
+	
+	// These flags are set on parent/root meshes, to denote that have children with "GROW_HORIZONTAL,GROW_VERTICAL" flags
 	TYPE_GROW_CONTAINER: _CNT <<= 0x1, 
 }
 

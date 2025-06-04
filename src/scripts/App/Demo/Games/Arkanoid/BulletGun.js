@@ -11,7 +11,7 @@ import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/Re
 import { Gl_add_wpos_y, Gl_set_alpha, Gl_set_dim_y, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { ARK_STATE } from "./ArkanoisConstants.js";
+import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Bricks_check_collision_column_only } from "./Bricks.js";
 import { Player_get } from "./Player.js";
 
@@ -124,7 +124,7 @@ function Gun_create(x, y, vb_groupidx) {
    // mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
    mesh.GenGfxCtx();
 
-   Vertex_buffer_calculate_render_group_starts();
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
    mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
@@ -144,7 +144,7 @@ function Gun_create(x, y, vb_groupidx) {
    // mesh2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
    mesh2.GenGfxCtx();
 
-   Vertex_buffer_calculate_render_group_starts();
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(mesh2.group_bufferidxs[0]);
    
    mesh2.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh2.gfx.vb.groupidx);
@@ -193,7 +193,7 @@ export class Bullet {
       mesh.geom.pos[0] = x;
       mesh.geom.pos[1] = y;
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
 
@@ -255,7 +255,7 @@ export function Bullet_init_buffer(x, y, group_idx, parent_root_posidx, parent_m
       const bullet = new Bullet(x, y, _, _, _, vb_groupidx);
 
       // Add to View Group
-      View_add_to_group(bullet.mesh, group_idx);
+      // View_add_to_group(bullet.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(bullet.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

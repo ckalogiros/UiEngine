@@ -30,10 +30,10 @@ import { Mesh_set_name } from "../../Operations/MeshPropertiesFunctions.js";
 /**********************************************************************************************************************/
 
 /**
- * Reserve the index for the widget to be created (the mesh buffer index),
+ * "#1"Reserve the index for the widget to be created (the mesh buffer index),
  * so that we can pass it to the widget constructor for reference to any widget/meshes it may create.
  * The reason being, in case a widget should be a ROOT widget, its children should be stored at
- * the widget_root_buffer, that needs the ROOTs mesh_bufferidx index.
+ * the widget_root_buffer, that needs to be constructed with the "mesh_bufferidx" index.
  */
 
 
@@ -42,36 +42,30 @@ const NOTIFICATIONS_ON = true;
 
 
 /**
- * 
- * @param {*} properties {is_root, pos, dim, col, name, style, margin, num_faces, is_debug_mesh}
+ * @param {*} properties // TODO: 
  * @returns 
  */
 export function Create_rect_mesh(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
-   const mesh_bufferidx = _mesh_buffer.Reserve();
-   // Create a new mesh_buffer element and add a new section mesh
+   const mesh_bufferidx = _mesh_buffer.Reserve(); // "#1" Reserve the mesh's index before mesh creation
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, (new Rect_Mesh(mesh_bufferidx, properties)));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
-
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 /**
- * This function calculates the area of a rectangle.
- * @param {*} properties { pos, dim, col, pad, text, font_size, texture_id, sub_texture_id, variant_idx, is_debug_mesh, }
+ * @param {*} properties // TODO: 
  * @see {@link Text_Mesh}
  */
 export function Create_text_mesh(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
-   // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Text_Mesh(properties));
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Text_Mesh(mesh_bufferidx, properties));
 
-   // Store the meshbuffer's index to the newly created mesh.
-   _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
    Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `T[${mesh_bufferidx}]:{${properties.text}}`);
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
@@ -83,11 +77,9 @@ export function Create_text_mesh(properties) {
 export function Create_widget_text(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
-   // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(properties));
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Text(mesh_bufferidx, properties));
 
-   // Store the meshbuffer's index to the newly created mesh.
-   _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
    Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `WT[${mesh_bufferidx}]{${properties.text}}`);
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh);
@@ -99,11 +91,9 @@ export function Create_widget_text(properties) {
 export function Create_widget_multi_text(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
-   // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Multi_Text(properties));
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Multi_Text(mesh_bufferidx, properties));
 
-   // Store the meshbuffer's index to the newly created mesh.
-   _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
    Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `MT[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
@@ -217,7 +207,6 @@ export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, te
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // TODO: num_faces should pass as parameter
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Menu_Bar(mesh_bufferidx, is_root, pos, dim, col, text_col, text, pad, bold, style, 1, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
@@ -243,24 +232,6 @@ export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Minimize(mesh_bufferidx, is_root, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh));
-
-   if (NOTIFICATIONS_ON && !is_debug_mesh)
-      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
-
-   return _mesh_buffer.buffer[mesh_bufferidx];
-}
-/** */
-export function Create_widget_text_for_debug_ui_only(is_root = 0x0, text, pos, font_size, col, bold, pad, is_debug_mesh = 0x0) {
-
-   const _mesh_buffer = Mesh_buffer_get();
-   // Create a new mesh_buffer element and add a new section mesh
-   const mesh_bufferidx = _mesh_buffer.Add(new Widget_Text(is_root, text, pos, font_size, col, bold, pad));
-
-
-   // Store the meshbuffer's index to the newly created mesh.
-   _mesh_buffer.buffer[mesh_bufferidx].mesh_bufferidx = mesh_bufferidx;
-   Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `DEBUG-WT[${mesh_bufferidx}]{${text}}`);
-
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

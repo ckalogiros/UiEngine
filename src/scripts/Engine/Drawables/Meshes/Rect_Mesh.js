@@ -4,10 +4,9 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
-import { Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_calculate_render_group_starts, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
-import { Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_vbidx_view_reset_mesh_per_vb_buffer, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Root_group_reset_gfxs, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
@@ -236,13 +235,15 @@ export class Rect_Mesh extends Mesh {
 
    /*******************************************************************************************************************************************************/
    // Graphics
-   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
+   GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL, specific_view_group = INT_NULL) {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
 
       // Add to view group
+      const view_groupidx = (specific_view_group !== INT_NULL) ? specific_view_group : this.group_bufferidxs[0];
+      // View_add_mesh(view_groupidx, this);
       View_add_mesh(this.group_bufferidxs[0], this);
 
 
@@ -467,8 +468,7 @@ export class Rect_Mesh extends Mesh {
             State_mesh_set_focused(section);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             section.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
-            // Root_group_set_in_focus(section.root_bufferidx);
-            // Mesh_set_root_in_focus(section.root_bufferidx);
+            // TODO: Create a set focus function, that repositions the vertex buffers in the render queue
 
          }
 
@@ -544,7 +544,8 @@ export class Rect_Mesh extends Mesh {
          const clip_right = root_pos[0] + root.geom.dim[0] * 2;
 
 
-         if(root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) Align_pre_simple___with_grow_containers(root);
+         if(root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) 
+            Align_pre_simple___with_grow_containers(root);
 
 
          // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
@@ -558,9 +559,8 @@ export class Rect_Mesh extends Mesh {
          // Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
          View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
 
-         const mouse_dif = Mouse_get_pos_dif()
-         const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
-         // Root_group_resize_and_rerender(root.root_bufferidx, dif.x, dif.y);
+         // const mouse_dif = Mouse_get_pos_dif()
+         // const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
          View_render_from_view_NEW(root.group_bufferidxs[0]);
 
       }

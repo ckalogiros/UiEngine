@@ -5,7 +5,7 @@ import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { Root_group_activate_all_vbs_in_renderqueue, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
+import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
 import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
@@ -390,7 +390,7 @@ export function Game_snake(y = 0, controls_create = true) {
    section.Render();
 
 
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
+   // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section);
    Construct_listen_events_relations_from_mesh_tree(section);
 
@@ -681,7 +681,7 @@ click mouse button.`;
    menu_panel.Render();
 
 
-   Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
+   // Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(menu_panel);
    Construct_listen_events_relations_from_mesh_tree(menu_panel);
 
@@ -1522,7 +1522,7 @@ function Snake_options_callback(params) {
    }
 
 
-   Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
+   // Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(menu_panel);
    Construct_listen_events_relations_from_mesh_tree(menu_panel);
 

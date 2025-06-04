@@ -2,7 +2,6 @@
 
 import { Create_rect_mesh, Create_widget_label, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_button, Create_widget_switch_simple } from "./CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../../Core/Views/RootView.js";
 import { BLUEL, GREY, WHITE, YELLOW } from "../../Material/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventFunctions.js";
 import { Slider_connect } from "../WidgetSlider.js";
@@ -12,7 +11,7 @@ import { Max } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "./WidgetEnableProperties.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Mesh_add_wpos_xy, Mesh_update_set_dim_xy } from "../../Operations/MeshAttributesFunctions.js";
-import { Vertex_buffer_calculate_render_group_starts } from "../../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Widget_render } from "./WidgetRender.js";
 
 
@@ -38,15 +37,8 @@ export function Widget_ready_slider_simple(is_root = 0x0, x = 0, y = 0, initial_
    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
       slider.GenGfxCtx();
+      Widget_render(slider);
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(slider.group_bufferidxs[0]);
-
-      Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-      slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
-
-      Construct_listen_events_from_mesh_tree(slider)
-      Construct_listen_events_relations_from_mesh_tree(slider);
    }
 
    return slider;

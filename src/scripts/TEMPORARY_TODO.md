@@ -1,5 +1,11 @@
 TODO
 
+# Re-implement all DEPRECATED functions in RootView.js in the MeshBufferViews.js
+
+# Align_expand() doubles the expansion in "function Test_alignment_slider_vert_hor_with_expand(x, y)"
+
+# All Rect mesh construction must tell explicitly to RESIZE_SELF
+
 # IMIDIATELY:  Check the uniform_bindings for each vb to be equal to 1 per uniform and not 1 per uniform per RG
    because I think I found 3 u_wpos bindings for 1 vb.
    And also we are gonna need to pass the argidx from the bindings update to all Clbk's

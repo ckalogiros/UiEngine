@@ -5,7 +5,6 @@ import { Input_keyboard_bind_keydown_callback, Input_keyboard_bind_keyup_callbac
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_dim_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_set_and_update_color_rgb, Mesh_set_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
@@ -1525,7 +1524,6 @@ function Tetris_start_menu(section_, emitter_) {
    menu_panel.Render();
 
 
-   Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
    Construct_listen_events_from_mesh_tree(menu_panel);
    Construct_listen_events_relations_from_mesh_tree(menu_panel);
 
@@ -1628,7 +1626,6 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, c
    section.Render();
 
 
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
    Construct_listen_events_from_mesh_tree(section);
    Construct_listen_events_relations_from_mesh_tree(section);
 

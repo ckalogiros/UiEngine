@@ -1346,3 +1346,199 @@ export function DEBUG_INFO_BUFFERS_PRINT2() {
 //    }
 
 // }
+
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Queue: Generic Array
+/**********************************************************************************************************************************************/
+/** */
+class Queue_buffer {
+   constructor(capacity) {
+      this.capacity = capacity;
+      this.size = 0;
+      this.front = 0;
+      this.buffer = new Array();
+   }
+   Realloc() {
+      console.log('---------------------- REALLOC ----------------------');
+      let old_data = this.buffer;
+      const old_capacity = this.capacity;
+
+      this.capacity *= 2;
+      const new_data = new Array(this.capacity);
+
+      // for (let i = 0; i < old_capacity; i++) {
+      //    new_data[i] = old_data[i];
+      // }
+      // for (let i = old_capacity; i < this.capacity; i++) {
+      //    new_data[i] = null;
+      // }
+      // for (let i = 0; i < this.front; i++) {
+      //    new_data[i] = old_data[i];
+      // }
+      // for (let i = old_capacity; i < this.capacity; i++) {
+      //    new_data[i] = null;
+      // }
+      for (let i = 0; i < this.capacity; i++) {
+         new_data[i] = null;
+      }
+      const new_front = (this.front+old_capacity) % this.capacity;
+      for (let i = 0; i < old_capacity; i++) {
+         const old_idx = (this.front+i) % old_capacity;
+         const idx = (new_front + i) % this.capacity;
+         new_data[idx] = old_data[old_idx];
+      }
+      
+      console.log(new_data);
+
+      
+      old_data = null;
+      this.buffer = new_data;
+
+      return old_capacity;
+
+   }
+   Add(elem) {
+      let idx = (this.front + this.size) % this.capacity;
+      if(this.size >= this.capacity) {
+
+         const old_capacity = this.Realloc();
+         this.front = (this.front+old_capacity) % this.capacity;
+         idx = (this.front + this.size) % this.capacity;
+      }
+
+
+      this.buffer[idx] = elem;
+      this.size++;
+   }
+   Remove() {
+      if(this.size <= 0) return;
+      this.buffer[this.front] = null;
+      this.front = (this.front+1) % this.capacity;
+      this.size--;
+   }
+   Print() {
+      console.log(
+         '   Capacity:', this.capacity,
+         '   Size:', this.size,
+         '   Front idx:', this.front,
+         '   Elements:', 
+      )
+      // for (let i = 0; i < this.size; i++) {
+      //    const idx = (this.front+i) % this.capacity;
+      //    console.log(this.buffer[idx])
+      // }
+      console.log(this.buffer);
+      console.log('--------------------------------------');
+   }
+
+}
+export function New_generic_queue(capacity=4) {
+
+   if(capacity % 2 !== 0) alert('Capacity should be a multiple of 2');
+   const buffer = new Queue_buffer(capacity);
+   return buffer;
+
+}
+export function Test_queue_buffer() {
+
+   const capacity = 4;
+   const q = New_generic_queue(capacity);
+   console.log(
+      'Test: Queue buffer',
+      'Init queue. capacity:', capacity,
+   );
+   
+   
+   q.Add('1');
+   console.log('----  Adding: 1', );
+   q.Print()
+   
+   q.Add('2');
+   console.log(' ----  Adding: 2', );
+   q.Print()
+   
+   q.Add('3');
+   console.log(' ----  Adding: 3', );
+   q.Print()
+   
+   q.Add('4');
+   console.log(' ----   Adding: 4', );
+   q.Print()
+   
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   // q.Remove();
+   // console.log(' ----  Remove');
+   // q.Print()
+   
+
+
+   q.Add('1');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('2');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('3');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('5');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+
+
+   q.Add('6');
+   console.log(' ----  -Adding: Reallocation', );
+   q.Print()
+
+   q.Add('7');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('8');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('9');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('10');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+
+
+}

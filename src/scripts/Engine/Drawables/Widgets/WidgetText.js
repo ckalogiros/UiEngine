@@ -23,10 +23,9 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
  */
 export class Widget_Text extends Text_Mesh {
 
-	constructor(properties) {
-		// { pos: pos, fontsize: fontsize, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+	constructor(mesh_bufferidx, properties) {
 
-		super(properties)
+		super(mesh_bufferidx, properties)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
 
 		this.StylesSetPad(properties.pad);
@@ -35,10 +34,10 @@ export class Widget_Text extends Text_Mesh {
 		this.align.flags = properties.layout;
 
 		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
-			
-            // Create view group
-            this.group_bufferidxs[0] = View_create_new_group(this);
+			// Create view group
+			this.group_bufferidxs[0] = View_create_new_group(this);
 		}
 	}
 
@@ -313,9 +312,9 @@ export class Widget_Multi_Text extends Widget_Text {
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(properties) {
+	constructor(mesh_bufferidx, properties) {
 
-		super(properties);
+		super(mesh_bufferidx, properties);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		this.alignment = properties.align;
@@ -478,7 +477,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
-			if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+			// if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
 		}
 	}
 

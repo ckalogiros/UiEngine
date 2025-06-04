@@ -2,7 +2,6 @@
 
 import { Mesh_unif_get_vb_root_wpos } from "../Engine/Core/MeshUniformsBuffer.js";
 import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../Engine/Core/Views/RootView.js";
 import { Color_hsv_to_rgb_calibrated } from "../Engine/Drawables/Material/Colors.js";
 import { Align_nested_sections_pre } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Create_rect_mesh, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
@@ -113,7 +112,6 @@ export function Test_find_match_from_parent_descending() {
    Align_nested_sections_pre(section)
    section.Render();
    View_build_group_from_root_mesh(section);
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
 
    section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 

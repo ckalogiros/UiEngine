@@ -43,7 +43,7 @@ export function Progarm_get_program(progidx) {
 
 
 
-export function Progarm_get_webgl_program_object(progidx) {
+export function Program_get_webgl_program_object(progidx) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
 	return _programs.buffer[progidx].shader_program;
 }

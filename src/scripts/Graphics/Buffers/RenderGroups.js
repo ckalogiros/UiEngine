@@ -1,7 +1,7 @@
 "use starict";
 
 import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
-import { Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
+import { VBI_get_attributes_per_vertex, Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
 
 
 
@@ -37,11 +37,16 @@ export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_face
          start:0, 
          count:0, 
          size:0, 
-         num_faces:num_faces,  // !!! We cannot trust the 'num_faces'. Insted use them from View_group structure
+         num_faces:num_faces,  // !!! We cannot trust the 'num_faces' of  the render groups yet. PLEASE instead use 'num_faces' from View_group structure
+
          draw_count:0, 
          draw_hint:gfxCtx.gl.STATIC_DRAW,
          index_offset:0,
+
+         // attribs_per_face:VBI_get_attributes_per_vertex(vb_data_idx),
+
          vb_data_idx:vb_data_idx, // TODO: For now it gets the vertex buffer group index. On "buffer instances" implementation should take the vb_info or vb_data index.
+         
          state:0x0,
 
          debug_is_reseted:true,
@@ -79,23 +84,24 @@ export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx,
    _render_groups.buffer[render_groupidx].debug_is_reseted = debug_is_reseted;
 }
 /** */
-// export function Vertex_buffer_render_group_set_start(render_groupidx, start) { 
-//    _render_groups.buffer[render_groupidx].start = start;
-// }
+export function Vertex_buffer_render_group_set_start(render_groupidx, start) { 
+   _render_groups.buffer[render_groupidx].start = start;
+}
 /** */
 export function Vertex_buffer_render_group_reset_draw_count(render_groupidx) { 
    _render_groups.buffer[render_groupidx].draw_count = 0;
    _render_groups.buffer[render_groupidx].count = 0;
 }
+/** */
 export function Vertex_buffer_render_group_set_draw_count_from_num_faces(render_groupidx, num_faces) { 
-   const vb_groupidx = _render_groups.buffer[render_groupidx].vb_data_idx;
-   const attribs_per_face = Vertex_buffer_group_get_attributes_per_face(vb_groupidx);
-   _render_groups.buffer[render_groupidx].draw_count = num_faces * attribs_per_face;
+   _render_groups.buffer[render_groupidx].draw_count = num_faces * INDICES_PER_RECT;
 }
 /** */
-// export function Vertex_buffer_render_group_set_size(render_groupidx, size) { 
-//    _render_groups.buffer[render_groupidx].size = size;
-// }
+export function Vertex_buffer_render_group_set_count_from_num_faces(render_groupidx, num_faces) { 
+   const vb_data_idx = _render_groups.buffer[render_groupidx].vb_data_idx;
+   const attributes_per_face = Vertex_buffer_group_get_attributes_per_face(vb_data_idx); // WRONG INDEX: Should be vb_groupidx instead of vb_info_idx/vb_data_idx
+   _render_groups.buffer[render_groupidx].count = num_faces * attributes_per_face;
+}
 /** */
 export function Vertex_buffer_render_group_set_state(render_groupidx, STATE_FLAG) {
    _render_groups.buffer[render_groupidx].state |= STATE_FLAG;
@@ -134,6 +140,7 @@ export function Vertex_buffer_render_group_print_loop() {
          'draw_count:', g.draw_count,
          'index_offset:', g.index_offset,
          'num_faces:', g.num_faces,
+         // 'attribs_per_face:', g.attribs_per_face,
       );
    }
 }
@@ -150,5 +157,6 @@ export function Vertex_buffer_render_group_print_render_group(render_groupidx) {
       'draw_count:', g.draw_count,
       'index_offset:', g.index_offset,
       'num_faces:', g.num_faces,
+      // 'attribs_per_face:', g.attribs_per_face,
    );
 }

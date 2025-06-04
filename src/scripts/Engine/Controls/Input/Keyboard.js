@@ -12,7 +12,7 @@ import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
-import { View_buffer_print, View_buffer_print_loop } from "../../Core/Views/MeshBufferViews.js";
+import { View_buffer_print, View_buffer_print_loop, View_buffer_print_roots } from "../../Core/Views/MeshBufferViews.js";
 import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
 import { Dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
@@ -20,7 +20,7 @@ import { Uniforms_buffer_block_print, Uniforms_buffer_print } from "../../../Gra
 import { Mesh_animations_print } from "../../Animations/MeshAnimations.js";
 import { Root_uniforms_for_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Callback_animations_print } from "../../Animations/CallbackAnimations.js";
-import { Particle_system_print_info } from "../../ParticlesSystem/ParticlesSystem.js";
+import { Particle_system_print_all_particles, Particle_system_print_free_particles_buffer, Particle_system_print_info } from "../../ParticlesSystem/ParticlesSystem.js";
 import { Notifications_print, Notifications_print_loop } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Texture_buffer_print } from "../../Loaders/Textures/Texture.js";
 import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_group_buffer_print_w6, Root_group_vbidx_buffer_print_loop_w2, Root_group_vbidx_buffer_print_w3 } from "../../Core/Views/RootView.js";
@@ -86,6 +86,8 @@ const y2 = _CNT++;
 const u1 = _CNT++;
 const u2 = _CNT++;
 const e1 = _CNT++;
+const e2 = _CNT++;
+const e3 = _CNT++;
 const n1 = _CNT++;
 const n2 = _CNT++;
 
@@ -436,10 +438,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'g4',
-      discr: 'EMPTY',
+      discr: 'View_buffer_print_roots()',
       func: (e)=>{
-         console.log('------------------ EMPTY ------------------');
-
+         console.log('------------------ View_buffer_print_roots ------------------');
+         View_buffer_print_roots();
       },
    },
    {
@@ -552,6 +554,22 @@ export const DEBUG_PRINT_KEYS = [
       func: (e)=>{
          console.log('------------------ Particle_system_print_info() ------------------');
          Particle_system_print_info();
+      },
+   },
+   {
+      key: 'e2',
+      discr: 'Particle_system_print_all_particles()',
+      func: (e)=>{
+         console.log('------------------ Particle_system_print_all_particles() ------------------');
+         Particle_system_print_all_particles();
+      },
+   },
+   {
+      key: 'e3',
+      discr: 'Particle_system_print_free_particles_buffer()',
+      func: (e)=>{
+         console.log('------------------ Particle_system_print_free_particles_buffer() ------------------');
+         Particle_system_print_free_particles_buffer();
       },
    },
    {
@@ -782,8 +800,8 @@ export function OnKeyUp(e){
          else if       (_keys_buffer[len].key === 'd') DEBUG_PRINT_KEYS[gd].func(e);  
          else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
          else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
-         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g2].func(e);  
-         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[g2].func(e);  
+         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g3].func(e);  
+         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[g4].func(e);  
          else if       (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[g5].func(e);  
          else if       (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[g6].func(e);  
       }
@@ -797,6 +815,8 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'e') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[e1].func(e);  
+         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[e2].func(e);  
+         if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[e3].func(e);  
       }
       else if  (_keys_buffer[0].key === 'n') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[n1].func(e);  
@@ -834,7 +854,7 @@ export function OnKeyUp(e){
    else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
    else if  (_keys_buffer[len].key === 'y') { console.log('@ Debug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
    else if  (_keys_buffer[len].key === 'u') { console.log('@ Uniform', `\n  1:${DEBUG_PRINT_KEYS[u1].discr}\n  2:${DEBUG_PRINT_KEYS[u2].discr}`); }
-   else if  (_keys_buffer[len].key === 'e') { console.log('@ Particles System', `\n  1:${DEBUG_PRINT_KEYS[e1].discr}\n`); }
+   else if  (_keys_buffer[len].key === 'e') { console.log('@ Particles System', `\n  1:${DEBUG_PRINT_KEYS[e1].discr}\n 2:${DEBUG_PRINT_KEYS[e2].discr}\n 3:${DEBUG_PRINT_KEYS[e3].discr}\n`); }
    else if  (_keys_buffer[len].key === 'n') { console.log('@ Notifications System', `\n  1:${DEBUG_PRINT_KEYS[n1].discr}\n   2:${DEBUG_PRINT_KEYS[n2].discr}\n`); }
    // Misc
    else if  (_keys_buffer[len].key === 'q') { console.log('@ Notifications System', `\n  1:${DEBUG_PRINT_KEYS[q1].discr}\n  2:${DEBUG_PRINT_KEYS[q2].discr}\n  3:${DEBUG_PRINT_KEYS[q3].discr}\n  4:${DEBUG_PRINT_KEYS[q4].discr}\n  5:${DEBUG_PRINT_KEYS[q5].discr}\n  6:${DEBUG_PRINT_KEYS[q6].discr}\n  7:${DEBUG_PRINT_KEYS[q7].discr}\n  8:${DEBUG_PRINT_KEYS[q8].discr}\n  9:${DEBUG_PRINT_KEYS[q9].discr}\n`); }}

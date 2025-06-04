@@ -10,7 +10,7 @@ import { Mesh_buffer_get_mesh_byidx } from '../../Core/MeshBuffer.js';
 import { Vertex_buffer_add_vertices_from_render_group } from '../../../Graphics/Buffers/VertexBuffers.js';
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_wpos_x, Mesh_update_set_wpos_x, Mesh_update_set_wpos_y, Set_color_a } from '../Operations/MeshAttributesFunctions.js';
-import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root, Root_group_per_vb_meshidx_view_get_all_roots } from '../../Core/Views/RootView.js';
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from '../../Core/Views/RootView.js';
 import { Listeners_set_priority } from '../../Events/EventListeners.js';
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_simple_default_properties } from './Helpers/WidgetEnableProperties.js';
 import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from '../../../GlobalFunctions.js';
@@ -1059,19 +1059,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
-
-      if (unif_name === 'u_wposxy') {
-
-         // Call for each root mesh in every vertex buffer
-         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
-         const len = root_meshes.length;
-         for (let i = 1; i < len; i++) {
-
-            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
-
-         }
-      }
 
    }
 

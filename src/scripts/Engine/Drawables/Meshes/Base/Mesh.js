@@ -674,13 +674,11 @@ export class Mesh {
                 const ubidx = this.uniforms[i].ubidx;
                 if (ubidx === INT_NULL) {
 
-
                     console.error('334334334334 ubidx is null.',
                         '\nPossible error: mesh is not the root mesh of the vertex buffer, and there is no ubidx store that is why ubidx is null',
                         '\nuniform name', unif_name,
                         '\nubidx', ubidx,
                         '\nmesh all uniforms', this.uniforms,
-
                     )
                     alert('334334334334 ubidx is null. Check if mesh is the root mesh of the vertex buffer')
                 }

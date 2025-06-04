@@ -15,7 +15,7 @@ import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } fr
 import { Abs, Floor, Min } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_combo_counter_add, Arkanoid_create_update_game_loop, Arkanoid_get_panel_dim_x, Arkanoid_get_panel_pos_x, Arkanoid_get_panel_right, ARKANOID_SECTION_DIM_X } from "./Arkanoid.js";
-import { ARK_STATE, ARKANOID_COLORS, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoisConstants.js";
+import { ARK_STATE, ARKANOID_COLORS, ARKANOID_FLAGS, BRICK_STAGES } from "./ArkanoidConstants.js";
 import { Coin_create } from "./Coin.js";
 import { Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
 import { Powup_create, Powup_get_byidx, Powup_remove_byidx, Powup_resolve_hit } from "./PowerUps.js";
@@ -160,7 +160,7 @@ export class Brick {
       mesh.geom.pos[0] = posx;
       mesh.geom.pos[1] = posy;
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
       // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
@@ -229,7 +229,7 @@ export function Bricks_init_buffer(x=0, y=0, group_idx, parent_root_posidx, pare
       vb_groupidx = brick.mesh.gfx.vb.groupidx;
 
       // Add to View Group
-      View_add_to_group(brick.mesh, group_idx);
+      // View_add_to_group(brick.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(brick.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 
@@ -295,7 +295,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
       const brick = new Brick(0, 0, color, name, flags, vb_groupidx);
       idx = brick.idx;
       // Add to group
-      View_add_to_group(brick.mesh, group_idx);
+      // View_add_to_group(brick.mesh, group_idx);
 
       brick.mesh.geom.pos[0] = brick.mesh.geom.defPos[0] = x;
       brick.mesh.geom.pos[1] = brick.mesh.geom.defPos[1] = y;

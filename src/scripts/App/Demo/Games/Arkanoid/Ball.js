@@ -15,10 +15,11 @@ import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/M
 import { Abs, Min } from "../../../../Helpers/Math/MathOperations.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_combo_counter_reset, Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_pady } from "./Arkanoid.js";
-import { ARK_STATE } from "./ArkanoisConstants.js";
+import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Bricks_check_collision } from "./Bricks.js";
 import { Physics } from "./HelperClasses.js";
 import { Player_get } from "./Player.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -77,20 +78,19 @@ export function Arkanoid_balls_destroy() {
 /** */
 export class Ball {
 
-   constructor(x, y, color = WHITE, vb_groupidx = INT_NULL) {
+   constructor(x, y, color = WHITE, groupidx) {
 
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[BALL_DIM_X, BALL_DIM_Y], col:color, name:'Ball',}));
+      const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[BALL_DIM_X, BALL_DIM_Y], col:color, name:'Ball',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BALL_DIM_X, });
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, vb_groupidx);
+      
+      mesh.SetViewGroupIndex(groupidx);
 
-      Vertex_buffer_calculate_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
 
       this.mesh = mesh;
 
@@ -166,10 +166,10 @@ export class Ball {
 
 }
 /** */
-export function Ball_init_buffer(x, y, group_idx, parent_root_posidx = INT_NULL, parent_mesh_bufferidx) {
+export function Ball_init_buffer(x, y, groupidx = INT_NULL, parent_root_posidx = INT_NULL, parent_mesh_bufferidx) {
 
    let idx = 0;
-   const ball = new Ball(x, y, BALL_COLORS[idx]);
+   const ball = new Ball(x, y, BALL_COLORS[idx], groupidx);
    let vb_groupidx = ball.mesh.gfx.vb.groupidx;
 
    // Implement to draw wpos from a root uniform wpos
@@ -183,7 +183,7 @@ export function Ball_init_buffer(x, y, group_idx, parent_root_posidx = INT_NULL,
       idx = idx >= BALL_COLORS.length ? 0 : idx;
       const color = BALL_COLORS[idx];
       const ball = new Ball(x, y, color, vb_groupidx);
-      View_add_to_group(ball.mesh, group_idx); // Add to View Group
+      // View_add_to_group(ball.mesh, groupidx); // Add to View Group
       Ball_remove_mesh_byidx(ball.idx);
 
       idx++;
@@ -205,7 +205,6 @@ export function Ball_remove_mesh_byidx(idx = INT_NULL) {
 
    _balls_buffer.buffer[idx].Reset();
    _free_balls_buffer_idxs.Add(idx);
-// 
    // Ball_print_loop();
 
 }

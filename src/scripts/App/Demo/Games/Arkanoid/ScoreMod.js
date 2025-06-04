@@ -62,7 +62,7 @@ class Score_Mod {
       mesh.text_mesh.geom.pos[0] += difx;
       mesh.text_mesh.geom.pos[1] += dify;
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(mesh.group_bufferidxs[0]);
    
 
@@ -141,7 +141,7 @@ export function Score_mod_init_buffer(group_idx, parent_root_posidx, parent_mesh
       }
 
       // Add to View Group
-      View_add_to_group(score_mod.mesh, group_idx);
+      // View_add_to_group(score_mod.mesh, group_idx);
       Score_mod_remove_text_mesh_byidx(score_mod.idx);
    }
 
@@ -183,7 +183,7 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
       idx = score_mod.idx;
 
       // Add to View Group
-      View_add_to_group(score_mod.mesh, score_mod_view_group_idx);
+      // View_add_to_group(score_mod.mesh, score_mod_view_group_idx);
    }
 
    _text_mesh_buffer.buffer[idx].number = score_mod_number;

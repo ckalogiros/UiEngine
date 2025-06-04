@@ -2,16 +2,16 @@
 
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
 import { BLUEL, GREEN, GREY, ORANGE, REDL, PURPLEB, PURPLER, YELLOWR, CYAN, TRANSPARENT, BLACK } from "../../Engine/Drawables/Material/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Widget_ready_label, Widget_ready_slider } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { Mesh_get_name, Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Align_expand, Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
-import { Vertex_buffer_calculate_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -25,9 +25,7 @@ export function Test_alignment() {
 
    // Create_triangle_structure();
 
-   // mesh = Test_alignment_slider_vert_hor_with_expand(400, y); y += mesh.geom.dim[1] * 2 + 20
-
-   // mesh = Test_alignment_slider_vert_23(30, 60); y += mesh.geom.dim[1] * 2 + 20;
+   // Test_alignment_slider_vert_hor_with_expand(400, y);
 
    // Test_align_float_right(40, 100);
 
@@ -75,146 +73,6 @@ function Find_last_right_aligned_child_from_parent(cur_pos_x = 0, parent = null,
 
    return pos_x;
 }
-
-// /** */
-// export function Align_pre_simple(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
-
-//    const ret = Align_pre_simple___(mesh, pos_x, pos_y, pad);
-//    if(mesh.align.flags & LAYOUT.RESIZE_SELF) {
-
-//       const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
-//       const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
-//       mesh.geom.dim[0] = ret.dim_x + pad_x;
-//       mesh.geom.dim[1] = ret.dim_y + pad_y;
-//    }
-
-//    return ret;
-
-// }
-// /** */
-// function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10],) {
-
-//    const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
-//    const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
-
-
-//    let cur_pos_x = pos_x;
-//    let cur_pos_y = pos_y;
-//    cur_pos_x += pad_x;
-//    cur_pos_y += pad_y;
-
-//    let total_size_x = 0;
-//    let total_size_y = 0;
-
-//    let accum_row_size_x = 0
-//    let accum_row_max_size_x = 0
-//    let row_max_size_y = 0
-//    let max_size_y = 0
-
-
-
-
-//    for (let i = 0; i <= mesh.children.boundary; i++) {
-
-//       const cur_mesh = mesh.children.buffer[i];
-
-//       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
-//       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
-
-
-//       if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
-
-//          cur_mesh.geom.pos[0] = cur_pos_x;
-//          cur_mesh.geom.pos[1] = cur_pos_y;
-
-
-//          const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
-
-//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
-
-//          if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-//             total_size_y += ret.dim_y + cur_pad_y;
-//             accum_row_size_x = 0;
-//          }
-//          else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-//             total_size_x += ret.dim_x;
-//             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-//          }
-
-//          accum_row_size_x += ret.dim_x + cur_pad_x;
-
-//          cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
-//          cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
-
-
-//          const next_mesh = mesh.children.buffer[i + 1];
-//          if (next_mesh) {
-//             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
-//                cur_pos_x = mesh.geom.pos[0] + pad_x;
-//                if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
-//                else cur_pos_y += cur_mesh.geom.dim[1] * 2;
-//                max_size_y += row_max_size_y / 2
-//                row_max_size_y = 0; // Reset current row max size
-//             }
-//             else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
-//          }
-//          else { // If this is the last child
-//             max_size_y += row_max_size_y / 2;
-//          }
-//       }
-//       else {
-
-//          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
-
-//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
-//             row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
-//          }
-
-//          // Update the total size accumulator according to widget's align flags
-//          if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-//             total_size_x += ret.dim_x;
-//             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-//          }
-//          else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-//             total_size_y += ret.dim_y;
-//             total_size_x = ret.dim_x;
-//             accum_row_size_x = 0;
-//          }
-
-//          // Calculate the next position, based on the next mesh's align flags
-//          const next_mesh = mesh.children.buffer[i + 1];
-//          if (next_mesh) {
-//             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
-//                if (row_max_size_y > ret.dim_y) cur_pos_y += row_max_size_y;
-//                else cur_pos_y += ret.dim_y * 2;
-//                cur_pos_x = mesh.geom.pos[0] + pad_x;
-//                max_size_y += row_max_size_y / 2
-//                row_max_size_y = 0; // Reset current row max size
-//             }
-//             else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2+cur_pad_x;
-//          }
-//          else { // If this is the last child
-//             max_size_y += row_max_size_y / 2;
-//          }
-//          accum_row_size_x += ret.dim_x + (cur_pad_x/2);
-//          // accum_row_size_x += ret.dim_x ;
-         
-//       }
-
-//       if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
-
-//    }
-
-//    const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
-//    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
-
-//    return {
-//       dim_x: size_x,
-//       dim_y: size_y,
-//    }
-
-
-// }
 /** */
 function Align_pre_simple___with_float_right(mesh, pos_x = 0, pos_y = 0, pad = [10, 10],) {
 
@@ -252,7 +110,7 @@ function Align_pre_simple___with_float_right(mesh, pos_x = 0, pos_y = 0, pad = [
          cur_mesh.geom.pos[1] = cur_pos_y;
 
 
-         const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
+         const ret = Align_pre_simple___with_float_right(cur_mesh, cur_pos_x, cur_pos_y, pad, max_size_y);
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
 
@@ -442,8 +300,6 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, dim: [0, 0], pos: [0, 0, 0], pad: [20, 20], col: TRANSPARENCY(GREY[0], 1.), name: 'MAIN_SECTION' }));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:2, enable_blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_ADD, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
 
-   section.StylesSetPad([10, 10]);
-   section.StylesSetMargin([0, 0]);
    section.align.flags = LAYOUT.RESIZE_SELF;
 
 
@@ -1263,28 +1119,10 @@ export function Test_alignment_nested_2(x = 50, y = 50) {
 
 
    /********************************************************************************************************************************************************/
-   // Align
-   // Align_pre_simple(section);
-   Align_nested_sections_pre(section);
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
-
-
-
-
-   /********************************************************************************************************************************************************/
    // Render
    section.GenGfxCtx();
-
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   Align_nested_sections_pre(section); // Align
+   Widget_render(section);
 
    return section;
 
@@ -1352,26 +1190,11 @@ function Test_alignment_slider_vert_hor_with_expand(x, y) {
 
 
    /********************************************************************************************************************************************************/
-   // Align
-   Align_pre_simple(section);
-   Align_expand(section, section.align.flags,)
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
-
-
-   /********************************************************************************************************************************************************/
    // Render
    section.GenGfxCtx();
-
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   Align_nested_sections_pre(section); // Align
+   Align_expand(section);
+   Widget_render(section);
 
    return section;
 
@@ -1463,29 +1286,13 @@ with right to left order`;
    }
 
 
-
-
-   /********************************************************************************************************************************************************/
-   // Align
-   // Align_pre_simple(section);
-   Align_pre_simple___with_float_right(section);
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
-
-
    /********************************************************************************************************************************************************/
    // Render
    section.GenGfxCtx();
-
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   Align_pre_simple___with_float_right(section);
+   // Align_nested_sections_pre(section); // Align
+   // Align_expand(section);
+   Widget_render(section);
 
    return section;
 }
@@ -1606,30 +1413,11 @@ function Create_triangle_structure(x = 50, y = 50) {
 
    
 
-
-
-   /********************************************************************************************************************************************************/
-   // Align
-   Align_pre_simple(section);
-
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
-
-
-
-
    /********************************************************************************************************************************************************/
    // Render
    section.GenGfxCtx();
-
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   Align_nested_sections_pre(section); // Align
+   Widget_render(section);
 
    return section;
 }
@@ -1702,18 +1490,18 @@ function Test_slider_control_pad(x, y) {
    const slider_3_tb = Widget_ready_slider(_, 0, 0, .0, 'Top-bottom', slider_size); slider_3_tb.StylesSetPad([0, 0]); slider_3_tb.AlignAddFlags(LAYOUT.HORIZONTAL); ss3.AddItem(slider_3_tb);
 
 
-   /********************************************************************************************************************************************************/
-   // Align
-   const ret = Align_pre_simple(section);
-   const pad_x = section.StylesGetPad(STYLES.AXIS.X);
-   const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
-   section.geom.dim[0] = ret.dim_x + pad_x;
-   section.geom.dim[1] = ret.dim_y + pad_y;
-   Align_expand(section, section.align.flags,)
+   // /********************************************************************************************************************************************************/
+   // // Align
+   // const ret = Align_pre_simple(section);
+   // const pad_x = section.StylesGetPad(STYLES.AXIS.X);
+   // const pad_y = section.StylesGetPad(STYLES.AXIS.Y);
+   // section.geom.dim[0] = ret.dim_x + pad_x;
+   // section.geom.dim[1] = ret.dim_y + pad_y;
+   // Align_expand(section, section.align.flags,)
 
-   // Calculate from pos=[0,0], and then add the user's pos
-   section.geom.pos[0] = pos[0];
-   section.geom.pos[1] = pos[1];
+   // // Calculate from pos=[0,0], and then add the user's pos
+   // section.geom.pos[0] = pos[0];
+   // section.geom.pos[1] = pos[1];
 
 
 
@@ -1923,10 +1711,10 @@ function Test_slider_control_pad(x, y) {
       // Render
       ss.GenGfxCtx();
 
-      Vertex_buffer_calculate_render_group_starts();
+      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(ss.group_bufferidxs[0]);
 
-      Root_group_activate_all_vbs_in_renderqueue(ss.root_bufferidx);
+      // Root_group_activate_all_vbs_in_renderqueue(ss.root_bufferidx);
       Construct_listen_events_from_mesh_tree(ss)
       Construct_listen_events_relations_from_mesh_tree(ss);
       ss.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, ss.gfx.vb.groupidx);
@@ -1939,14 +1727,10 @@ function Test_slider_control_pad(x, y) {
    /********************************************************************************************************************************************************/
    // Render
    section.GenGfxCtx();
-
-   Vertex_buffer_calculate_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   // Align_pre_simple___with_float_right(section);
+   Align_nested_sections_pre(section); // Align
+   Align_expand(section);
+   Widget_render(section);
 
 
 

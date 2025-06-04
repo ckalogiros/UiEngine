@@ -37,7 +37,7 @@
 
 # Decision: Where the render group 'start' and 'size' are calculated
    -> It is calculated in the VertexBuffers.js file
-      by Vertex_buffer_calculate_render_group_starts() function
+      by Vertex_buffer_calculate_vertexbuffer_render_group_starts() function
       where we run for each vertexbuffer->for each rendergroup
 
 # Decision: Where the render group 'num_faces'is calculated
