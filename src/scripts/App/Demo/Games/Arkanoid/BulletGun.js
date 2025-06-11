@@ -4,7 +4,6 @@ import { Callback_animations_create, Callback_animations_get_byidx } from "../..
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_dim_y } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
@@ -254,8 +253,6 @@ export function Bullet_init_buffer(x, y, group_idx, parent_root_posidx, parent_m
 
       const bullet = new Bullet(x, y, _, _, _, vb_groupidx);
 
-      // Add to View Group
-      // View_add_to_group(bullet.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(bullet.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

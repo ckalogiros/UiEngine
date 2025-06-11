@@ -37,7 +37,9 @@ export class Widget_Text extends Text_Mesh {
 
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
 			// Create view group
-			this.group_bufferidxs[0] = View_create_new_group(this);
+			if (this.group_bufferidxs[0] === INT_NULL) {
+            this.group_bufferidxs[0] = View_create_new_group(this);
+         }
 		}
 	}
 
@@ -74,7 +76,15 @@ export class Widget_Text extends Text_Mesh {
 
 	/*******************************************************************************************************************************************************/
 	// Graphics
+	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
+		this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		
+		// Add to view group
+		View_add_mesh(this.group_bufferidxs[0], this);
+		
+		return this.gfx;
+	}
 
 	Render() {
 
@@ -93,11 +103,11 @@ export class Widget_Text extends Text_Mesh {
 		this.root_bufferidx = root_bufferidx;
 		Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 	}
-    /** */
-    SetViewGroupIndex(view_groupidx) {
+	/** */
+	SetViewGroupIndex(view_groupidx) {
 
-        this.group_bufferidxs[0] = view_groupidx;
-    }
+		this.group_bufferidxs[0] = view_groupidx;
+	}
 
 	GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 

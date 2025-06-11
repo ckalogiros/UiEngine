@@ -33,6 +33,7 @@ export function Widget_gfx_ready_enable({
    enable_pass_vpos = false,
    enable_pass_wpos = false,
    enable_blend_mode,
+   set_state = 0x0,
    gfx_ctx_flags = 0x0,
    listener={ type:0x0, Clbk:null, params:null },
    scroller=null,
@@ -93,6 +94,10 @@ export function Widget_gfx_ready_enable({
       mesh.GfxEnableBlend(enable_blend_mode);
    }
 
+   if (set_state) {
+      mesh.StateEnable(set_state);
+   }
+
    if (gfx_ctx_flags) {
       mesh.gfx_ctx_flags = gfx_ctx_flags;
    }
@@ -109,10 +114,12 @@ export function Widget_gfx_ready_enable({
    if (scroller) {
       const params = {
          width:(scroller.width!==undefined) ? scroller.width : 10,
-         max_height:(scroller.max_height!==undefined) ? scroller.max_height : 80,
+         // max_height:(scroller.max_height!==undefined) ? scroller.max_height : 80,
+         max_height:mesh.geom.dim[1],
          parent:scroller.parent!==undefined ? scroller.parent : null,
       };
       mesh.EnableScroller(params);
+      mesh.align.flags |= LAYOUT.FIXED_HEIGHT;
 
    }
 

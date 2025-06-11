@@ -32,8 +32,8 @@ const root_group_view_buffer = New_generic_buffer(_, 'Root group view');
 export function Root_group_buffer_reset() { root_group_view_buffer.ResetFull(); }
 const _root_vbidx_buffer = New_generic_buffer(_, 'Root vbidx view');
 export function Root_group_gfx_buffer_reset() { _root_vbidx_buffer.ResetFull(); }
-const _root_per_vb_meshidx_buffer = New_generic_buffer(_, 'Root pervb view');
-export function Root_group_batch_buffer_reset() { _root_per_vb_meshidx_buffer.ResetFull(); }
+// const _root_per_vb_meshidx_buffer = New_generic_buffer(_, 'Root pervb view');
+// export function Root_group_batch_buffer_reset() { _root_per_vb_meshidx_buffer.ResetFull(); }
 
 export function Root_group_buffer_reset_dealocate() {
 
@@ -99,13 +99,6 @@ export function Root_group_view_buffer_get_root_meshidx(idx) { return root_group
 /** */
 export function Root_group_view_buffer_get_root_pos(idx) { return Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[idx].buffer[0]).geom.pos; }
 /** */
-export function Root_group_view_buffer_get_root_unif_wpos(idx) {
-   const root_mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[idx].buffer[0]);
-   if (root_mesh.root_posidx === INT_NULL) alert('No root was constructed yet\nWidget_root_buffer_get_root_unif_wpos()')
-   const wpos = Mesh_unif_get_vb_root_wpos(root_mesh.root_posidx);
-   return wpos;
-}
-/** */
 export function Root_group_view_buffer_get_mesh_by_rootidx(idx) {
 
    const mesh = Mesh_buffer_get_mesh_byidx(root_group_view_buffer.buffer[idx].buffer[0]);
@@ -121,9 +114,9 @@ export function Root_group_view_buffer_create_root(mesh_bufferidx) {
 
    root_group_view_buffer.buffer[root_idx].Add(mesh_bufferidx);
 
-   Root_group_vbidx_view_create(root_idx);
+   // Root_group_vbidx_view_create(root_idx);
 
-   Root_group_per_vb_meshidx_view_create_root(root_idx, mesh_bufferidx);
+   // Root_group_per_vb_meshidx_view_create_root(root_idx, mesh_bufferidx);
 
    return root_idx;
 }
@@ -140,7 +133,7 @@ export function Root_group_view_buffer_add_mesh(root_bufferidx, mesh_bufferidx) 
 export function Root_group_view_buffer_remove_root_byidx(root_bufferidx) {
    if (root_group_view_buffer.buffer[root_bufferidx] !== INT_NULL) {
 
-      Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx);
+      // Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx);
       Root_group_vbidx_view_remove_byidx(root_bufferidx)
       root_group_view_buffer.RemoveByIdx(root_bufferidx);
    }
@@ -233,13 +226,13 @@ function Root_group_vbidx_view_remove_byidx(root_bufferidx) {
 
 
 // DEPRECATED
-function Root_group_vbidx_view_create(root_bufferidx) {
+// function Root_group_vbidx_view_create(root_bufferidx) {
 
-   const idx = _root_vbidx_buffer.Add(New_int8_buffer(_, 'NEW _root_vbidx_buffer'));
+//    const idx = _root_vbidx_buffer.Add(New_int8_buffer(_, 'NEW _root_vbidx_buffer'));
 
-   if (root_bufferidx !== idx)
-      alert('Widget root gfx buffer not the same with the Widget root buffer');
-}
+//    if (root_bufferidx !== idx)
+//       alert('Widget root gfx buffer not the same with the Widget root buffer');
+// }
 
 
 // DEPRECATED
@@ -368,26 +361,26 @@ export function Root_group_vbidx_view_reset_mesh_per_vb_buffer(root_bufferidx) {
 // }
 
 
-// DEPRECATED
-export function Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx) {
-   _root_per_vb_meshidx_buffer.RemoveByIdx(root_bufferidx);
-}
+// // DEPRECATED
+// export function Root_group_per_vb_meshidx_view_remove_byidx(root_bufferidx) {
+//    _root_per_vb_meshidx_buffer.RemoveByIdx(root_bufferidx);
+// }
 
 
 // DEPRECATED
-function Root_group_per_vb_meshidx_view_create_root(root_bufferidx, mesh_bufferidx) {
+// function Root_group_per_vb_meshidx_view_create_root(root_bufferidx, mesh_bufferidx) {
 
-   const root_batch_vb = {
-      rootidx: root_bufferidx,
-      meshidx: mesh_bufferidx,
-      vb: [], // To store the mesh_bufferidx of the first mesh of the batch, as well as the number of faces of all the meshes in one batch(1 face = 4 vertices)
-   };
+//    const root_batch_vb = {
+//       rootidx: root_bufferidx,
+//       meshidx: mesh_bufferidx,
+//       vb: [], // To store the mesh_bufferidx of the first mesh of the batch, as well as the number of faces of all the meshes in one batch(1 face = 4 vertices)
+//    };
 
-   const idx = _root_per_vb_meshidx_buffer.Add(root_batch_vb);
+//    const idx = _root_per_vb_meshidx_buffer.Add(root_batch_vb);
 
-   if (root_bufferidx !== idx)
-      alert('Widget root batch buffer not the same with the Widget root buffer');
-}
+//    if (root_bufferidx !== idx)
+//       alert('Widget root batch buffer not the same with the Widget root buffer');
+// }
 
 
 // DEPRECATED
@@ -395,7 +388,7 @@ function Root_group_per_vb_meshidx_view_create_root(root_bufferidx, mesh_bufferi
 
 //    if (root_bufferidx === INT_NULL) return; // Case there is no widget root creation.
 
-//    const root_batch = _root_per_vb_meshidx_buffer.buffer[root_bufferidx];
+//    const root_batch = _root_per_vb_meshidx_buffer.buffer[root_bufferidx]   ;
 //    const vb_dataidx = root_batch.vb.push({
 //       num_faces: 0,
 //       meshidx: mesh_bufferidx,

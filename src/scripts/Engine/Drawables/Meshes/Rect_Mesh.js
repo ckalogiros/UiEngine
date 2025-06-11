@@ -14,11 +14,11 @@ import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js"
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_movexy } from "../Widgets/ScrollerComponent.js";
-import { Mesh_get_real_pos_xy } from "../Operations/MeshAttributesFunctions.js";
+import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_movexy, Scroller_component_resize_y, Scroller_component_set_pos_from_scrolled_section } from "../Widgets/ScrollerComponent.js";
+import { Mesh_get_real_pos_xy_obj_t } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
-import { View_add_mesh, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
+import { View_add_mesh, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -47,7 +47,9 @@ export class Rect_Mesh extends Mesh {
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
-         this.group_bufferidxs[0] = View_create_new_group(this);
+         if (this.group_bufferidxs[0] === INT_NULL) {
+            this.group_bufferidxs[0] = View_create_new_group(this);
+         }
       }
 
       this.type |= MESH_TYPE.RECT_MESH | properties.is_debug_mesh;
@@ -423,22 +425,22 @@ export class Rect_Mesh extends Mesh {
       // This is for move and/or resize events
       else if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-         const pos = Mesh_get_real_pos_xy(section);
-         const right = pos[0] + section.geom.dim[0] * 2;
-         const bottom = pos[1] + section.geom.dim[1] * 2;
+         const pos = Mesh_get_real_pos_xy_obj_t(section);
+         const right = pos.x + section.geom.dim[0] * 2;
+         const bottom = pos.y + section.geom.dim[1] * 2;
 
          const point = Mouse_get_pos();
-         if (section.state.mask & MESH_STATE_FLAGS.IS_RESIZEABLE && (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1])) {
+         if (section.state.mask & MESH_STATE_FLAGS.IS_RESIZEABLE && (point.x > right - TEMP_RESIZE_MARGIN[0] || point.y > bottom - TEMP_RESIZE_MARGIN[1])) {
 
             // We have Resize
-            if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+            if (point.x > right - TEMP_RESIZE_MARGIN[0] && point.y > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
                // console.log('X Y RESIZE');
 
                const OnResizeFn = section.OnResize;
                const idx = Time_intervals_create(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
                section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
-            else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+            else if (point.x > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
                // console.log('X RESIZE');
             }
             else { // Its a height resize
@@ -496,52 +498,54 @@ export class Rect_Mesh extends Mesh {
 
 
       // Set min dimentions. // TODO: Who decides for the minimum dimentions??????
-      const pos = Mesh_get_real_pos_xy(root);
-      const min_sizex = pos[0] + 80;
-      const min_sizey = pos[1] + 80;
+      const pos = Mesh_get_real_pos_xy_obj_t(root);
+      const min_sizex = pos.x + 80;
+      const min_sizey = pos.y + 80;
       let changes_hapened = false;
 
 
 
-      if (mouse_pos[0] > min_sizex) {
+      if (mouse_pos.x > min_sizex) {
 
-                  // console.log('1', root.geom.dim[1])
-                  if(root.scroller_comp) {
-                     // const scroller_comp = Components_get_scroller_component(root.children_scrollers_buffer.buffer[i]);
-                     // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
-                     Scroller_component_calculate_handle_pos_dim(root.scroller_comp);
-                  }
+         // console.log('1', root.geom.dim[1])
+         if(root.scroller_comp) {
+            // const scroller_comp = Components_get_scroller_component(root.children_scrollers_buffer.buffer[i]);
+            // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
+            // Scroller_component_calculate_handle_pos_dim(root.scroller_comp);
+         }
 
-         const sizex = mouse_pos[0] - pos[0];
+         const sizex = mouse_pos.x - pos.x;
          root.geom.dim[0] = sizex / 2;
          changes_hapened = true;
       }
 
-      if (mouse_pos[1] > min_sizey) {
+      if (mouse_pos.y > min_sizey) {
 
-                  // console.log('1', root.geom.dim[1])
-                  if(root.scroller_comp) {
-                     // const scroller_comp = Components_get_scroller_component(root.children_scrollers_buffer.buffer[i]);
-                     // Scroller_component_set_pos_from_scrolled_section(scroller_comp);
-                     Scroller_component_calculate_handle_pos_dim(root.scroller_comp);
-                  }
-
-         const sizey = mouse_pos[1] - pos[1];
-         root.geom.dim[1] = sizey / 2;
+         // console.log('1', root.geom.dim[1])
+         
+         const sizey = (mouse_pos.y - pos.y)/2;
+         root.geom.dim[1] = sizey;
          changes_hapened = true;
+         if(root.scroller_comp) {
+
+            const pad_y = root.StylesGetPad(STYLES.AXIS.Y);
+            Scroller_component_resize_y(root.scroller_comp, sizey-pad_y);
+            // const scroller_comp = Components_get_scroller_component(root.children_scrollers_buffer.buffer[i]);
+            // Scroller_component_set_pos_from_scrolled_section(root.scroller_comp);
+            // Scroller_component_calculate_handle_pos_dim(root.scroller_comp);
+         }
       }
 
 
 
       if (changes_hapened) {
 
+         const root_pos = Mesh_get_real_pos_xy_obj_t(root);
+         const clip_top = root_pos.y;
+         const clip_bottom = root_pos.y + root.geom.dim[1] * 2;
+         const clip_right = root_pos.x + root.geom.dim[0] * 2;
 
-         Root_group_reset_gfxs(root.root_bufferidx)
-
-         const root_pos = Mesh_get_real_pos_xy(root);
-         const clip_top = root_pos[1];
-         const clip_bottom = root_pos[1] + root.geom.dim[1] * 2;
-         const clip_right = root_pos[0] + root.geom.dim[0] * 2;
+         View_reset_rendering_buffer_whole_view_group(root.group_bufferidxs[0]);
 
 
          if(root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) 
@@ -550,18 +554,15 @@ export class Rect_Mesh extends Mesh {
 
          // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
          for (let i = 0; i <= root.children.boundary; i++) {
-
-            Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
+            // Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
          }
          // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
          // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh
          // Root_group_vbidx_view_reset_mesh_per_vb_buffer(root.root_bufferidx);
-         View_reset_to_index_from_view_group_NEW(root.group_bufferidxs[0]);
-
-         // const mouse_dif = Mouse_get_pos_dif()
-         // const dif = { x: mouse_dif.x / 2, y: -mouse_dif.y / 2 };
-         View_render_from_view_NEW(root.group_bufferidxs[0]);
+         
+         View_render_whole_view_group_NEW(root.group_bufferidxs[0]);
+         // View_render_from_view_NEW(root.group_bufferidxs[0]);
 
       }
    }

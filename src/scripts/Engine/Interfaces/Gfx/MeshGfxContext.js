@@ -1,7 +1,7 @@
 "use strict";
 
 
-import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_group_state_enable, Vertex_buffer_group_get_vertices_per_face, } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_group_set_ibidx, Vertex_buffer_group_get_vbidxs, VBI_get_byidx, Vertex_buffer_group_get_progidx, Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx, Vertex_buffer_group_set_texidx, Vertex_buffer_group_set_mesh_debug_name, Vertex_buffer_group_state_enable, Vertex_buffer_group_get_vertices_per_face, VBI_state_enable, } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Program_get_webgl_program_object, Program_store_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
@@ -12,7 +12,7 @@ import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/Unifor
 import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Root_group_per_vb_meshidx_view_assign_and_accum_to_vb, Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
+import { Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
@@ -291,6 +291,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, vb_aprox_size, progidx, is_private);
+
+         VBI_state_enable(vb_group.idx, BUFFER_STATE.NEEDS_UPDATE);
          
          // For debugging only 
          Vertex_buffer_group_set_mesh_debug_name(vb_group.idx, Mesh_get_name(mesh));
@@ -307,7 +309,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
          // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
-         Mesh_per_vb_create_vb(vb_groupidx);
+         // Mesh_per_vb_create_vb(vb_groupidx);
 
          
          /*******************************************************************************************************************/
@@ -395,8 +397,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    // Add mesh to the root batch buffer for batch update
-   if(!temp_is_particle_system) 
-      Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
+   // if(!temp_is_particle_system) 
+   //    Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
 
 
    // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.

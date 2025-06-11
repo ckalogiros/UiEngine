@@ -4,7 +4,7 @@ import { State_mesh_set_focused } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_group_update_scissorbox_all_vb, Vertex_buffer_set_and_update_uniform } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_find_uniform_ubidx_from_name } from "../../../Graphics/ShaderPrograms.js";
 import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
-import { Root_group_vbidx_view_get, Root_group_view_buffer_get_mesh_by_rootidx } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_get_mesh_by_rootidx } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
@@ -55,29 +55,29 @@ export function Mesh_get_uniform_ubidx_from_name(uniforms_buffer, unif_name) {
     console.error('unif_name', unif_name, '\nuniforms_buffer', uniforms_buffer);
     alert('Mesh_get_uniform_ubidx_from_name()\nNo mesh with uniform found.')
 }
-/** */
+/** DEPRECATED */
 export function Mesh_set_scissorbox(root_bufferidx, meshidx_x, meshidx_y, meshidx_w, meshidx_h) {
 
-    const root_vb_groupidxs = Root_group_vbidx_view_get(root_bufferidx);
+    // const root_vb_groupidxs = Root_group_vbidx_view_get(root_bufferidx);
 
-    // const mx = Mesh_buffer_get_mesh_byidx(meshidx_x);
-    // const my = Mesh_buffer_get_mesh_byidx(meshidx_y);
-    // const mw = Mesh_buffer_get_mesh_byidx(meshidx_w);
-    // const mh = Mesh_buffer_get_mesh_byidx(meshidx_h);
+    // // const mx = Mesh_buffer_get_mesh_byidx(meshidx_x);
+    // // const my = Mesh_buffer_get_mesh_byidx(meshidx_y);
+    // // const mw = Mesh_buffer_get_mesh_byidx(meshidx_w);
+    // // const mh = Mesh_buffer_get_mesh_byidx(meshidx_h);
 
-    // const x = mx.GetPosX();
-    // const y = my.GetPosY();
-    // const w = mw.geom.dim[0]*2;
-    // const h = mh.geom.dim[1]*2;
+    // // const x = mx.GetPosX();
+    // // const y = my.GetPosY();
+    // // const w = mw.geom.dim[0]*2;
+    // // const h = mh.geom.dim[1]*2;
 
-    // Run for all vertex buffer groups that belong to the root widget
-    for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
+    // // Run for all vertex buffer groups that belong to the root widget
+    // for (let i = 0; i <= root_vb_groupidxs.boundary; i++) {
 
 
-        // Set scissor box
-        Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
-        Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
-    }
+    //     // Set scissor box
+    //     Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
+    //     Vertex_buffer_group_update_scissorbox_all_vb(root_vb_groupidxs.buffer[i], meshidx_x, meshidx_y, meshidx_w, meshidx_h)
+    // }
 }
 /** */
 export function Mesh_calc_pos_dif(mesh1, mesh2) {
@@ -91,79 +91,79 @@ export function Mesh_calc_pos_dif(mesh1, mesh2) {
         m1_posy - m2_posy,
     ];
 }
-/** */
+/** DEPRECATED: Reimplement with ViewGroups*/
 export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_NULL) {
 
-    // Get all vertex buffers of all the root grouped meshes.
-    const gfx_buffers = Root_group_vbidx_view_get(root_bufferidx);
+    // // Get all vertex buffers of all the root grouped meshes.
+    // const gfx_buffers = Root_group_vbidx_view_get(root_bufferidx);
 
-    let scrollers = []
+    // let scrollers = []
 
-    for (let i = 0; i <= gfx_buffers.boundary; i++) {
+    // for (let i = 0; i <= gfx_buffers.boundary; i++) {
 
-        // Reorder renderqueue
-        Renderqueue_set_priority_by_vb(LAST, gfx_buffers.buffer[i]);
+    //     // Reorder renderqueue
+    //     Renderqueue_set_priority_by_vb(LAST, gfx_buffers.buffer[i]);
 
-        const root_mesh_idx = Mesh_per_vb_get_vb_byidx(gfx_buffers.buffer[i]);
+    //     const root_mesh_idx = Mesh_per_vb_get_vb_byidx(gfx_buffers.buffer[i]);
 
-        // Check for any scroller component and reorder its Draw
-        if (root_mesh_idx !== null && root_mesh_idx !== undefined) {
-            for (let j = 0; j <= root_mesh_idx.boundary; j++) {
+    //     // Check for any scroller component and reorder its Draw
+    //     if (root_mesh_idx !== null && root_mesh_idx !== undefined) {
+    //         for (let j = 0; j <= root_mesh_idx.boundary; j++) {
 
-                const mesh_idx = root_mesh_idx.buffer[j];
+    //             const mesh_idx = root_mesh_idx.buffer[j];
 
-                if (mesh_idx !== INT_NULL) {
+    //             if (mesh_idx !== INT_NULL) {
 
-                    const mesh = Mesh_buffer_get_mesh_byidx(mesh_idx);
+    //                 const mesh = Mesh_buffer_get_mesh_byidx(mesh_idx);
 
-                    if (mesh && mesh.scroller_comp_idx !== INT_NULL) {
+    //                 if (mesh && mesh.scroller_comp_idx !== INT_NULL) {
 
-                        const scroller = Components_get_scroller_component(mesh.scroller_comp_idx);
-                        scrollers.push(scroller)
+    //                     const scroller = Components_get_scroller_component(mesh.scroller_comp_idx);
+    //                     scrollers.push(scroller)
 
-                        // Reorder renderqueue
-                        Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
+    //                     // Reorder renderqueue
+    //                     Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
 
-                    }
-                }
+    //                 }
+    //             }
 
-            }
-        }
-        else {
-            console.error('129917330298 \nRoot mesh is missing\nfor setting the scroller\'s render priority.');
-        }
-
-
-    }
+    //         }
+    //     }
+    //     else {
+    //         console.error('129917330298 \nRoot mesh is missing\nfor setting the scroller\'s render priority.');
+    //     }
 
 
-    // Reorder listeners buffer
-    const root = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
-    // TODO: We need to insure that there is a root widget liste event in all root widgets
-    if (root.listeners) {
-        Listeners_set_priority(E.H, root.listeners);
-        Listeners_set_priority(E.C, root.listeners);
-    }
+    // }
 
 
-    // Do the same for any scrollers
+    // // Reorder listeners buffer
+    // const root = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
+    // // TODO: We need to insure that there is a root widget liste event in all root widgets
+    // if (root.listeners) {
+    //     Listeners_set_priority(E.H, root.listeners);
+    //     Listeners_set_priority(E.C, root.listeners);
+    // }
 
-    for (let j = 0; j < scrollers.length; j++) {
 
-        const scroller = scrollers[j];
+    // // Do the same for any scrollers
 
-        // Reorder renderqueue
-        Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
+    // for (let j = 0; j < scrollers.length; j++) {
 
-        if (scroller.listeners) {
-            Listeners_set_priority(E.H, scroller.listeners);
-            Listeners_set_priority(E.C, scroller.listeners);
-        }
-    }
+    //     const scroller = scrollers[j];
+
+    //     // Reorder renderqueue
+    //     Renderqueue_set_priority_by_vb(LAST, scroller.gfx.vb.groupidx);
+
+    //     if (scroller.listeners) {
+    //         Listeners_set_priority(E.H, scroller.listeners);
+    //         Listeners_set_priority(E.C, scroller.listeners);
+    //     }
+    // }
 
 
     // Set the global state
-    State_mesh_set_focused(root);
+    // State_mesh_set_focused(root);
 }
 /** */
 export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border = 0) {

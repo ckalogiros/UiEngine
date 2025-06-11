@@ -3,6 +3,18 @@
 import * as math from '../../../Helpers/Math/MathOperations.js'
 
 
+function Calculate_text_length(text) {
+
+    const len = text.length;
+    let cnt = 0;
+    for(let i=0; i<len; i++) {
+        if(text[i] !== '\n') cnt++;
+    }
+
+    return cnt;
+}
+
+
 /** */
 export class Geometry2D {
 
@@ -49,7 +61,7 @@ export class Geometry2D_Text extends Geometry2D {
        super(pos, [size, size]);
        this.font_size = size;
        this.text = text;
-       this.num_faces = text.length;
+       this.num_faces = Calculate_text_length(text);
        this.type |= MESH_TYPE.TEXT_GEOMETRY2D;
     }
  }

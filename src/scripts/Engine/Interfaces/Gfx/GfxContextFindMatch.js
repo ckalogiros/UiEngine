@@ -4,6 +4,7 @@ import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Vertex_buffer_group_get_sid, Vertex_buffer_group_get_texidx } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_get_vb_root_wpos_has_absolute_pos } from "../../Core/MeshUniformsBuffer.js";
+import { View_get_group } from "../../Core/Views/MeshBufferViews.js";
 import { Root_group_vbidx_view_get } from "../../Core/Views/RootView.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
@@ -34,7 +35,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
    if (FLAGS & GFX_CTX_FLAGS.PRIVATE) {
 
       if (FLAGS & GFX_CTX_FLAGS.FROM_ROOT_WIDGET) {
-         vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+         vb_groupidx = Find_gfx_match_widget_root_impl(mesh.group_bufferidxs[0], mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
       }
       else if (FLAGS & GFX_CTX_FLAGS.FROM_PARENT_ASC) {
 
@@ -44,7 +45,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 
             // Case the mesh is a text mesh, and there is a gfx buffer to be found, then because we dont have access to any parent mesh we would rather call to find a match from the root buffer.   
             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
-               vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+               vb_groupidx = Find_gfx_match_widget_root_impl(mesh.group_bufferidxs[0], mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
             }
          }
          else {
@@ -100,7 +101,7 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
          else {
             // For text meshes, find any match from the root.   
             if (mesh.type & MESH_TYPE.WIDGET_TEXT || mesh.type & MESH_TYPE.TEXT_MESH) {
-               vb_groupidx = Find_gfx_match_widget_root_impl(mesh.root_bufferidx, mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
+               vb_groupidx = Find_gfx_match_widget_root_impl(mesh.group_bufferidxs[0], mesh.sid, mesh.mat.texidx, FLAGS&GFX_CTX_FLAGS.ABSOLUTE_POSITION);
             }
             else vb_groupidx = Find_gfx_match_from_mesh_tree(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, mesh, _vb_groupidx); // HACK: we explicitly pass FLAGS that are hard coded.
          }
@@ -126,43 +127,80 @@ export function Find_gfx_match_from_mesh_tree(FLAGS, mesh, _vb_groupidx = null) 
 /****************************************************************************************************************************************************/
 
 
-function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid, mesh_texidx, mesh_has_absolute_pos=0x0) {
+function Find_gfx_match_widget_root_impl(groupidx, target_sid, mesh_texidx, mesh_has_absolute_pos=0x0) {
 
-   let found_vb_groupidx = INT_NULL;
+   let found_vb_match = INT_NULL;
 
-   if (root_bufferidx === INT_NULL) {
+   if (groupidx === INT_NULL) {
       if (GFX_CONEXT_DEBUG) console.warn('FAILED TO Find_gfx_match, widget_root is NULL.');
       return INT_NULL;
    }
 
-   // Find match from SID
-   const gfx_idxs = Root_group_vbidx_view_get(root_bufferidx);
+   // Find match from vertex buffer SID, checking vbs of the group 
+   const view_group = View_get_group(groupidx);
+   for (let i = 0; i <= view_group.vb.boundary; i++) { // All vertex buffer groups
 
-   for (let i = 0; i <= gfx_idxs.boundary; i++) {
+      for (let j = 0; j <= view_group.vb.buffer[i].rg.boundary; j++) { // 
 
-      const vb_groupidx = gfx_idxs.buffer[i];
-      const gfx_sid = Vertex_buffer_group_get_sid(vb_groupidx); // Get the sid of the current gfx from the vertex buffer.
+         const vb_groupidx =  view_group.vb.buffer[i].vb_groupidx;
+         const gfx_sid = Vertex_buffer_group_get_sid(vb_groupidx); // Get the sid of the current gfx from the vertex buffer.
+         // We need to have knowledge if the meshes of the vb stored, have absolute position or not
+         const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
+
+         if((mesh_has_absolute_pos === has_vb_absolute_pos) && Sid_check_match(target_sid, gfx_sid)) {
+
+            // Check also if mesh has texture and the texidx matches the vb group's texidx
+            const texidx = Vertex_buffer_group_get_texidx(vb_groupidx);
+            if(texidx === mesh_texidx){
+               found_vb_match = vb_groupidx;
+               break;
+            }         
+         }
+      }
+   }
+
+   return found_vb_match;
+
+}
+
+/** DEPRECATED */
+// function Find_gfx_match_widget_root_impl(root_bufferidx, target_sid, mesh_texidx, mesh_has_absolute_pos=0x0) {
+
+//    let found_vb_groupidx = INT_NULL;
+
+//    if (root_bufferidx === INT_NULL) {
+//       if (GFX_CONEXT_DEBUG) console.warn('FAILED TO Find_gfx_match, widget_root is NULL.');
+//       return INT_NULL;
+//    }
+
+//    // Find match from SID
+//    const gfx_idxs = Root_group_vbidx_view_get(root_bufferidx);
+
+//    for (let i = 0; i <= gfx_idxs.boundary; i++) {
+
+//       const vb_groupidx = gfx_idxs.buffer[i];
+//       const gfx_sid = Vertex_buffer_group_get_sid(vb_groupidx); // Get the sid of the current gfx from the vertex buffer.
 
 
                
-      // We need to have knowledge if the meshes of the vb stored, have absolute position or not
-      const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
+//       // We need to have knowledge if the meshes of the vb stored, have absolute position or not
+//       const has_vb_absolute_pos = Mesh_unif_get_vb_root_wpos_has_absolute_pos(i);
 
-      if((mesh_has_absolute_pos === has_vb_absolute_pos) && Sid_check_match(target_sid, gfx_sid)) {
+//       if((mesh_has_absolute_pos === has_vb_absolute_pos) && Sid_check_match(target_sid, gfx_sid)) {
 
-         // Check also if mesh has texture and the texidx matches the vb group's texidx
-         const texidx = Vertex_buffer_group_get_texidx(vb_groupidx);
-         if(texidx === mesh_texidx){
-            found_vb_groupidx = vb_groupidx;
-            break;
-         }         
-      }
+//          // Check also if mesh has texture and the texidx matches the vb group's texidx
+//          const texidx = Vertex_buffer_group_get_texidx(vb_groupidx);
+//          if(texidx === mesh_texidx){
+//             found_vb_groupidx = vb_groupidx;
+//             break;
+//          }         
+//       }
 
-   }
+//    }
 
-   return found_vb_groupidx;
+//    return found_vb_groupidx;
 
-}
+// }
 
 
 

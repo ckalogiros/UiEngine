@@ -1,7 +1,7 @@
 "use starict";
 
 import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
-import { VBI_get_attributes_per_vertex, Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
+import { Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
 
 
 
@@ -49,7 +49,7 @@ export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_face
          
          state:0x0,
 
-         debug_is_reseted:true,
+         // debug_is_reseted:true,
 
       }
    );
@@ -68,9 +68,13 @@ export function Vertex_buffer_render_group_get_all() {
 export function Vertex_buffer_render_group_get_render_group(render_groupidx) { 
    return _render_groups.buffer[render_groupidx];
 }
-/** */
+/** Get size to calculate the next rendergroup start attribute */
 export function Vertex_buffer_render_group_get_size(render_groupidx) { 
    return _render_groups.buffer[render_groupidx].size;
+}
+/** Count is only for the used attributes of the rendergroup */
+export function Vertex_buffer_render_group_get_count(render_groupidx) { 
+   return _render_groups.buffer[render_groupidx].count;
 }
 
 
@@ -80,9 +84,9 @@ export function Vertex_buffer_render_group_set_num_faces(render_groupidx, num_fa
    _render_groups.buffer[render_groupidx].num_faces = num_faces;
 }
 /** */
-export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx, debug_is_reseted) { 
-   _render_groups.buffer[render_groupidx].debug_is_reseted = debug_is_reseted;
-}
+// export function Vertex_buffer_render_group_set_debug_is_reseted(render_groupidx, debug_is_reseted) { 
+//    _render_groups.buffer[render_groupidx].debug_is_reseted = debug_is_reseted;
+// }
 /** */
 export function Vertex_buffer_render_group_set_start(render_groupidx, start) { 
    _render_groups.buffer[render_groupidx].start = start;
@@ -143,6 +147,7 @@ export function Vertex_buffer_render_group_print_loop() {
          // 'attribs_per_face:', g.attribs_per_face,
       );
    }
+   console.log(_render_groups);
 }
 export function Vertex_buffer_render_group_print_render_group(render_groupidx) {
    

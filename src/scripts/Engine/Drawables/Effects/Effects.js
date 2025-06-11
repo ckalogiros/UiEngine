@@ -18,7 +18,6 @@ import { Gl_set_dim_xy, Gl_set_generic2, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpo
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../Core/Views/MeshBufferViews.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY } from "../Material/Colors.js";
 import { Mesh_set_color_rgba } from "../Operations/MeshAttributesFunctions.js";
@@ -75,7 +74,7 @@ class Effect_Mesh_Explosion_Circle {
       
       mesh.Render();
       
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.render_groupidx);
       
       // Initialize generic uniforms, only once(first mesh initialization)
       if(vb_groupidx===INT_NULL) {
@@ -142,8 +141,6 @@ export function Effects_explosion_circle_init_buffer(group_idx, parent_root_posi
       effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_groupidx, group_idx); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
-      // Add to View Group
-      // View_add_to_group(effect.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 
@@ -294,7 +291,7 @@ class Effect_Mesh_Explosion_Glow {
       
       
       mesh.Render();
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.render_groupidx);
       
       // Initialize generic uniforms, only once(first mesh initialization)
       if(vb_groupidx===INT_NULL) {
@@ -349,8 +346,6 @@ export function Effects_explosion_glow_init_buffer(group_idx, parent_root_posidx
       effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_groupidx, group_idx); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
-      // Add to View Group
-      // View_add_to_group(effect.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
       if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

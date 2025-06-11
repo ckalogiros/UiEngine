@@ -5,7 +5,7 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_activate_rg, View_add_mesh, View_deactivate_rg, View_render_from_view_NEW, View_render_from_view_specific_render_group_NEW, View_reset_to_index_from_view_group_NEW } from "../../Core/Views/MeshBufferViews.js";
+import { View_calculate_rendergroup_draw_count, View_add_mesh, View_reset_rendergroup_draw_count, View_render_from_view_NEW, View_render_specific_render_group, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
@@ -901,10 +901,10 @@ alert('00000111119999922222')
 
       if(menu.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) { // for fast activation
          // Activate specific render groups
-         View_deactivate_rg(menu.gfx.vb.render_groupidx);
+         View_reset_rendergroup_draw_count(menu.gfx.vb.render_groupidx);
       }
       else { // Render the whole buffer mesh by mesh for each render group
-         View_reset_to_index_from_view_group_NEW(menu.group_bufferidxs[0]);
+         View_reset_rendering_buffer_whole_view_group(menu.group_bufferidxs[0]);
          View_render_from_view_NEW(menu.group_bufferidxs[0]);
       }
 
@@ -986,17 +986,17 @@ alert('00000111119999922222')
       if(menu.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) { // for fast activation
          if(menu.is_gfx_inserted) {
             // Activate specific render groups
-            View_activate_rg(menu.group_bufferidxs);
+            View_calculate_rendergroup_draw_count(menu.group_bufferidxs);
          }
          else { // First time menu is rendered
             // Render menu's rendergroup
             // TODO: Render the rest of the render groups that belong to the menu...
-            View_render_from_view_specific_render_group_NEW(menu.group_bufferidxs);
+            View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], );
          }
       }
       // Slower
       else { // Render the whole buffer mesh by mesh for each render group
-         View_reset_to_index_from_view_group_NEW(menu.group_bufferidxs[0]);
+         View_reset_rendering_buffer_whole_view_group(menu.group_bufferidxs[0]);
          View_render_from_view_NEW(menu.group_bufferidxs[0]);
       }
 

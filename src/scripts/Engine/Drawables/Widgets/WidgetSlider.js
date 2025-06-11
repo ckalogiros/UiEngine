@@ -44,7 +44,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          dim: properties.dim,
          col: properties.col,
          pad: properties.pad,
-         name: properties.text,
+         name: properties.text!==undefined ? properties.text : 'SliderBar',
          num_faces: properties.num_faces,
          is_debug_mesh: properties.is_debug_mesh,
       }));
@@ -88,8 +88,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          handle.group_bufferidxs[0] = this.group_bufferidxs[0];
       }
 
-      Mesh_set_name(handle, 'Slider handle');
-      Mesh_get_name(this, 'Slider Bar');
+      Mesh_set_name(handle, 'SliderHandle');
 
    }
    SetLayout(align_flags) {
@@ -273,38 +272,38 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 
 
-   Render() {
+   // Render() {
 
-      if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
+   //    if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
 
-      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); this.is_gfx_inserted = true }
+   //    if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); this.is_gfx_inserted = true }
 
-      const handle = this.children.buffer[0];
-      if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE_FLAGS.ACTIVE)) { handle.AddToGfx(); handle.is_gfx_inserted = true }
-   }
+   //    const handle = this.children.buffer[0];
+   //    if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE_FLAGS.ACTIVE)) { handle.AddToGfx(); handle.is_gfx_inserted = true }
+   // }
 
 
-   Rerender() {
+   // Rerender() {
 
-      Vertex_buffer_add_vertices_from_render_group(this.gfx, bar.geom, this.mat, _, Mesh_get_name(this), true);
-      this.is_gfx_inserted = true;
-      this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+   //    Vertex_buffer_add_vertices_from_render_group(this.gfx, bar.geom, this.mat, _, Mesh_get_name(this), true);
+   //    this.is_gfx_inserted = true;
+   //    this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
       
-      const handle = this.children.buffer[0];
-      Vertex_buffer_add_vertices_from_render_group(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle), true);
+   //    const handle = this.children.buffer[0];
+   //    Vertex_buffer_add_vertices_from_render_group(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle), true);
 
-      handle.is_gfx_inserted = true;
-      handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
-   }
+   //    handle.is_gfx_inserted = true;
+   //    handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+   // }
 
 
-   DeactivateGfx() {
+   // DeactivateGfx() {
 
-      super.DeactivateGfx()
-      const handle = this.children.buffer[0];
-      handle.DeactivateGfx();
+   //    super.DeactivateGfx()
+   //    const handle = this.children.buffer[0];
+   //    handle.DeactivateGfx();
 
-   }
+   // }
 
 
 
@@ -833,6 +832,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          texture_id:properties.name_text.texture_id,
          font_size:properties.name_text.font_size,
          text:properties.name_text.text, 
+         name:'SliderNameText', 
          variant_idx:properties.name_text.variant_idx, 
          is_debug_mesh: is_debug_mesh, 
          // sub_texture_id, 
@@ -868,7 +868,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
          dim: properties.dim,
          col: properties.col,
          pad: properties.pad,
-         name: properties.text,
+         name: properties.text!==undefined ? properties.text : 'WidgetSlider',
          num_faces: properties.num_faces,
          is_debug_mesh: properties.is_debug_mesh,
       }));
@@ -1279,62 +1279,62 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    }
 
 
-   Render() {
+   // Render() {
 
-      if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
+   //    if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
 
-      if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); this.is_gfx_inserted = true }
-      if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); this.text_mesh.is_gfx_inserted = true }
+   //    if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); this.is_gfx_inserted = true }
+   //    if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); this.text_mesh.is_gfx_inserted = true }
 
-      const bar = this.children.buffer[this.bar_idx];
-      if (!bar.is_gfx_inserted && (bar.state.mask & MESH_STATE_FLAGS.ACTIVE)) { bar.AddToGfx(); bar.is_gfx_inserted = true }
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    if (!bar.is_gfx_inserted && (bar.state.mask & MESH_STATE_FLAGS.ACTIVE)) { bar.AddToGfx(); bar.is_gfx_inserted = true }
 
-      const handle = bar.children.buffer[0];
-      if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE_FLAGS.ACTIVE)) { handle.AddToGfx(); handle.is_gfx_inserted = true }
+   //    const handle = bar.children.buffer[0];
+   //    if (!handle.is_gfx_inserted && (handle.state.mask & MESH_STATE_FLAGS.ACTIVE)) { handle.AddToGfx(); handle.is_gfx_inserted = true }
 
-      const value_text = this.children.buffer[this.value_text_idx];
-      if (!value_text.is_gfx_inserted && (value_text.state.mask & MESH_STATE_FLAGS.ACTIVE)) { value_text.AddToGfx(); value_text.is_gfx_inserted = true }
-   }
+   //    const value_text = this.children.buffer[this.value_text_idx];
+   //    if (!value_text.is_gfx_inserted && (value_text.state.mask & MESH_STATE_FLAGS.ACTIVE)) { value_text.AddToGfx(); value_text.is_gfx_inserted = true }
+   // }
 
 
-   Rerender() {
+   // Rerender() {
 
-      // Reset gfx start for the mesh
-      Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this), true);
-      this.is_gfx_inserted = true;
-      this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+   //    // Reset gfx start for the mesh
+   //    Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this), true);
+   //    this.is_gfx_inserted = true;
+   //    this.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
-      this.text_mesh.AddToGfxFromReset();
+   //    this.text_mesh.AddToGfxFromReset();
 
-      const bar = this.children.buffer[this.bar_idx];
-      Vertex_buffer_add_vertices_from_render_group(bar.gfx, bar.geom, bar.mat, _, Mesh_get_name(bar), true);
-      bar.is_gfx_inserted = true;
-      bar.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    Vertex_buffer_add_vertices_from_render_group(bar.gfx, bar.geom, bar.mat, _, Mesh_get_name(bar), true);
+   //    bar.is_gfx_inserted = true;
+   //    bar.StateEnable(MESH_STATE_FLAGS.ACTIVE);
       
-      const handle = bar.children.buffer[0];
-      Vertex_buffer_add_vertices_from_render_group(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle), true);
-      handle.is_gfx_inserted = true;
-      handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+   //    const handle = bar.children.buffer[0];
+   //    Vertex_buffer_add_vertices_from_render_group(handle.gfx, handle.geom, handle.mat, _, Mesh_get_name(handle), true);
+   //    handle.is_gfx_inserted = true;
+   //    handle.StateEnable(MESH_STATE_FLAGS.ACTIVE);
 
-      const value_text = this.children.buffer[this.value_text_idx];
-      value_text.AddToGfxFromReset();
-   }
+   //    const value_text = this.children.buffer[this.value_text_idx];
+   //    value_text.AddToGfxFromReset();
+   // }
 
 
-   DeactivateGfx() {
+   // DeactivateGfx() {
 
-      const bar = this.children.buffer[this.bar_idx];
-      // const name_text = this.text_mesh;
-      const handle = bar.children.buffer[0];
-      const value_text = this.children.buffer[this.value_text_idx];
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    // const name_text = this.text_mesh;
+   //    const handle = bar.children.buffer[0];
+   //    const value_text = this.children.buffer[this.value_text_idx];
 
-      bar.DeactivateGfx();
-      // name_text.DeactivateGfx();
-      handle.DeactivateGfx();
-      value_text.DeactivateGfx();
-      super.DeactivateGfx()
+   //    bar.DeactivateGfx();
+   //    // name_text.DeactivateGfx();
+   //    handle.DeactivateGfx();
+   //    value_text.DeactivateGfx();
+   //    super.DeactivateGfx()
 
-   }
+   // }
 
 
 

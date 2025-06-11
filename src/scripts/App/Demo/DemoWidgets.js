@@ -1,7 +1,7 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_build_group_from_root_mesh, View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
+import { View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
@@ -202,8 +202,6 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    section.GenGfxCtx();
    
    Align_nested_sections_pre(section);
-
-   // View_build_group_from_root_mesh(scrolled_section);
 
    Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
@@ -534,7 +532,6 @@ nested layouts with well-aligned items.\
    // Render
    
    root_s.GenGfxCtx();
-   // View_build_group_from_root_mesh(root_s);
 
    Align_nested_sections_pre(root_s);
 
@@ -829,7 +826,6 @@ ensuring they remain accessible when reopening a parent dropdown.\
    Construct_listen_events_relations_from_mesh_tree(section);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-   // View_build_group_from_root_mesh(section);
 
    // // Color some words
    // info.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 8);
@@ -1126,8 +1122,6 @@ WIDGET: COLOR-PICKER\
       Construct_listen_events_from_mesh_tree(section)
       Construct_listen_events_relations_from_mesh_tree(section);
 
-      // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-      // View_build_group_from_root_mesh(section);
    }
 
    return section;
@@ -1318,17 +1312,21 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
-      // picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
+      // // picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
+      // picker.GenGfxCtx();
+      // Align_nested_sections_pre(picker);
+
+      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
+      // View_render_from_view_NEW(picker.group_bufferidxs[0]);
+
+      // picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
+
+      // Construct_listen_events_from_mesh_tree(picker);
+      // Construct_listen_events_relations_from_mesh_tree(picker);
+
       picker.GenGfxCtx();
-      Align_nested_sections_pre(picker);
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(picker.group_bufferidxs[0]);
-
-      picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-
-      Construct_listen_events_from_mesh_tree(picker);
-      Construct_listen_events_relations_from_mesh_tree(picker);
+      Align_nested_sections_pre(picker)
+      Widget_render(picker);
    }
 
    return picker;
@@ -1582,9 +1580,6 @@ export function Demo_complicated_widget_layout(x = 0, y = 0) {
    Align_nested_sections_pre(dp)
 
    Widget_render(dp);
-
-   // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
-   // View_build_group_from_root_mesh(dp);
 
    // todo.clbk()
 

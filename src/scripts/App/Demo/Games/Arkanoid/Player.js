@@ -2,15 +2,14 @@
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group, View_calculate_render_group_starts, View_render_from_view_NEW } from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_calculate_render_group_starts, View_render_from_view_NEW } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_update_set_dim_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 
 
@@ -47,7 +46,7 @@ export class Player {
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
       mesh.SetViewGroupIndex(groupidx);
-      Root_group_view_buffer_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
+      // Root_group_view_buffer_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
 
       mesh.GenGfxCtx();
       // Widget_render(mesh);
@@ -69,8 +68,6 @@ export function Player_init(x, y, group_idx = INT_NULL, parent_root_posidx = INT
 
 
    const player = new Player(x, y, group_idx);
-   // Add to View Group
-   // View_add_to_group(player.mesh, group_idx);
    // Implement to draw wpos from a root uniform wpos 
    if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(player.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
 

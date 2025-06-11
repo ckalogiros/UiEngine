@@ -904,7 +904,8 @@ export class M_Buffer {
    }
 
 
-   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS AND THE SUBSTITUTION INDEX UPDATE IS FOR THE MESHES IDX FIELD. Call this on every Destroy, to have all M_Buffer elements not sparsed
+   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS. THE SUBSTITUTION INDEX UPDATE IS FOR THE MESHES IDX FIELD. 
+   // Call this on every Destroy, to have all M_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
       if (destroyed_idx < this.boundary) {

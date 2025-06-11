@@ -41,3 +41,4 @@ Is an array of 4 index values the mesh belongs to:
 2. the vb index (of the vertex buffer in the view group)
 3. the rg index (of the render group of the vertex buffer group of the view group)
 4. the mesh index (...), that is the index in the mesh indexes buffer this mesh is stored by the ViewGroup 
+

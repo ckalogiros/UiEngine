@@ -797,7 +797,7 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    emitter.parent = parent;
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
    emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true, emitter.vb_aprox_size);
-   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
+   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.render_groupidx);
    // Add to view group
    View_add_mesh(emitter.group_bufferidxs[0], emitter);
 

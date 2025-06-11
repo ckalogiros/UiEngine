@@ -97,3 +97,26 @@
    it resets only the render group the menu belongs to
    and re-renders that render group
    BUG: Problem arises when another dp is part of the render group of that dp-menu.
+
+
+
+
+
+
+# ###########################################################################################################################
+# ###########################################################################################################################
+# Render new mesh to existing view group
+requires: 
+   1. The view group to be rendered
+
+Calling "Widget_render()" on the new  mesh, we check if the rendergroup it belongs is rendered
+and we continue: 
+by calculating the start attribute index of this rendergroup
+by rendering only this rendergroup if the rendergroup is not already rendered. 
+
+After that we must render any child mesh that may have different vertexbuffer(like text meshes),
+repeating the above proccess.
+is_rendergroup_being_rendered?
+if(NOT) 
+   calculate start
+   render rg

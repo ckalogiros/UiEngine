@@ -28,6 +28,8 @@ const GL_STATE = {
     BOUND_TEXTURE_IDX: INT_NULL, // The current bound texture index 
     // BOUND_TEXTURE_UNIT_ID: INT_NULL, // The current bound texture 
 
+    TEST_DEBUG:INT_NULL,
+
     Reset(){
         this.BOUND_PROG_IDX = INT_NULL;
         this.BOUND_PROG = INT_NULL;

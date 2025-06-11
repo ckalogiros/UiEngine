@@ -8,7 +8,7 @@ import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW, YELLOWR } from "../Material/Colors.js";
 import { NOTIFICATION_TYPE, Notifications_deactivate, Notifications_get_ui_widget, Notifications_initialize, Notifications_set_ui_widget } from "./DebugInfoUiNotifications.js";
-import { View_add_to_group, View_build_group_from_root_mesh, View_get_count, View_remove_from_group, View_set_view_vb_start,  View_reset_from_view_all_buffers, View_build_all_group_from_root_mesh, View_render_from_view_NEW } from "../../Core/Views/MeshBufferViews.js";
+import { View_get_count, View_remove_mesh_from_group, View_render_from_view_NEW } from "../../Core/Views/MeshBufferViews.js";
 import { Clipy_from_group, Clipy_one_mesh } from "../Operations/Clip.js";
 import { VBI_get_byidx, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_get_Active_count, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_count, Vertex_buffer_group_get_size } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_get_count, Str_buffer_mesh_names_get_size } from "../../Core/StringBuffer.js";
@@ -197,14 +197,14 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
       generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
 
-      timer.CreateNewText('Meshes:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
-      timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
-      timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
-      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+      // timer.CreateNewText('Meshes:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      // timer.CreateNewText('000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      // timer.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_buffer_get_count, _, _, _); // idx param is for use in creating separate timer for each widget dynamic text.
+      // generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
 
-      timer.CreateNewText('Active VBs:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
-      timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
-      timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderqueue_get_count, _, _, generic_time_interval)
+      // timer.CreateNewText('Active VBs:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      // timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      // timer.SetDynamicText(`ms${ms} Renderloop 1secReset`, ms, Renderqueue_get_count, _, _, generic_time_interval)
 
       // timer.CreateNewText('GPU:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
       // timer.CreateNewText('0000000', fontsizedynamic, YELLOW[9], pad2, .9);
@@ -293,16 +293,6 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
 
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // Align_nested_sections_pre(section);
-      // section.GenGfxCtx();
-
-      // // View_build_all_group_from_root_mesh(section);
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -370,14 +360,6 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -437,13 +419,6 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
 
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -512,13 +487,6 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
 
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -585,13 +553,6 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -657,13 +618,6 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -728,13 +682,6 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
-      // section.GenGfxCtx();
-      // Align_nested_sections_pre(section);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-      // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
       Widget_render(section);
@@ -875,21 +822,6 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
 
 
       dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-      // dp.GenGfxCtx();
-      // Align_nested_sections_pre(dp);
-
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(dp.group_bufferidxs[0]);
-
-      // dp.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, dp.gfx.vb.groupidx)
-
-
-      // Construct_listen_events_from_mesh_tree(dp)
-      // Construct_listen_events_relations_from_mesh_tree(dp);
-
-      // // Create Group for this dropdown, to easily remove meshes from their vertex buffers and rebuild the vertex buffer
-      // View_build_group_from_root_mesh(dp);
-
       dp.GenGfxCtx();
       Align_nested_sections_pre(dp);
       Widget_render(dp);
@@ -1192,24 +1124,6 @@ function Debug_info_create_ui_stats() {
 
    }
 
-
-
-
-
-
-   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-   // Align_nested_sections_pre(section);
-
-   // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-
-   // Construct_listen_events_from_mesh_tree(section)
-   // Construct_listen_events_relations_from_mesh_tree(section);
    section.GenGfxCtx();
    Align_nested_sections_pre(section);
    Widget_render(section);
@@ -1624,18 +1538,6 @@ function Debug_info_create_ui_performance_timers() {
 
    }
 
-
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-
-   // Align_nested_sections_pre(section);
-
-   // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   // Construct_listen_events_from_mesh_tree(section)
-   // Construct_listen_events_relations_from_mesh_tree(section);
    section.GenGfxCtx();
    Align_nested_sections_pre(section);
    Widget_render(section);
@@ -1731,17 +1633,6 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    infomesh.gfx_pool_request |= GFX_POOL_REQUESTS.SMALLEST; // Assign so the gfx pool requests the smalest buffers
    infomesh.gfx_pool_request &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
-
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   // Align_nested_sections_pre(section);
-
-   // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   // Construct_listen_events_from_mesh_tree(section)
-   // Construct_listen_events_relations_from_mesh_tree(section);
    section.GenGfxCtx();
    Align_nested_sections_pre(section);
    Widget_render(section);
@@ -1841,7 +1732,6 @@ export function Debug_info_create_ui_focused() {
    // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
 
 
-   // View_build_group_from_root_mesh(section);
    section.GenGfxCtx();
    Align_nested_sections_pre(section);
    Widget_render(section);
@@ -1850,16 +1740,6 @@ alert('9918133321467615\nERROR: Older implementation needed a group to clip mesh
    const clip_top = Mesh_get_real_pos_y(section);
    const clip_bottom = clip_top + section.geom.dim[1] * 2;
    Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
-
-   // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   // View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-   // View_set_view_vb_start(section.group_bufferidxs, section.gfx.vb.start);
-
-   // Construct_listen_events_from_mesh_tree(section)
-   // Construct_listen_events_relations_from_mesh_tree(section);
 
    DEBUG_INFO.UI_FOCUSED.MESH_BUFFER_IDX = section.mesh_bufferidx;
    DEBUG_INFO.UI_FOCUSED.IS_ON = true;
@@ -2302,7 +2182,6 @@ function Debug_info_create_mesh_info(params) {
       ];
 
       // Scoller_component_destroy(ui_widget.scroller_comp);
-      // View_remove_view(scroller.group_bufferidxs);
       scroller.Destroy();
 
 
@@ -2359,8 +2238,6 @@ function Debug_info_create_mesh_info(params) {
 
    Construct_listen_events_from_mesh_tree(scroller)
    Construct_listen_events_relations_from_mesh_tree(scroller);
-
-   View_build_group_from_root_mesh(scroller.scrolled_section)
 
 
    DEBUG_INFO.UI_MESH.ROOT_IDX = scroller.root_bufferidx;
@@ -2877,7 +2754,6 @@ function Dbg_info_ui_create_ui(pos, name) {
    Construct_listen_events_from_mesh_tree(scrolled)
    Construct_listen_events_relations_from_mesh_tree(scrolled);
 
-   View_build_group_from_root_mesh(scrolled);
 
    const scroller_component = Components_create_scroller_component(_, 200, scrolled);
    Scoller_component_gengfx_and_render(scroller_component, scrolled, _);
@@ -2947,7 +2823,7 @@ function Dbg_ui_destroy_entry(params) {
             ui_buffer.entries_flags.buffer[i] &= ~NOTIFICATION_TYPE.FLAGS.IS_INSERTED;
 
             if (info_data.group_bufferidxs[0] !== INT_NULL) {
-               View_remove_from_group(info_data);
+               View_remove_mesh_from_group(info_data);
             }
             info_data.Destroy();
             const sort = ui_buffer.entries.RemoveByIdxNoGapsVersion(i);
@@ -3036,7 +2912,6 @@ export function Debug_info_mesh_tree_create_ui() {
          mesh_tree_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 
@@ -3330,7 +3205,6 @@ export function Debug_info_mesh_buffer_create_ui() {
          mesh_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 
@@ -3375,7 +3249,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
    const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
 
-   View_reset_from_view_all_buffers(scrolled.group_bufferidxs[0]);
+   // View_reset_from_view_all_buffers(scrolled.group_bufferidxs[0]);
 
 
    const col_menu = TRANSPARENCY(GREY[1], .9), col_dp = TRANSPARENCY(GetRandomColor(), 1.);
@@ -3451,7 +3325,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
 
    /********************************************************************************************************************/
    // Re-render   
-   View_build_all_group_from_root_mesh(scrolled.group_bufferidxs[0], false);
+   // View_build_all_group_from_root_mesh(scrolled.group_bufferidxs[0], false);
 
    // Update size and count info of the mesh buffer
    const buffer_info = root_dp.menu.children.buffer[0];
@@ -3576,7 +3450,6 @@ export function Debug_info_string_buffer_create_ui() {
          string_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 
@@ -3794,7 +3667,6 @@ export function Debug_info_mesh_per_vb_buffer_create_ui() {
          mesh_per_vb_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 
@@ -4032,7 +3904,6 @@ function Debug_info_vertex_buffer_create_ui() {
          vertex_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 
@@ -4220,7 +4091,6 @@ function Debug_info_render_queue_buffer_create_ui() {
          render_queue_buffer_ui_pos[2] = ui_widget.geom.pos[2],
 
          // Scoller_component_destroy(ui_widget.scroller_comp);
-         // View_remove_view(ui_widget.group_bufferidxs);
          ui_widget.Destroy();
 
 

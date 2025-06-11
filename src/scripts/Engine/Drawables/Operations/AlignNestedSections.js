@@ -32,7 +32,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
    cur_pos_x += pad_x;
    cur_pos_y += pad_y;
 
-   let total_size_x = 0;
+
    let total_size_y = 0;
 
    let accum_row_size_x = 0
@@ -48,7 +48,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
 
-
       if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
 
          cur_mesh.geom.pos[0] = cur_pos_x;
@@ -56,7 +55,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
 
 
          const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad);
-         // if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) console.log('RESIZE_SELF', cur_mesh.name, ret.dim_y);
 
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
 
@@ -64,8 +62,7 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
             total_size_y += ret.dim_y + cur_pad_y;
             accum_row_size_x = 0;
          }
-         else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-            total_size_x += ret.dim_x;
+         else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {   
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
          }
 
@@ -79,13 +76,16 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+               // console.error('cur_mesh:', cur_mesh.name, 'next_mesh:', next_mesh.name, );
                cur_pos_x = mesh.geom.pos[0] + pad_x;
-               if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
-               else cur_pos_y += cur_mesh.geom.dim[1] * 2;
+               cur_pos_y += row_max_size_y;
                max_size_y += row_max_size_y / 2
                row_max_size_y = 0; // Reset current row max size
             }
-            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
+            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
+               cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x;
+            }
+            accum_row_size_x += cur_pad_x/2;
          }
          else { // If this is the last child
             max_size_y += row_max_size_y / 2;
@@ -93,34 +93,34 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       }
       else {
 
-         if(cur_mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR)
-            console.log()
-
+         // if(cur_mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR)
+         //    console.log()
+         
          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
-         // if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) console.log('WIDGET', cur_mesh.name, ret.dim_y);
-
+         // console.log('::::::::::::::::::LAYOUT:::::::::::::::::::::::\n', cur_mesh.name, ret.dim_x, ret.dim_y)
+         
          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
             row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
          }
-
+         
          // Update the total size accumulator according to widget's align flags
          if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-            total_size_x += ret.dim_x;
             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
          }
          else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
             total_size_y += ret.dim_y;
-            total_size_x = ret.dim_x;
             accum_row_size_x = 0;
          }
-
+         
          // Calculate the next position, based on the next mesh's align flags
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+
+               cur_pos_x = mesh.geom.pos[0] + pad_x;
+
                if (row_max_size_y > ret.dim_y) cur_pos_y += row_max_size_y;
                else cur_pos_y += ret.dim_y * 2;
-               cur_pos_x = mesh.geom.pos[0] + pad_x;
                max_size_y += row_max_size_y / 2
                row_max_size_y = 0; // Reset current row max size
             }
@@ -128,13 +128,15 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
          }
          else { // If this is the last child
             max_size_y += row_max_size_y / 2;
+            // console.error('cur_mesh:', cur_mesh.name, );
          }
+
          accum_row_size_x += ret.dim_x + (cur_pad_x / 2);
-         // accum_row_size_x += ret.dim_x ;
 
       }
 
-      if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
+      if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x;
+
 
    }
 
@@ -146,79 +148,6 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       dim_y: size_y,
    }
 
-}
-/** Expand width of all children meshes to the widest width dimention */
-export function Align_expand(parent, min_width = 0) {
-
-   let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
-   if (width < min_width) width = min_width;
-
-   for (let i = 0; i <= parent.children.boundary; i++) {
-
-      const cur_mesh = parent.children.buffer[i];
-
-      if (cur_mesh) {
-
-         const pad = cur_mesh.StylesGetPad();
-
-         if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-            cur_mesh.geom.dim[0] = width;
-            cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-            // console.log('000000000000000000', cur_mesh.name)
-         }
-         // if (cur_mesh.align.flags & LAYOUT.FLOAT_RIGHT) {
-
-         // }
-
-         // if (align.flags & LAYOUT.INHERIT) opt = parent.align.flags;
-
-         // if (cur_mesh.type & MESH_TYPE.WIDGET_LABEL) {
-         //    // // For other than section widgets, the parent should control cur_mesh expansion 
-         //    if (align.flags & LAYOUT.EXPAND) {
-         //       cur_mesh.geom.dim[0] = width;
-         //       cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //    }
-         // }
-         // else if (cur_mesh.type & MESH_TYPE.SECTION_MESH) {
-         //    // For section widgets, the cur_mesh's align.flags should control cur_mesh expansion 
-
-         //    // if (opt & LAYOUT.VERTICAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    // }
-         //    // else if (opt & LAYOUT.HORIZONTAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    // }
-
-         //    // Align_expand(cur_mesh, opt, width);
-         //    width = Align_expand(cur_mesh, opt, width);
-         //    // if(width < min_width) width = min_width;
-         // }
-         // else {
-
-         //    if (opt & LAYOUT.VERTICAL) {
-         //       if (cur_mesh.align.flags & LAYOUT.EXPAND) {
-         //          cur_mesh.geom.dim[0] = width;
-         //          cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //       }
-         //    }
-         //    else if (opt & LAYOUT.HORIZONTAL) {
-         //       // width -= cur_mesh.geom.dim[0] *2
-         //       // cur_mesh.geom.dim[0] = width;
-         //       // cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
-         //    }
-         // }
-
-         Align_expand(cur_mesh)
-      }
-   }
-
-   return width
 }
 /** */
 // TODO: We need a GROW_SELF that will grow based on its children size and an GROW for sharing with other sections
@@ -359,157 +288,164 @@ export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y =
 }
 
 
+/** Expand width of all children meshes to the widest width dimention */
+export function Align_expand(parent, min_width = 0) {
 
-/** NOT IMPLEMENTED */
-/** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
-function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
+   let width = parent.geom.dim[0] - parent.StylesGetPad(STYLES.AXIS.X);
+   if (width < min_width) width = min_width;
 
-   const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
-   const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
+   for (let i = 0; i <= parent.children.boundary; i++) {
 
+      const cur_mesh = parent.children.buffer[i];
 
-   let cur_pos_x = pos_x;
-   let cur_pos_y = pos_y;
-   cur_pos_x += pad_x;
-   cur_pos_y += pad_y;
+      if (cur_mesh) {
 
-   let total_size_y = 0;
+         const pad = cur_mesh.StylesGetPad();
 
-   let accum_row_size_x = 0
-   let accum_row_max_size_x = 0
-   let row_max_size_y = 0
-   let max_size_y = 0
-
-   let skip = false;
-
-
-
-
-   for (let i = 0; i <= mesh.children.boundary; i++) {
-
-      const cur_mesh = mesh.children.buffer[i];
-
-      const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
-      const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
-
-      if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
-
-         cur_mesh.geom.pos[0] = cur_pos_x;
-         cur_mesh.geom.pos[1] = cur_pos_y;
-
-         const ret = Align_pre_simple___with_scroller(cur_mesh, cur_pos_x, cur_pos_y, pad);
-
-         /** Scroller resize based on scrolled section height or scollers max_height */
-         if (cur_mesh.scroller_comp) {
-            // Scroller_component_set_pos_xy(cur_mesh.scroller_comp, cur_pos_x-cur_pad_x, cur_pos_y-cur_pad_y);
-
-            total_size_y += cur_mesh.scroller_comp.geom.dim[1];
-
-            if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-               cur_pos_y += cur_mesh.scroller_comp.geom.dim[1] * 2;
-
-               accum_row_size_x = 0;
-               // accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0] + cur_pad_x; // Add scroller's width to the total size
-               accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0]; // Add scroller's width to the total size
-            }
-
-            skip = true;
-
+         if (cur_mesh.align.flags & LAYOUT.EXPAND) {
+            cur_mesh.geom.dim[0] = width;
+            cur_mesh.geom.defDim[0] = cur_mesh.geom.dim[0] + pad[0];
          }
 
-
-         if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
-
-         if (!skip) {
-            if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-               total_size_y += ret.dim_y + cur_pad_y;
-               accum_row_size_x = 0;
-            }
-            else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-               if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-            }
-
-         }
-
-
-         accum_row_size_x += ret.dim_x + cur_pad_x;
-
-         cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
-         cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
-
-
-
-
-         if (!skip) {
-            const next_mesh = mesh.children.buffer[i + 1];
-            if (next_mesh) {
-               if (next_mesh.align.flags & LAYOUT.VERTICAL) {
-                  cur_pos_x = mesh.geom.pos[0] + pad_x;
-                  if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
-                  else cur_pos_y += cur_mesh.geom.dim[1] * 2;
-                  max_size_y += row_max_size_y / 2
-                  row_max_size_y = 0; // Reset current row max size
-               }
-               else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
-            }
-            else { // If this is the last child
-               max_size_y += row_max_size_y / 2;
-            }
-         }
-
-
+         Align_expand(cur_mesh)
       }
-      else {
-
-         const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
-
-         if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
-            row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
-         }
-
-         // Update the total size accumulator according to widget's align flags
-         if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-            if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-         }
-         else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
-            total_size_y += ret.dim_y;
-            accum_row_size_x = 0;
-         }
-
-         // Calculate the next position, based on the next mesh's align flags
-         const next_mesh = mesh.children.buffer[i + 1];
-         if (next_mesh) {
-            if (next_mesh.align.flags & LAYOUT.VERTICAL) {
-               if (row_max_size_y > ret.dim_y) cur_pos_y += row_max_size_y;
-               else cur_pos_y += ret.dim_y * 2;
-               cur_pos_x = mesh.geom.pos[0] + pad_x;
-               max_size_y += row_max_size_y / 2;
-               row_max_size_y = 0; // Reset current row max size
-            }
-            else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x;
-         }
-         else { // If this is the last child
-            max_size_y += row_max_size_y / 2;
-         }
-         accum_row_size_x += ret.dim_x + (cur_pad_x / 2);
-
-      }
-
-      if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
-
    }
 
-   const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
-   const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
-
-   return {
-      dim_x: size_x,
-      dim_y: size_y,
-   }
-
-
+   return width
 }
 
+
+
+
+/** SAVES: DO NOT DELETE */
+// function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
+
+//    const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
+//    const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
+
+
+//    let cur_pos_x = pos_x;
+//    let cur_pos_y = pos_y;
+//    cur_pos_x += pad_x;
+//    cur_pos_y += pad_y;
+
+
+//    let total_size_y = 0;
+
+//    let accum_row_size_x = 0
+//    let accum_row_max_size_x = 0
+//    let row_max_size_y = 0
+//    let max_size_y = 0
+
+
+//    for (let i = 0; i <= mesh.children.boundary; i++) {
+
+//       const cur_mesh = mesh.children.buffer[i];
+
+//       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
+//       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
+
+
+//       if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
+
+//          cur_mesh.geom.pos[0] = cur_pos_x;
+//          cur_mesh.geom.pos[1] = cur_pos_y;
+
+
+//          const ret = Align_pre_simple___(cur_mesh, cur_pos_x, cur_pos_y, pad);
+
+//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+
+//          if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+//             total_size_y += ret.dim_y + cur_pad_y;
+//             accum_row_size_x = 0;
+//          }
+//          else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {   
+//             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+//          }
+
+//          accum_row_size_x += ret.dim_x + cur_pad_x;
+
+//          cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
+//          if(cur_mesh.align.flags & LAYOUT.FIXED_HEIGHT) cur_mesh.geom.dim[1] = ret.dim_y;
+//          else cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
+
+
+//          const next_mesh = mesh.children.buffer[i + 1];
+//          if (next_mesh) {
+//             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+//                cur_pos_x = mesh.geom.pos[0] + cur_pad_x;
+//                cur_pos_y += row_max_size_y;
+//                /**DO NOT DELETE: The above line works fine, but keep the code below,  */
+//                // if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) 
+//                //    cur_pos_y += row_max_size_y;
+//                // else {
+//                //    cur_pos_y += cur_mesh.geom.dim[1] * 2;
+//                //    console.error('===============================================\ncur_mesh:', cur_mesh.name, 'next_mesh:', next_mesh.name, '\nrow_max_size_y', row_max_size_y, 'cur_mesh.dim', cur_mesh.geom.dim[1] * 2);
+//                // }
+//                max_size_y += row_max_size_y / 2
+//                row_max_size_y = 0; // Reset current row max size
+//             }
+//             else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) {
+//                cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x;
+//             }
+//             accum_row_size_x += cur_pad_x/2;
+//          }
+//          else { // If this is the last child
+//             max_size_y += row_max_size_y / 2;
+//          }
+//       }
+//       else {
+
+//          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
+//          console.log(cur_mesh.name, ret.dim_x, ret.dim_y)
+
+//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
+//             row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+//          }
+
+//          // Update the total size accumulator according to widget's align flags
+//          if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
+//             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+//          }
+//          else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+//             total_size_y += ret.dim_y;
+//             accum_row_size_x = 0;
+//          }
+
+//          // Calculate the next position, based on the next mesh's align flags
+//          const next_mesh = mesh.children.buffer[i + 1];
+//          if (next_mesh) {
+//             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+//                if (row_max_size_y > ret.dim_y) cur_pos_y += row_max_size_y;
+//                else cur_pos_y += ret.dim_y * 2;
+//                cur_pos_x = mesh.geom.pos[0] + pad_x;
+//                max_size_y += row_max_size_y / 2
+//                // row_max_size_y = 0; // Reset current row max size
+//             }
+//             else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x;
+//          }
+//          else { // If this is the last child
+//             max_size_y += row_max_size_y / 2;
+//          }
+         
+//          accum_row_size_x += ret.dim_x + (cur_pad_x / 2);
+
+//       }
+
+//       if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x;
+
+//    }
+
+//    const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
+//    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
+
+//    return {
+//       dim_x: size_x,
+//       dim_y: size_y,
+//    }
+
+// }
 
 
 /** Unused */
@@ -673,6 +609,155 @@ function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10,
 //    const size_y = total_size_y;
 //    return {
 //       dim: [accum_row_max_size_x, size_y],
+//       dim_x: size_x,
+//       dim_y: size_y,
+//    }
+
+
+// }
+/** NOT IMPLEMENTED */
+// /** Align nested sections in Horizontal/Vertical manner, without updating vertex buffers. */
+// function Align_pre_simple___with_scroller(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
+
+//    const pad_x = mesh.StylesGetPad(STYLES.AXIS.X);
+//    const pad_y = mesh.StylesGetPad(STYLES.AXIS.Y);
+
+
+//    let cur_pos_x = pos_x;
+//    let cur_pos_y = pos_y;
+//    cur_pos_x += pad_x;
+//    cur_pos_y += pad_y;
+
+//    let total_size_y = 0;
+
+//    let accum_row_size_x = 0
+//    let accum_row_max_size_x = 0
+//    let row_max_size_y = 0
+//    let max_size_y = 0
+
+//    let skip = false;
+
+
+
+
+//    for (let i = 0; i <= mesh.children.boundary; i++) {
+
+//       const cur_mesh = mesh.children.buffer[i];
+
+//       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
+//       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
+
+//       if (cur_mesh.align.flags & LAYOUT.RESIZE_SELF) {
+
+//          cur_mesh.geom.pos[0] = cur_pos_x;
+//          cur_mesh.geom.pos[1] = cur_pos_y;
+
+//          const ret = Align_pre_simple___with_scroller(cur_mesh, cur_pos_x, cur_pos_y, pad);
+
+//          /** Scroller resize based on scrolled section height or scollers max_height */
+//          if (cur_mesh.scroller_comp) {
+//             // Scroller_component_set_pos_xy(cur_mesh.scroller_comp, cur_pos_x-cur_pad_x, cur_pos_y-cur_pad_y);
+
+//             total_size_y += cur_mesh.scroller_comp.geom.dim[1];
+
+//             if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+//                cur_pos_y += cur_mesh.scroller_comp.geom.dim[1] * 2;
+
+//                accum_row_size_x = 0;
+//                // accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0] + cur_pad_x; // Add scroller's width to the total size
+//                accum_row_size_x += cur_mesh.scroller_comp.geom.dim[0]; // Add scroller's width to the total size
+//             }
+
+//             skip = true;
+
+//          }
+
+
+//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+
+//          if (!skip) {
+//             if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+//                total_size_y += ret.dim_y + cur_pad_y;
+//                accum_row_size_x = 0;
+//             }
+//             else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
+//                if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+//             }
+
+//          }
+
+
+//          accum_row_size_x += ret.dim_x + cur_pad_x;
+
+//          cur_mesh.geom.dim[0] = ret.dim_x + cur_pad_x;
+//          cur_mesh.geom.dim[1] = ret.dim_y + cur_pad_y;
+
+
+
+
+//          if (!skip) {
+//             const next_mesh = mesh.children.buffer[i + 1];
+//             if (next_mesh) {
+//                if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+//                   cur_pos_x = mesh.geom.pos[0] + pad_x;
+//                   if (row_max_size_y > ret.dim_y * 2 + cur_pad_y * 2) cur_pos_y += row_max_size_y;
+//                   else cur_pos_y += cur_mesh.geom.dim[1] * 2;
+//                   max_size_y += row_max_size_y / 2
+//                   row_max_size_y = 0; // Reset current row max size
+//                }
+//                else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2;
+//             }
+//             else { // If this is the last child
+//                max_size_y += row_max_size_y / 2;
+//             }
+//          }
+
+
+//       }
+//       else {
+
+//          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
+
+//          if (row_max_size_y < ret.dim_y * 2 + cur_pad_y * 2) {
+//             row_max_size_y = ret.dim_y * 2 + cur_pad_y * 2;
+//          }
+
+//          // Update the total size accumulator according to widget's align flags
+//          if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
+//             if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
+//          }
+//          else if (cur_mesh.align.flags & LAYOUT.VERTICAL) {
+//             total_size_y += ret.dim_y;
+//             accum_row_size_x = 0;
+//          }
+
+//          // Calculate the next position, based on the next mesh's align flags
+//          const next_mesh = mesh.children.buffer[i + 1];
+//          if (next_mesh) {
+//             if (next_mesh.align.flags & LAYOUT.VERTICAL) {
+//                if (row_max_size_y > ret.dim_y) cur_pos_y += row_max_size_y;
+//                else cur_pos_y += ret.dim_y * 2;
+//                cur_pos_x = mesh.geom.pos[0] + pad_x;
+//                max_size_y += row_max_size_y / 2;
+//                row_max_size_y = 0; // Reset current row max size
+//             }
+//             else if (next_mesh.align.flags & LAYOUT.HORIZONTAL) cur_pos_x += cur_mesh.geom.dim[0] * 2 + cur_pad_x;
+//          }
+//          else { // If this is the last child
+//             max_size_y += row_max_size_y / 2;
+//          }
+//          accum_row_size_x += ret.dim_x + (cur_pad_x / 2);
+
+//       }
+
+//       if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
+
+//    }
+
+//    const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
+//    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
+
+//    return {
 //       dim_x: size_x,
 //       dim_y: size_y,
 //    }

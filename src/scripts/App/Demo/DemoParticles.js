@@ -4,10 +4,7 @@
 
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
 import { Mesh_buffer_get_mesh_byidx } from '../../Engine/Core/MeshBuffer.js';
-import { View_build_group_from_root_mesh } from '../../Engine/Core/Views/MeshBufferViews.js';
-import { Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, GREENL, GREY, ORANGER, PURPLEB, WHITE, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
@@ -2226,20 +2223,6 @@ export function Test_noise_shader() {
    section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
    section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx);
-   // // section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.ABSOLUTE_POSITION|GFX_CTX_FLAGS.FROM_PARENT_DSC, section.mesh_bufferidx, true);
-   // section.GenGfxCtx();
-   // // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-   // section.Calc_no_gfx_update();
-   // section.Render();
-
-
-   // Construct_listen_events_from_mesh_tree(section);
-   // Construct_listen_events_relations_from_mesh_tree(section);
-
-   // View_build_group_from_root_mesh(section);
-
-   // section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
 
    section.GenGfxCtx();
    Align_nested_sections_pre(section);

@@ -1,7 +1,7 @@
 "use strict";
 
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_get_view_byidx } from "../../Core/Views/MeshBufferViews.js";
+import { View_get_group } from "../../Core/Views/MeshBufferViews.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "./MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_remove, Mesh_state_check } from "./MeshPropertiesFunctions.js";
 
@@ -18,7 +18,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
    let changes_hapened = false;
    const limit = (clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i<=group.vb.boundary; i++){
    
@@ -84,7 +84,7 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
    let changes_hapened = false;
    const limit = (clip_left && clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i <= group.vb.boundary; i++){
    
@@ -128,7 +128,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
    let changes_hapened = false;
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
    
    for(let i=0; i <= group.vb.boundary; i++){
       
@@ -230,7 +230,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
    let changes_hapened = false;
    const limit = (clip_bottom) ? { top: clip_top, bottom: clip_bottom, } : { top: TEST_CLIP_LEFT, bottom: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i<=group.vb.boundary; i++){
    

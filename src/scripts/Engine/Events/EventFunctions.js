@@ -2,6 +2,7 @@
 
 import { Listen_event_types_get_type_from_index } from "../../GlobalFunctions.js";
 import { Mesh_buffer_get_mesh_byidx } from "../Core/MeshBuffer.js";
+import { View_get_group_root_meshidx } from "../Core/Views/MeshBufferViews.js";
 import { Root_group_view_buffer_get_root_meshidx } from "../Core/Views/RootView.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Listener_assign_parent_event, Listener_create_root_view } from "./EventListeners.js";
@@ -56,7 +57,8 @@ function Find_parent_listen_event(EVENT_TYPE_IDX, mesh) {
 
     // If no parent with event is found, create FAKE event at the widget root
     if (current === null) { // UNNECESSARY: I believe if break is not reached, then current will go to scene which is 'NO_MESH_PARENT'
-        const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx)
+        // const root_meshidx = Root_group_view_buffer_get_root_meshidx(mesh.root_bufferidx)
+        const root_meshidx = View_get_group_root_meshidx(mesh.group_bufferidxs[0]);
         current = Mesh_buffer_get_mesh_byidx(root_meshidx)
     }
 

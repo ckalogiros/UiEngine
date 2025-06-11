@@ -109,36 +109,43 @@ export function Texture_metrics_get_calc_width_from_string(metrics_idx, str) {
 
    return width;
 }
-export function Texture_metrics_get_calc_dim_from_string(metrics_idx, str) { 
+export function Texture_metrics_get_calc_dim_from_string(metrics_idx, str, face_count) { 
 
-   const face_count = str.length; // Avoid having clamped text faces not being added(because the GenGfx creates the start and end of the text mesh attributes in the vertex buffer)
    let width = 0;
    let max_width = 0;
    let line_height = _metrics_buffer[metrics_idx].texture.line_height;
    let height = line_height;
    let new_lines = 0;
+   let row_faces = 1;
+   let max_row_faces = 0;
 
    for (let i = 0; i < face_count; i++) {
 
       const char_code = str[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
 
+      // Also calculate for new lines
       if(str[i] === '\n'){
          
          if(max_width < width) max_width = width;
          width = 0;
          height += line_height;
          new_lines++;
+         if(max_row_faces < row_faces) max_row_faces = row_faces;
+         row_faces = 0;
+         console.log('new line', )
       }
       else {
          width += _metrics_buffer[metrics_idx].sub_tex[char_code].width;
+         row_faces++;
+         // console.log(_metrics_buffer[metrics_idx].sub_tex[char_code].width)
       }
    }
 
    if(max_width < width) max_width = width;
+   if(max_row_faces < row_faces) max_row_faces = row_faces;
 
-   // width = (width > max_width) ? width : max_width;
    
-   return {width:max_width, height:height, new_lines:new_lines};
+   return {width:max_width, height:height, new_lines:new_lines, max_row_faces:max_row_faces};
 }
 
 

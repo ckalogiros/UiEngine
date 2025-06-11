@@ -3,8 +3,8 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_calculate_render_group_starts } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
@@ -20,6 +20,7 @@ import { Bricks_check_collision } from "./Bricks.js";
 import { Physics } from "./HelperClasses.js";
 import { Player_get } from "./Player.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 
 
 
@@ -89,8 +90,16 @@ export class Ball {
       
       mesh.SetViewGroupIndex(groupidx);
 
+      // mesh.GenGfxCtx();
+      // Widget_render(mesh);
+
       mesh.GenGfxCtx();
-      Widget_render(mesh);
+      // Widget_render(mesh);
+      //  View_calculate_view_group_starts(mesh.group_bufferidxs[0]);
+      View_calculate_render_group_starts(mesh.gfx.vb.groupidx, mesh.gfx.vb.render_groupidx)
+      mesh.AddToGfx();
+      Construct_listen_events_from_mesh_tree(mesh)
+      Construct_listen_events_relations_from_mesh_tree(mesh);
 
       this.mesh = mesh;
 
@@ -182,8 +191,7 @@ export function Ball_init_buffer(x, y, groupidx = INT_NULL, parent_root_posidx =
 
       idx = idx >= BALL_COLORS.length ? 0 : idx;
       const color = BALL_COLORS[idx];
-      const ball = new Ball(x, y, color, vb_groupidx);
-      // View_add_to_group(ball.mesh, groupidx); // Add to View Group
+      const ball = new Ball(x, y, color, groupidx);
       Ball_remove_mesh_byidx(ball.idx);
 
       idx++;

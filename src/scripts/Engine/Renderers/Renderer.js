@@ -106,13 +106,13 @@ export class Renderer {
 
          // Framebuffer_update_draw();
          this.scene.OnUpdate();
-
+         
          Notifications_update();
-
+         
          Uniforms_block_update_uniform();
-
+         
          Particle_system_update()
-
+         
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.GlDraw)

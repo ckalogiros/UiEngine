@@ -3,7 +3,6 @@
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
@@ -140,8 +139,6 @@ export function Score_mod_init_buffer(group_idx, parent_root_posidx, parent_mesh
          vb_groupidxs.text_mesh = score_mod.mesh.text_mesh.gfx.vb.groupidx;
       }
 
-      // Add to View Group
-      // View_add_to_group(score_mod.mesh, group_idx);
       Score_mod_remove_text_mesh_byidx(score_mod.idx);
    }
 
@@ -182,8 +179,6 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
       const score_mod = new Score_Mod(score_mod_number, text, x, y, font, font_size, color, text_color, vb_groupidxs);
       idx = score_mod.idx;
 
-      // Add to View Group
-      // View_add_to_group(score_mod.mesh, score_mod_view_group_idx);
    }
 
    _text_mesh_buffer.buffer[idx].number = score_mod_number;

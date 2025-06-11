@@ -1,12 +1,10 @@
 "use strict";
 
-import { Mesh_unif_get_vb_root_wpos } from "../Engine/Core/MeshUniformsBuffer.js";
-import { View_build_group_from_root_mesh } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Color_hsv_to_rgb_calibrated } from "../Engine/Drawables/Material/Colors.js";
 import { Align_nested_sections_pre } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Create_rect_mesh, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Style_label_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Events/EventFunctions.js";
+import { Widget_render } from "../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -33,7 +31,12 @@ export function Test_find_match_from_parent_descending() {
    const test_name = 'find_match_from_parent_descending';
    const font_size = 18;
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 200, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ROOT' }));
+   const section = Create_rect_mesh(Style_rect_default_properties({ 
+      is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], 
+      pos: [100, 200, 0], dim: [20, 20], col: 
+      Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), 
+      layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ROOT' 
+   }));
    Widget_gfx_ready_enable({
       mesh: section, enable_sdf_rect: 15,
       listener: { type: LISTEN_EVENT_TYPES.MOVE },
@@ -108,15 +111,11 @@ export function Test_find_match_from_parent_descending() {
 
 
    section.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   Align_nested_sections_pre(section)
-   section.Render();
-   View_build_group_from_root_mesh(section);
 
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
+   section.GenGfxCtx();
+   Align_nested_sections_pre(section);
+   Widget_render(section);
 
 
 

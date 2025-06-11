@@ -97,20 +97,30 @@ export function Gl_draw(gl) {
                 // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+                console.log('BUFFER_DATA', vb_groupidx)
+            }
+            else if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
+                const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+                gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint); 
+                vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+                console.log('FROM_REALLOC', vb_groupidx)
             }
             if(render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
-
+                
                 const vbo = VBI_get_vbo(render_group.vb_data_idx);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                 const vb_data = Vertex_buffer_get_by_vbidx(render_group.vb_data_idx);
                 // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
                 gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
-
+                
                 // console.log('!!: bufferSubData', vb_info.vbidx)
                 
                 render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
                 GL_STATE.BOUND_VBO = vbo;
                 GL_STATE.BOUND_VBIDX = render_group.vb_data_idx;
+
+
+                // console.log('SUB_DATA')
 
                 // console.log(render_group.start, render_group.count, vb_data.length);
                 // console.log(

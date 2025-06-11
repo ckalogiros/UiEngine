@@ -322,11 +322,13 @@ function Index_buffer_add_indices(ibidx, num_faces) {
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 /** */
-export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert) {
+// export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert) {
+export function Index_buffer_info_check_has_enough_indices(ibidx, vertices_count, num_faces_to_insert) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];
 
-   const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
+   // const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
+   const total_draw_count = ((vertices_count/4) + num_faces_to_insert) * ib_info.indices_per_face;
 
 
    if (total_draw_count > ib_info.count) {
@@ -336,14 +338,11 @@ export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, nu
          ib_info.Realloc(total_draw_count);
       }
 
-      Index_buffer_add_indices(ibidx, num_faces_to_insert);
+      Index_buffer_add_indices_from_render_group(ibidx, num_faces_to_insert)
 
-      ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
-      // ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-      // console.log('iskjds')
    }
 }
-/** */
+/** DEPRECATED??? */
 export function Index_buffer_build_indices_from_render_group(ibidx, render_groupidxs, attribs_per_vertex, vertices_per_face) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];
@@ -395,7 +394,7 @@ export function Index_buffer_build_indices_from_render_group(ibidx, render_group
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 /** */
-export function Index_buffer_add_indices_from_render_group(ibidx, render_groupidx, attribs_per_vertex, vertices_per_face, num_faces) {
+export function Index_buffer_add_indices_from_render_group(ibidx, num_faces) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];
    let k = ib_info.vCount;

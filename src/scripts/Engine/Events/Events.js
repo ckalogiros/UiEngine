@@ -119,12 +119,13 @@ export function Events_handle_immidiate(e) {
         // TODO: isn't it unecessary to check if colorable????? The purpose of hover is to color????
         if (Mesh_state_check(e.params.mesh, MESH_STATE_FLAGS.IS_HOVER_COLORABLE) && e.params.mesh.mesh_bufferidx !== STATE.mesh.hoveredIdx) {
 
-            // Unhover any hovered mesh.
+            // Unhover any PREVIOUS hovered mesh.
             if (STATE.mesh.hovered) {
 
                 // If there is a resolve function, call it.
                 if(STATE.mesh.hovered.event_clbks_resolve_fn) {
-                    STATE.mesh.hovered.event_clbks_resolve_fn(STATE.mesh.hovered, EVENT_HANDLER_TYPE.MOUSE_UNHOVER);
+                    const clbk_params = STATE.mesh.hovered.event_clbks.buffer[STATE.mesh.hovered.current_event_callback_idx].clbk_params;
+                    STATE.mesh.hovered.event_clbks_resolve_fn(STATE.mesh.hovered, EVENT_HANDLER_TYPE.MOUSE_UNHOVER, clbk_params);
                 }
                 else if(STATE.mesh.hovered.current_event_callback_idx !== INT_NULL){
                     const Clbk = STATE.mesh.hovered.event_clbks.buffer[STATE.mesh.hovered.current_event_callback_idx].Clbk;
@@ -132,7 +133,6 @@ export function Events_handle_immidiate(e) {
                         // console.error('Event callback is running second time, from unhover event. CHECK if THERE IS ANY CONFLICT OF DUPLICATE EVENT CALL')
                         const clbk_params = STATE.mesh.hovered.event_clbks.buffer[STATE.mesh.hovered.current_event_callback_idx].clbk_params;
                         Clbk(clbk_params, EVENT_HANDLER_TYPE.MOUSE_UNHOVER);
-                        // console.log('UNHOVER 2')
                     }
                 }
 
@@ -148,18 +148,13 @@ export function Events_handle_immidiate(e) {
 
             // If there is a resolve function, call it.
             if(e.params.mesh.event_clbks_resolve_fn) {
-                e.params.mesh.event_clbks_resolve_fn(e.params.mesh, EVENT_HANDLER_TYPE.MOUSE_HOVER);
+                const clbk_params = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].clbk_params;
+                e.params.mesh.event_clbks_resolve_fn(e.params.mesh, EVENT_HANDLER_TYPE.MOUSE_HOVER, clbk_params);
             }
             else if(e.params.mesh.current_event_callback_idx !== INT_NULL){
                 const Clbk = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].Clbk;
                 if(Clbk !== undefined){
                     const clbk_params = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].clbk_params;
-                    // console.log('HOVER ', 
-                    //     'active', clbk_params.animation_params.is_animation_active,
-                    //     'inflate', clbk_params.animation_params.in_animation_inflate,
-                    //     'deflate', clbk_params.animation_params.in_animation_deflate,
-                    //     'stall', clbk_params.animation_params.in_animation_inflate_stall,
-                    // )
                     Clbk(clbk_params, EVENT_HANDLER_TYPE.MOUSE_HOVER);
                 }
             }
@@ -168,7 +163,6 @@ export function Events_handle_immidiate(e) {
 
     }
 
-    // else if (e.type === 'unhover') {
     else if (e.type & EVENT_HANDLER_TYPE.MOUSE_UNHOVER) {
 
         if (Mesh_state_check(e.params.mesh, MESH_STATE_FLAGS.IN_HOVER_COLOR)) {
@@ -176,27 +170,18 @@ export function Events_handle_immidiate(e) {
             e.params.mesh.state.mask &= ~MESH_STATE_FLAGS.IN_HOVER_COLOR; // Set false
         }
 
-            // If there is a resolve function, call it.
-            if(e.params.mesh.event_clbks_resolve_fn) {
-                e.params.mesh.event_clbks_resolve_fn(e.params.mesh, EVENT_HANDLER_TYPE.MOUSE_UNHOVER);
+        // If there is a resolve function, call it.
+        if(e.params.mesh.event_clbks_resolve_fn) {
+            const clbk_params = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].clbk_params;
+            e.params.mesh.event_clbks_resolve_fn(e.params.mesh, EVENT_HANDLER_TYPE.MOUSE_UNHOVER, clbk_params);
+        }
+        else if(e.params.mesh.current_event_callback_idx !== INT_NULL){
+            const Clbk = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].Clbk;
+            if(Clbk !== undefined){
+                const clbk_params = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].clbk_params;
+                Clbk(clbk_params, EVENT_HANDLER_TYPE.MOUSE_UNHOVER);
             }
-            else if(e.params.mesh.current_event_callback_idx !== INT_NULL){
-                const Clbk = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].Clbk;
-                if(Clbk !== undefined){
-                    // console.error('Event callback is running second time, from unhover event. CHECK if THERE IS ANY CONFLICT OF DUPLICATE EVENT CALL')
-                    const clbk_params = e.params.mesh.event_clbks.buffer[e.params.mesh.current_event_callback_idx].clbk_params;
-                    // console.log('UNHOVER 1', 
-                    //     'active', clbk_params.animation_params.is_animation_active,
-                    //     'inflate', clbk_params.animation_params.in_animation_inflate,
-                    //     'deflate', clbk_params.animation_params.in_animation_deflate,
-                    //     'stall', clbk_params.animation_params.in_animation_inflate_stall,
-                    // )
-                    // console.log('UNHOVER 1', clbk_params.animation_params.in_animation_inflate_stall)
-                    Clbk(clbk_params, EVENT_HANDLER_TYPE.MOUSE_UNHOVER);
-                    // console.log('UNHOVER 1', clbk_params.animation_params.cur_posx)
-                }
-            }
-        // }
+        }
         
         e.params.mesh.state.mask &= ~MESH_STATE_FLAGS.IN_HOVER; // Set false
         State_mesh_set_hovered(null);

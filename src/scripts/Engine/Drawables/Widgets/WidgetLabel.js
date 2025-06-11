@@ -261,28 +261,29 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    Render() {
-        if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
-        if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
-        if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
-    }
+    // Render() {
+    //     if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
+    //     if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
+    //     if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
+    // }
 
 
-    Rerender() {
 
-        this.AddToGfxFromReset();
-        this.text_mesh.AddToGfxFromReset();
-    }
+    // Rerender() {
+
+    //     this.AddToGfxFromReset();
+    //     this.text_mesh.AddToGfxFromReset();
+    // }
 
 
-    DeactivateGfx() {
+    // DeactivateGfx() {
 
-        // Deactivate label's area
-        super.DeactivateGfx();
+    //     // Deactivate label's area
+    //     super.DeactivateGfx();
 
-        // Deactivate for label's text 
-        this.text_mesh.DeactivateGfx();
-    }
+    //     // Deactivate for label's text 
+    //     this.text_mesh.DeactivateGfx();
+    // }
 
 
 
@@ -603,18 +604,18 @@ export class Widget_Label extends Rect_Mesh {
 
                 const right = mesh.geom.pos[0] + mesh.geom.dim[0];
                 const bottom = mesh.geom.pos[1] + mesh.geom.dim[1];
-                if (point[0] > right - TEMP_RESIZE_MARGIN[0] || point[1] > bottom - TEMP_RESIZE_MARGIN[1]) {
+                if (point.x > right - TEMP_RESIZE_MARGIN[0] || point.y > bottom - TEMP_RESIZE_MARGIN[1]) {
 
                     // We have Resize
 
-                    if (point[0] > right - TEMP_RESIZE_MARGIN[0] && point[1] > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
+                    if (point.x > right - TEMP_RESIZE_MARGIN[0] && point.y > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
                         // console.log('X Y RESIZE');
 
                         const OnResizeFn = mesh.OnResize;
                         const idx = Time_intervals_create(10, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
                     }
-                    else if (point[0] > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
+                    else if (point.x > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
                         // console.log('X RESIZE');
                     }
                     else { // Its a height resize

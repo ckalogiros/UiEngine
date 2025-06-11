@@ -8,7 +8,6 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfo
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_group_remove_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../../../Graphics/Buffers/UniformBuffers.js";
 import { Scoller_component_destroy } from "../../Widgets/ScrollerComponent.js";
-import { View_remove_view } from "../../../Core/Views/MeshBufferViews.js";
 import { Program_store_shader_operations } from "../../../../Graphics/ShaderPrograms.js";
 import { Sid_check_unif_match_sids, State_mesh_reset } from "../../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_remove } from "../../Operations/MeshPropertiesFunctions.js";
@@ -44,62 +43,62 @@ export class Mesh {
      */
 
 
-    // Bit masks and single values
-    sid;        // BitField: Shader Program Unique Identifier
-    type;       // BitField: All different class types of this mesh. 
-    state;      // BitField: Mesh state. 
-    event_flags;// Bitfield: Event flags
-    gfx_pool_request;  // BitField: 
+    // // Bit masks and single values
+    // sid;        // BitField: Shader Program Unique Identifier
+    // type;       // BitField: All different class types of this mesh. 
+    // state;      // BitField: Mesh state. 
+    // event_flags;// Bitfield: Event flags
+    // gfx_pool_request;  // BitField: 
 
-    gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
-    gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
+    // gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
+    // gfx_ctx_parent;     // Value: The index of the parent from which to start search mesh tree for finding gfx context 
 
-    align;           // Struct: Variables to define mesh's alignment
+    // align;           // Struct: Variables to define mesh's alignment
 
 
     // IMPORTANT: If the mesh is a root mesh: direct child of the scene, then the idx is a refference to the scene's mesh buffer. Else if mesh has parent another mesh, then the idx is the index of the parent's children buffer
-    idx;        // Value: This is the index of the mesh in the parents's children buffer.
-    mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
-    group_bufferidxs; // Array[3]: The [0] is the index of the group in the group buffer. The [1] is the index to the elem of the array representing the vertex buffer of this mesh, and [2] is the index of the buffer this mesh's index is stored to. 
+    // idx;        // Value: This is the index of the mesh in the parents's children buffer.
+    // mesh_bufferidx; // Value: This is the index of the mesh in the Mesh_Buffer storage.
+    // group_bufferidxs; // Array[3]: The [0] is the index of the group in the group buffer. The [1] is the index to the elem of the array representing the vertex buffer of this mesh, and [2] is the index of the buffer this mesh's index is stored to. 
     
-    parent;     // Pointer: to the parent mesh.
-    children;   // Buffer: of pointers to children mesh.
+    // parent;     // Pointer: to the parent mesh.
+    // children;   // Buffer: of pointers to children mesh.
     
-    geom;   // Class: Geometry: position, dimentions, ...
-    mat;    // Class: Material: color, texture coordinates, ...
-    gfx;    // Class: Graphics: start index, attributes count, vertexbuffer, shader program, ...
+    // geom;   // Class: Geometry: position, dimentions, ...
+    // mat;    // Class: Material: color, texture coordinates, ...
+    // gfx;    // Class: Graphics: start index, attributes count, vertexbuffer, shader program, ...
     
-    is_gfx_inserted; // Bool: A way to tell if the mesh has been inserted to the graphics buffers.
-    isFramebufferRendered; // Value: Stores the index of the framebuffer the mesh is rendered to. Else INT_NULL for no framebuffer rendering for this mesh.
+    // is_gfx_inserted; // Bool: A way to tell if the mesh has been inserted to the graphics buffers.
+    // isFramebufferRendered; // Value: Stores the index of the framebuffer the mesh is rendered to. Else INT_NULL for no framebuffer rendering for this mesh.
     
-    shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
+    // shader_ops_idxs; // Array: An array to store indexes. These indexes are part of a Shader's Program.shader_ops array. 
     
-    listeners;      // Buffer: Indexes to the EventListeners class.
-    event_clbks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
-    current_event_callback_idx; // Index: A way to choose between different event callback functions.
-    timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
+    // listeners;      // Buffer: Indexes to the EventListeners class.
+    // event_clbks; // Buffer: A buffer to store all callbacks, for any event enabled for the mesh.
+    // current_event_callback_idx; // Index: A way to choose between different event callback functions.
+    // timeIntervalsIdxBuffer; // Buffer: This buffer stores indexes of the timeIntervals this mesh is using.
     
-    scroller_comp;  // Pointer to scroller mesh.
-    scroller_comp_idx;  // An index to scroller buffer.
-    children_scrollers_buffer; // A buffer to store all scrollers this mesh is the root for. (For Move() functionality etc) 
-    has_children_scrollers; // A quick way to check if any children scroller exists
-    components;     // BitField: Type of 'COMPONENTS'. // TODO: Later implement more components other than scrollers.
+    // scroller_comp;  // Pointer to scroller mesh.
+    // scroller_comp_idx;  // An index to scroller buffer.
+    // children_scrollers_buffer; // A buffer to store all scrollers this mesh is the root for. (For Move() functionality etc) 
+    // has_children_scrollers; // A quick way to check if any children scroller exists
+    // components;     // BitField: Type of 'COMPONENTS'. // TODO: Later implement more components other than scrollers.
     
-    debug_info;         // Struct: Debug_info_ui.
+    // debug_info;         // Struct: Debug_info_ui.
     
-    nameidx; // Index to Str buffer:
+    // nameidx; // Index to Str buffer:
     
-    /** UNUSED */
-    sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
-    fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
+    // /** UNUSED */
+    // sceneidx;   // Value: An index to the scene that the mesh belongs to(index only).
+    // fbidx;      // Value: The framebuffer index that this mesh is reb=ndered to. If INT_NULL the mesh is rendered to the default gl output buffer. 
     
-    /** TO BE DELETED */
-    uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
-    root_posidx; // An index to the root position buffer. 
-    per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
-    root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
-    batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
-    name; // String:
+    // /** TO BE DELETED */
+    // uniforms;   // Array: Uniform info: {name, type, flags}. It is set only for mesh that is the first mesh for a Program to be created
+    // root_posidx; // An index to the root position buffer. 
+    // per_vb_bufferidx;  // Value. Index of the msh inside the Gfx Buffer.
+    // root_bufferidx; // Value: This is the index of the mesh in the Widget_root_buffer storage.
+    // batch_buffer_vbidx; // Value: This is the index of the mesh in the Widget_root_batch_buffer storage.
+    // name; // String:
 
 
     constructor(geom = null, mat = null) {
@@ -272,7 +271,8 @@ export class Mesh {
         // Remove from any View
         if (this.group_bufferidxs[0] !== INT_NULL) {
 
-            View_remove_view(this.group_bufferidxs);
+            // View_remove_view(this.group_bufferidxs);
+            // TODO: Call remove mesh from view group
             this.group_bufferidxs[0] = INT_NULL;
             this.group_bufferidxs[1] = INT_NULL;
             this.group_bufferidxs[2] = INT_NULL;

@@ -1,10 +1,8 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
-import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
 import { Mouse_android_deactivate_scrolling, Mouse_get_pos_difx } from "../../../../Engine/Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_build_group_from_root_mesh } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
 import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
@@ -1472,8 +1470,7 @@ function Snake_options_callback(params) {
 
 
 
-   // controls_section.Calc_no_gfx_update();
-   View_build_group_from_root_mesh(controls_section);
+   // controls_section.();
    controls_section.Calc_no_gfx_update();
    const center = (menu_panel.geom.dim[0] - controls_section.geom.dim[0]);
    controls_section.MoveNoGfxUpdate(center, pad); //pad += controls_section.geom.dim[1]*2 + 10;

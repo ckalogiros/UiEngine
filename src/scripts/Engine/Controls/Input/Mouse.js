@@ -2,7 +2,7 @@
 
 import { Vertex_buffer_group_update_scissorbox_all_vb } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { GetSign } from "../../../Helpers/Helpers.js";
-import { Abs, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Floor, Round, RoundArr2 } from "../../../Helpers/Math/MathOperations.js";
 import { Callback_animations_create } from "../../Animations/CallbackAnimations.js";
 import { Info_listener_dispatch_event } from "../../Drawables/DebugInfo/InfoListeners.js";
 import { RegisterEvent } from "../../Events/Events.js";
@@ -51,30 +51,31 @@ const mouse = {
       xprev: INT_NULL, yprev: INT_NULL, // Mouse previous pos
       xdiff: 0, ydiff: 0, // Mouse pos difference form previous pos (in pixels)
 
-      GetPos(){
-         return RoundArr2([
-            this.x,
-            this.y,
-         ]);
-      },
-      GetPosX(){
-         return this.x;
-      },
-      GetPosY(){
-         return this.y;
-      },
-      GetDif(){
-         return {
-            x:Round(this.xdiff),
-            y:Round(this.ydiff),
-         };
-      },
-      GetPrevPos(){
-         return {
-            x:Round(this.xprev),
-            y:Round(this.yprev),
-         };
-      },
+      // GetPos(){
+      //    // return RoundArr2([
+      //    //    this.x,
+      //    //    this.y,
+      //    // ]);
+      //    return { x:Floor(this.x), y:Floor(this.y), };
+      // },
+      // GetPosX(){
+      //    return this.x;
+      // },
+      // GetPosY(){
+      //    return this.y;
+      // },
+      // GetDif(){
+      //    return {
+      //       x:Round(this.xdiff),
+      //       y:Round(this.ydiff),
+      //    };
+      // },
+      // GetPrevPos(){
+      //    return {
+      //       x:Round(this.xprev),
+      //       y:Round(this.yprev),
+      //    };
+      // },
       SetPos(x, y){
          this.x = x;
          this.y = y;
@@ -162,13 +163,19 @@ const mouse = {
  * @returns {Obj:{x,y}} 
  */
 export function Mouse_get_pos() {
-   return mouse.pos.GetPos();
+   // return mouse.pos.GetPos();
+   return {
+      x:~~(mouse.pos.x), // floor value
+      y:~~(mouse.pos.y),
+   };
 }
 export function Mouse_get_posx() {
-   return mouse.pos.GetPosX();
+   return (~~(mouse.pos.x)); // floor value
+   // return mouse.pos.GetPosX();
 }
 export function Mouse_get_posy() {
-   return mouse.pos.GetPosY();
+   return (~~(mouse.pos.y)); // floor value
+   // return mouse.pos.GetPosY();
 }
 
 
@@ -176,7 +183,7 @@ export function Mouse_get_pos_dif() {
    return {
       x:mouse.pos.xdiff,
       y:mouse.pos.ydiff,
-   };;
+   };
 }
 
 
@@ -191,6 +198,10 @@ export function Mouse_get_pos_dify() {
 
 
 function MouseGetDir() {
+   return {
+      x:~~(mouse.pos.xdiff),
+      y:~~(mouse.pos.ydiff),
+   };
    return mouse.pos.GetDif();
 }
 
@@ -240,9 +251,6 @@ export function Mouse_set_coordinates(coord){
 
    mouse.pos.x = coord[0] - VIEWPORT.MARGIN.LEFT; 
    mouse.pos.y = coord[1] + VIEWPORT.MARGIN.TOP; 
-
-   // mouse.pos.xdiff = mouse.pos.x - mouse.pos.xprev;
-   // mouse.pos.ydiff = -(mouse.pos.y - mouse.pos.yprev); // Reverse the direction(negative for down dir and positive for up dir) 
 
 }
 

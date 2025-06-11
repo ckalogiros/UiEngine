@@ -2,7 +2,7 @@
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { View_build_group_from_root_mesh, View_render_from_view_NEW } from "../Engine/Core/Views/MeshBufferViews.js";
+import { View_render_from_view_NEW } from "../Engine/Core/Views/MeshBufferViews.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
@@ -920,7 +920,6 @@ function Options_menu_callback(params) {
    // Build a group view of the scrolled section for the scroller
    if (controls_section !== null) {
 
-      View_build_group_from_root_mesh(controls_section);
       Align_nested_sections_pre(controls_section);
       // const center = (menu_panel.geom.dim[0] - controls_section.geom.dim[0]);
       // controls_section.MoveNoGfxUpdate(center, ypos); ypos += controls_section.geom.dim[1] * 2 + 10;

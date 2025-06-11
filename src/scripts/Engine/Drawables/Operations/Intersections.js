@@ -3,14 +3,13 @@
 
 
 /**
- * 
- * @param {*} p An array of 2, as a 2D point. [0]: x coord, [1]: y coord. 
- * @param {*} r An array of 2 of 2, as a 2D rectangle. [0][0]: left, [0][1]: right, [1][0]: top, [1][1]: botto 
+ * @param {*} p x,y coords. 
+ * @param {*} lrtb 2D rectangle. left, right, top, bottom 
  * @returns True for collision. 
  */
-export function Intersection_point_rect(p, r){
+export function Intersection_point_rect(px, py, l, r, t, b){
 
-   if(p[0] > r[0][0] && p[0] < r[0][1] && p[1] > r[1][0] && p[1] < r[1][1])
+   if(px > l && px < r && py > t && py < b)
       return true;
    
    return false;
@@ -36,10 +35,11 @@ export function Collision_PointTriangle(p, t){
 
 export function Check_intersection_point_rect(pos, dim, point, margin = [0,0]){
 
-   const rect = [
-       [pos[0]-margin[0], pos[0]+dim[0]*2+margin[0]], // Left  Right 
-       [pos[1]-margin[1], pos[1]+dim[1]*2+margin[1]], // Top  Bottom
-   ];
-   
-   return Intersection_point_rect(point, rect);
+   const l = pos[0]-margin[0];
+   const r = pos[0]+dim[0]*2+margin[0];
+   const t = pos[1]-margin[1];
+   const b = pos[1]+dim[1]*2+margin[1];
+
+      // return b;
+   return Intersection_point_rect(point[0], point[1], l, r, t, b);
 }

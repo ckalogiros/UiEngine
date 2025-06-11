@@ -1,13 +1,10 @@
 "use strict";
 
 import { Free_int16_buffer, New_generic_buffer, New_int16_buffer } from "./Buffers.js";
-import { BLUEL, GREEN, GREY } from "../Drawables/Material/Colors.js";
-import { Create_widget_button, Create_widget_dropdown, Create_widget_text } from "../Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Dropdown_roots_set_root } from "../Drawables/Widgets/Widget_Dropdown.js";
 import { Str_buffer_mesh_names_remove_by_idx } from "./StringBuffer.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
-import { Mesh_get_real_pos_xy } from "../Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_get_real_pos_xy_obj_t } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
@@ -55,49 +52,30 @@ export function Mesh_buffer_get_mesh_pos(mesh_bufferidx) { return _mesh_buffer.b
 export function Mesh_buffer_get_mesh_dim(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.dim; }
 export function Mesh_buffer_get_mesh_num_faces(mesh_bufferidx) { return _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces; }
 
+const _temp_no_allocations_buffer = { l:0, r:0,t:0,b:0, };
 
-
+/** */
 export function Mesh_buffer_get_mesh_bounding_box(mesh_bufferidx) {
 
-if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===INT_NULL) {
+   if(_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === undefined || mesh_bufferidx===INT_NULL) {
 
-   console.error('441552413332', 'mesh_bufferidx', mesh_bufferidx, '_mesh_buffer.buffer', _mesh_buffer.buffer)
-   alert('441552413332');
-   STATE.loop.paused = true;
-   return;
-}
-
-   const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
-   const pos = Mesh_get_real_pos_xy(_mesh_buffer.buffer[mesh_bufferidx]);
-   temp_no_allocation_buffer[0][0] = pos[0] - hover_margin[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[0];
-   temp_no_allocation_buffer[1][0] = pos[1] - hover_margin[1];
-   // TODO: For meshes with more than 4 vertices we must multiply the dimention with the number of faces. So we need to know which coordinate the mesh has the extra vertices towards to, and then mult that coord with the num faces. Currently the only coord to expand is the x axis(for colorpicker HUE bar) 
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + hover_margin[1];
-
-   return temp_no_allocation_buffer;
-}
-
-
-const temp_no_allocation_buffer = []
-temp_no_allocation_buffer[0] = [0, 0]
-temp_no_allocation_buffer[1] = [0, 0]
-export function Mesh_buffer_get_mesh_bounding_box_with_hover_margin(mesh_bufferidx) {
-   if (_mesh_buffer.buffer[mesh_bufferidx] === null || _mesh_buffer.buffer[mesh_bufferidx] === _) {
-      console.log('Meshbuffer: idx', mesh_bufferidx, _mesh_buffer.buffer);
-      return false;
+      console.error('441552413332', 'mesh_bufferidx', mesh_bufferidx, '_mesh_buffer.buffer', _mesh_buffer.buffer)
+      alert('441552413332');
+      STATE.loop.paused = true;
+      return;
    }
 
-   const pos = Mesh_get_real_pos_xy(_mesh_buffer.buffer[mesh_bufferidx]);
-   temp_no_allocation_buffer[0][0] = pos[0];
-   // temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[0];
-   temp_no_allocation_buffer[0][1] = pos[0] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2;
-   temp_no_allocation_buffer[1][0] = pos[1];
-   temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2;
-   // temp_no_allocation_buffer[1][1] = pos[1] + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + _mesh_buffer.buffer[mesh_bufferidx].hover_margin[1];
+   const hover_margin = _mesh_buffer.buffer[mesh_bufferidx].StylesGetHoverMargin();
+   const pos = Mesh_get_real_pos_xy_obj_t(_mesh_buffer.buffer[mesh_bufferidx]);
+   _temp_no_allocations_buffer.l = pos.x - hover_margin[0];
+   _temp_no_allocations_buffer.r = pos.x + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[0] * 2 * _mesh_buffer.buffer[mesh_bufferidx].geom.num_faces + hover_margin[0];
+   _temp_no_allocations_buffer.t = pos.y - hover_margin[1];
+   // TODO: For meshes with more than 4 vertices we must multiply the dimention with the number of faces. So we need to know which coordinate the mesh has the extra vertices towards to, and then mult that coord with the num faces. Currently the only coord to expand is the x axis(for colorpicker HUE bar) 
+   _temp_no_allocations_buffer.b = pos.y + _mesh_buffer.buffer[mesh_bufferidx].geom.dim[1] * 2 + hover_margin[1];
 
-   return temp_no_allocation_buffer;
+   return _temp_no_allocations_buffer;
 }
+
 
 
 export function Mesh_buffer_remove_mesh_byidx(mesh_bufferidx, root_bufferidx) {

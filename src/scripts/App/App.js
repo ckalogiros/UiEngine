@@ -23,7 +23,7 @@ import { Dropdown_roots_reset } from '../Engine/Drawables/Widgets/Widget_Dropdow
 import { Particles_system_reset } from '../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from '../Engine/Styles.js';
 import { Generic_buffers_container_reset } from '../Engine/Core/Buffers.js';
-import { Root_group_batch_buffer_reset, Root_group_buffer_reset_dealocate, Root_group_gfx_buffer_reset_dealocate } from '../Engine/Core/Views/RootView.js';
+import { Root_group_buffer_reset_dealocate } from '../Engine/Core/Views/RootView.js';
 import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 import { Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { State_reset } from '../GlobalFunctions.js';
@@ -156,8 +156,8 @@ export function App_reset(){
     // Root_group_buffer_reset();
     Root_group_buffer_reset_dealocate();
     // Root_group_gfx_buffer_reset();
-    Root_group_gfx_buffer_reset_dealocate();
-    Root_group_batch_buffer_reset();
+    // Root_group_gfx_buffer_reset_dealocate();
+    // Root_group_batch_buffer_reset();
 
     View_buffer_reset_g_buffer();
 

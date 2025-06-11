@@ -6,7 +6,7 @@ import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../
 import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y, Gl_rotate_z_2d, Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_set_angle, Gl_set_rgb } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Shader_builder_create_attribs_info } from '../../../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wpos_obj_t, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
 import { Mesh_get_uniform_ubidx_from_name } from './MeshHelperFunctions.js';
 
 
@@ -208,16 +208,23 @@ export function Set_color_a(mesh, alpha) {
 // Positions
 
 
-/** */
+/** Returns object type instead of array */
+export function Mesh_get_real_pos_xy_obj_t(mesh) {
+
+   const p = Mesh_unif_get_vb_root_wpos_obj_t(mesh.gfx.vb.render_groupidx);
+
+   p.x += mesh.geom.pos[0];
+   p.y += mesh.geom.pos[1];
+   return p;
+   // return [p.x, p.y];
+}
 export function Mesh_get_real_pos_xy(mesh) {
 
-   // const p = Mesh_unif_get_vb_root_wpos(mesh.root_posidx);
    const p = Mesh_unif_get_vb_root_wpos(mesh.gfx.vb.render_groupidx);
-   let pos = [p[0], p[1], 0];
 
-   pos[0] += mesh.geom.pos[0];
-   pos[1] += mesh.geom.pos[1];
-   return pos;
+   p[0] += mesh.geom.pos[0];
+   p[1] += mesh.geom.pos[1];
+   return p;
 }
 /** */
 export function Mesh_get_real_pos_x(mesh,) {

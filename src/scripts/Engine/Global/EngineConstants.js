@@ -253,6 +253,26 @@ const MESH_STATE_FLAGS = {
 
 
 
+
+
+_CNT = 0x1;
+const VIEW_GROUP_STATE_FLAGS = {
+
+	ACTIVE: _CNT,
+	// IS_USED:_CNT,
+	IS_RENDERED: _CNT <<= 1,
+
+	// IN_: _CNT <<= 1,
+
+	// HAS_: _CNT <<= 1,
+
+};
+
+
+
+
+
+
 // TODO: Deprecated
 _CNT = 0x1;
 const SECTION = {

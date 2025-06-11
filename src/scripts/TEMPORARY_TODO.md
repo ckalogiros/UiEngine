@@ -1,5 +1,17 @@
 TODO
 
+#BUG: If a text begins with a new line character, then any change to the text is aborted
+   SetTextFromString() etc...
+
+# SEE ChatGPT to implement ArrayBuffers for different types in a tightly packed array
+
+# Scroller: 
+   2. Try to implement scroller as auto as possible
+
+
+# "Debug_info_ui()"
+   See the architecture for removing meshes from rendering
+
 # Re-implement all DEPRECATED functions in RootView.js in the MeshBufferViews.js
 
 # Align_expand() doubles the expansion in "function Test_alignment_slider_vert_hor_with_expand(x, y)"

@@ -101,12 +101,12 @@ function Animate_chain_link(params) {
    const mouse_pos = Mouse_get_pos();
 
    // Abort if mouse outside canvas
-   if(mouse_pos[0] <= 0 || mouse_pos[1] <= 0) return;
+   if(mouse_pos.x <= 0 || mouse_pos.y <= 0) return;
 
 
    const axis = [
-      mouse_pos[0] - Mesh_get_real_pos_x(head),
-      mouse_pos[1] - Mesh_get_real_pos_y(head),
+      mouse_pos.x - Mesh_get_real_pos_x(head),
+      mouse_pos.y - Mesh_get_real_pos_y(head),
    ];
 
    const dist = Magnitude(axis[0], axis[1]);

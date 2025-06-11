@@ -379,11 +379,18 @@ export function VBI_get_byidx(vb_info_idx) {
     return _vertex_buffer_infos.buffer[vb_info_idx];
 }
 /** */
+export function VBI_state_enable(vb_info_idx, STATE_FLAG) {
+
+    _vertex_buffer_infos.buffer[vb_info_idx].state.mask |= STATE_FLAG;
+
+}
+/** */
 function Vertex_buffer_info_gl_destroy(gl) {
     for (let i = 0; i <= _vertex_buffer_infos.boundary; i++) {
         gl.deleteBuffer(_vertex_buffer_infos.buffer[i].vbo);
     }
 }
+
 
 
 
@@ -578,6 +585,7 @@ export function Vertex_buffer_group_state_enable(vb_groupidx, STATE_FLAG) {
         _vertex_buffer_groups.buffer[vb_groupidx].needs_any_update = true; // Set the groups needs update, so we don't have to check all vertex buffers if none needs update
 
 }
+
 
 
 
@@ -780,11 +788,10 @@ export function Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, unif
 
 /***************************************************************************************************************************************************/
 /***************************************************************************************************************************************************/
-// Insert-Remove-Reset From Vertex Buffer
-/***************************************************************************************************************************************************/
+// Render group functionality
 
 /** Calculates all render group's start index on a per vertex buffer basis 
- * // TODO: We must implement the calcuuulation of the index_offsets for each render group, in the index buffer
+ * // TODO: We must implement the calcuulation of the index_offsets for each render group, in the index buffer
 */
 export function Vertex_buffer_calculate_vertexbuffer_render_group_starts() {
 
@@ -841,80 +848,36 @@ export function Vertex_buffer_calculate_vertexbuffer_render_group_starts() {
 
     }
 }
-/** Calculate all attribute start indexes for all vertex buffers and their render groups */
-// export function Vertex_buffer_calculate_vertexbuffer_render_group_starts(vb_groupidx, render_groupidx) {
-
-//     let num_faces = 0;
-//     let num_attributes = 0;
-//     let start_attrib = 0; // Resets on each diffferent vertex buffer
-    
-//     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
-//     const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
-//     const attribs_per_vertex = vb_info.attribs_info.count;
-//     const vertices_per_face = vb_group.vertices_per_face;
-    
-//     let total_size = 0;
-    
-//     const rgidx = render_groupidx;
-//     const rg = Vertex_buffer_render_group_get_render_group(rgidx); 
-    
-    
-//     rg.start = start_attrib; // Stores for every previous attributes size accumulation
-//     rg.size = rg.num_faces * vertices_per_face * attribs_per_vertex; 
-    
-//     // Calculate index buffer's offset for this render group 
-//     rg.index_offset = rg.start / (vertices_per_face * attribs_per_vertex) * INDICES_PER_RECT;
-    
-//     num_faces += rg.num_faces;
-//     num_attributes += rg.num_faces * vertices_per_face * attribs_per_vertex;
-    
-//     start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
-    
-//     total_size += rg.size;
-//     console.log('_vertex_buffer_groups', vb_groupidx, 'rg', rg);
-
-//     // Reallocate vb, according to render groups total size
-//     if(total_size >  vb_info.size) {
-        
-//         const extra_size = total_size - vb_info.size;
-//         const size_dif = vb_info.Realloc(extra_size);
-//         console.error('REALLOC', vb_info.size, 'size_dif', size_dif);
-//         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-//     }
-// }
 /** Calculate all attribute start indexes per render group */
-export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, render_groupidx) {
+export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, render_groupidx, start_attribute_index) {
 
     let num_faces = 0;
     let num_attributes = 0;
-    let start_attrib = 0; // Resets on each different vertex buffer
+    let start_attrib = start_attribute_index; // Resets on each different vertex buffer
     
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
     const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[0]);
     const attribs_per_vertex = vb_info.attribs_info.count;
     const vertices_per_face = vb_group.vertices_per_face;
     
-    let total_size = 0;
+    let total_size = start_attribute_index;
     
-    {
-        const rgidx = render_groupidx;
-        const rg = Vertex_buffer_render_group_get_render_group(rgidx); 
-        
-        rg.start = start_attrib; // Stores for every previous attributes size accumulation
-        rg.size = rg.num_faces * vertices_per_face * attribs_per_vertex; 
-        
-        // Calculate index buffer's offset for this render group 
-        rg.index_offset = rg.start / (vertices_per_face * attribs_per_vertex) * INDICES_PER_RECT;
-        
-        num_faces += rg.num_faces;
-        num_attributes += rg.num_faces * vertices_per_face * attribs_per_vertex;
-        
-        start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
-        
-        total_size += rg.size;
-        console.log('_vertex_buffer_groups', vb_groupidx, 'rg', rg);
-    }
-
+    const rgidx = render_groupidx;
+    const rg = Vertex_buffer_render_group_get_render_group(rgidx); 
+    
+    rg.start = start_attrib; // Stores for every previous attributes size accumulation
+    rg.size = rg.num_faces * vertices_per_face * attribs_per_vertex; 
+    
+    // Calculate index buffer's offset for this render group 
+    rg.index_offset = rg.start / (vertices_per_face * attribs_per_vertex) * INDICES_PER_RECT;
+    
+    num_faces += rg.num_faces;
+    num_attributes += rg.num_faces * vertices_per_face * attribs_per_vertex;
+    
+    start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
+    
+    total_size += rg.size;
+    
     // Reallocate vb according to render groups total size
     if(total_size >  vb_info.size) {
         
@@ -924,6 +887,18 @@ export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, ren
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
     }
 }
+
+
+
+
+
+
+
+
+/***************************************************************************************************************************************************/
+/***************************************************************************************************************************************************/
+// Index Buffer
+
 /** Creates indices for all vertex buffers. Called once at app intitialization (for now...) */
 export function Vertex_buffer_build_index_buffer_all() {
 
@@ -935,6 +910,18 @@ export function Vertex_buffer_build_index_buffer_all() {
         Index_buffer_build_indices_from_render_group(vb_group.ibidx, vb_group.render_groupidxs, attribs_per_vertex, vb_group.vertices_per_face);
     }
 }
+
+
+
+
+
+
+
+/***************************************************************************************************************************************************/
+/***************************************************************************************************************************************************/
+// Insert-Remove-Reset From Vertex Buffer
+/***************************************************************************************************************************************************/
+
 /** */
 export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _num_faces = 0, dbg_mesh_name, use_from_reset=false) {
     
@@ -947,6 +934,7 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     
     const render_groupidx = gfx.vb.render_groupidx;
     const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
+    let eee = 0;
 
     
     // Run for every vertex buffer of the group.
@@ -973,18 +961,18 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start_attribute_index, num_faces, attribs_per_vertex, verts_per_face, a_vpos_offset, a_uv_offset);
         
 
-        // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
-        Index_buffer_add_indices_from_render_group(vb_group.ibidx, render_groupidx, attribs_per_vertex, verts_per_face, num_faces);
-
-        if(render_groupidx===2)
-            console.log
-
+        eee = vb_info.count;
         render_group.count += total_attribs;
-        vb_info.count = render_group.count;
+        vb_info.count += total_attribs;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
         
+        // Index_buffer_add_indices_from_render_group(vb_group.ibidx, num_faces);
+        Index_buffer_info_check_has_enough_indices(vb_group.ibidx, vb_info.vCount, num_faces);
+
+
+        
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
-        vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
+        // vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
         vb_group.needs_any_update = true;
         render_group.state |= RENDER_GROUP_STATE.NEEDS_UPDATE;
         
@@ -993,14 +981,15 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         // Store the texture index in the vertex
         vb_info.texidx = mat.texidx;
         // Store the inserted mesh's start index
+        gfx.vb.counts.buffer[i] = total_attribs;
         if(use_from_reset === false) {
-            gfx.vb.counts.buffer[i] = total_attribs;
             gfx.vb.starts.buffer[i] = start_attribute_index;
+            // console.log(dbg_mesh_name, start_attribute_index)
         }
         
     }
 
-    return 0;
+    return eee;
 
 }
 /** */
@@ -1029,13 +1018,14 @@ export function Vertex_buffer_init_vertices_for_particles(gfx, texidx, _num_face
             total_attribs = vb_info.attribs_info.count * ((verts_per_face * num_faces) + 2); 
         }
         else total_attribs = attribs_per_vertex * verts_per_face * num_faces; // BUG: Mesh attrib size is not for instanced geom. Better use the gfx.vb.counts 
-        
-        // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
-        Index_buffer_add_indices_from_render_group(vb_group.ibidx, render_groupidx, attribs_per_vertex, verts_per_face, num_faces);
 
         render_group.count += total_attribs;
-        vb_info.count = render_group.count;
+        // vb_info.count = render_group.count;
+        vb_info.count += total_attribs;
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
+        
+        // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
+        Index_buffer_add_indices_from_render_group(vb_group.ibidx, num_faces);
         
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
@@ -1056,6 +1046,12 @@ export function Vertex_buffer_init_vertices_for_particles(gfx, texidx, _num_face
 export function Vertex_buffer_reset_to_index_NEW(vb_groupidx, render_groupidx) {
 
     const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
+
+    // Update the new attributes and vertices count
+    _vertex_buffer_infos.buffer[render_group.vb_data_idx].count -= render_group.count;
+    _vertex_buffer_infos.buffer[render_group.vb_data_idx].vCount -= render_group.count / _vertex_buffer_infos.buffer[render_group.vb_data_idx].attribs_info.count;
+
+    // Reset render group
     render_group.count = 0;
     render_group.draw_count = 0;
     render_group.debug_is_reseted = true;
