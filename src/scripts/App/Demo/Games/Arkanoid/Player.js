@@ -3,14 +3,13 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_calculate_render_group_starts, View_render_from_view_NEW } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_update_set_dim_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -36,7 +35,7 @@ export function Player_get_pad() { return PLAYER_PAD; }
 /** */
 export class Player {
 
-   constructor(x, y, groupidx) {
+   constructor(x, y, groupidx, parent) {
 
       const posx = x;
       const posy = y;
@@ -45,16 +44,13 @@ export class Player {
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
-      mesh.SetViewGroupIndex(groupidx);
-      // Root_group_view_buffer_add_mesh(name_text.root_bufferidx, name_text.mesh_bufferidx);
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
 
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       mesh.GenGfxCtx();
-      // Widget_render(mesh);
-      //  View_calculate_view_group_starts(mesh.group_bufferidxs[0]);
-      View_calculate_render_group_starts(mesh.gfx.vb.groupidx, mesh.gfx.vb.render_groupidx)
-      mesh.AddToGfx();
-      Construct_listen_events_from_mesh_tree(mesh)
-      Construct_listen_events_relations_from_mesh_tree(mesh);
+      Widget_render(mesh);
 
       this.in_scale_animation = false;
       this.mesh = mesh;
@@ -64,12 +60,12 @@ export class Player {
    }
 }
 /** */
-export function Player_init(x, y, group_idx = INT_NULL, parent_root_posidx = INT_NULL, parent_mesh_bufferidx) {
+export function Player_init(x, y, group_idx = INT_NULL, parent = null) {
 
 
-   const player = new Player(x, y, group_idx);
+   const player = new Player(x, y, group_idx, parent);
    // Implement to draw wpos from a root uniform wpos 
-   if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(player.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+   if (parent !== null) Mesh_unif_hack_parent_root_wpos(player.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
    return player;
 }

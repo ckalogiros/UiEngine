@@ -14,6 +14,7 @@ import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoidConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
 import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -51,7 +52,7 @@ export function Arkanoid_powup_destroy() {
 /** */
 class Powup {
 
-   constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, groupidx=INT_NULL, parent=null) {
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[POWUP_INIT_SIZE, POWUP_INIT_SIZE], col:color, name:'PowupMesh', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:false,});
@@ -69,24 +70,25 @@ class Powup {
       this.control_values = [.59, .78, 1., .18, .09, .36];
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.control_values.length);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+      
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.SetViewGroupIndex(groupidx);
+
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
+
+      // if (coin_vb_groupidx === INT_NULL) coin_vb_groupidx = mesh.gfx.vb.groupidx;
+;
+
+      // if (powup_vb_groupidx === INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
 
 
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
-          
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
-
-      if (powup_vb_groupidx === INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
-
-
-      if (vb_groupidx.label === INT_NULL) {
-         Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      }
+      // if (vb_groupidx.label === INT_NULL) {
+      //    Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
+      // }
 
       this.idx = _powup_buffer.Add(this);
       this.mesh = mesh;
@@ -141,18 +143,18 @@ export function Powup_remove_all() {
    }
 }
 /** */
-export function Powup_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = PRE_INITIALIZED_POWUP_MESHES) {
+export function Powup_init_buffer(groupidx, parent, num_effect_meshes = PRE_INITIALIZED_POWUP_MESHES) {
 
    let vb_groupidx = INT_NULL;
    let powup = null;
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      powup = new Powup(_, _, _, _, vb_groupidx);
+      powup = new Powup(_, _, _, _, groupidx, parent);
       vb_groupidx = powup.mesh.gfx.vb.groupidx;
 
       // Implement to draw wpos from a root uniform wpos 
-      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(powup.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      if (parent !== null) Mesh_unif_hack_parent_root_wpos(powup.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Powup_remove_byidx(powup.idx);
    }

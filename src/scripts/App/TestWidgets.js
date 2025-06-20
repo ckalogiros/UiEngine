@@ -1,7 +1,7 @@
 "use strict";
 import { FloorArr2, FloorArr3, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_activate_all_vbs_in_renderqueue, View_get_all_root_mehes, View_buffer_print_roots, View_buffer_remove_group, View_calculate_render_group_starts, View_get_group, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_specific_render_group, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
+import { View_activate_all_vbs_in_renderqueue, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_view_buffer_add_mesh, Root_group_view_buffer_get } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated, ORANGEL } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
@@ -21,7 +21,7 @@ import { Timer_get_global_timer } from '../Engine/Timers/Timers.js';
 import { Demo_animations, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
-import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders } from './Demo/DemoParticles.js';
+import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders, Test_noise_shader } from './Demo/DemoParticles.js';
 import { Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_fps_detailed, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Demo_complicated_widget_layout, Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height, Texture_metrics_get_sub_tex_width, Texture_metrics_get_texture_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
@@ -29,8 +29,6 @@ import { Board_rotations } from './Demo/DemoBoardRotations.js';
 import { Callback_animations_create } from '../Engine/Animations/CallbackAnimations.js';
 import { App_reinitialize, App_reset } from './App.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer, Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from '../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js';
-import { Effect_explosion_circle_get_mesh_byidx, Effects_create_explosion_circle } from '../Engine/Drawables/Effects/Effects.js';
-import { Linear_interpolation } from '../Helpers/Math/MathFunctions.js';
 import { Arkanoid_initialize, Arkanoid_test_game_options } from './Demo/Games/Arkanoid/Arkanoid.js';
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_rotate_z, Mesh_set_color_rgba } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Mesh_event_callback_create, Mesh_get_name, Mesh_listener_create } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
@@ -81,7 +79,7 @@ export function TestWidgetsGeneric() {
     { // Statistics
         let yy = 0, pp = 23;
         const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
-        const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
+        // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
         // const d5 = Debug_info_ui_static_app_generic_buffers_container(ROOT_WIDGETS.CREATE_ROOT, 0, yy);yy += d5.geom.dim[1]*2
@@ -96,12 +94,11 @@ export function TestWidgetsGeneric() {
     // Test_create_render_groups_resize_and_rerender();
 
 
-
     // Demo_page();
     // Demos_welcome_menu();
 
     { // Games
-        // Arkanoid_initialize();
+        Arkanoid_initialize();
         // Arkanoid_test_game_options();
 
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -109,8 +106,6 @@ export function TestWidgetsGeneric() {
     }
 
     { // Quick widget enable
-
-
         // CreateSimpleWidgetText(120, 280)
         // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
         // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
@@ -145,57 +140,41 @@ export function TestWidgetsGeneric() {
     }
 
     { // Test: Tool-tip info
-
+        // const info_panel = Create_info_panel_tool_tip(10, 600);
+        // const event_clbk_params = {
+        //     Clbk: (params) => {
+        //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
+        //     },
+        //     clbk_params: {
+        //         info_panel: info_panel,
+        //     },
+        // }
         
-        const info_panel = Create_info_panel_tool_tip(10, 600);
-        const event_clbk_params = {
-            Clbk: (params) => {
-                // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
-            },
-            clbk_params: {
-                info_panel: info_panel,
-            },
-        }
+        // let k = 0, y=50;
+        // { 
+        //     const section = Create_rect_mesh(Style_rect_default_properties({ 
+        //         is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10], 
+        //         pos: [200,300,0], dim: [0,0], col: GREY[2], 
+        //         name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+        //     }));
+        //     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
 
+        //     for(let i=0; i<13; i++){
+        //         const label = Create_widget_label(Style_label_default_properties({
+        //             pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
+        //             texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL, 
+        //         }));
+        //         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+        //         section.AddItem(label);
+        //         Mesh_event_callback_create(label, event_clbk_params, Resolve_mesh_info_tool_tip);
+        //     }
 
-        
-        let k = 0, y=50;
-        { 
-            const section = Create_rect_mesh(Style_rect_default_properties({ 
-                is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10], 
-                pos: [200,300,0], dim: [0,0], col: GREY[2], 
-                name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
-            }));
-            Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
+        //     section.GenGfxCtx();
+        //     Align_nested_sections_pre(section);
+        //     Widget_render(section);
 
-            for(let i=0; i<13; i++){
-                const label = Create_widget_label(Style_label_default_properties({
-                    pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
-                    texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL, 
-                }));
-                Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-                section.AddItem(label);
-                Mesh_event_callback_create(label, event_clbk_params, Resolve_mesh_info_tool_tip);
-            }
+        // }
 
-            section.GenGfxCtx();
-            Align_nested_sections_pre(section);
-            Widget_render(section);
-
-        }
-
-        // VBI_state_enable(0, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(1, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(2, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(3, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(4, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(5, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(6, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(7, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(8, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(9, BUFFER_STATE.NEEDS_UPDATE);
-        // VBI_state_enable(10, BUFFER_STATE.NEEDS_UPDATE);
-        // // Vertex_buffer_group_state_enable(11, BUFFER_STATE.NEEDS_UPDATE);
     }
 
 
@@ -412,6 +391,9 @@ export function TestWidgetsGeneric() {
             // Create_smoke_particles();
 
             // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
+            // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, false, 28, );
+
+            // Test_noise_shader(); // NOT IMPLEMENTED
 
         }
 
@@ -999,7 +981,7 @@ function Resolve_mesh_info_tool_tip(hovered_mesh, clbk_params, tool_tip_params) 
         else { // Create new text
 
             widget_text = Create_widget_text({
-                pad: [10, 6], pos: [0, 0, 0], col: ORANGER[9],
+                pad: [6, 2], pos: [0, 0, 0], col: ORANGER[9],
                 font_size: 10, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
                 text: msg[i],
                 layout:LAYOUT.VERTICAL,
@@ -4199,93 +4181,76 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
 
     /********************************************************************************************************************************************/
     // EXAMPLE: Add two simple rect meshes, one of which  has a child
-    { /** Add rect */
-        const newmesh = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [300, 100, 0], dim: [20, 20], col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.HORIZONTAL, name:'newmesh' }));
-        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
-        newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        newmesh.GenGfxCtx();
-        Widget_render(newmesh);
-    }
-    { /** Add rect */
-        const newmesh = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 100, 0], dim: [20, 20], col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'newmesh' }));
-        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
-        const n = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(GREEN[7], tr), layout: LAYOUT.HORIZONTAL, name:'newmesh' }));
-        Widget_gfx_ready_enable({ mesh: n, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
-        newmesh.AddItem(n);
+    // { /** Add rect */
+    //     const newmesh = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [300, 100, 0], dim: [20, 20], col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.HORIZONTAL, name:'newmesh' }));
+    //     Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
+    //     newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
+    //     newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    //     newmesh.GenGfxCtx();
+    //     Widget_render(newmesh);
+    // }
+    // { /** Add rect */
+    //     const newmesh = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 100, 0], dim: [20, 20], col: TRANSPARENCY(PURPLER[7], tr), layout: LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'newmesh' }));
+    //     Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
+    //     const n = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [0, 0], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(GREEN[7], tr), layout: LAYOUT.HORIZONTAL, name:'newmesh' }));
+    //     Widget_gfx_ready_enable({ mesh: n, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+    //     newmesh.AddItem(n);
 
-        newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        newmesh.GenGfxCtx();
-        Align_nested_sections_pre(newmesh);
-        Widget_render(newmesh);
-    }
+    //     newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
+    //     newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    //     newmesh.GenGfxCtx();
+    //     Align_nested_sections_pre(newmesh);
+    //     Widget_render(newmesh);
+    // }
     
 
     /********************************************************************************************************************************************/
     // EXAMPLE: Add two simple label meshes
+    let l_y_pos = 20;
     { /** Add label mesh */
         const newmesh = Create_widget_label(Style_label_default_properties({
-            // is_root: _,
-            is_root: ROOT_WIDGETS.CREATE_ROOT,
-            pos: [20,20, 0],
-            col: TRANSPARENCY(PURPLER[7], tr),
-            text_pad: [0, 0],
-            text: '1234',
-            texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
-            variant_idx: _,
-            font_size: 12,
-            text_col: _,
-            layout: LAYOUT.VERTICAL,
-            is_debug_mesh: false,
+            is_root: _, 
+            // is_root: ROOT_WIDGETS.CREATE_ROOT,
+            pos: [20,l_y_pos, 0], col: TRANSPARENCY(PURPLER[7], tr), text_pad: [0, 0], text: '1234',
+            texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12, layout: LAYOUT.VERTICAL, is_debug_mesh: false,
         }));
-        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } });
+        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
         
+        // newmesh.parent = blu;
+        // blu.AddItem(newmesh);
         newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
-        View_buffer_remove_group(1)
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+        // View_buffer_remove_group(1);
+        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
+        // newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_GROUP);
         newmesh.GenGfxCtx();
         Widget_render(newmesh);
+        l_y_pos += newmesh.geom.dim[1] * 2 + 3;
     }
-    { /** Add label mesh */
-        const newmesh = Create_widget_label(Style_label_default_properties({
-            // is_root: _,
-            is_root: ROOT_WIDGETS.CREATE_ROOT,
-            pos: [20,50, 0],
-            col: TRANSPARENCY(GREEN[7], tr),
-            text_pad: [0, 0],
-            text: '1234',
-            texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
-            variant_idx: _,
-            font_size: 12,
-            text_col: _,
-            layout: LAYOUT.VERTICAL,
-            is_debug_mesh: false,
-        }));
-        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } });
-        
-        newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        newmesh.GenGfxCtx();
-        Widget_render(newmesh);
-    }
+
+
+
+
     
 
     /********************************************************************************************************************************************/
     // EXAMPLE: Add two simple slider meshes
-    { /** Add slider mesh */
-        const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [100,200,0], dim: [120, 10], col: PURPLE[5] }));
-        // const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: _, pos: [100,0,0], dim: [120, 10], col: PURPLE[5] }));
-        Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
+    // { /** Add slider mesh */
+    //     const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [100,200,0], dim: [120, 10], col: PURPLE[5] }));
+    //     // const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: _, pos: [100,0,0], dim: [120, 10], col: PURPLE[5] }));
+    //     Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
         
-        newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-        newmesh.GenGfxCtx();
-        // Align_nested_sections_pre(newmesh);
-        Widget_render(newmesh);
-    }
+    //     newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
+    //     newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+    //     newmesh.GenGfxCtx();
+    //     // Align_nested_sections_pre(newmesh);
+    //     Widget_render(newmesh);
+    // }
 
 
+
+    View_reset_rendering_buffer_whole_view_group(blu.group_bufferidxs[0]); // Reset info panel and info text
+    Align_nested_sections_pre(blu);
+    View_render_whole_view_group_NEW(blu.group_bufferidxs[0]); // rerender test mesh
 
     return blu;
 }
@@ -6632,7 +6597,7 @@ function Shader_color_functions_explosion_glow(x = 20, y = 300, w = 200, h = 200
 
     // Render
     mesh.GenGfxCtx();
-Widget_render(mesh);
+    Widget_render(mesh);
     mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_parameters);
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];

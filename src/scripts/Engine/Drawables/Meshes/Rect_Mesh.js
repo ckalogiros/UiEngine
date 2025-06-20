@@ -18,7 +18,7 @@ import { Components_create_scroller_component, Scoller_component_gengfx, Scoller
 import { Mesh_get_real_pos_xy_obj_t } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
-import { View_add_mesh, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
+import { View_add_mesh, View_buffer_remove_group, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -169,6 +169,10 @@ export class Rect_Mesh extends Mesh {
    }
    /** */
    SetViewGroupIndex(view_groupidx) {
+
+      // if(this.group_bufferidxs[0] !== INT_NULL) {
+      //    View_buffer_remove_group(this.group_bufferidxs[0]);
+      // }
 
       this.group_bufferidxs[0] = view_groupidx;
 

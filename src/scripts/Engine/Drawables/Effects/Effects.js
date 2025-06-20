@@ -21,6 +21,7 @@ import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY } from "../Material/Colors.js";
 import { Mesh_set_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Widget_render } from "../Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -36,10 +37,14 @@ export const EFFECTS_TYPES = {
    EXPLOSION_CIRCLE: {
       ID:_CNT++,
       VB_GROUP_IDX:INT_NULL,
+      VIEW_GROUP_IDX:INT_NULL,
+      PARENT:null,
    },
    EXPLOSION_GLOW: {
       ID:_CNT++,
       VB_GROUP_IDX:INT_NULL,
+      VIEW_GROUP_IDX:INT_NULL,
+      PARENT:null,
    },
 };
 
@@ -55,34 +60,25 @@ export const EFFECTS_TYPES = {
 
 class Effect_Mesh_Explosion_Circle {
 
-   constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], vb_groupidx=INT_NULL, group_idx = INT_NULL, ring_diameter, intensity) {
+   constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], groupidx = INT_NULL, parent, ring_diameter, intensity) {
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshCircle',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false, });
 
-
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:0, generic:{a:.01, b:0}});
       
-      mesh.SetViewGroupIndex(group_idx);
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.SetViewGroupIndex(groupidx);
       
-      // Render
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+      // mesh.geom.pos[0] = x;
+      // mesh.geom.pos[1] = y;
       
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
-      
-      
-      mesh.Render();
-      
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.render_groupidx);
-      
-      // Initialize generic uniforms, only once(first mesh initialization)
-      if(vb_groupidx===INT_NULL) {
-         Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      }
-      
-      
-      // console.log('idx', freeidx, 'vb start', mesh.gfx.vb.starts.buffer[0])
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
+
       // If new mesh is created, add it to the effects buffer
       this.idx = _effect_explosion_circle_mesh_buffer.Add(this);
 
@@ -131,18 +127,21 @@ export function Effect_explosion_circle_destroy_mesh_byidx(idx = INT_NULL) {
 }
 
 
-export function Effects_explosion_circle_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
+export function Effects_explosion_circle_init_buffer(groupidx, parent, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
 
    let vb_groupidx = INT_NULL;
    let effect = null;
    
    for(let i=0; i<num_effect_meshes; i++) {
 
-      effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, vb_groupidx, group_idx); 
+      effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, groupidx, parent); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
       // Implement to draw wpos from a root uniform wpos 
-      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      if(parent!==null) Mesh_unif_hack_parent_root_wpos(effect.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
+
+      EFFECTS_TYPES.EXPLOSION_CIRCLE.VIEW_GROUP_IDX = groupidx;
+      EFFECTS_TYPES.EXPLOSION_CIRCLE.PARENT = parent;
 
 
       Effect_explosion_circle_remove_mesh_byidx(effect.idx);
@@ -198,9 +197,7 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
    }
    else { // If no apropriate free effect was found, create new effect
       
-      // alert('0090090095')
-      const vb_groupidx = EFFECTS_TYPES.EXPLOSION_CIRCLE.VB_GROUP_IDX;
-      const new_effect = new Effect_Mesh_Explosion_Circle(x-w+w_src, y-h+h_src, w, h, color, vb_groupidx, ring_diameter, intensity); 
+      const new_effect = new Effect_Mesh_Explosion_Circle(x-w+w_src, y-h+h_src, w, h, color, EFFECTS_TYPES.EXPLOSION_CIRCLE.VIEW_GROUP_IDX, EFFECTS_TYPES.EXPLOSION_CIRCLE.PARENT, ring_diameter, intensity); 
       idx = new_effect.idx;
 
       // new_effect.mesh.timer = 0.01;
@@ -266,37 +263,33 @@ const _free_effect_explosion_glow_idx_buffer = New_int8_buffer(PRE_INITIALIZED_E
 
 class Effect_Mesh_Explosion_Glow {
 
-   constructor(x=0, y=0, w=35, h=35, color=GREY[7], vb_groupidx=INT_NULL, group_idx = INT_NULL) {
+   constructor(x=0, y=0, w=35, h=35, color=GREY[7], groupidx = INT_NULL, parent=null) {
 
       this.timer = 0;
       this.timer_limit = 0;
       this.timer_step = 0;
       
+      // const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshGlow',}));
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshGlow',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false});
 
+      const generic_controls_parameters = [.8, .0, .7];
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_GLOW, {time:0});
-
-      mesh.SetViewGroupIndex(group_idx);
-
-
-      // const 
-      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 3);
+      mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
       
-      // Render
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.SetViewGroupIndex(groupidx);
       
       
-      mesh.Render();
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.render_groupidx);
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
       
       // Initialize generic uniforms, only once(first mesh initialization)
-      if(vb_groupidx===INT_NULL) {
-         mesh.GfxUniformSetAndUpdate('u_generic_controls', [.8, .0, .7]);
-      }
+      // mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
       
       Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
       
@@ -336,25 +329,24 @@ export function Effects_explosion_glow_destroy_mesh_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 
-export function Effects_explosion_glow_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
+export function Effects_explosion_glow_init_buffer(groupidx, parent, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
       
    let vb_groupidx = INT_NULL;
    let effect = null;
 
    for(let i=0; i<num_effect_meshes; i++) {
 
-      effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, vb_groupidx, group_idx); 
+      effect = new Effect_Mesh_Explosion_Glow(_, _, w, h, _, groupidx, parent); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
       // Implement to draw wpos from a root uniform wpos 
-      if(parent_root_posidx!==INT_NULL) Mesh_unif_hack_parent_root_wpos(effect.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      if(parent!==null) Mesh_unif_hack_parent_root_wpos(effect.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
 
       Effects_explosion_glow_remove_mesh_byidx(effect.idx);
    }
    EFFECTS_TYPES.EXPLOSION_GLOW.VB_GROUP_IDX = vb_groupidx;
 
-   // return vb_groupidx;
    return effect;
 
 }

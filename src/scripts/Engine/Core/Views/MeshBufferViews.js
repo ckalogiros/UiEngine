@@ -63,7 +63,7 @@ function View_group_create(mesh) {
       console.error('@ View_group_create(). mesh is alredy in a group', 'mesh', mesh.name)
       alert('@ View_group_create(). mesh is alredy in a group')
    }
-   console.error('@ View_group_create().', 'mesh', mesh.name)
+   // console.error('@ View_group_create().', 'mesh', Mesh_get_name(mesh));
 
    const mesh_idx = mesh.mesh_bufferidx;
    const view = {
@@ -229,6 +229,7 @@ function Find_match_from_children(mesh, parent) {
 
    return { view_rgidx: view_rgidx, done: done };
 }
+/** */
 function Find_match_gfx_from_parent(mesh, parent) {
 
    let view_rgidx = INT_NULL;
@@ -245,8 +246,7 @@ function Find_match_gfx_from_parent(mesh, parent) {
          done = true;
       } 
    }
-   // Check if the parent has a text_mesh
-   // Avoid matching the same text_mesh
+   // Check if the parent has a text_mesh. Avoid matching self
    else if (parent.text_mesh && mesh !== parent.text_mesh && Sid_check_match(mesh.sid, parent.text_mesh.sid)) {
       
       const texidx = Vertex_buffer_group_get_texidx(parent.text_mesh.gfx.vb.groupidx);
@@ -259,25 +259,107 @@ function Find_match_gfx_from_parent(mesh, parent) {
 
    return { view_rgidx: view_rgidx, done: done };
 }
+/** */
 function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 
    let ret = Find_match_gfx_from_parent(mesh, parent)
 
    if (!ret.done) {
 
-      ret = Find_match_from_children(mesh, parent)
-
+      ret = Find_match_from_children(mesh, parent);
+      
       if (!ret.done && parent.parent) { // Run recursively 
-         if ((parent.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW)===0 &&
-              mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW) { // Avoid searches from parent up if parent is in a NEW_GROUP
-               ret.view_rgidx = Find_match_gfx_from_parent_ascending_search_all(mesh, parent.parent)
-            }
+         if ((parent.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW)===0 && mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW) { // Avoid searches from parent up if parent is in a NEW_GROUP
+            ret.view_rgidx = Find_match_gfx_from_parent_ascending_search_all(mesh, parent.parent)
+         }
+         else { // Since the we have parent.parent and is the root (RENDER_GROUP_NEW or RENDER_GROUP_FROM_NEW), we want  to search all its children
+            ret = Find_match_from_children(mesh, parent.parent);
+         }
       }
    }
 
    return ret.view_rgidx;
 }
 
+/** */
+function Find_match_gfx_from_view_group(mesh, view_groupidx) {
+
+   let done = false;
+   let view_rgidx = INT_NULL;
+   const view = _view_buffer.buffer[view_groupidx];
+   for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
+
+      const view_vbidx = i;
+      for (let j = 0; j <= view.vb.buffer[view_vbidx].rg.boundary; j++) { // 
+            
+         const rg = view.vb.buffer[view_vbidx].rg.buffer[j];
+
+         for (let k = 0; k <= rg.meshidxs.boundary; k++) { 
+
+            const midx = rg.meshidxs.buffer[k];
+            const m = Mesh_buffer_get_mesh_byidx(midx);
+            if(Sid_check_match(mesh.sid, m.sid)) {
+               
+               const texidx = Vertex_buffer_group_get_texidx(m.gfx.vb.groupidx);
+               if(texidx === mesh.mat.texidx){
+                  view_rgidx = m.group_bufferidxs[2];
+                  done = true;
+               } 
+            }
+            // Check if the m has a text_mesh. Avoid matching self
+            else if (m.text_mesh && mesh !== m.text_mesh && Sid_check_match(mesh.sid, m.text_mesh.sid)) {
+               
+               const texidx = Vertex_buffer_group_get_texidx(m.text_mesh.gfx.vb.groupidx);
+               if(texidx === mesh.mat.texidx){
+                  view_rgidx = m.text_mesh.group_bufferidxs[2];
+                  done = true;
+                  break;
+               }
+            }
+         }
+      }
+   }
+
+   return view_rgidx;
+}
+/** */
+function Find_match_gfx_from_view_vb(mesh, view_groupidx, view_vbidx) {
+
+   let done = false;
+   let view_rgidx = INT_NULL;
+   
+   const view = _view_buffer.buffer[view_groupidx];
+   for (let j = 0; j <= view.vb.buffer[view_vbidx].rg.boundary; j++) {  
+         
+      const rg = view.vb.buffer[view_vbidx].rg.buffer[j];
+
+      for (let k = 0; k <= rg.meshidxs.boundary; k++) { 
+
+         const midx = rg.meshidxs.buffer[k];
+         const m = Mesh_buffer_get_mesh_byidx(midx);
+         if(Sid_check_match(mesh.sid, m.sid)) {
+            
+            const texidx = Vertex_buffer_group_get_texidx(m.gfx.vb.groupidx);
+            if(texidx === mesh.mat.texidx){
+               view_rgidx = m.group_bufferidxs[2];
+               done = true;
+            } 
+         }
+         // Check if the m has a text_mesh. Avoid matching self
+         else if (m.text_mesh && mesh !== m.text_mesh && Sid_check_match(mesh.sid, m.text_mesh.sid)) {
+            
+            const texidx = Vertex_buffer_group_get_texidx(m.text_mesh.gfx.vb.groupidx);
+            if(texidx === mesh.mat.texidx){
+               view_rgidx = m.text_mesh.group_bufferidxs[2];
+               done = true;
+               break;
+            }
+         }
+      }
+   }
+
+   return view_rgidx;
+}
 
 
 
@@ -298,7 +380,7 @@ function Find_match_gfx_from_parent_ascending_search_all(mesh, parent) {
 //
 
 /** Create uniforms from rendergroups */
-function View_reate_uniforms_for_render_group(mesh, COPY_WPOS_TO_UNIFWPOS) {
+function View_create_uniforms_for_render_group(mesh, COPY_WPOS_TO_UNIFWPOS) {
 
    const uniforms = mesh.uniforms;
    const flags = mesh.gfx_ctx_flags;
@@ -317,14 +399,6 @@ function View_reate_uniforms_for_render_group(mesh, COPY_WPOS_TO_UNIFWPOS) {
             // const HAS_STICKY_POS = temp_is_particle_system===false ? (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY : 0x0;
             const HAS_STICKY_POS = 0x0;
             
-            // let COPY_MESH_POS = false;
-            // let COPY_MESH_POS = Mesh_unif_is_vb_root_wpos(mesh.root_posidx, mesh.mesh_bufferidx);
-            /**
-             * if:
-             * mesh has parent
-             * parent is on different vb
-             */
-   
             // Create a position for each render group to update the uniform position (for each render group draw call) of a vertex buffer
             mesh.root_posidx = Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, COPY_WPOS_TO_UNIFWPOS);
             // Set the update callback function, along with the position index to be used for the uniform update
@@ -338,40 +412,7 @@ function View_reate_uniforms_for_render_group(mesh, COPY_WPOS_TO_UNIFWPOS) {
 
 
 
-/** */
-function Build_per_gfx_view_group_from_root_mesh_recursive(mesh, groupidx) {
 
-   mesh.gfx = Gfx_generate_context(mesh.gfx_ctx_flags, mesh, _);
-   
-   
-   // Connect the mesh with the View via indexes
-   const info = View_add_mesh(groupidx, mesh);
-   mesh.group_bufferidxs[0] = info[0]; // Groups buffer index.
-   mesh.group_bufferidxs[1] = info[1]; // VB buffers index, which vb buffer the mesh belongs.
-   mesh.group_bufferidxs[2] = info[2]; // Render groups  .
-   mesh.group_bufferidxs[3] = info[3]; // Mesh's index in the group buffer  .
-   
-   if (mesh.text_mesh) {
-      
-      mesh.text_mesh.gfx = Gfx_generate_context(mesh.gfx_ctx_flags, mesh, _);
-      const text_info = View_add_mesh(groupidx, mesh.text_mesh);
-      mesh.text_mesh.group_bufferidxs[0] = text_info[0]; // Groups buffer index.
-      mesh.text_mesh.group_bufferidxs[1] = text_info[1]; // VB buffers index, which vb buffer the mesh belongs.
-      mesh.text_mesh.group_bufferidxs[2] = text_info[2]; // Render groups  .
-      mesh.text_mesh.group_bufferidxs[3] = text_info[3]; // Mesh's index in the group buffer  .
-   }
-
-   for (let i = 0; i <= mesh.children.boundary; i++) {
-
-      const child = mesh.children.buffer[i];
-      if (child) {
-
-         Build_per_gfx_view_group_from_root_mesh_recursive(child, groupidx)
-
-      }
-   }
-
-}
 /** Add mesh to view-group. Create vertex buffer render-group */
 export function View_add_mesh(groupidx, mesh) {
 // TODO: Comment logic
@@ -404,15 +445,25 @@ export function View_add_mesh(groupidx, mesh) {
          
          mesh.gfx.vb.render_groupidx = new_render_groupidx;
 
-         View_reate_uniforms_for_render_group(mesh, is_root_group);
+         View_create_uniforms_for_render_group(mesh, is_root_group);
          
       }
       else {
          
-         // TODO: Create insertions here, matched based on other flags,
-         const found_match = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
-         if (found_match !== INT_NULL) {
-            view_rgidx = found_match;
+         let rgidx_found_match = INT_NULL;
+
+         if((mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP)) {
+            rgidx_found_match = Find_match_gfx_from_view_vb(mesh, groupidx, view_vbidx);
+         }
+         else if((mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_GROUP)) {
+            rgidx_found_match = Find_match_gfx_from_view_group(mesh, groupidx);
+         }
+         else {
+            rgidx_found_match = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
+         }
+         
+         if (rgidx_found_match !== INT_NULL) {
+            view_rgidx = rgidx_found_match;
             mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
             view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
             Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces)
@@ -431,7 +482,7 @@ export function View_add_mesh(groupidx, mesh) {
             
             mesh.gfx.vb.render_groupidx = new_render_groupidx;
 
-            View_reate_uniforms_for_render_group(mesh, is_root_group);
+            View_create_uniforms_for_render_group(mesh, is_root_group);
          }
          
       }
@@ -457,6 +508,7 @@ export function View_add_mesh(groupidx, mesh) {
       
       
       view_vbidx = view.vb.Add({
+         state: 0x0, // SEE: VIEW_GROUP_STATE_FLAGS
          vb_groupidx: vb_groupidx,
          rg: render_groups,
       });
@@ -466,7 +518,7 @@ export function View_add_mesh(groupidx, mesh) {
       mesh.gfx.vb.render_groupidx = new_render_groupidx;
 
       
-      View_reate_uniforms_for_render_group(mesh, is_root_group);
+      View_create_uniforms_for_render_group(mesh, is_root_group);
       
    }
    
@@ -530,7 +582,7 @@ export function View_reset_rendergroup_draw_count(render_groupidx) {
 /*****************************************************************************************************************************/
 
 /** */
-export function View_calculate_view_group_starts(view_groupidx) {
+function View_calculate_view_group_starts(view_groupidx) {
 
    const view = _view_buffer.buffer[view_groupidx];
    for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
@@ -546,7 +598,7 @@ export function View_calculate_view_group_starts(view_groupidx) {
 
 }
 /** */
-export function View_calculate_render_group_starts(groupidx, view_vbidx, view_rgidx) {
+function View_calculate_render_group_starts(groupidx, view_vbidx, view_rgidx) {
 
    const view = _view_buffer.buffer[groupidx];
    let rg_start_attribute = 0; 
@@ -566,57 +618,53 @@ export function View_calculate_render_group_starts(groupidx, view_vbidx, view_rg
    Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, rg_idx, rg_start_attribute);
 
 }
-/**SAVE */
-// export function View_calculate_render_group_starts(groupidx, view_vbidx, view_rgidx) {
-
-//    const view = _view_buffer.buffer[groupidx];
-//    let rg_start_attribute = 0; 
-   
-//    // Calculate the the attribute index at which this rendergroup should start, by counting all previous rendergroups sizes.
-//    for(let i = view_vbidx; i <= view.vb.boundary; i++) { // Run only for the rendergroup's vertex buffer // BUG: What about vbs that are part of the mesh and belong to different vb_idx????????? 
-      
-//       rg_start_attribute = 0; 
-//       const rg = view.vb.buffer[i].rg;
-//       const len = (view_rgidx < view.vb.active_count) ? view_rgidx : view.vb.active_count;
-//       // for(let j = 0; j < view_rgidx; j++) { // Run only for all previous rendergroups to sum the total size(AKA. find the attribute start index)
-//       for(let j = 0; j < len; j++) { // Run only for all previous rendergroups to sum the total size(AKA. find the attribute start index)
-
-//          const rendergroup_size = Vertex_buffer_render_group_get_size(rg.buffer[j].render_groupidx)
-//          rg_start_attribute += rendergroup_size;
-
-//          console.log('\noooooooooooooooooooooooooooooooooooooo\nrg.buffer[j].render_groupidx', rg.buffer[j].render_groupidx, 'rendergroup_size', rendergroup_size, 'rg_start_attribute', rg_start_attribute)
-//       }
-
-//    }
-
-//    const vb_groupidx = view.vb.buffer[view_vbidx].vb_groupidx;
-//    const rg_idx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
-//    Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, rg_idx, rg_start_attribute);
-
-// }
 /** Activate view group's render queue's vertex buffers */
 export function View_activate_all_vbs_in_renderqueue(group_bufferidxs) {
 
    const groupidx = group_bufferidxs[0];
    const view = _view_buffer.buffer[groupidx];
    
+   // console.error('###########################################\nActivate vbs:');
    for (let i = 0; i <= view.vb.boundary; i++) { // Vertex Attribute Buffering.
       
       const vb_groupidx = view.vb.buffer[i].vb_groupidx;
       Renderqueue_set_active(vb_groupidx, true);
+      console.error(vb_groupidx)
    }
 }
 /** Deactivate view group's render queue's vertex buffers */
 export function View_deactivate_all_vbs_in_renderqueue(group_bufferidxs) {
-
+   
    const groupidx = group_bufferidxs[0];
    const view = _view_buffer.buffer[groupidx];
    
+   // console.error('###########################################\nDeactivate vbs:');
    for (let i = 0; i <= view.vb.boundary; i++) { // Vertex Attribute Buffering.
       
       const vb_groupidx = view.vb.buffer[i].vb_groupidx;
       Renderqueue_set_active(vb_groupidx, false);
+      console.error(vb_groupidx)
    }
+}
+/** Activate by render group */
+export function View_activate_vb_in_renderqueue_from_rendergroup(groupidx, view_vbidx) {
+
+   const view = _view_buffer.buffer[groupidx];
+   const vb_groupidx = view.vb.buffer[view_vbidx].vb_groupidx;
+   Renderqueue_set_active(vb_groupidx, true);
+   view.vb.buffer[view_vbidx].state |= VIEW_GROUP_STATE_FLAGS.IS_VB_ACTIVATED;
+   // console.error('###### ACTIVATE VB IN RENDERQUEUE', vb_groupidx)
+   
+}
+/** Deactivate by render group */
+export function View_deactivate_vb_in_renderqueue_from_rendergroup(groupidx, view_vbidx) {
+   
+   const view = _view_buffer.buffer[groupidx];
+   const vb_groupidx = view.vb.buffer[view_vbidx].vb_groupidx;
+   Renderqueue_set_active(vb_groupidx, false);
+   view.vb.buffer[view_vbidx].state &= ~VIEW_GROUP_STATE_FLAGS.IS_VB_ACTIVATED;
+   console.error('###### DEACTIVATE VB IN RENDERQUEUE', vb_groupidx)
+   
 }
 /** */
 export function View_get_all_root_mehes() {
@@ -643,11 +691,15 @@ export function View_render_from_view_NEW(view_groupidx) {
 }
 /** Render all meshes of the whole view group to vertex buffer */
 export function View_render_whole_view_group_NEW(view_groupidx) {
-
+// console.log('======-=-=-===-=-=-=-=-=-=-=-=-=-=-=-=-');
    const view = _view_buffer.buffer[view_groupidx];
    for (let i = 0; i <= view.vb.boundary; i++) { // All vertex buffer groups
 
       const view_vbidx = i;
+
+      if((view.vb.buffer[view_vbidx].state & VIEW_GROUP_STATE_FLAGS.IS_VB_ACTIVATED)===0){
+         View_activate_vb_in_renderqueue_from_rendergroup(view_groupidx, view_vbidx);
+      }
           
       for (let j = 0; j <= view.vb.buffer[view_vbidx].rg.boundary; j++) { // 
             
@@ -688,15 +740,18 @@ export function View_render_whole_view_group_NEW(view_groupidx) {
    }
 }
 /** Render all meshes of a specific render group to vertex buffer */
-export function View_render_specific_render_group(groupidx, view_vbidx, view_rgidx) {
+export function View_render_specific_render_group(groupidx, view_vbidx, view_rgidx, add_in_already_rendered_group=false) {
 
    const view = _view_buffer.buffer[groupidx];
    const rg = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx];
 
+   // Avoid continuing to accum vb.count for re-rendering an already rendered rg.(reset drawCount and count)
+   if(add_in_already_rendered_group) Vertex_buffer_render_group_reset_draw_count(rg.render_groupidx, 0);
+
    for (let k = 0; k <= rg.meshidxs.boundary; k++) { // Vertex Attribute Buffering.
 
       const is_rendergroup_alredy_rendered = View_is_render_group_rendered(groupidx, view_vbidx, view_rgidx);
-      if(!is_rendergroup_alredy_rendered) {
+      if(!is_rendergroup_alredy_rendered || add_in_already_rendered_group) {
 
          // TODO: Run calc if this is not the only rg for this group using this vertex buffer
          // Also: if we just need to update an existing rg (after rg reset), then we need NOT to recalc starts
@@ -713,7 +768,7 @@ export function View_render_specific_render_group(groupidx, view_vbidx, view_rgi
             mesh.AddToGfx();
             // if (!mesh.is_gfx_inserted) mesh.AddToGfx();
             // else mesh.AddToGfxFromReset();
-            // console.log('->>>>>>>>>>', mesh.name)
+            // console.log('->>>>>>>>>>', mesh.name, 'meshidx', meshidx);
          }
       }
    }
@@ -801,8 +856,10 @@ export function View_buffer_print_loop() {
 
    for (let i = 0; i <= _view_buffer.boundary; i++) {
 
-      console.log('group:', i);
       const view = _view_buffer.buffer[i];
+      const root = Mesh_buffer_get_mesh_byidx(view.rootidx);
+      const root_name = (root) ? Mesh_get_name(root) : 'null'; 
+      console.log('group:', i, 'root:', view.rootidx, 'name:', root_name);
       for (let j = 0; j <= view.vb.boundary; j++) {
 
          console.log(
@@ -811,11 +868,14 @@ export function View_buffer_print_loop() {
 
          for (let k = 0; k <= view.vb.buffer[j].rg.boundary; k++) {
 
+            const rg_root = Mesh_buffer_get_mesh_byidx(view.vb.buffer[j].rg.buffer[k].meshidxs.buffer[0]);
+            const rg_root_name = (rg_root) ? Mesh_get_name(rg_root) : 'null';
             console.log(
+               `    rgroot:${rg_root_name}\n`,
                `    rgidx:${view.vb.buffer[j].rg.buffer[k].render_groupidx}`,
                `    start:${view.vb.buffer[j].rg.buffer[k].start}`,
                `    num_faces:${view.vb.buffer[j].rg.buffer[k].num_faces}`,
-               '\n    meshidxs', view.vb.buffer[j].rg.buffer[k].meshidxs.buffer,
+               '    meshidxs', view.vb.buffer[j].rg.buffer[k].meshidxs.buffer,
             );
          }
 

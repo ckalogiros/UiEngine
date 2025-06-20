@@ -297,7 +297,6 @@ class Vertex_Buffer_Info {
     Realloc(extra_size = 0) {
 
         const new_size = this.#CalculateMemoryPaddedSize(this.count, extra_size);
-        // const size_dif = new_size - this.size;
         this.size = new_size + this.size;
 
         const new_data = Typed_array_create_from_type(this.type, this.size);
@@ -307,15 +306,10 @@ class Vertex_Buffer_Info {
         // const size = old_data.length;
         // for (let i = 0; i < size; i++) {
         //     new_data[i] = old_data[i];
-        //     // console.log(
-        //     //     'i', i,
-        //     //     'new_data[i]', new_data[i],
-        //     // )
         // }
         _vertex_buffers_data.buffer[this.vbidx] = new_data;
 
         if (DEBUG.GFX.BUFFERS) console.warn('Resizing vertex buffer!');
-        // return size_dif;
     }
 
 
@@ -829,20 +823,14 @@ export function Vertex_buffer_calculate_vertexbuffer_render_group_starts() {
 
             total_size += rg.size;
             // console.log('_vertex_buffer_groups', i, 'rg', rg)
-            // console.log(
-            //     '_vertex_buffer_groups', i, 
-            //     'rg.start', rg.start, 
-            //     'rg.num_faces', rg.num_faces, 
-            //     'start_attrib', start_attrib, 
-            // )
         }
 
         // Reallocate vb according to render groups total size
         if(total_size >  vb_info.size) {
             
             const extra_size = total_size - vb_info.size;
-            const size_dif = vb_info.Realloc(extra_size);
-            console.error('REALLOC',vb_info.size)
+            vb_info.Realloc(extra_size);
+            console.error('REALLOC', vb_info.size, 'vbidx', vb_info.vbidx,  'count', vb_info.count);
             vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
         }
 
@@ -877,13 +865,16 @@ export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, ren
     start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
     
     total_size += rg.size;
+    // console.log(
+    //     '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n', 'rg total size', total_size 
+    // )
     
     // Reallocate vb according to render groups total size
     if(total_size >  vb_info.size) {
         
         const extra_size = total_size - vb_info.size;
-        const size_dif = vb_info.Realloc(extra_size);
-        console.error('REALLOC', vb_info.size, 'size_dif', size_dif);
+        vb_info.Realloc(extra_size);
+        console.error('REALLOC', vb_info.size, 'vbidx', vb_info.vbidx,  'count', vb_info.count);
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
     }
 }
@@ -931,7 +922,6 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
     
     const num_faces = (_num_faces) ? _num_faces : gfx.num_faces;
-    
     const render_groupidx = gfx.vb.render_groupidx;
     const render_group = Vertex_buffer_render_group_get_render_group(render_groupidx);
     let eee = 0;
@@ -960,6 +950,11 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
         Gl_operation_add(vb_info.add_to_vb_fnidx, vb_data, geom, mat, start_attribute_index, num_faces, attribs_per_vertex, verts_per_face, a_vpos_offset, a_uv_offset);
         
+        // if(vb_groupidx===0)
+        //     console.warn(
+        //         'render_group.start', render_group.start,
+        //         'render_group.count', render_group.count,
+        //     )
 
         eee = vb_info.count;
         render_group.count += total_attribs;
@@ -1025,7 +1020,8 @@ export function Vertex_buffer_init_vertices_for_particles(gfx, texidx, _num_face
         vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
         
         // Index_buffer_info_check_has_enough_indices(vb_group.ibidx, render_group.draw_count, num_faces);
-        Index_buffer_add_indices_from_render_group(vb_group.ibidx, num_faces);
+        // Index_buffer_add_indices_from_render_group(vb_group.ibidx, num_faces);
+        Index_buffer_info_check_has_enough_indices(vb_group.ibidx, vb_info.vCount, num_faces);
         
         prog.state.mask |= PROGRAM_STATE.ACTIVE; // Sets a program to 'active', only if there are meshes in the program's vb
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;

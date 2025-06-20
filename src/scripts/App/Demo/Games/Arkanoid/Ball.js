@@ -2,25 +2,23 @@
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Create_particle_emitter, Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_calculate_render_group_starts } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_emitter_enable_intermidiate_emission, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Particle_system_emitt, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particle_system_init_particles, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Min } from "../../../../Helpers/Math/MathOperations.js";
-import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_particles_system_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_combo_counter_reset, Arkanoid_get_main_panel_padx, Arkanoid_get_main_panel_pady } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Bricks_check_collision } from "./Bricks.js";
 import { Physics } from "./HelperClasses.js";
 import { Player_get } from "./Player.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
 
 
 
@@ -33,7 +31,7 @@ export const BALL_SIZE = 12;
 const BALL_DIM_X = BALL_SIZE;
 const BALL_DIM_Y = BALL_SIZE;
 const BALL_SPEED = 4;
-const MAX_BALLS_COUNT = 3;
+const MAX_BALLS_COUNT = 1;
 const MAX_ACCEL = 9;
 
 
@@ -79,7 +77,7 @@ export function Arkanoid_balls_destroy() {
 /** */
 export class Ball {
 
-   constructor(x, y, color = WHITE, groupidx) {
+   constructor(x, y, color = WHITE, groupidx, parent) {
 
       const posx = x;
       const posy = y;
@@ -88,18 +86,14 @@ export class Ball {
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BALL_DIM_X, });
 
       
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+
       mesh.SetViewGroupIndex(groupidx);
-
-      // mesh.GenGfxCtx();
-      // Widget_render(mesh);
-
+      // mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
       mesh.GenGfxCtx();
-      // Widget_render(mesh);
-      //  View_calculate_view_group_starts(mesh.group_bufferidxs[0]);
-      View_calculate_render_group_starts(mesh.gfx.vb.groupidx, mesh.gfx.vb.render_groupidx)
-      mesh.AddToGfx();
-      Construct_listen_events_from_mesh_tree(mesh)
-      Construct_listen_events_relations_from_mesh_tree(mesh);
+      Widget_render(mesh);
 
       this.mesh = mesh;
 
@@ -122,36 +116,27 @@ export class Ball {
          const scale = 2.;
          const particles_size = BALL_DIM_X * scale;
          const mod = BALL_SPEED * .002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
-         const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles`, color, [0, 0, 1], [particles_size, particles_size], 0.015 + mod, 1, 0, _, _, 4, _, 1);
-         const tail_emitter = Particles_get_particle_system(tail_emitter_idx);
+         const tail_emitter = Create_particle_emitter(Style_particles_system_default_properties({
+            name:'NoiseTestParticles', 
+            col:color, pos:[0, 0, 10], dim:[particles_size, particles_size], 
+            t_step:0.015 + mod, life_time:1, accel:0, deccel:.96, gravity:-1, max_speed:4, 
+            num_particles_per_frame:1, scale_down:1, has_intermidiate_emission:true,
+         }));
+         const tail_emitter_idx = tail_emitter.idx;
          Widget_gfx_ready_enable({mesh:tail_emitter, enable_src_color_in_main:false, }); // Just to enable u_wposxy and u_blend_mode
 
          tail_emitter.EnableProperties(PARTICLES.HAS_FADE);
          tail_emitter.GfxEnableFn(SID.SHAD.FN_NOISE, {time:0});
          tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
 
-         // // tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-         // // tail_emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-         // // tail_emitter.EnableGfx(SID.SHAD.FN_NOISE); // TODO: Does nothing, there is no enable for '.FN_NOISE'
-         // tail_emitter.GfxEnableFn(SID.SHAD.FN_NOISE, {time:0}); // TODO: Does nothing, there is no enable for '.FN_NOISE'
-
-
-         // // tail_emitter.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-         // tail_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS, }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 4);
-
          tail_emitter.SetDir(1, 1);
 
          // Render 
          Particles_gen_gfx_ctx(tail_emitter, this.mesh);
+         Particle_system_init_particles(tail_emitter);
          // Initialize values to uniforms
          // tail_emitter.GfxUniformSetAndUpdate('u_noise_params', [.2, 0.4, .12, 0]);
          tail_emitter.GfxUniformSetAndUpdate('u_generic_controls', [.2, 0.4, .12, 0]);
-
-
-         Particle_system_emitter_set_position_xy(tail_emitter_idx, this.mesh.geom.pos[0], this.mesh.geom.pos[1]);
-         Particle_system_emitter_set_prev_position_xy(tail_emitter_idx);
-         Particle_system_emitter_enable_intermidiate_emission(tail_emitter_idx);
-
 
          this.tail_emitter_idx = tail_emitter_idx;
       }
@@ -175,14 +160,14 @@ export class Ball {
 
 }
 /** */
-export function Ball_init_buffer(x, y, groupidx = INT_NULL, parent_root_posidx = INT_NULL, parent_mesh_bufferidx) {
+export function Ball_init_buffer(x, y, groupidx = INT_NULL, parent = null) {
 
    let idx = 0;
-   const ball = new Ball(x, y, BALL_COLORS[idx], groupidx);
+   const ball = new Ball(x, y, BALL_COLORS[idx], groupidx, parent);
    let vb_groupidx = ball.mesh.gfx.vb.groupidx;
 
    // Implement to draw wpos from a root uniform wpos
-   if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(ball.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+   if (parent !== null) Mesh_unif_hack_parent_root_wpos(ball.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
    Ball_remove_mesh_byidx(ball.idx);
    idx++;
@@ -191,7 +176,7 @@ export function Ball_init_buffer(x, y, groupidx = INT_NULL, parent_root_posidx =
 
       idx = idx >= BALL_COLORS.length ? 0 : idx;
       const color = BALL_COLORS[idx];
-      const ball = new Ball(x, y, color, groupidx);
+      const ball = new Ball(x, y, color, groupidx, parent);
       Ball_remove_mesh_byidx(ball.idx);
 
       idx++;
@@ -441,6 +426,7 @@ export function Ball_update(bound_left, bound_right, bound_top, bound_bottom, pl
       ball.mesh.geom.pos[0] += ph.velx * (ph.speed + ph.accelx);
       ball.mesh.geom.pos[1] += ph.vely * (ph.speed + ph.accely);
       Mesh_update_set_wpos_xy(ball.mesh);
+      // console.log(ball.mesh.geom.pos[0], ball.mesh.geom.pos[1])
 
       if (ph.accelx < .1) ph.accelx = 0; // Avoid accel from reaching very small floating point vales
       else if (ph.accelx > 0) ph.accelx *= .99; //else console.log('Accel x is diminished')

@@ -254,7 +254,7 @@ export function Bullet_init_buffer(x, y, group_idx, parent_root_posidx, parent_m
       const bullet = new Bullet(x, y, _, _, _, vb_groupidx);
 
       // Implement to draw wpos from a root uniform wpos 
-      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(bullet.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(bullet.mesh.gfx.vb.render_groupidx, parent_root_posidx, parent_mesh_bufferidx);
 
       Bullet_remove_byidx(bullet.idx);
    }

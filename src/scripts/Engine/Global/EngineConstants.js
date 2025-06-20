@@ -258,7 +258,8 @@ const MESH_STATE_FLAGS = {
 _CNT = 0x1;
 const VIEW_GROUP_STATE_FLAGS = {
 
-	ACTIVE: _CNT,
+	ACTIVE: _CNT, 
+	IS_VB_ACTIVATED: _CNT <<= 0x1, // Has the vertex buffer been added to the renderqueue for rendering?
 	// IS_USED:_CNT,
 	IS_RENDERED: _CNT <<= 1,
 

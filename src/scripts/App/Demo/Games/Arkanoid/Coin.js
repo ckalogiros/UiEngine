@@ -15,6 +15,7 @@ import { Arkanoid_coin_counter_add } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top } from "./Player.js";
 import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_mesh_byidx } from "./ScoreMod.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -35,6 +36,8 @@ let coin_vb_groupidx = INT_NULL;
 let coins_view_group_idx = INT_NULL;
 /** */
 let is_all_animations_finished = false;
+/** */
+let coin_parent = null; // TODO: Is there another way to store a parent uppon init of balls???
 /** */
 export function Coin_is_all_animations_finished() { return is_all_animations_finished; }
 /** */
@@ -68,7 +71,7 @@ export function Arkanoid_coin_destroy() {
 /** */
 class Coin {
 
-   constructor(x = 0, y = 0, texture_file_id = COIN_TEXTURE, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, texture_file_id = COIN_TEXTURE, vb_groupidx = INT_NULL, groupidx, parent) {
 
       this.is_active = false;
 
@@ -76,27 +79,25 @@ class Coin {
       // Coin textured mesh
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[COIN_SIZE, COIN_SIZE], col:WHITE, name:'CoinMesh', texture_id:texture_file_id}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:COIN_SIZE, });
+      
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.SetViewGroupIndex(groupidx);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-
-
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx)
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
 
       if (coin_vb_groupidx === INT_NULL) coin_vb_groupidx = mesh.gfx.vb.groupidx;
 
 
-      if (vb_groupidx.label === INT_NULL) {
-         Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      }
+      // if (vb_groupidx.label === INT_NULL) {
+      //    Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
+      // }
 
       this.mesh = mesh;
+
       this.glow_mesh = null;
       this.score_mod = null;
 
@@ -129,7 +130,7 @@ class Coin {
       const x = this.glow_mesh.mesh.geom.pos[0] + this.glow_mesh.mesh.geom.dim[0];
       const y = this.glow_mesh.mesh.geom.pos[1] + this.glow_mesh.mesh.geom.dim[1];
 
-      const text_mesh_idx = Score_mod_create(0.5, '+0.5', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, color);
+      const text_mesh_idx = Score_mod_create(0.5, '+0.5', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, color, coins_view_group_idx, coin_parent);
       const score_mod = Score_mod_get_text_mesh_byidx(text_mesh_idx);
       this.score_mod = score_mod;
       return score_mod;
@@ -226,22 +227,26 @@ export function Coin_remove_all() {
    }
 }
 /** */
-export function Coin_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = PRE_INITIALIZED_COIN_MESHES) {
+export function Coin_init_buffer(group_idx, parent, num_effect_meshes = PRE_INITIALIZED_COIN_MESHES) {
 
    let vb_groupidx = INT_NULL;
    let coin = null;
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      coin = new Coin(_, _, _, vb_groupidx);
+      coin = new Coin(_, _, _, vb_groupidx, group_idx, parent);
       vb_groupidx = coin.mesh.gfx.vb.groupidx;
 
+      
       Coin_remove_byidx(coin.idx);
    }
-
+   
+   coin_parent = parent; 
    coins_view_group_idx = group_idx;
+   
    // Implement to draw wpos from a root uniform wpos 
-   if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(coin.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+   if (parent !== null) Mesh_unif_hack_parent_root_wpos(coin.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
+   // if (parent !== null) Mesh_unif_hack_parent_root_wpos(coin.mesh.root_posidx, parent.root_posidx, parent.mesh_bufferidx);
 
    return coin;
 }
@@ -277,7 +282,7 @@ export function Coin_create(x, y, w = COIN_SIZE, h = COIN_SIZE, w_src = 0, h_src
    }
    else { // If no apropriate free mesh was found, create new mesh
 
-      const coin = new Coin(xx, yy, _, coin_vb_groupidx);
+      const coin = new Coin(xx, yy, _, coin_vb_groupidx, coins_view_group_idx, coin_parent);
       idx = coin.idx;
       coin.is_active = true;
 

@@ -635,7 +635,6 @@ export class Mesh {
             if (this.uniforms[found_idx].ubidx === INT_NULL) {
 
                 // console.error('ubidx is INT_NULL. SEE if the uniform of this mesh has already been initialized for the vertex buffer.');
-
                 this.uniforms[found_idx].ubidx = Uniforms_buffer_find_ubidx_from_name(this.uniforms[found_idx].name, this.gfx.vb.groupidx)
 
                 if (this.uniforms[found_idx].ubidx === INT_NULL) {

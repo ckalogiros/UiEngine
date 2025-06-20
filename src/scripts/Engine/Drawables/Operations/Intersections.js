@@ -41,5 +41,5 @@ export function Check_intersection_point_rect(pos, dim, point, margin = [0,0]){
    const b = pos[1]+dim[1]*2+margin[1];
 
       // return b;
-   return Intersection_point_rect(point[0], point[1], l, r, t, b);
+   return Intersection_point_rect(point.x, point.y, l, r, t, b);
 }

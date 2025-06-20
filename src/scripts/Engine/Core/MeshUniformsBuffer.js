@@ -101,15 +101,12 @@ export function Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS=0x0,
    let parent_posidx = INT_NULL
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
-   // console.log(mesh.name, 'pos', mesh_pos)
-   // wpos[0] = mesh_pos[0];
-   // wpos[1] = mesh_pos[1];
+
    if(IS_VB_ROOT){
       wpos[0] = mesh_pos[0];
       wpos[1] = mesh_pos[1];
       mesh_pos[0] = 0;
       mesh_pos[1] = 0;
-      
    }
    
    
@@ -118,21 +115,7 @@ export function Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS=0x0,
       parent_meshidx = mesh_parent.mesh_bufferidx;
       // parent_posidx = mesh_parent.root_posidx;
       parent_posidx = mesh_parent.gfx.vb.render_groupidx;
-         
-         // if (mesh_type & MESH_TYPE.TEXT_MESH) {
-            
-         //    // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
-         //    wpos[0] = 0;
-         //    wpos[1] = 0;
-         // }
       }
-   //    else if(IS_VB_ROOT){
-   //       mesh_pos[0] = 0;
-   //       mesh_pos[1] = 0;
-   //    }
-      // console.log(mesh.name, 'pos', mesh_pos)
-   
-   
    
    const entry = {
       wpos: [wpos[0], wpos[1]],
@@ -151,75 +134,14 @@ export function Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS=0x0,
    
    // Store the uniform's index, for updating the uniforms on position change
    const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
-   if(wpos_ubidx_idx !== idx) alert('unif wpos idx does not match the ubidx wpos idx');
+   if(wpos_ubidx_idx !== idx) alert('unif wpos index does not match the ubidx index');
+   if(rgidx !== idx) alert('unif wpos index does not match the rendergroup index');
    
    // Mesh_set_and_update_wpos_uniform(progidx, debug_vb_groupidx, root_wpos, null)
 
 
    return idx;
 }
-/** DEPRECATED: Use only with RG */
-// export function Mesh_unif_create_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent, progidx, debug_vb_groupidx, ubidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, COPY_MESH_POS) {
-
-//    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
-//    let meshidx = mesh_bufferidx;
-//    let parent_posidx = INT_NULL
-//    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
-//    const wpos = [0, 0];
-
-//    if(IS_VB_ROOT){
-//       wpos[0] = mesh_pos[0];
-//       wpos[1] = mesh_pos[1];
-      
-//    }
-   
-
-//    let root_wpos = [wpos[0], wpos[1]];
-//    if (mesh_parent !== null){
-      
-//       // CopyArr2(root_wpos, Mesh_unif_get_vb_root_wpos(mesh_parent.root_posidx));  console.log('2', root_wpos);
-      
-//       parent_meshidx = mesh_parent.mesh_bufferidx;
-//       parent_posidx = mesh_parent.root_posidx;
-      
-//       if (mesh_type & MESH_TYPE.TEXT_MESH) {
-         
-//          // If wpos is text(seperate vb), we don't want the wpos offset to store the first text's pos as the offset of all texts that draw from the wpos
-//          wpos[0] = 0;
-//          wpos[1] = 0;
-//       }
-//    }
-//    else if(IS_VB_ROOT){
-//       mesh_pos[0] = 0;
-//       mesh_pos[1] = 0;
-//    }
-   
-   
-   
-//    const entry = {
-//       wpos: [wpos[0], wpos[1]],
-//       meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_wpos' buffer
-//       parent_posidx: parent_posidx,
-//       debug_vb_groupidx:debug_vb_groupidx,
-//       has_absolute_pos: HAS_ABSOLUTE_POS,
-//       sticky_pos: HAS_STICKY_POS,
-//       scroll_bar: INT_NULL, // unif_wpos index for any scrollbar. Use: Move the scrollbar with the root mesh move (seperately), because the scrollbars aren't children of any root unif
-//    }
-   
-//    _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
-   
-//    const idx = _per_vb_mesh_unif_wpos.Add(entry);
-   
-   
-//    // Store the uniform's index, for updating the uniforms on position change
-//    const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
-//    if(wpos_ubidx_idx !== idx) alert('unif wpos idx does not match the ubidx wpos idx');
-   
-//    // Mesh_set_and_update_wpos_uniform(progidx, debug_vb_groupidx, root_wpos, null)
-
-
-//    return idx;
-// }
 /** */
 export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_pos, mesh_type, mesh_nameidx, mesh_parent=null, 
                                                 progidx, vb_groupidx, HAS_ABSOLUTE_POS=0x0, HAS_STICKY_POS=0x0, IS_VB_ROOT, IS_VB_USED) {
@@ -232,8 +154,6 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    /**DEBUG*/ let parent_meshidx = INT_NULL; // For debugging
    const wpos = [0, 0];
 
-   // wpos[0] = mesh_pos[0];
-   // wpos[1] = mesh_pos[1];
  
    if(IS_VB_ROOT){
       wpos[0] = mesh_pos[0];
@@ -249,7 +169,8 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
          alert('47119181716 \nroot wpos ERROR. mesh is root and are on the same VB parent')
       }
       parent_meshidx = mesh_parent.mesh_bufferidx;
-      parent_posidx = mesh_parent.root_posidx;
+      // parent_posidx = mesh_parent.root_posidx;
+      parent_posidx = mesh_parent.gfx.vb.render_groupidx;
 
       if (mesh_type & MESH_TYPE.TEXT_MESH) {
 
@@ -286,10 +207,6 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh_bufferidx, mesh_po
    dbg_for_unifwpos.nameidx = mesh_nameidx;
    dbg_for_unifwpos.parent_meshidx = parent_meshidx;
    dbg_for_unifwpos.vbidx = vb_groupidx;
-   // _debug_names_per_vb_mesh_unif_wpos.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vb_groupidx });
-
-
-   // Mesh_set_and_update_wpos_uniform(progidx, vb_groupidx, unif_wpos.wpos, null)
 
    return vb_groupidx; // Return this unif wpos index(which matches the vb_groupidx)
 }

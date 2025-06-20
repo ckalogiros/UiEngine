@@ -3,7 +3,6 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
@@ -19,6 +18,9 @@ import { Coin_create } from "./Coin.js";
 import { Player_get_dimy, Player_get_top, Player_check_powup_collision } from "./Player.js";
 import { Powup_create, Powup_get_byidx, Powup_remove_byidx, Powup_resolve_hit } from "./PowerUps.js";
 import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_mesh_byidx } from "./ScoreMod.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -37,7 +39,7 @@ const BRICKS = {
    TYPES: [],
    HIT_SIDE: {},
    SCALE_DOWN: 1,
-   PRE_INITIALIZED_MESHES: 1,
+   PRE_INITIALIZED_MESHES: 80,
    ROW_PAD: 3, // Pad between rows
    COLUMN_PAD: 3, // Pad between columns
    PAD_X: 20, // Panel left-right pad
@@ -49,6 +51,7 @@ const BRICKS = {
    R_CORNERS: 10,
    ROW_HEIGHT: 0,
    COL_WIDTH: 0,
+   PARENT: null,
 
    Reset() {
       this.CURRENT_STAGE_INDEX = 0;
@@ -128,64 +131,57 @@ export function Arkanoid_bricks_destroy() {
    Free_int8_buffer(_free_brick_idxs_buffer);
 }
 /** */
+let aaa = true
 export class Brick {
 
-   constructor(x = 0, y = 0, color, name = 'BRICK', flags = 0x0, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, color, name = 'BRICK', flags = 0x0, groupidx, parent=null) {
 
       const posx = x;
       const posy = y;
 
-      // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
-      const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
+      const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
+      // const mesh = Create_rect_mesh(Style_rect_default_properties({ is_root:ROOT_WIDGETS.CREATE_ROOT, pos: [0, 0, 1], dim: [BRICKS.DIM_X_SCALED, BRICKS.DIM_Y_SCALED], col: color, name: name, }));
       Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 10, enable_src_color_in_main: true, });
 
 
-      // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
       // mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
 
-      mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
       // mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-      this.generic_control_values = [1., .5, .3, .0];
-      // this.generic_control_values = [1., 1., 1., .5];
-      // this.generic_control_values = [1., .5, .5, .0];
       // this.generic_control_values = [.4, .75, 1., .23];
-      // this.generic_control_values = [.4, 1., .4, .0];
-      // this.generic_control_values = [1., .26, .8, .0];
+      this.generic_control_values = [.4, .75, 1., .23];
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.generic_control_values.length);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
 
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      // parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
 
-      mesh.geom.pos[0] = posx;
-      mesh.geom.pos[1] = posy;
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-      // mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, vb_groupidx);
+      // console.error('***************************************************************')
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
+      if(aaa) {
+         mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
+         aaa=false;
+      }
+      mesh.GenGfxCtx();
+      // Widget_render(mesh);
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
       // // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
-      mesh.GfxUniformsSetClbk('u_generic_controls', () => {
-         return this.generic_control_values;
-      }, mesh.gfx.vb.groupidx);
+      mesh.GfxUniformsSetClbk('u_generic_controls', () => { return this.generic_control_values; }, mesh.gfx.vb.groupidx);
       // mesh.GfxUniformSetAndUpdate('u_scale2', [1, 1]);
 
       mesh.geom.dim[0] = BRICKS.DIM_X;
       mesh.geom.dim[1] = BRICKS.DIM_Y;
 
-
       this.mesh = mesh;
-
       this.is_active = false;
       this.flags = flags;
       this.lock_squash_anim = false;
       this.hit_side = BRICKS.HIT_SIDE.NONE;
 
-
       this.idx = _bricks_buffer.Add(this);
-
-
       this.powup_type_idx = INT_NULL;
 
    }
@@ -215,35 +211,32 @@ export function Brick_destroy_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 /** */
-export function Bricks_init_buffer(x=0, y=0, group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = BRICKS.PRE_INITIALIZED_MESHES) {
+export function Bricks_init_buffer(x=0, y=0, groupidx, parent, num_effect_meshes = BRICKS.PRE_INITIALIZED_MESHES) {
 
    Bricks_init();
 
-   let vb_groupidx = INT_NULL;
    let brick = null;
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      brick = new Brick(x, y, _, _, vb_groupidx);
-      vb_groupidx = brick.mesh.gfx.vb.groupidx;
+      brick = new Brick(x, y, _, _, _, groupidx, parent);
 
       // Implement to draw wpos from a root uniform wpos 
-      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(brick.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      // if (parent !== null) Mesh_unif_hack_parent_root_wpos(brick.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Brick_remove_byidx(brick.idx);
    }
 
+   
    const br = _bricks_buffer.buffer[0];
-
-   // br.mesh.GfxUniformSetAndUpdate('u_scale2', [BRICKS.SCALE_DOWN, 1]);
-   // br.mesh.GfxUniformSetAndUpdate('u_scale2', [1, 1]);
-   // br.mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, br.mesh.gfx.vb.groupidx);
-   // mesh.GfxUniformSetAndUpdate('u_generic_controls', this.generic_control_values); // Sdf-InnerShadow-Glow
+   br.mesh.GfxUniformSetAndUpdate('u_scale2', [BRICKS.SCALE_DOWN, 1]);
+   br.mesh.GfxUniformSetAndUpdate('u_generic_controls', br.generic_control_values); // Sdf-InnerShadow-Glow
    // br.mesh.GfxUniformsSetClbk('u_generic_controls', ()=>{ 
    //    return br.generic_control_values; 
    // }, br.mesh.gfx.vb.groupidx);
 
-   BRICKS.VB_GROUP_IDX = vb_groupidx;
+   BRICKS.VB_GROUP_IDX = brick.mesh.gfx.vb.groupidx;
+   BRICKS.PARENT = parent;
 
    return brick;
 }
@@ -262,7 +255,7 @@ export function Bricks_reset_all_deactivated_bricks() {
    _bricks_counter.count = 0;
 }
 /** */
-function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
+function Bricks_create(x, y, color, name, flags, groupidx) {
 
    let idx = INT_NULL;
 
@@ -289,7 +282,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
    }
    else { // If no apropriate free mesh was found, create new mesh
 
-      const brick = new Brick(0, 0, color, name, flags, vb_groupidx);
+      const brick = new Brick(0, 0, color, name, flags, groupidx, BRICKS.PARENT);
       idx = brick.idx;
 
       brick.mesh.geom.pos[0] = brick.mesh.geom.defPos[0] = x;
@@ -313,7 +306,7 @@ function Bricks_create(x, y, color, name, flags, vb_groupidx, group_idx) {
 }
 
 /** */
-export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
+export function Bricks_set_stage_bricks(x = 0, y = 0, groupidx) {
 
    // Here we add any padding for the bricks rows positioning
    // The brick row 0 is the refference position to remove all unecessary pading for calculating the row from the ball's position
@@ -346,7 +339,7 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
 
             const color = Bricks_resolve_color_from_flag(flags);
 
-            const brick = Bricks_create(posx, posy, color, `br-${i}-${j}`, flags, vb_groupidx, group_idx);
+            const brick = Bricks_create(posx, posy, color, `br-${i}-${j}`, flags, groupidx);
             _bricks_rows.buffer[i].AddAtIndex(j, brick.idx);
 
             _bricks_buffer.buffer[brick.idx].mesh.geom.pos[1] -= 800;
@@ -370,7 +363,7 @@ export function Bricks_set_stage_bricks(x = 0, y = 0, group_idx) {
    // Calculate number of alive rows 
    Bricks_set_alive_rows_counter();
 
-   console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[', _bricks_rows)
+   // console.log('[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[', _bricks_rows)
 
    return _bricks_buffer;
 }
@@ -386,7 +379,7 @@ function Bricks_set_alive_rows_counter() {
       }
    }
 
-   console.warn('_bricks_counter', _bricks_counter);
+   // console.warn('_bricks_counter', _bricks_counter);
 }
 /** */
 export function Bricks_get_alive_rows_counter() {
@@ -520,7 +513,7 @@ export function Bricks_check_collision(posx, posy, dimx, dimy, difx, dify, dirx,
             const b = posy + (dimy * 2);
 
             // console.log('br_l', br_l, 'br_t', br_t)
-            console.log('br_t', br_t,'ball t', t, )
+            // console.log('br_t', br_t,'ball t', t, )
 
             if (r > br_l && l < br_r && b > br_t && t < br_b) {
 
@@ -625,7 +618,7 @@ export function Bricks_check_collision_column_only(posx, posy, dimx, dimy, diry)
                rowidxs.RemoveByIdx(cols_found[j]);
                if (rowidxs.boundary < 0) {
                   _bricks_counter.rows_alive--;
-                  console.warn(_bricks_counter)
+                  // console.warn(_bricks_counter)
                }
 
                Clbk_animation_push(brick, posx, posy, dimx, dimy);
@@ -655,7 +648,7 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
    const x = brick.mesh.geom.pos[0];
    const y = brick.mesh.geom.pos[1];
 
-   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9]);
+   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9], BRICKS.VB_GROUP_IDX, BRICKS.PARENT);
    const score_mod = Score_mod_get_text_mesh_byidx(score_mod_idx);
 
    // Resolve the hit direction to move the brick
@@ -1088,8 +1081,7 @@ function Animation_powup_hit(x, y) {
    const time_step = 0.03, slope_const = 0.5, scale = 3;
    const slope_params_pointer = new Function_Slope(slope_const, time_step, scale);
 
-
-   const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, PURPLE[9]);
+   const text_mesh_idx = Score_mod_create(0.2, '+0.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, PURPLE[9], BRICKS.VB_GROUP_IDX, BRICKS.PARENT);
    const label = Score_mod_get_text_mesh_byidx(text_mesh_idx);
 
 

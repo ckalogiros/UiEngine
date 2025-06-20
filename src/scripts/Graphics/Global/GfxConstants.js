@@ -320,7 +320,8 @@ const GFX_CTX_FLAGS = {
     // Render groups
     RENDER_GROUP_NEW: _CNT<<=0x1,
     RENDER_GROUP_FROM_NEW: _CNT<<=0x1, // Stop search at parent new group, and create new group for the mesh
-    RENDER_GROUP_FROM_ALL: _CNT<<=0x1, // Dont stop search until the whole view group is searched
+    RENDER_GROUP_MATCH_FROM_GROUP: _CNT<<=0x1,
+    RENDER_GROUP_MATCH_FROM_RENDER_GROUP: _CNT<<=0x1,
 
 
     // UNUSED

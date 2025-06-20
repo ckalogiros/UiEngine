@@ -94,10 +94,9 @@ export function Gl_draw(gl) {
 
                 const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                // gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                console.log('BUFFER_DATA', vb_groupidx)
+                // console.log('BUFFER_DATA', vb_groupidx)
             }
             else if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
                 const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
@@ -112,6 +111,7 @@ export function Gl_draw(gl) {
                 const vb_data = Vertex_buffer_get_by_vbidx(render_group.vb_data_idx);
                 // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
                 gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
+                // gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, 400);
                 
                 // console.log('!!: bufferSubData', vb_info.vbidx)
                 
@@ -120,6 +120,14 @@ export function Gl_draw(gl) {
                 GL_STATE.BOUND_VBIDX = render_group.vb_data_idx;
 
 
+                // console.log(
+                //     'render_group.vb_data_idx', render_group.vb_data_idx,
+                //     'rgidx', rgidx,
+                //     'vb_data', vb_data.length,
+                //     'render_group.start', render_group.start,
+                //     'render_group.count', render_group.count,
+                // )
+                
                 // console.log('SUB_DATA')
 
                 // console.log(render_group.start, render_group.count, vb_data.length);
@@ -142,13 +150,11 @@ export function Gl_draw(gl) {
              * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
             */
 
-            const index_elements_offset = 6*j;
             const instance_count = 1;
-
             // gl.LINES, gl.POINTS, gl.TRIANGLES
             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, instance_count)
             // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, instance_count)
-            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 6, instance_count)
+            // gl.drawElementsInstanced(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0, instance_count)
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
 

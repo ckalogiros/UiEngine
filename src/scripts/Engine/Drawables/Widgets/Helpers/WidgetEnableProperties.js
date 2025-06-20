@@ -674,3 +674,31 @@ export function Style_color_picker_default_properties(user_properties) {
 
    return properties;
 }
+/** */
+// name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down
+export function Style_particles_system_default_properties(user_properties) {
+   const properties = {
+      is_root: user_properties.is_root,
+      
+      name: user_properties.name !== undefined ? user_properties.name : 'ParticlesSystem',
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+      dim: user_properties.dim !== undefined ? user_properties.dim : [10,10],
+      col: user_properties.col,
+      t_step: user_properties.t_step !== undefined ? user_properties.t_step : .0001,
+      life_time: user_properties.life_time !== undefined ? user_properties.life_time : 1,
+      accel: user_properties.accel !== undefined ? user_properties.accel : 1,
+      deccel: user_properties.deccel !== undefined ? user_properties.deccel : .99,
+      gravity: user_properties.gravity !== undefined ? user_properties.gravity : 0,
+      max_speed: user_properties.max_speed !== undefined ? user_properties.max_speed : 2,
+      texture_id: user_properties.texture_id !== undefined ? user_properties.texture_id : INT_NULL,
+      num_particles_per_frame: user_properties.num_particles_per_frame !== undefined ? user_properties.num_particles_per_frame : 1,
+      scale_down: user_properties.scale_down !== undefined ? user_properties.scale_down : 1,
+      has_intermidiate_emission: user_properties.has_intermidiate_emission !== undefined ? user_properties.has_intermidiate_emission : false,
+
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+   };
+
+
+  return properties;
+
+}

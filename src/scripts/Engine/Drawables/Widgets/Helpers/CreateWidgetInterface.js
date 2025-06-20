@@ -11,6 +11,7 @@ import { Widget_Switch_Simple } from "../WidgetSwitch.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
 import { Widget_Color_Picker } from "../WidgetColorPicker.js";
 import { Mesh_set_name } from "../../Operations/MeshPropertiesFunctions.js";
+import { Particle_system_create_emitter } from "../../../ParticlesSystem/ParticlesSystem.js";
 
 /**
  * All Functions to create widgets.
@@ -246,6 +247,22 @@ export function Create_widget_color_picker(is_root = 0x0, margin, pos, dim, col,
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Color_Picker(mesh_bufferidx, is_root, margin, pos, dim, col, name, style, _, is_debug_mesh));
 
    if (NOTIFICATIONS_ON && !is_debug_mesh)
+      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
+
+   return _mesh_buffer.buffer[mesh_bufferidx];
+}
+/**
+ * @param {*} properties name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down
+ * @returns 
+ */
+export function Create_particle_emitter(properties) {
+
+   const _mesh_buffer = Mesh_buffer_get();
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, Particle_system_create_emitter(mesh_bufferidx, name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down));
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, Particle_system_create_emitter(mesh_bufferidx, properties));
+
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];

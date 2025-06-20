@@ -31,7 +31,7 @@ export const ARK_STATE = {
 };
 
 // ARK_STATE.RESET(ARK_STATE.START);
-// ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
+ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
 
 
@@ -158,6 +158,19 @@ export function Arkanoid_initialize_stages_schema() {
       [c|i,___,c|o,d|o,___,b|o,c|o,___,b|o], // 12
       [c|o,___,c|l,d|o,___,b|o,c|o,___,b|o], // 13
    ];
+   // const BRICKS_STAGE_NO_POWUPS_TEST = [
+   //    [___,___,___,___,a,___,___,___,___], // 1
+   //    [___,___,___,a,b,a,___,___,___], // 2 
+   //    [___,___,a,c,b,c,a,___,___], // 3
+   //    [___,a,c,d,b,d,c,a,___], // 4
+   //    [a,c,d,d,b,d,d,c,a], // 5
+   //    [___,a,c,d,b,d,c,a,___], // 6
+   //    [___,___,a,c,b,c,a,___,___], // 7
+   //    [___,___,___,a,b,a,___,___,___], // 8
+   // ];
+   const BRICKS_STAGE_NO_POWUPS_TEST = [
+      [a,b,c,d,a,b,c,d], // 1
+   ];
    const BRICKS_STAGE_2 = [
       [___,___,___,___,a|o,___,___,___,___], // 1
       [___,___,___,a|o,b|o,a|o,___,___,___], // 2 
@@ -191,21 +204,22 @@ export function Arkanoid_initialize_stages_schema() {
 
    let cnt = 0;
    // Set the sequence of each consecutive stage
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_NO_POWUPS_TEST;
    BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
 }
 
 
