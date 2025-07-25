@@ -8,7 +8,7 @@ import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, GREENL, GREY, ORANGER, PURPL
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Switch_simple_time_interval_callback } from '../../Engine/Drawables/Widgets/WidgetSwitch.js';
-import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx, Particle_system_init_particles } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
+import { Particle_system_create_emitter, Particle_system_emitt, Particles_get_particle_system, Particles_gen_gfx_ctx, Particle_system_init_particles, Particle_system_set_uwpos_x, Particle_system_set_uwpos_y } from '../../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Time_intervals_create } from '../../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer, Timer_get_global_timer_cycle } from '../../Engine/Timers/Timers.js';
 import { CopyArr4 } from '../../Helpers/Math/MathOperations.js';
@@ -19,10 +19,17 @@ import { Mesh_add_wpos_xy } from '../../Engine/Drawables/Operations/MeshAttribut
 import { Align_nested_sections_pre } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Color_theme_label_auto, Color_theme_slider_auto, Color_theme_switch_auto } from '../../Engine/Drawables/Material/Themes.js';
 import { Widget_render } from '../../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
+import { View_destroy_view_group_and_meshes } from '../../Engine/Core/Views/MeshBufferViews.js';
 
 
 const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
 const text_pad = [16, 10];
+// Init values for smoke Transform/physics parameters: Gravity , Acceleration , Deccelerarion , Set Emitter X Position , Set Emitter Y Position 
+const physics_init_values = {
+   grav:{max:1.0, start:-0.5,},
+   accel:{max:15.0, start:0.0,},
+   deccel:{h:1.0, k:-2.8, r:3.8 * 3.8}, // 
+};
 
 
 // const control_parameters = {
@@ -74,7 +81,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       name:'GlowParticles', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
    }));
    // let emitter = Particles_get_particle_system(emitter1_idx);
    Widget_gfx_ready_enable({ mesh: emitter, enable_sdf_rect: particles_size, enable_unif_scale: true });
@@ -132,18 +139,18 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       // The values are interpolated based on 'Create_particles_controls()' 
 
       {
-         const max = 1, start = -.5;
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
          const v = (transform_parameters[0] * max) + start;
          emitter.gravity = v;
       }
       {
-         const max = 25, start = 0;
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
          const v = (transform_parameters[1] * max) + start;
          emitter.accel = v;
          emitter.max_speed = 4;
       }
       {
-         const h = 1, k = -2.8, r = 3.8 * 3.8;
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
          const x = transform_parameters[2];
          const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
          emitter.deccel = v;
@@ -250,7 +257,7 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
       name:'GlowParticlesTest', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
    }));
    // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true, });
    Widget_gfx_ready_enable({ mesh: emitter, enable_unif_scale: true, });
@@ -308,18 +315,18 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
       // The values are interpolated based on 'Create_particles_controls()' 
 
       {
-         const max = 1, start = -.5;
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
          const v = (transform_parameters[0] * max) + start;
          emitter.gravity = v;
       }
       {
-         const max = 25, start = 0;
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
          const v = (transform_parameters[1] * max) + start;
          emitter.accel = v;
          emitter.max_speed = 4;
       }
       {
-         const h = 1, k = -2.8, r = 3.8 * 3.8;
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
          const x = transform_parameters[2];
          const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
          emitter.deccel = v;
@@ -434,7 +441,7 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
       name:'SparkleParticles', 
       col:PURPLEB[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
    }));
    Widget_gfx_ready_enable({ mesh: emitter, enable_unif_scale: true, })
 
@@ -454,18 +461,18 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
       // The values are interpolated based on 'Create_particles_controls()' 
 
       {
-         const max = 1, start = -.5;
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
          const v = (transform_parameters[0] * max) + start;
          emitter.gravity = v;
       }
       {
-         const max = 25, start = 0;
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
          const v = (transform_parameters[1] * max) + start;
          emitter.accel = v;
          emitter.max_speed = 4;
       }
       {
-         const h = 1, k = -2.8, r = 3.8 * 3.8;
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
          const x = transform_parameters[2];
          const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
          emitter.deccel = v;
@@ -587,7 +594,6 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
  */
 /*********************************************************************************************************************************************************************************************/
 
-
 export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame = 10, generic_controls_parameters = [0, .6, .3], transform_parameters=null) { // 3 control Sliders 
 
    const scale_down = .14;
@@ -604,7 +610,8 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
       name:'ExplosionParticles', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, scale_down:scale_down,
+      // num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:false, num_particles:20, scale_down:scale_down,
    }));
    Widget_gfx_ready_enable({ mesh: emitter, enable_sdf_rect: particles_size, enable_unif_scale: true, });
 
@@ -624,18 +631,19 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
       // The values are interpolated based on 'Create_particles_controls()' 
 
       {
-         const max = 1, start = -.5;
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
          const v = (transform_parameters[0] * max) + start;
          emitter.gravity = v;
       }
       {
-         const max = 25, start = 0;
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
          const v = (transform_parameters[1] * max) + start;
+
          emitter.accel = v;
          emitter.max_speed = 4;
       }
       {
-         const h = 1, k = -2.8, r = 3.8 * 3.8;
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
          const x = transform_parameters[2];
          const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
          emitter.deccel = v;
@@ -672,7 +680,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    const zpos = -1
 
-   const switch_panel = Create_emitt_switch_panel({ z: zpos, emitter: emitter, emitt_options: { continuous_emitt: true, button_pres_emitt: true } });
+   const switch_panel = Create_emitt_switch_panel({ z: zpos, emitter: emitter, emitt_options: { continuous_emitt: false, button_pres_emitt: true } });
    controls_section.AddItem(switch_panel);
 
    const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
@@ -777,13 +785,12 @@ export function Create_particles_controls(emitter, color = GREY[2], parameters =
       { // Gravity
          const slider = Create_slider_control(slider_dim, color, 'Gravity', slider_rcorners, default_font,);
          controls_buffer.push(slider);
-         // slider.SetInitialValue(parameters ? parameters[0] : .48);
          slider.SetInitialValue((parameters && parameters[0]!==undefined) ? parameters[0] : .48);
 
          Slider_connect(slider, (params, slider_val) => {
 
             // Linear Interpolation
-            const max = 1, start = -.5;
+            const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
             const v = (slider_val * max) + start;
             emitter.gravity = v;
 
@@ -799,10 +806,8 @@ export function Create_particles_controls(emitter, color = GREY[2], parameters =
 
          Slider_connect(slider, (params, slider_val) => {
 
-            // emitter.accel = slider_val;
-
             // Linear Interpolation
-            const max = 25, start = 0;
+            const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
             const v = (slider_val * max) + start;
             emitter.accel = v;
             emitter.max_speed = 4;
@@ -819,11 +824,10 @@ export function Create_particles_controls(emitter, color = GREY[2], parameters =
 
          Slider_connect(slider, (params, slider_val) => {
 
-            const h = 1, k = -2.8, r = 3.8 * 3.8;
+            const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
             const x = slider_val;
             const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
             emitter.deccel = v;
-
 
             if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[2] = slider_val;
 
@@ -978,8 +982,7 @@ export function Create_particles_controls(emitter, color = GREY[2], parameters =
 /** Smoke Particles - Textured
  */
 /*********************************************************************************************************************************************************************************************/
-
-export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create = true) {
+export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.CREATE_ROOT, controls_create = true, num_particles_per_frame = 10, generic_controls_parameters = [.13, .4], transform_parameters=null) {
 
    const emitters = [];
    const emitter_idxs = [];
@@ -997,7 +1000,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
       col:YELLOWR[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
       texture_id:TEXTURES.SMOKE_1,
-      num_particles_per_frame:2, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
    }));
    Widget_gfx_ready_enable({ mesh: emitter, })
 
@@ -1007,7 +1010,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    emitter.EnableProperties(PARTICLES.HAS_FADE);
    emitter.speed = speed;
 
-   emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
+   emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
 
    emitter.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.TEX2, { time: 0 });
    emitter.GfxPassAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.TEX2);
@@ -1021,22 +1024,46 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
       // emitter.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
    }
 
+   if(transform_parameters) {
+      // The values are interpolated based on 'Create_particles_controls()' 
+      
+      {
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
+         const v = (transform_parameters[0] * max) + start;
+         emitter.gravity = v;
+      }
+      {
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
+         const v = (transform_parameters[1] * max) + start;
+         emitter.accel = v;
+         // emitter.max_speed = 1;
+      }
+      {
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
+         const x = transform_parameters[2];
+         const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
+         emitter.deccel = v;
+      }
+      {
+         const v = transform_parameters[3] * VIEWPORT.WIDTH;
+         emitter.geom.pos[0] = v;
+      }
+      {
+         const v = transform_parameters[4] * VIEWPORT.HEIGHT;
+         emitter.geom.pos[1] = v;
+      }
+   }
 
    Particles_gen_gfx_ctx(emitter);
    Particle_system_init_particles(emitter);
 
-   emitter.GfxUniformSetAndUpdate('u_generic_controls', [.2, 1.]);
+   emitter.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
 
    emitter.SetConeOfDirection(1, 1, -.1, .2);
 
    emitters[cnt] = emitter;
    emitter_idxs[cnt] = emitter.idx;
    cnt++;
-
-
-
-
-
 
 
 
@@ -1133,23 +1160,6 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
    /****************************************************************************************************************/
    // Create Sliders for manipulating variables of particles
 
-   
-   // // Contols for shader params
-   // if (emitter.sid.unif & SID.UNIF.U_SCALE_VEC2) {
-   //    const slider = Create_slider_control(slider_dim, slider_col, 'Scale', slider_rcorners, default_font,);
-   //    controls_buffer.push(slider);
-   //    slider.SetInitialValue(shader_parameters ? shader_parameters[0] : emitter.geom.scale[0]);
-   //    Slider_connect(slider, (params, slider_val) => {
-         
-   //       const val_idx = 0;
-   //       // Find the ubidx
-   //       const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
-   //       Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-         
-   //    }, { mnemonics: { shader_parameters: shader_parameters }, },);
-   // }
-
-
    // Contols for tarnsform and physics
    { // Gravity
       const slider = Create_slider_control(slider_dim, slider_col, 'Gravity', slider_rcorners, default_font,);
@@ -1158,9 +1168,9 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
       Slider_connect(slider, (params, slider_val) => {
 
          // Linear Interpolation
-         const max = 1, start = -.5;
-         const y = (slider_val * max) + start;
-         emitter.gravity = y;
+         const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
+         const v = (slider_val * max) + start;
+         emitter.gravity = v;
 
          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[0] = slider_val;
 
@@ -1176,9 +1186,9 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
          emitter.accel = slider_val;
 
          // Linear Interpolation
-         const max = 15, start = 0;
-         const y = (slider_val * max) + start;
-         emitter.accel = y;
+         const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
+         const v = (slider_val * max) + start;
+         emitter.accel = v;
          emitter.max_speed = 4;
 
          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[1] = slider_val;
@@ -1192,11 +1202,10 @@ export function Create_smoke_particles_controls(emitter, color = GREY[2], parame
       Slider_connect(slider, (params, slider_val) => {
 
          /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
-         const h = 1, k = -2.8, r = 3.8 * 3.8;
+         const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
          const x = slider_val;
-         let y = 0;
-         y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
-         emitter.deccel = y;
+         const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
+         emitter.deccel = v;
 
          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[2] = slider_val;
 
@@ -1292,7 +1301,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    for (let i = 0; i < num_balls; i++) {
 
       const dim = [comet_size, comet_size]
-      const pos = [100, 100]
+      // const pos = [100, 100]
+      const pos = [0, 0]
 
       const ball = Create_rect_mesh(Style_rect_default_properties({ pos: [pos[0], pos[1], 2], dim: dim, col: WHITE, name: 'Ball', }));
       Widget_gfx_ready_enable({ mesh: ball, enable_sdf_rect: dim[0], listener: { type: LISTEN_EVENT_TYPES.MOVE } })
@@ -1312,12 +1322,12 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       // const glow_emitter_idx = Particle_system_create_emitter('Glow Particles', TRANSPARENCY(color, .5), [0, 0, 3], [glow_size, glow_size], .005, 1., 1.8, .99, 0, 16, _, 1, scale_down);
       const glow_emitter = Create_particle_emitter(Style_particles_system_default_properties({
          name:'TailGlowParticles', 
+         // col:color, pos:[x, y, 10], dim:[glow_size, glow_size], 
          col:color, pos:[0, 0, 10], dim:[glow_size, glow_size], 
          t_step:.005, life_time:1, accel:1.8, deccel:.99, gravity:0, max_speed:16, 
-         num_particles_per_frame:1, scale_down:scale_down,
+         num_particles_per_frame:1, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
       }));
-      // Widget_gfx_ready_enable({ mesh: glow_emitter, enable_sdf_rect: particles_size, enable_unif_scale: true })
-      Widget_gfx_ready_enable({ mesh: glow_emitter, enable_sdf_rect: 10, enable_unif_scale: true })
+      Widget_gfx_ready_enable({ mesh: glow_emitter, enable_sdf_rect: particles_size, enable_unif_scale: true })
       
       glow_emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, glow_generic_controls_parameters.length);
 
@@ -1340,9 +1350,10 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       // const tail_emitter_idx = Particle_system_create_emitter(`Tail Particles ${i}`, color, [0, 0, 1], [particles_size, particles_size], 0.015, 1, 0, _, _, 4, _, 1, scale_down);
       const tail_emitter = Create_particle_emitter(Style_particles_system_default_properties({
          name:'TailNoiseParticles', 
+         // col:color, pos:[x, y, 10], dim:[particles_size, particles_size], 
          col:color, pos:[0, 0, 10], dim:[particles_size, particles_size], 
          t_step:.015, life_time:1, accel:0, deccel:_, gravity:_, max_speed:4, 
-         num_particles_per_frame:1, scale_down:scale_down,
+         num_particles_per_frame:1, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
       }));
       Widget_gfx_ready_enable({ mesh: tail_emitter, enable_src_color_in_main: false }); // Just to enable u_wposxy and u_blend_mode
 
@@ -1380,8 +1391,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    for (let i = 0; i < num_balls; i++) {
 
       const glow_emitter = glow_emitter_buffer[i];
-      // Particles_gen_gfx_ctx(glow_emitter, particles_panel);
-      Particles_gen_gfx_ctx(glow_emitter);
+      Particles_gen_gfx_ctx(glow_emitter, particles_panel);
+      // Particles_gen_gfx_ctx(glow_emitter);
       Particle_system_init_particles(glow_emitter);
       // Initialize values to uniforms
       glow_emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
@@ -1390,8 +1401,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       
       // Render Ball tail particles on top of the glow particles
       const tail_emitter = noise_emitter_buffer[i];
-      // Particles_gen_gfx_ctx(tail_emitter, particles_panel);
-      Particles_gen_gfx_ctx(tail_emitter);
+      Particles_gen_gfx_ctx(tail_emitter, particles_panel);
+      // Particles_gen_gfx_ctx(tail_emitter);
       Particle_system_init_particles(tail_emitter);
       // Initialize values to uniforms
       tail_emitter.GfxUniformSetAndUpdate('u_generic_controls', noise_generic_controls_parameters);
@@ -1478,7 +1489,8 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
                else {
    
                   const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
-                  colorpicker.Destroy();
+                  // colorpicker.Destroy();
+                  View_destroy_view_group_and_meshes(colorpicker.group_bufferidxs[0]);
                }
             },
             null, cp_params, _,
@@ -1513,6 +1525,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
       }
 
       controls_section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
+      // controls_section.GfxCtxAddFlag();
       
       
       /****************************************************************************************************************/
@@ -1725,12 +1738,107 @@ export function Create_comet_glow_contols(glow_emitter_buffer, color = GREY[2], 
 
 export function Comet_create_controls(noise_emitter_buffer, noise_control_parameters, generic_contols_parameters, uniform_name, glow_emitter_buffer, glow_control_parameters,) {
 
-   const controls_buffer = Create_comet_noise_contols(noise_emitter_buffer, _, noise_control_parameters, generic_contols_parameters, uniform_name);
-   const glow_controls_buffer = Create_comet_glow_contols(glow_emitter_buffer, _, glow_control_parameters, uniform_name);
+   const controls_buffer = [];
 
-   const len = glow_controls_buffer.length;
-   for (let i = 0; i < len; i++) {
-      controls_buffer.push(glow_controls_buffer[i]);
+   { // Create color picker panel
+
+      const panel_col = Color_hsv_to_rgb_calibrated(.0 , 0, 0.9, 1, .18, 0);
+      const label_theme = Color_theme_label_auto(.33, .8, .28, .0);
+      const switch_theme = Color_theme_switch_auto(.33, .8, .28, .0);
+      
+      // const panel_col = Color_hsv_to_rgb_calibrated(.0, .0, .8, 1, .12, .0);
+      // const label_theme = Color_theme_label_auto(.6, .8, .2, .0);
+      // const switch_theme = Color_theme_switch_auto(.6, 1., .2, .0);
+
+      const panel = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 1], col: panel_col, name: 'color_picker_panel', layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+      Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 16, })
+      
+      // Create label
+      // const label = Create_widget_label(Style_label_default_properties({ text: 'Colorpicker', pos: [0, 0, 2], theme: Color_theme_label_auto(.0, .2, 1, 1, .8, 0), text_col:Color_hsv_to_rgb_calibrated(.60, .3, 1., 1, 1, 1), text_pad: text_pad, texture_id: default_font, layout: LAYOUT.VERTICAL }));
+      const label = Create_widget_label(Style_label_default_properties({ text: 'Colorpicker', pos: [0, 0, 2], theme: label_theme, text_pad: text_pad, texture_id: default_font, layout: LAYOUT.VERTICAL }));
+      Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 16, })
+      panel.AddItem(label);
+      
+      const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 18, theme: switch_theme, name: 'color_picker_switch' }));
+      Widget_gfx_ready_enable({ mesh: colorpicker_switch, enable_sdf_rect: 18, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP } })
+      panel.AddItem(colorpicker_switch);
+
+      controls_buffer.push(panel);
+
+      // Create events
+      const cp_params = {
+         noise_emitter_buffer: noise_emitter_buffer,
+         glow_emitter_buffer: glow_emitter_buffer,
+         mnemonics: { transparency: 0.5, hue: 0.5, color: null },
+      };
+      colorpicker_switch.Bind(
+         (params) => {
+
+            /**
+             * This is the callback function that the switch is calling upon switch.OnClick via the 'switch.evt_params.EventClbk()'.
+             */
+            const switch_mesh = params.target_mesh;
+            const isOn = switch_mesh.isOn;
+
+            const x = 0;
+            const y = VIEWPORT.HEIGHT - 300;
+
+
+            if (isOn) {
+
+               const transparency = params.params.mnemonics.transparency;
+               const hue = params.params.mnemonics.hue;
+               const color = params.params.mnemonics.color;
+
+               const colorpicker = Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, x, y, 300, 300,);
+               colorpicker.SetTransparencySliderSetInitialValue(transparency);
+               colorpicker.SetHueSliderSetInitialValue(hue);
+
+               colorpicker.AssignTargetMeshClbk((col, params) => {
+
+                  const noise_emitter_buffer = params.noise_emitter_buffer;
+                  const glow_emitter_buffer = params.glow_emitter_buffer;
+                  const color = col;
+
+                  const len = noise_emitter_buffer.length;
+                  for (let i = 0; i < len; i++) {
+
+                     const tail_emitter = noise_emitter_buffer[i];
+                     const glow_emitter = glow_emitter_buffer[i];
+
+                     CopyArr4(tail_emitter.mat.col, color);
+                     CopyArr4(glow_emitter.mat.col, color);
+                  }
+                  // TODO: store all the colorpicker params in mnemonics
+                  // params.mnemonics.color = color;
+               }, params.params);
+               switch_mesh.temporary_renameme = colorpicker.mesh_bufferidx; // TODO: TEMPORARY assign. We need a way to store the colorpicker's index somewhere so that this callback can destroy it
+            }
+            else {
+
+               const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
+               // colorpicker.Destroy();
+               View_destroy_view_group_and_meshes(colorpicker.group_bufferidxs[0]);
+            }
+         },
+         null, cp_params, _,
+      );
+
+   }
+
+   const noise_controls_buffer = Create_comet_noise_contols(noise_emitter_buffer, _, noise_control_parameters, generic_contols_parameters, uniform_name);
+   {
+      const len = noise_controls_buffer.length;
+      for (let i = 0; i < len; i++) {
+         controls_buffer.push(noise_controls_buffer[i]);
+      }
+   }
+   const glow_controls_buffer = Create_comet_glow_contols(glow_emitter_buffer, _, glow_control_parameters, uniform_name);
+   {
+      const len = glow_controls_buffer.length;
+      for (let i = 0; i < len; i++) {
+         controls_buffer.push(glow_controls_buffer[i]);
+      }
    }
 
    return controls_buffer;
@@ -1777,6 +1885,7 @@ function Animate_comet(params) {
       ball.geom.pos[1] += y;
 
       const pos = [ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]];
+      // const pos = [ball.geom.pos[0], ball.geom.pos[1]];
       tail_emitter.geom.pos[0] = pos[0];
       tail_emitter.geom.pos[1] = pos[1];
 
@@ -1811,7 +1920,7 @@ function Animate_comet(params) {
       }
 
 
-      // Particle_system_emitt({ params: { target_params: [tail_emitter_idx], } });
+      Particle_system_emitt({ params: { target_params: [tail_emitter_idx], } });
       /*********************************************************************************************************/
       // Secondary Particles
       glow_particles.geom.pos[0] = pos[0];
@@ -1950,7 +2059,7 @@ export function Test_noise_shader() {
          col:PURPLEB[9], pos:[0, 0, 10], dim:[dim[0], dim[1]], 
          t_step:.003, life_time:1, accel:1, deccel:.96, gravity:-1, max_speed:3, 
          texture_id:TEXTURES.SMOKE_1,
-         num_particles_per_frame:1, scale_down:1,
+         num_particles_per_frame:1, is_continuous_emmit:true, num_particles:1, scale_down:1,
       }));
 
       emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
@@ -2109,7 +2218,8 @@ export function Test_noise_shader() {
             else {
 
                const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
-               colorpicker.Destroy();
+               // colorpicker.Destroy();
+               View_destroy_view_group_and_meshes(colorpicker.group_bufferidxs[0]);
             }
          },
          null, null,
@@ -2135,9 +2245,9 @@ export function Test_noise_shader() {
 
          Slider_connect(slider, (params, slider_val) => {
 
-            const max = 1, start = -.5;
-            const y = (slider_val * max) + start;
-            emitters[0].gravity = y;
+            const max = physics_init_values.grav.max, start = physics_init_values.grav.start;
+            const v = (slider_val * max) + start;
+            emitters[0].gravity = v;
          }, _);
       }
       { // Acceleration
@@ -2152,9 +2262,9 @@ export function Test_noise_shader() {
             emitters[0].accel = slider_val;
 
             // Linear Interpolation
-            const max = 15, start = 0;
-            const y = (slider_val * max) + start;
-            emitters[0].accel = y;
+            const max = physics_init_values.accel.max, start = physics_init_values.accel.start;
+            const v = (slider_val * max) + start;
+            emitters[0].accel = v;
             emitters[0].max_speed = 4;
          }, _);
       }
@@ -2167,11 +2277,10 @@ export function Test_noise_shader() {
          Slider_connect(slider, (params, slider_val) => {
 
             /* Solve for y~={0.86, 1.0} => {h:1, k:-2.8, r:3.8} */
-            const h = 1, k = -2.8, r = 3.8 * 3.8;
+            const h = physics_init_values.deccel.h, k = physics_init_values.deccel.k, r = physics_init_values.deccel.r;
             const x = slider_val;
-            let y = 0;
-            y = Math.sqrt(-((x - h) * (x - h)) + r) + k;
-            emitters[0].deccel = y;
+            const v = Math.sqrt(-((x - h) * (x - h)) + r) + k;
+            emitters[0].deccel = v;
 
          }, _);
       }
@@ -2419,7 +2528,8 @@ function Create_color_picker_switch_panel(z, emitter) {
          else {
 
             const colorpicker = Mesh_buffer_get_mesh_byidx(switch_mesh.temporary_renameme)
-            colorpicker.Destroy();
+            // colorpicker.Destroy();
+            View_destroy_view_group_and_meshes(colorpicker.group_bufferidxs[0]);
          }
       },
       null, { mnemonics: { transparency: 0.5, hue: 0.5, color: null }, }, _,

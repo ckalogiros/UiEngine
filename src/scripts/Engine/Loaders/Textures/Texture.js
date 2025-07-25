@@ -252,7 +252,6 @@ function Gl_texture_unit_delete_all() {
 		if(_textureBuffer[i] !== null){
 			
 			const tbo = _textureBuffer[i].tbo;
-			gfxCtx.gl.activeTexture(_textureBuffer[i].tex_unit_id);
 			gfxCtx.gl.bindTexture(gfxCtx.gl.TEXTURE_2D, null);
 			gfxCtx.gl.deleteTexture(tbo);
 		}

@@ -120,7 +120,8 @@ export class Ball {
             name:'NoiseTestParticles', 
             col:color, pos:[0, 0, 10], dim:[particles_size, particles_size], 
             t_step:0.015 + mod, life_time:1, accel:0, deccel:.96, gravity:-1, max_speed:4, 
-            num_particles_per_frame:1, scale_down:1, has_intermidiate_emission:true,
+            num_particles_per_frame:1,  is_continuous_emmit:true, num_particles:1,
+            scale_down:1, has_intermidiate_emission:true,
          }));
          const tail_emitter_idx = tail_emitter.idx;
          Widget_gfx_ready_enable({mesh:tail_emitter, enable_src_color_in_main:false, }); // Just to enable u_wposxy and u_blend_mode

@@ -1,5 +1,8 @@
 TODO
 
+All games that use an interval for their gam loop should be replaced by:
+We already have an app loop. Construct a mechanism that uses that loop 
+
 #BUG: If a text begins with a new line character, then any change to the text is aborted
    SetTextFromString() etc...
 
@@ -20,7 +23,7 @@ TODO
 
 # IMIDIATELY:  Check the uniform_bindings for each vb to be equal to 1 per uniform and not 1 per uniform per RG
    because I think I found 3 u_wpos bindings for 1 vb.
-   And also we are gonna need to pass the argidx from the bindings update to all Clbk's
+   And also we are gonna need to pass the rgidx from the bindings update to all Clbk's
    and handle which values should get at the Clbk site 
 
 # Correct the root_posidx. The idx value is the same with rgidx
@@ -44,7 +47,7 @@ TODO
 
 # IMIDIATELY:  I think '_per_vb_mesh_unif_wpos_ubidxs' is unused and must  be deleted
 # IMIDIATELY:  Fix Resize rect function
-# IMIDIATELY:  Remove all the crap for buffer data full update from the Draw loop
+# IMIDIATLY:  Remove all the crap for buffer data full update from the Draw loop
       1. Use  of a command buffer
       2. HACK: us a one time interval
       3. In Darw, but updates only for NEEDS_UPDATE_FROM_REALLOC, and once on vb construction

@@ -27,6 +27,7 @@ import { Root_group_buffer_reset_dealocate } from '../Engine/Core/Views/RootView
 import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 import { Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { State_reset } from '../GlobalFunctions.js';
+import { Vertex_buffer_render_group_reset_g_buffer } from '../Graphics/Buffers/RenderGroups.js';
 
 
 
@@ -131,6 +132,7 @@ export function App_reset(){
     Listener_reset_event_storage_buffers_dealocate();
     Notifications_reset();
     Renderqueue_reset();
+    Vertex_buffer_render_group_reset_g_buffer();
     
     Gfx_pool_vb_reset();
 
@@ -151,7 +153,7 @@ export function App_reset(){
 
     Mesh_buffer_reset();
     // Mesh_per_vb_reset();
-    Mesh_per_vb_reset_dealocate()
+    // Mesh_per_vb_reset_dealocate()
 
     // Root_group_buffer_reset();
     Root_group_buffer_reset_dealocate();

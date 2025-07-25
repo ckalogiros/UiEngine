@@ -195,7 +195,10 @@ const fs_op_sdf_rect = `
       angle = v_angle;
     #endif
 
-    // float ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    // #ifdef U_GENERIC_CONTROLS
+    //   // int u_gen_ctrl_map_cnt = 0; // Indexing: u_generic_controls[] buffer
+    //   float ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
+    // #endif
     // float ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
     
     local_res *= scale_down;

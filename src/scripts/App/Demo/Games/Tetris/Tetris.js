@@ -3,14 +3,14 @@
 import { Callback_animations_create, Callback_animations_destroy } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Input_keyboard_bind_keydown_callback, Input_keyboard_bind_keyup_callback } from "../../../../Engine/Controls/Input/Keyboard.js";
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh, Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Create_particle_emitter, Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_dim_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_set_and_update_color_rgb, Mesh_set_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Mesh_event_callback_create } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
-import { Particle_system_create_emitter, Particle_system_emitt, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_init_particles, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
@@ -20,8 +20,10 @@ import { Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunction
 import { Abs, Floor, Fract } from "../../../../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "../../../App.js";
 import { Demo_page } from "../../../DemoPage.js";
-import { Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Style_button_default_properties, Style_label_default_properties, Style_particles_system_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Align_nested_sections_pre } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { View_destroy_view_group_and_meshes, View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -80,6 +82,7 @@ const def_speed = speed;
 // const cell_round_corners = TOKEN_SIZE/2;
 const cell_round_corners = 10;
 const cell_feather = 2.6;
+const scale_down = 1.;
 
 // Indexes to a specific token's pivots
 const ROTATION_STATES = {
@@ -113,7 +116,6 @@ const _token_rotation_states_pivots = [
    [2, 2, 2, 2], // Rotation state: L
    [2, 2, 2, 2], // Rotation state: L_mirrored
 ];
-
 
 
 
@@ -251,9 +253,9 @@ const _free_cells_buffer = New_int16_buffer(16, 'TetrisFreeCells');
 function Tetris_initialize_grid() {
 
 
+   const num_tokens_height = TETRIS_PANEL_HEIGHT / TOKEN_SIZE;
    for (let i = 0; i < MAX_COLUMNS; i++) {
 
-      const num_tokens_height = TETRIS_PANEL_HEIGHT / TOKEN_SIZE;
       const col_idxs = New_int16_buffer(num_tokens_height, `TetrisColumn${i}`);
 
       _grid_columns.Add(col_idxs);
@@ -261,6 +263,8 @@ function Tetris_initialize_grid() {
       // Initialize grids top cells row indexes
       grid_top_cells_row_idxs[i] = INT_NULL;
    }
+
+   return num_tokens_height*MAX_COLUMNS;
 
 }
 /** */
@@ -282,16 +286,16 @@ function Grid_get_rowidx_from_posy(ypos) {
    return row_idx;
 }
 /** */
-function Grid_get_posy_from_rowidx(rowidx) {
-
-   const y = ((TOP_ROW - rowidx) * ROW_HEIGHT);
-   return y;
-}
-/** */
 function Grid_get_posx_from_colidx(colidx) {
 
    const x = ((colidx * COL_WIDTH) + TOKEN_SIZE + tetris_panel_pad);
    return x;
+}
+/** */
+function Grid_get_posy_from_rowidx(rowidx) {
+
+   const y = ((TOP_ROW - rowidx) * ROW_HEIGHT);
+   return y;
 }
 /** */
 function Grid_remove_row(row_idx) {
@@ -1211,8 +1215,11 @@ function Tetris_create_token_line4(section, token) {
          const cell = Cell_create(colidx, TOP_ROW - rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
+         cell.mesh.SetViewGroupIndex(section.group_bufferidxs[0]);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
+         // Widget_render(cell.mesh);
+         // cell.mesh.Render();
+         View_render_specific_render_group(cell.mesh.group_bufferidxs[0], cell.mesh.group_bufferidxs[1], cell.mesh.group_bufferidxs[2], true);
       }
    }
    {
@@ -1232,8 +1239,10 @@ function Tetris_create_token_line4(section, token) {
          const cell = Cell_create(colidx, TOP_ROW - rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
+         cell.mesh.SetViewGroupIndex(section.group_bufferidxs[0]);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
+         // cell.mesh.Render();
+         View_render_specific_render_group(cell.mesh.group_bufferidxs[0], cell.mesh.group_bufferidxs[1], cell.mesh.group_bufferidxs[2], true);
       }
    }
    {
@@ -1253,8 +1262,10 @@ function Tetris_create_token_line4(section, token) {
          const cell = Cell_create(colidx, TOP_ROW - rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
+         cell.mesh.SetViewGroupIndex(section.group_bufferidxs[0]);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
+         // cell.mesh.Render();
+         View_render_specific_render_group(cell.mesh.group_bufferidxs[0], cell.mesh.group_bufferidxs[1], cell.mesh.group_bufferidxs[2], true);
       }
    }
    {
@@ -1274,8 +1285,10 @@ function Tetris_create_token_line4(section, token) {
          const cell = Cell_create(colidx, TOP_ROW - rowidx, TETRIS_TOKENS_COLORS.LINE);
          token.AddCell(cell.idx, colidx, rowidx, TOKEN_TYPE.LINE, ROTATION_STATES.UP);;
          section.AddItem(cell.mesh);
+         cell.mesh.SetViewGroupIndex(section.group_bufferidxs[0]);
          cell.mesh.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, section.gfx.vb.groupidx);
-         cell.mesh.Render();
+         // cell.mesh.Render();
+         View_render_specific_render_group(cell.mesh.group_bufferidxs[0], cell.mesh.group_bufferidxs[1], cell.mesh.group_bufferidxs[2], true);
       }
    }
 }
@@ -1335,10 +1348,10 @@ function Tetris_create_token_line2(section, token) {
 
 
 /** */
-// const token_cycle = [Tetris_create_token_line4, Tetris_create_token_shape_L_mirror, Tetris_create_token_shape_L, Tetris_create_token_square]
-const token_cycle = [Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4]
+const token_cycle = [Tetris_create_token_line4, Tetris_create_token_shape_L_mirror, Tetris_create_token_shape_L, Tetris_create_token_square]
+// const token_cycle = [Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4]
 
-let cycle_cnt = 0;
+let cycle_tokens_cnt = 0;
 /** */
 const token_cycle_len = token_cycle.length - 1;
 /** */
@@ -1347,17 +1360,15 @@ function Tetris_create_token(token_id, section) {
    const token = curr_token;
    token.Reset();
 
-   const Create_token = token_cycle[cycle_cnt];
-   cycle_cnt++;
-   if (cycle_cnt > token_cycle_len) cycle_cnt = 0;
+   const Create_token = token_cycle[cycle_tokens_cnt];
+   cycle_tokens_cnt++;
+   if (cycle_tokens_cnt > token_cycle_len) cycle_tokens_cnt = 0;
    Create_token(section, token)
 
    curr_token = token;
    speed = def_speed;
 
 }
-/** */
-const scale_down = 1.;
 /** */
 function Tetris_start_menu(section_, emitter_) {
 
@@ -1373,10 +1384,6 @@ function Tetris_start_menu(section_, emitter_) {
    const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[VIEWPORT.WIDTH / 2, Mesh_get_real_pos_y(section_), 10], col:TRANSPARENCY(GREY[3], .9), name:'MenuLoadPanel',}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:r_corners, enable_unif_scale:true, });
 
-   // menu_panel.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // menu_panel.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-   // menu_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-
    zpos++;
 
 
@@ -1384,7 +1391,6 @@ function Tetris_start_menu(section_, emitter_) {
 
    /*************************************************************************************************/
    // Menu Options
-
    const btn_col = TRANSPARENCY(GREEN[5], .8);
 
    // Calculate dimentions for small width device
@@ -1488,67 +1494,46 @@ function Tetris_start_menu(section_, emitter_) {
 
    }
 
-   // play_contols_info.options = SECTION.RESIZE_PARENT | SECTION.VERTICAL;
-
-
 
 
    /*******************************************************************************************/
    // Start Game button
-   const start_btn = Create_widget_close_btn(Style_button_default_properties({target_mesh:menu_panel, text:'PLAY', pos:[0, 0, zpos], col:btn_col, text_pad:[dim[0] / 2 - pad * 2, 10], layout:LAYOUT.VERTICAL, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
-   Widget_gfx_ready_enable({mesh:start_btn, enable_sdf_rect:start_btn.geom.dim[1] });
+   const start_btn = Create_widget_button(Style_button_default_properties({ 
+      target_mesh:menu_panel, 
+      text:'Play', 
+      pos:[0, 0, zpos], col:btn_col, 
+      text_pad:[dim[0] / 2 - pad * 2, 10], 
+      texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+      font_size:10, 
+      layout:LAYOUT.VERTICAL, 
+   }));
+   Widget_gfx_ready_enable({mesh:start_btn, enable_sdf_rect:start_btn.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.HOVER}});
    menu_panel.AddItem(start_btn);
-
+      start_btn.Bind(
+      (params) => { // Click callback
+         // Destroy 'Start' panel 
+         const root = params.params.root_mesh;
+         View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
+         // Start the game loop
+         Time_intervals_create(1, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params.params.params);
+      },
+      _,
+      {root_mesh:menu_panel, params:{section: section_, emitter: emitter_}},
+      _
+   );
 
 
    /*************************************************************************************************/
    // Render Menu 
-
-   
    menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
    Align_nested_sections_pre(menu_panel);
+   Widget_render(menu_panel);
 
-   // menu_panel.Calc_no_gfx_update();
-
-   // menu_panel.MoveNoGfxUpdate(-menu_panel.geom.dim[0], 0,);
-   // start_btn.MoveNoGfxUpdate(
-   //    (menu_panel.geom.pos[0] - start_btn.geom.pos[0]) + (menu_panel.geom.dim[0] - start_btn.geom.dim[0]),
-   //    (menu_panel.geom.pos[1] - start_btn.geom.pos[1]) + (menu_panel.geom.dim[1] * 2 - (start_btn.geom.dim[1] * 2 + 10)),
-   // );
-   // play_contols_info.MoveNoGfxUpdate(
-   //    (menu_panel.geom.pos[0] - play_contols_info.geom.pos[0]) + (menu_panel.geom.dim[0] - play_contols_info.geom.dim[0]),
-   //    0,
-   // );
-
-   menu_panel.Render();
-
-
-   Construct_listen_events_from_mesh_tree(menu_panel);
-   Construct_listen_events_relations_from_mesh_tree(menu_panel);
-
-   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
    menu_panel.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
 
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
-
-
-   // Create event callback for the close menu button
-   const evt_clbk_params = {
-      evt_clbks: () => {
-
-         // Create Tetris Game Loop
-         const params = {
-            section: section_,
-            emitter: emitter_,
-         }
-
-         game_loop_time_interval_idx = Time_intervals_create(1, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params);
-      },
-   }
-
-   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
 }
 
@@ -1558,7 +1543,7 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, c
 
    /*************************************************************************************************/
    // Create the columns to store any
-   Tetris_initialize_grid();
+   const num_grid_locs = Tetris_initialize_grid();
 
    tetris_panel_posx = x;
    tetris_panel_posy = y;
@@ -1569,13 +1554,6 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, c
 
    const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, pad:[10, 10], pos:[VIEWPORT.WIDTH / 2 - (TETRIS_PANEL_WIDTH + tetris_panel_pad), y, 0], dim:[(TETRIS_PANEL_WIDTH + tetris_panel_pad), TETRIS_PANEL_HEIGHT + tetris_panel_pad], col:GREY[0], name:'TetrisSection'}));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, enable_unif_scale:true, })
-   // section.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
-
-   // section.EnableGfx(MESH_ENABLE.GFX.PASS_VPOS2);
-   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   // section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 20);
-   // section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
 
    // Create token
    const token = new Token();
@@ -1623,18 +1601,13 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, c
    // Render Section 
    section.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    section.GenGfxCtx();
-   section.Render();
+   Widget_render(section);
 
-
-   Construct_listen_events_from_mesh_tree(section);
-   Construct_listen_events_relations_from_mesh_tree(section);
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
    section.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
 
 
    // Create Tetris Game Loop
-   const emitter = Particles_explosion();
+   const emitter = Particles_explosion(_, _, _, num_grid_locs);
 
 
    // Bind Keyboard Controls
@@ -1642,6 +1615,7 @@ export function Tetris(root_widget = 0x0, x, y, is_activated_by_demo_ = false, c
    Input_keyboard_bind_keyup_callback(Keyboard_input_keyup);
 
    Tetris_start_menu(section, emitter);
+
 }
 /** */
 function Tetris_game_loop(params) {
@@ -1690,9 +1664,6 @@ function Tetris_game_loop(params) {
          }
       }
    }
-
-
-
 
 
    // Resolve Collision
@@ -2162,7 +2133,7 @@ function Animation_scale_up_stop(params) {
 /******************************************************************************************************************************/
 // Explosion particles
 /** */
-export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4) { // 3 control Sliders 
+export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4, num_grid_locs) { // 3 control Sliders 
 
    /**
     * // IMPORTANT: Watch out for the particles lifetime. Too long and will be creating a lot of particles.
@@ -2177,43 +2148,40 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4) {
    // Create Particles Particles Emitter
    const particles_size = 30;
    // num_particles_per_frame = 128;
-   num_particles_per_frame = 128;
+   num_particles_per_frame = 32;
 
+   // const max_explosions = (num_grid_locs / 3) * 2 
+   const max_explosions = MAX_COLUMNS * 4; //  
 
+   const emitter = Create_particle_emitter(Style_particles_system_default_properties({
+      name:'Particle System Glow Emitter', 
+      col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
+      t_step:.001, life_time:1, accel:4, deccel:.78, gravity:.1, max_speed:4, 
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:false, num_particles:max_explosions,
+      scale_down:scale_down,
+   }));
+   Widget_gfx_ready_enable({mesh:emitter, enable_unif_scale:true,});
 
-   // const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .03, 1, 4, .98, .1, 4, _, num_particles_per_frame);
-   const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .002, 1, 4, .98, .1, 4, _, num_particles_per_frame);
-   const emitter = Particles_get_particle_system(emitter_idx);
-   // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect: particles_size, enable_src_color_in_main:false, enable_unif_scale:true}); // Just to enable u_wposxy and u_blend_mode
-   // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect: particles_size, enable_unif_scale:true, });
-   Widget_gfx_ready_enable({mesh:emitter, enable_unif_scale:true, });
-
-   // // emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
-   // // emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 4, jiggley: 3 });
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+   emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
    emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 3.5, jiggley: 4 });
    emitter.EnableProperties(PARTICLES.HAS_FADE);
-
-   
    
    emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.8, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
-   // emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.85, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
-   
-   
-   // emitter.GfxEnableFn(SID.SHAD.FN_GLOW, {time:0,});
-   // const contols_values = [0., .6, .4];
-   // emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, contols_values.length);
+   // emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.3, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
 
-   // emitter.SetConeOfDirection(-.1, .1, .1, -.1);
-   emitter.SetConeOfDirection(-.1, .1, .05, -.05);
+   // emitter.SetConeOfDirection(-.1, .1, .05, -.05);
 
 
-   Particles_gen_gfx_ctx(emitter,);
+   Particles_gen_gfx_ctx(emitter, _);
+   Particle_system_init_particles(emitter);
 
 
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
-   // emitter.GfxUniformSetAndUpdate('u_generic_controls', contols_values);
+   // emitter.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
+   // emitter.GfxUniformsSetClbk('u_blend_mode', () => {
+   //    return emitter.sid.blend_options;
+   // }, emitter.gfx.vb.groupidx);
 
 
    /****************************************************************************************************************/

@@ -2,6 +2,7 @@
 
 
 export function Pow(base, exp){
+    if(exp < 1) alert('Power function takes only > 1 integers')
     let res = base;
     while(exp){
         res *= base;

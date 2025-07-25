@@ -142,7 +142,7 @@ export class Mesh {
         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
-        this.per_vb_bufferidx = INT_NULL;
+        // this.per_vb_bufferidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
 
@@ -150,8 +150,6 @@ export class Mesh {
             proportion:{x:1, y:1}, // The proportion (in percentage) of current mesh to it's parent's dimentions
             hor_grow_count: 0,
             vert_grow_count: 0,
-            TEMP_children_hor:0,
-            TEMP_children_vert:0,
             flags: LAYOUT.HORIZONTAL, // SEE: LAYOUT constant
             pad_x: 0,
             pad_y: 0,
@@ -261,7 +259,7 @@ export class Mesh {
             this.scroller_comp = null;
 
             // In order 'this' will be removed from the mesh_buffer, needs to have no scrollers enebled
-            this.components = 0x0;
+            // this.components = 0x0;
         }
 
 
@@ -300,11 +298,10 @@ export class Mesh {
             // }
 
             Gfx_pool_remove_geometry(this.gfx, this.geom.num_faces, _, this);
-
+            this.is_gfx_inserted = false;
         }
 
-        Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
-
+        // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
 
 
         /**
@@ -322,8 +319,8 @@ export class Mesh {
 
         /*************************************************************************************/
         // Remove from widget root buffer.
-        if ((this.components & COMPONENTS.SCROLLER) === 0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
-        else alert()
+        // if ((this.components & COMPONENTS.SCROLLER) === 0) Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
+        // else alert()
 
         // Destroy Generic Buffers
         if (this.event_clbks) Free_generic_buffer(this.event_clbks);
@@ -341,6 +338,8 @@ export class Mesh {
         // Remove mesh from STATE.
         State_mesh_reset(this);
 
+
+        Mesh_buffer_remove_mesh_byidx(this.mesh_bufferidx, this.root_bufferidx);
 
         return shift_children;
     }

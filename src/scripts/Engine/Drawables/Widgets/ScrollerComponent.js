@@ -78,7 +78,7 @@ export function Components_create_scroller_component(width = 12, height = 100, m
    const idx = _scrollers_buffer.Add(bar);
    mesh.scroller_comp_idx = idx;
    mesh.scroller_comp = bar;
-   mesh.components |= COMPONENTS.SCROLLER;
+   // mesh.components |= COMPONENTS.SCROLLER;
 
    return bar;
 

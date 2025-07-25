@@ -57,25 +57,18 @@ export class Text_Mesh extends Mesh {
       this.text_width = 0;
       this.text_height = 0;
       this.#CalculateTextDimentionsFromMetrics();
-      // const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
-      // this.text_width =  ret.width * this.geom.font_size;
-      // this.text_height = ret.height * this.geom.font_size;
-      
-      // /** // HACK: For some reason the width of the whole text is off by the ammount of characters. We correct by increasing by hlf of that */
-      // this.text_width += (ret.max_row_faces+0)/2; // If new lines exist, we need to add the row faces of the the max row faces 
-      // if(ret.new_lines > 0) this.text_height -= (this.geom.font_size); // Same with height
 
       this.SetLayout(properties.layout);
    }
    /** */
    #CalculateTextDimentionsFromMetrics() {
-      const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text, this.geom.num_faces);
+      const ret = Texture_metrics_get_calc_dim_from_string(this.mat.metrics_idx, this.mat.text);
       this.text_width =  ret.width * this.geom.font_size;
       this.text_height = ret.height * this.geom.font_size;
+      // console.error('ret.height', ret.height, 'this.geom.num_faces', this.geom.num_faces)
       
-      /** // HACK: For some reason the width of the whole text is off by the ammount of characters. We correct by increasing by hlf of that */
-      this.text_width += (ret.max_row_faces+0)/2; // If new lines exist, we need to add the row faces of the the max row faces 
-      if(ret.new_lines > 0) this.text_height -= (this.geom.font_size); // Same with height
+      /** // HACK: For some reason the width of the whole text is off by the ammount of characters. We correct by increasing by half of that */
+      this.text_width += (ret.max_row_faces+0)/2; 
    }
    /** */
    SetLayout(align_flags) {
@@ -122,10 +115,11 @@ export class Text_Mesh extends Mesh {
    /** */
    GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, specific_vb_groupidx = INT_NULL) {
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
 
       // Add to view group
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
 
       return this.gfx;
    }

@@ -15,6 +15,7 @@ import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
 import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -73,22 +74,14 @@ class Powup {
       
       // Must be set before GenGfxCtx call
       mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
-      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      // parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+
       mesh.SetViewGroupIndex(groupidx);
-
-      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
       mesh.GenGfxCtx();
-      Widget_render(mesh);
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
-      // if (coin_vb_groupidx === INT_NULL) coin_vb_groupidx = mesh.gfx.vb.groupidx;
-;
-
-      // if (powup_vb_groupidx === INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
-
-
-      // if (vb_groupidx.label === INT_NULL) {
-      //    Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      // }
+      if (powup_vb_groupidx === INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
 
       this.idx = _powup_buffer.Add(this);
       this.mesh = mesh;
@@ -203,7 +196,7 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
    else { // If no apropriate free mesh was found, create new mesh
 
       // TODO: How to find the vb idx if a new text needs to be created in the already created vb?
-      const powup = new Powup(x - w + w_src, y - h + h_src, color, _, powup_vb_groupidx);
+      const powup = new Powup(x - w + w_src, y - h + h_src, color,);
       idx = powup.idx;
    }
 

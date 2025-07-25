@@ -10,7 +10,7 @@ import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
 import { New_generic_buffer, New_int8_buffer } from "../Core/Buffers.js";
-import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../Core/MeshUniformsBuffer.js";
 import { Str_buffer_get_by_idx } from "../Core/StringBuffer.js";
 import { View_add_mesh, View_create_new_group, View_render_specific_render_group } from "../Core/Views/MeshBufferViews.js";
 import { Material, Material_Texture } from "../Drawables/Material/Material.js";
@@ -206,13 +206,13 @@ class Particle {
    }
 }
 
-function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles_per_frame, has_intermidiate_emission) {
+function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles, has_intermidiate_emission) {
 
    
-   const total_particles_num = (life_time / t_step) * num_particles_per_frame;
+   const total_particles_num = (life_time / t_step) * num_particles;
    // TODO: The ammount of extra particles can be aproximated only if we take into consideration the max speed(deriving the max number of particles being put in between the spaces)
    const extra_particles = has_intermidiate_emission ? total_particles_num*2 : 0;
-   return Floor(total_particles_num)+1+extra_particles;
+   return Floor(total_particles_num)+100+extra_particles;
 }
 
 class Emitter {
@@ -265,9 +265,16 @@ class Emitter {
          ydir_pos: 1, // Lower quadrant
          ydir_neg: 0, // Upper quadrant
       }
-
-
-      this.vb_aprox_size = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles_per_frame, properties.has_intermidiate_emission);
+      
+      if(properties.is_continuous_emmit) {
+         
+         // this.vb_aprox_size = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles, properties.has_intermidiate_emission);
+         this.vb_aprox_size = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles_per_frame, properties.has_intermidiate_emission);
+      }
+      else {
+         
+         this.vb_aprox_size = properties.num_particles_per_frame * properties.num_particles;
+      }
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
       // this.free_particles_idxs_buffer = New_int32_buffer(vb_aprox_size, 'ParticlesSystem-free_particles_idxs_buffer');
@@ -778,10 +785,9 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
 
 /** */
 // TODO: pass an already created sid, for selecting from a gama of shader particles
-// @params: (mesh_bufferidx, name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down)
-export function Particle_system_create_emitter(mesh_bufferidx, name, properties) {
+export function Particle_system_create_emitter(mesh_bufferidx, properties) {
 
-   const emitter = new Emitter(mesh_bufferidx, name, properties);
+   const emitter = new Emitter(mesh_bufferidx, properties);
    const idx = _emitters.Add(emitter);
    _emitters.buffer[idx].idx = idx;
 
@@ -792,12 +798,21 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
 
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
 
+   const pos_x = emitter.geom.pos[0];
+   const pos_y = emitter.geom.pos[1];
+   emitter.geom.pos[0] = 0;
+   emitter.geom.pos[1] = 0;
+   
    emitter.parent = parent;
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true, emitter.vb_aprox_size);
+   const ret = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true, emitter.vb_aprox_size);
+   emitter.gfx = ret.gfx;
    emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.render_groupidx);
    // Add to view group
-   View_add_mesh(emitter.group_bufferidxs[0], emitter);
+   View_add_mesh(emitter.group_bufferidxs[0], emitter, ret.is_root_widget_on_reused_vb);
+
+   emitter.geom.pos[0] = pos_x;
+   emitter.geom.pos[1] = pos_y;
 
    // TODO: Temporary implementation of assigning the correct gfx update function pointer
    // TODO: Implement an Abstract function to not use function pointer 
@@ -1348,7 +1363,14 @@ function Emitter_particles_set_direction_explosio(emitter) {
 
 
 
+export function Particle_system_set_uwpos_x(emitter, pos_x) {
 
+   Mesh_unif_set_vb_root_wposx(emitter.root_posidx, pos_x);
+}
+export function Particle_system_set_uwpos_y(emitter, pos_y) {
+
+   Mesh_unif_set_vb_root_wposy(emitter.root_posidx, pos_y);
+}
 
 
 

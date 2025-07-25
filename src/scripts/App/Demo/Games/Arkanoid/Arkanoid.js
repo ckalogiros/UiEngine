@@ -107,7 +107,7 @@ export function Arkanoid_get_panel_bottom() { return arkanoid_panel_mesh.geom.po
 
 
 /** */
-export function Arkanoid_initialize() {
+export function Arkanoid_initialize(initial_y_pos=0) {
 
    Arkanoid_initialize_flags();
 
@@ -116,15 +116,13 @@ export function Arkanoid_initialize() {
    ARK_STATE.RESET(ARK_STATE.START);
    // ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
-   let ypos = ARKANOID_SECTION_PAD_Y;
+   let ypos = initial_y_pos + ARKANOID_SECTION_PAD_Y;
 
-   Arkanoid_initialize_game(ARKANOID_SECTION_PAD_X, ypos);
+   // ypos += 40 // Add a padd to the game panel from the menu panel
+   Arkanoid_initialize_game(ARKANOID_SECTION_PAD_X, initial_y_pos);
    View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
    Arkanoid_initialize_start_menu(ARKANOID_SECTION_PAD_X, ypos);
 
-   // TEMORARY
-   // Bricks_reset_all_deactivated_bricks();
-   // Bricks_set_stage_bricks(0, 0, _arkanoid_struct.game_panel.panel.view_group[0]);
 }
 /** */
 function Arkanoid_load_state(state) {
@@ -177,7 +175,13 @@ function Arkanoid_on_click_callback(params) {
 /** */
 function Arkanoid_initialize_start_menu(x, y) {
 
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], pos:[x, y, 0], dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], col:GREY[1]}));
+   const section = Create_rect_mesh(Style_rect_default_properties({
+      is_root:ROOT_WIDGETS.CREATE_ROOT, 
+      pad:[0, 0], pos:[x, y, 0], 
+      // pad:[0, 0], pos:[0, 500, 0], 
+      dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], 
+      col:TRANSPARENCY(GREY[1], 1.0)}
+   ));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
    Mesh_set_name(section, 'Arkanoid-Start Menu Panel');
 
@@ -190,7 +194,8 @@ function Arkanoid_initialize_start_menu(x, y) {
    
    /*******************************************************************************************/
    // Load menu button
-   const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:ARKANOID_COLORS.blue, dim:[16, 16], text_pad:[40, 15]}));
+   // const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:ARKANOID_COLORS.blue, dim:[16, 16], text_pad:[40, 15]}));
+   const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:TRANSPARENCY(ARKANOID_COLORS.blue, .7), dim:[16, 16], text_pad:[40, 15]}));
    Widget_gfx_ready_enable({mesh:start_menu_btn, enable_sdf_rect:20, enable_pass_vpos:true, listener:{type:LISTEN_EVENT_TYPES.HOVER}});
    
    start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
@@ -221,7 +226,7 @@ function Arkanoid_initialize_start_menu(x, y) {
    _arkanoid_struct.start_menu.panel.view_group = section.group_bufferidxs;
 
    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, 0.5, .0, true)
-   Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, )
+   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, )
 
 
 
@@ -230,12 +235,12 @@ function Arkanoid_initialize_start_menu(x, y) {
 /** */
 function Arkanoid_initialize_game(x, y) {
 
-   const menu = Arkanoid_create_ui_menu(x, 30, ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y)
+   const menu = Arkanoid_create_ui_menu(x, y, ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y)
    _arkanoid_struct.menu = menu;
    // const group_idx = menu.group_bufferidxs[0];
    
    
-   let ypos = ARKANOID_MENU_DIM_Y * 2;
+   let ypos = y + ARKANOID_MENU_DIM_Y * 2;
    
    
    
@@ -320,9 +325,9 @@ function Arkanoid_initialize_game(x, y) {
    // Power ups
    const powup = Powup_init_buffer(group_idx, parent,);
    _arkanoid_struct.game_panel.powups.view_group = powup.mesh.group_bufferidxs;
-   // // Fire bullet power up
-   // const gun = Bullet_init_buffer(0, 0, group_idx, parent.root_posidx, parent.mesh_bufferidx);
-   // _arkanoid_struct.game_panel.gun.view_group = gun.mesh.group_bufferidxs;
+   // Fire bullet power up
+   const gun = Bullet_init_buffer(0, 0, group_idx, parent);
+   _arkanoid_struct.game_panel.gun.view_group = gun.mesh.group_bufferidxs;
    // Score modifier text
    const score_vb_grouidxs = Score_mod_init_buffer(group_idx, parent,);
 
@@ -375,7 +380,6 @@ function Arkanoid_run(params) {
    const bound_right = game_panel_pos_x + panel.geom.dim[0] * 2;
 
    let posx = mouse_posx - game_panel_pos_x - player_half_dimx;
-   // let posx = mouse_posx  - player_half_dimx;
 
    // Limit player move to the left and right panel bounds
    if (posx > bound_right - player_half_dimx * 2) posx = bound_right - player_half_dimx * 2;
@@ -385,7 +389,6 @@ function Arkanoid_run(params) {
    const new_posx = posx;
    player.mesh.geom.pos[0] = new_posx;
    Mesh_update_set_wpos_x(player.mesh);
-   // player.mesh.SetWposX(new_posx + player_half_dimx);
 
 
    const pl_left = player.mesh.geom.pos[0];
@@ -421,21 +424,20 @@ function Arkanoid_run(params) {
          Ball_update(bound_local_left, bound_local_right, bound_local_top, bound_local_bottom, player.mesh.geom.pos, player.mesh.geom.dim);
       }
 
-      // // Update fire bullet power up
-      // if (ARK_STATE.IS(ARK_STATE.GUN_ENABLED)) {
-      //    // Gun_update_pos_x(game_panel_pos_x + player.mesh.geom.pos[0] + player_half_dimx);
-      //    Gun_update_pos_x(player.mesh.geom.pos[0] + player_half_dimx);
-      // }
-      // if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
-      //    Bullet_update();
-      // }
+      // Update fire bullet power up
+      if (ARK_STATE.IS(ARK_STATE.GUN_ENABLED)) {
+         Gun_update_pos_x(player.mesh.geom.pos[0] + player_half_dimx);
+      }
+      if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
+         Bullet_update();
+      }
 
       Coin_update();
 
 
       // Update Effects
       Effects_explosion_glow_update();
-      Effects_explosion_circle_update();
+      // Effects_explosion_circle_update();
 
    }
 

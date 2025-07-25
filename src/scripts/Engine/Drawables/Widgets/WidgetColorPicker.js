@@ -15,6 +15,7 @@ import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
+import { View_add_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -106,8 +107,9 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: color_pick, enable_sdf_rect: properties.rcorners.color_pick, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
-      color_pick.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // color_pick.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
+      // color_pick.align.flags = LAYOUT.VERTICAL;
 
 
 
@@ -121,9 +123,9 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: panel2, enable_sdf_rect: properties.rcorners.panel2, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       panel2_idx = panel.AddItem(panel2);
-
-
-
+      
+      
+      
       /******************************************************************************/
       // Create the color present mesh
       const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({ 
@@ -386,12 +388,16 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
-
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
+      
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
+      // alert('IMPLEMENT: Create View for colorpicker widget')
+      
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
-
+      
    }
 
 
@@ -597,7 +603,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
 
 
-
       /*****************************************************************************************************/
       // Calculate the color for the color pick panel
 
@@ -796,8 +801,8 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const panel2 = panel.children.buffer[panel2_idx]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
 
       const click_pos = params.click_pos;
-      const x = click_pos[0] -  Mesh_get_real_pos_x(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
-      const y = click_pos[1] -  Mesh_get_real_pos_y(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const x = click_pos.x -  Mesh_get_real_pos_x(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const y = click_pos.y -  Mesh_get_real_pos_y(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
       widget.color_pick_click_pos = [x, y];
 
       const percentagex = (x / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage 

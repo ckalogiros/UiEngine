@@ -1,13 +1,10 @@
 "use strict";
 
 import { Index_buffer_reset } from "../../../Graphics/Buffers/IndexBuffers.js";
-// import { Vertex_buffer_reset_to_index } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Vertex_buffer_create_attribs_info_per_vb_instanced } from "../../../Graphics/ShaderAttributes.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
-import { Renderqueue_set_active, Renderqueue_set_flags, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
-import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
-import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_gfx_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_get_vb_root_wpos } from "../MeshUniformsBuffer.js";
+import { Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer } from "../Buffers.js";
+import { Mesh_buffer_get_mesh_byidx, Mesh_per_vb_remove_all_from_index, Mesh_per_vb_reset_buffer } from "../MeshBuffer.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Floor } from "../../../Helpers/Math/MathOperations.js";

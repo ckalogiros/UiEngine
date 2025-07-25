@@ -22,6 +22,7 @@ import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.j
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
+import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -106,14 +107,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       // HACK: Scale down before render
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
             
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(panel.group_bufferidxs[0]);
-
-      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(panel);
-      Construct_listen_events_relations_from_mesh_tree(panel);
-      panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
-
+      Widget_render(panel);
 
       total_height = y;
       total_height += panel.geom.dim[1] * 2;
@@ -177,15 +171,7 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       panel.GenGfxCtx();
       Align_nested_sections_pre(panel);
       Align_expand(panel);
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(panel.group_bufferidxs[0]);
-
-      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(panel);
-      Construct_listen_events_relations_from_mesh_tree(panel);
-      panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
-
+      Widget_render(panel);
 
       total_height += panel.geom.dim[1] * 2;
    }
@@ -256,15 +242,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    ret1.target_mesh.geom.dim[1] = size+scale; // HACK: We need that the scaled size is calculated for the panel's dimentions
    Align_nested_sections_pre(panel);
    ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
-               
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(panel.group_bufferidxs[0]);
-   
-
-   // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(panel);
-   Construct_listen_events_relations_from_mesh_tree(panel);
-   panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
+   Widget_render(panel);
 
    return panel;
 }
@@ -302,14 +280,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true, font_
    panel.GenGfxCtx();
 
    Align_nested_sections_pre(panel);
-
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(panel.group_bufferidxs[0]);
-
-   // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-   Construct_listen_events_from_mesh_tree(panel);
-   Construct_listen_events_relations_from_mesh_tree(panel);
-   panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
+   Widget_render(panel);
 
    return {
       panel: panel,
@@ -357,14 +328,7 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       // Align_nested_sections_pre(panel, panel.geom.pos[0], panel.geom.pos[1]);
       Align_nested_sections_pre(panel);
       Align_expand(panel);
-   
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(panel.group_bufferidxs[0]);
-
-      // Root_group_activate_all_vbs_in_renderqueue(panel.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(panel);
-      Construct_listen_events_relations_from_mesh_tree(panel);
-      panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, panel.gfx.vb.groupidx);
+      Widget_render(panel);
    }
 
    return panel;
@@ -446,15 +410,8 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
       Align_nested_sections_pre(menu_panel);
       Align_expand(menu_panel);
 
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
-   
-      // Root_group_activate_all_vbs_in_renderqueue(menu_panel.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(menu_panel);
-      Construct_listen_events_relations_from_mesh_tree(menu_panel);
-   
-      menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
-   
+      Widget_render(menu_panel);
+
       // Set menu in focus
       Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
    }
@@ -482,7 +439,7 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
 
 }
 /** */
-function Create_menu_items_buttons() {
+export function Create_menu_items_buttons() {
 
    const menu_items_array = [];
 
@@ -495,12 +452,14 @@ function Create_menu_items_buttons() {
    let btn_col = TRANSPARENCY(GREY[1], 1.);
    const layout = LAYOUT.VERTICAL|LAYOUT.EXPAND;
    
-
+   const saturation = .5;
+   const contrast = .28;
+   const hue_preserve = .7;
    {
       /*******************************************************************************************/
       // Button 1
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.57, .8, .28, .0), text:'Mathematics      ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.57, saturation, contrast, hue_preserve), text:'Mathematics      ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -509,7 +468,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 2
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.18, .8, .28, .0), text:'Mathematics      ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.18, saturation, contrast, hue_preserve), text:'Mathematics      ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -518,7 +477,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 3
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.79, .8, .28, .0), text:'Molecular Biology',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.79, saturation, contrast, hue_preserve), text:'Molecular Biology',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -527,7 +486,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 4
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.28, .8, .28, .0), text:'Chemistry        ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(contrast, saturation, contrast, hue_preserve), text:'Chemistry        ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -536,7 +495,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 5
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.51, .8, .28, .0), text:'Neuroscience     ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.51, saturation, contrast, hue_preserve), text:'Neuroscience     ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -544,7 +503,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 6
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.89, .8, .28, .0), text:'Physics          ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.89, saturation, contrast, hue_preserve), text:'Physics          ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -552,7 +511,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 7
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.12, .8, .28, .0), text:'Biochemistry     ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.12, saturation, contrast, hue_preserve), text:'Biochemistry     ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -560,7 +519,7 @@ function Create_menu_items_buttons() {
       /*******************************************************************************************/
       // Button 8
       btn_col = GetSequencedColor(7);
-      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.06, .8, .28, .0), text:'Genetics         ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
+      const button = Create_widget_button(Style_button_default_properties({ theme: Color_theme_label_auto(.06, saturation, contrast, hue_preserve), text:'Genetics         ',pos:[0, 0, 0], col:btn_col, text_col:text_col, text_pad:[15, 8], font_size:font_size,  bold:.5, texture_id:font, layout:layout}));
       Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
       menu_items_array.push(button);
    }
@@ -620,31 +579,17 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
       if (create_slider) {
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
-            
-         Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-         View_render_from_view_NEW(slider.group_bufferidxs[0]);
-      
-         // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+         Widget_render(slider);
 
-         Construct_listen_events_from_mesh_tree(slider)
-         Construct_listen_events_relations_from_mesh_tree(slider);
       }
       
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
 
       Align_nested_sections_pre(mesh);
+
+      Widget_render(mesh);
             
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-      
-
-      // Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(mesh);
-      Construct_listen_events_relations_from_mesh_tree(mesh);
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
-
    }
 
 
@@ -793,14 +738,8 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
 
          slider.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
                      
-         Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-         View_render_from_view_NEW(slider.group_bufferidxs[0]);
-      
-         // Root_group_activate_all_vbs_in_renderqueue(slider.root_bufferidx);
-         slider.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, slider.gfx.vb.groupidx)
+         Widget_render(slider);
 
-         Construct_listen_events_from_mesh_tree(slider)
-         Construct_listen_events_relations_from_mesh_tree(slider);
       }
 
       
@@ -810,16 +749,9 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
       mesh.GenGfxCtx();
 
       Align_nested_sections_pre(mesh);
-            
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
       
+      Widget_render(mesh);
 
-
-      // Root_group_activate_all_vbs_in_renderqueue(mesh.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(mesh);
-      Construct_listen_events_relations_from_mesh_tree(mesh);
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
    }
 
 
@@ -954,18 +886,10 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    // Render 
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
       
-      // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-      controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
       Align_nested_sections_pre(controls_section);
-      
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(controls_section.group_bufferidxs[0]);
-      
-      // Root_group_activate_all_vbs_in_renderqueue(controls_section.root_bufferidx);
-      Construct_listen_events_from_mesh_tree(controls_section);
-      Construct_listen_events_relations_from_mesh_tree(controls_section);
+      Widget_render(controls_section);
+
 
    }
 
@@ -1008,15 +932,8 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
 
       section.GenGfxCtx();
       Align_nested_sections_pre(section);
+      Widget_render(section);
       
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(section.group_bufferidxs[0]);
-      
-      section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-      Construct_listen_events_from_mesh_tree(section);
-      Construct_listen_events_relations_from_mesh_tree(section);
-      // Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-
       total_height += section.geom.dim[1] * 2;
 
    }

@@ -2,11 +2,10 @@
 
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle, Effects_create_explosion_glow } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, WHITE, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Gl_add_wpos_xy, Gl_set_alpha, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation, Quadratic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs } from "../../../../Helpers/Math/MathOperations.js";
@@ -15,7 +14,7 @@ import { Arkanoid_coin_counter_add } from "./Arkanoid.js";
 import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Player_check_coin_collision, Player_get_dimy, Player_get_top } from "./Player.js";
 import { Score_mod_create, Score_mod_get_text_mesh_byidx, Score_mod_remove_text_mesh_byidx } from "./ScoreMod.js";
-import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -29,9 +28,9 @@ export const COIN_TEXTURE = TEXTURES.COIN;
 /** */
 export const COIN_SIZE = 16;
 /** */
-const PRE_INITIALIZED_COIN_MESHES = 12;
+const PRE_INITIALIZED_COIN_MESHES = 6;
 /** */
-let coin_vb_groupidx = INT_NULL;
+// let coin_vb_groupidx = INT_NULL;
 /** */
 let coins_view_group_idx = INT_NULL;
 /** */
@@ -45,7 +44,7 @@ export function Coin_set_false_is_all_animations_finished() { is_all_animations_
 /** */
 export function Arkanoid_coin_reset() {
 
-   coin_vb_groupidx = INT_NULL;
+   // coin_vb_groupidx = INT_NULL;
    coins_view_group_idx = INT_NULL;
    is_all_animations_finished = false;
 
@@ -71,30 +70,28 @@ export function Arkanoid_coin_destroy() {
 /** */
 class Coin {
 
-   constructor(x = 0, y = 0, texture_file_id = COIN_TEXTURE, vb_groupidx = INT_NULL, groupidx, parent) {
+   constructor(x = 0, y = 0, texture_file_id = COIN_TEXTURE, groupidx, parent) {
 
       this.is_active = false;
 
 
       // Coin textured mesh
-      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[COIN_SIZE, COIN_SIZE], col:WHITE, name:'CoinMesh', texture_id:texture_file_id}));
+      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 3], dim:[COIN_SIZE, COIN_SIZE], col:WHITE, name:'CoinMesh', texture_id:texture_file_id}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:COIN_SIZE, });
       
       // Must be set before GenGfxCtx call
       mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
-      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      // parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+
       mesh.SetViewGroupIndex(groupidx);
-
-      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      // console.log('coin groupidx', groupidx)
+      // console.log('_coin_buffer', _coin_buffer)
+      // console.log('_free_coin_idx_buffer', _free_coin_idx_buffer)
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
       mesh.GenGfxCtx();
-      Widget_render(mesh);
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
+      // if (coin_vb_groupidx === INT_NULL) coin_vb_groupidx = mesh.gfx.vb.groupidx;
 
-      if (coin_vb_groupidx === INT_NULL) coin_vb_groupidx = mesh.gfx.vb.groupidx;
-
-
-      // if (vb_groupidx.label === INT_NULL) {
-      //    Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      // }
 
       this.mesh = mesh;
 
@@ -118,7 +115,7 @@ class Coin {
 
       // Coin Glow effect mesh
       const ring_diameter = 1.0, intensity = .4;
-      const coin_glow_fx_idx = Effects_create_explosion_circle(x + COIN_SIZE, y + COIN_SIZE, COIN_SIZE * 1.6, COIN_SIZE * 1.6, 0, 0, YELLOWR[9], ring_diameter, intensity)
+      const coin_glow_fx_idx = Effects_create_explosion_circle(x + COIN_SIZE, y + COIN_SIZE, COIN_SIZE * 1.6, COIN_SIZE * 1.6, 0, 0, YELLOWR[9], ring_diameter, intensity, false)
       const coin_glow_fx = Effect_explosion_circle_get_mesh_byidx(coin_glow_fx_idx);
       this.glow_mesh = coin_glow_fx;
       return coin_glow_fx;
@@ -194,7 +191,7 @@ export function Coin_get_byidx(idx = INT_NULL) {
 }
 /** Removes the coin mesh from the storage buffer and from rendering, but mesh still remains in the application */
 
-export function Coin_remove_byidx(idx = INT_NULL) {
+function Coin_remove_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _coin_buffer.buffer[idx] === undefined) alert('1231231231232 Wrong index for _coin_buffer')
 
    const mesh = _coin_buffer.buffer[idx].mesh;
@@ -234,7 +231,7 @@ export function Coin_init_buffer(group_idx, parent, num_effect_meshes = PRE_INIT
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      coin = new Coin(_, _, _, vb_groupidx, group_idx, parent);
+      coin = new Coin(_, _, _, group_idx, parent);
       vb_groupidx = coin.mesh.gfx.vb.groupidx;
 
       
@@ -282,7 +279,7 @@ export function Coin_create(x, y, w = COIN_SIZE, h = COIN_SIZE, w_src = 0, h_src
    }
    else { // If no apropriate free mesh was found, create new mesh
 
-      const coin = new Coin(xx, yy, _, coin_vb_groupidx, coins_view_group_idx, coin_parent);
+      const coin = new Coin(xx, yy, _, coins_view_group_idx, coin_parent);
       idx = coin.idx;
       coin.is_active = true;
 

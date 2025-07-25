@@ -189,8 +189,7 @@ export function Style_rect_default_properties(user_properties) {
       is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
    };
 
-
-  return properties;
+   return properties;
 
 }
 /** */
@@ -615,7 +614,7 @@ export function Style_dropdown_default_properties(user_properties) {
          col: user_properties.btn_col !== undefined ? user_properties.btn_col : user_properties.col !== undefined ? user_properties.col : BLUEL[4],
          // col: BLUEL[4],
          dim:_,
-         text_col:WHITE, 
+         text_col:user_properties.text_col !== undefined ? user_properties.text_col : WHITE, 
          // pad:user_properties.pad !== undefined ? user_properties.pad : [10,10], 
          pad:[0,0], 
 
@@ -632,8 +631,17 @@ export function Style_dropdown_default_properties(user_properties) {
          variant_idx:_,
          
          is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+
+         
       },
    };
+
+   if(user_properties.theme!==undefined) {
+      properties.dp.col = user_properties.theme.col;
+      properties.menu.col = user_properties.theme.menu_col;
+      properties.btn.col = user_properties.theme.btn_col;
+      properties.btn.text_col = user_properties.theme.text_col;
+   }
 
    return properties;
 }
@@ -692,6 +700,8 @@ export function Style_particles_system_default_properties(user_properties) {
       max_speed: user_properties.max_speed !== undefined ? user_properties.max_speed : 2,
       texture_id: user_properties.texture_id !== undefined ? user_properties.texture_id : INT_NULL,
       num_particles_per_frame: user_properties.num_particles_per_frame !== undefined ? user_properties.num_particles_per_frame : 1,
+      num_particles: user_properties.num_particles !== undefined ? user_properties.num_particles : 1, // Used to set the total number of particles in case there is no continuous emission
+      is_continuous_emmit: user_properties.is_continuous_emmit !== undefined ? user_properties.is_continuous_emmit : true, // Continuous emmiting particles versus 1 time emmit particles
       scale_down: user_properties.scale_down !== undefined ? user_properties.scale_down : 1,
       has_intermidiate_emission: user_properties.has_intermidiate_emission !== undefined ? user_properties.has_intermidiate_emission : false,
 

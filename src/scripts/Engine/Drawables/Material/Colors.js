@@ -1,6 +1,6 @@
 "use strict";
 
-import { Abs, Clamp, Fract, Mod, Mult_arr3_scalar } from "../../../Helpers/Math/MathOperations.js";
+import { Abs, Clamp, Fract, Max, Min, Mod, Mult_arr3_scalar, Pow } from "../../../Helpers/Math/MathOperations.js";
 
 
 
@@ -110,12 +110,12 @@ export function  Color_hsv_to_rgb(h, s, v, a=1) {
 
 export function Color_hsv_to_rgb_calibrated(h, s, v, alpha=1, contrast=75, hue_preservation=.3) {
 
-	const c = v * s;
+	let c = v * s;
 	const h6 = (h * 6) % 6;
 	const x = c * (1 - Math.abs(h6 % 2 - 1));
-
+	
 	let r = 0, g = 0, b = 0;
-
+	
 	if (h6 < 1)       [r, g, b] = [c, x, 0];
 	else if (h6 < 2)  [r, g, b] = [x, c, 0];
 	else if (h6 < 3)  [r, g, b] = [0, c, x];
@@ -123,14 +123,34 @@ export function Color_hsv_to_rgb_calibrated(h, s, v, alpha=1, contrast=75, hue_p
 	else if (h6 < 5)  [r, g, b] = [x, 0, c];
 	else              [r, g, b] = [c, 0, x];
 
-	const m = v - c;
-	return new Float32Array([
+	if(s<=0) hue_preservation = 0;
+	// else hue_preservation*=s;
+	
+	let m = v - c;
+	const color = new Float32Array([
 		(r + m) * (contrast + (1 - contrast) * hue_preservation), 
 		(g + m) * (contrast + (1 - contrast) * hue_preservation), 
 		(b + m) * (contrast + (1 - contrast) * hue_preservation), 
 		alpha,
 	]);
+	
+	// Pop out low luminance colors(like blue), by  
+	const lum = Color_calculate_luminance_from_rgb(color);
+	if(s>0){
 
+		// m = v - (v * s *(1-(lum*lum*lum*lum)));
+		// m = v - (v * s *(1-(lum*lum)));
+		// m = v - (v * s *(1-(lum)));
+		
+		const calibrated = 1-(lum*lum*lum*lum); // intrpolates 0-1 to 1-0
+		color[0] = (r + m) * (contrast + (1 - contrast) * hue_preservation * (calibrated));
+		color[1] = (g + m) * (contrast + (1 - contrast) * hue_preservation * (calibrated));
+		color[2] = (b + m) * (contrast + (1 - contrast) * hue_preservation * (calibrated)); 
+
+		// console.warn((contrast + (1 - contrast) * hue_preservation * (calibrated)))
+	}
+
+	return color;
 
 }
 

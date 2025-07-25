@@ -3,7 +3,7 @@
 import { Create_rect_mesh, Create_widget_label, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_buffer_print_w1, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
+import { BLUEL, Color_hsv_to_rgb_calibrated, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
@@ -11,7 +11,7 @@ import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/
 import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_rotate_z_2d, Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_rotate_z_2d, Gl_set_angle, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomInt, GetRandomPos, GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js";
@@ -19,6 +19,8 @@ import { Widget_gfx_ready_enable, Style_multi_text_default_properties, Style_rec
 import { Mesh_add_wpos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_y, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Uniforms_buffer_get_uniform_byidx } from "../../Graphics/Buffers/UniformBuffers.js";
+import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { Color_theme_slider_auto } from "../../Engine/Drawables/Material/Themes.js";
 
 
 
@@ -58,8 +60,8 @@ const random_velocities = [
 export function Sattelite_rotation(x = 0, y = 0) {
 
 
-   let total_height = 20;
-   const pad = 10;
+   const pad = 0;
+   let total_height = y + pad;
    const panel_height = 150;
 
    const rcorners = 10;
@@ -75,36 +77,32 @@ export function Sattelite_rotation(x = 0, y = 0) {
    if (PLATFORM.ANY_SMARTPHONE_DEVICE) slider_dim[0] = VIEWPORT.WIDTH / 2 - 10;
 
    // Rotation slider
-   const rot_slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:PURPLE[6], name:'Rotation', layout:LAYOUT.VERTICAL, texture_id:default_font}));
+   const rot_slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, theme:Color_theme_slider_auto(.22, 1, .18, 0), name:'Rotation', layout:LAYOUT.VERTICAL, texture_id:default_font}));
    Widget_gfx_ready_enable({mesh:rot_slider, enable_sdf_rect:rcorners,});
    controls_section.AddItem(rot_slider);
    rot_slider.SetInitialValue(0);
 
    // Speed slider
-   const spd_slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:PURPLE[6], name:'Speed', layout:LAYOUT.VERTICAL, texture_id:default_font}));
+   const spd_slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, theme:Color_theme_slider_auto(.58, 1, .18, 0), name:'Speed', layout:LAYOUT.VERTICAL, texture_id:default_font}));
    Widget_gfx_ready_enable({mesh:spd_slider, enable_sdf_rect:rcorners,});
    controls_section.AddItem(spd_slider);
    spd_slider.SetInitialValue(0.01);
 
 
    // Render
-   Align_nested_sections_pre(controls_section);
    controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   controls_section.Render();
-   controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-   Construct_listen_events_from_mesh_tree(controls_section)
-   Construct_listen_events_relations_from_mesh_tree(controls_section);
+   Align_nested_sections_pre(controls_section);
+   Widget_render(controls_section);
 
-   total_height += controls_section.geom.dim[1] + pad;
+   total_height += controls_section.geom.dim[1] * 2 + pad;
 
 
    /*********************************************************************************************************************************************/
    // Main Panel Section
 
-   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[4, 4], pos:[x + pad, y + total_height * 2, 0], dim:[panel_height, panel_height], col:GREY[1], name:'Sattelite_rotation->panel'}));
    const section = Create_rect_mesh(Style_rect_default_properties({
       is_root:ROOT_WIDGETS.CREATE_ROOT,
-      pad:[4, 4], pos:[10,200,0], dim:[panel_height, panel_height], col:GREY[5], 
+      pad:[0, 0], pos:[x+pad,total_height,0], dim:[panel_height, panel_height], col:Color_hsv_to_rgb_calibrated(0,0,1,1,.18,0), 
       name:'Sattelite_rotation->panel', 
       layout:LAYOUT.RESIZE_SELF|LAYOUT.FIXED_WIDTH|LAYOUT.FIXED_HEIGHT
    }));
@@ -126,7 +124,6 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
       const ball = Create_rect_mesh(Style_rect_default_properties({pos:[pos[0], pos[1], 2], dim:dim, col:BLUEL[9], name:'Ball' + i, }));
       Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0], });
-      // Widget_gfx_ready_enable({mesh:ball, enable_sdf_rect:dim[0], });
       section.AddItem(ball);
 
       balls_buffer[i] = ball;
@@ -148,21 +145,14 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
    }
 
-   const sat = Create_rect_mesh(Style_rect_default_properties({pos:[100,100,2], dim:[6, 12], col:YELLOWL[9], name:'Satelite'}));
+   const sat = Create_rect_mesh(Style_rect_default_properties({pos:[100,100,2], dim:[6, 12], col:YELLOWL[9], name:'Satelite', }));
    Widget_gfx_ready_enable({mesh:sat, enable_sdf_rect:6, enable_attr_angle:0, });
    // Widget_gfx_ready_enable({mesh:sat, enable_sdf_rect:6, });
    section.AddItem(sat);
    
    // Render
-   Align_nested_sections_pre(section);
-   
-   
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   section.Render();
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
+   section.GenGfxCtx();
+   Widget_render(section);
 
    total_height += panel_height + pad;
 
@@ -427,19 +417,76 @@ function Animate_sattelite(params) {
       //    console.log(params.params.hits);
       // }
 
+      // const angle = Math.atan2(x*.5, y*.5); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
+      // Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
+      // const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
+      // Gl_set_angle(sat.gfx, normalizedAngle);
+
+      // const scale = .1;
+
+      // // const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+      // const r = ball.geom.dim[0]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+      // const cx = sat.geom.pos[0]; // Center to sattelites position
+      // const cy = sat.geom.pos[1];
+      // const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter  
+      // const b = (cy + (r * Math.cos(angle)));
+
+
+      //    const new_posx = ball.geom.pos[0]  + a;
+      //    const new_posy = ball.geom.pos[1]  + b;
+      //    // const new_posx = ball.geom.pos[0] + ball.geom.dim[0] + a;
+      //    // const new_posy = ball.geom.pos[1] + ball.geom.dim[1] + b;
+      //    // const new_posx = ball.geom.pos[0] + ball.geom.dim[0] + a;
+      //    // const new_posy = ball.geom.pos[1] + ball.geom.dim[1] + b;
+      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0]*2) + a;
+      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1]*2) + b;
+      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0]*2 - sat.geom.dim[0]) + a;
+      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1]*2 - sat.geom.dim[1]) + b;
+      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0] - sat.geom.dim[0]) + a;
+      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1] - sat.geom.dim[1]) + b;
+      //    // const new_posx = ball.geom.pos[0] + a - ball.geom.dim[0]*2;
+      //    // const new_posy = ball.geom.pos[1] + b - ball.geom.dim[0]*2;
+      //    // const new_posx = ball.geom.pos[0]+ ball.geom.dim[0];
+      //    // const new_posy = ball.geom.pos[1]+ ball.geom.dim[1];
+      //    // const new_posx = ball.geom.pos[0];
+      //    // const new_posy = ball.geom.pos[1];
+      //    // const new_posx = a;
+      //    // const new_posy = b;
+      
+      //    Gl_set_wpos_xy(sat.gfx, new_posx, new_posy, sat.geom.num_faces);
+
+         
+      // Mesh_add_wpos_xy(sat, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
+      // Mesh_add_wpos_xy(sat, a, b);
+
       const angle = Math.atan2(x, y); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
+      {
+      Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
       const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
       Gl_set_angle(sat.gfx, normalizedAngle);
-      Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
 
+      // const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+      const r = ball.geom.dim[0]+10; // Set the radius in which the sattelite will be rotating (perimetricaly)
+      // const r =  ball.geom.dim[0] + ball.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
       const cx = sat.geom.pos[0]; // Center to sattelites position
-      const cy = sat.geom.pos[1]
-      const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter, and we add the   
+      const cy = sat.geom.pos[1];
+      const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter  
       const b = (cy + (r * Math.cos(angle)));
 
-      Mesh_add_wpos_xy(sat, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
-      Mesh_add_wpos_xy(sat, a, b);
+
+         // const new_posx = (ball.geom.pos[0] + ball.geom.dim[0] + a)-(sat.geom.pos[0]+sat.geom.dim[0]);
+         // const new_posy = (ball.geom.pos[1] + ball.geom.dim[1] + b)-(sat.geom.pos[1]+sat.geom.dim[1]);
+         const new_posx = (ball.geom.pos[0] + ball.geom.dim[0] + a)-(sat.geom.pos[0]);
+         const new_posy = (ball.geom.pos[1] + ball.geom.dim[1] + b)-(sat.geom.pos[1]);
+         // const new_posx = ball.geom.pos[0] + a;
+         // const new_posy = ball.geom.pos[1] + b;
+         // const new_posx = ball.geom.pos[0];
+         // const new_posy = ball.geom.pos[1];
+         // const new_posx = a;
+         // const new_posy = b;
+      
+         Gl_set_wpos_xy(sat.gfx, new_posx, new_posy, sat.geom.num_faces);
+      }
 
 
       /** if the ball has hitted the wall boundaries, set the slider (value and position) according to the new direction */
@@ -482,8 +529,8 @@ function Animate_sattelite(params) {
 // Elastic Collisions
 
 
-const elastic_collisions_panel_dim = [100, 100];
-const num_balls = 6;
+const elastic_collisions_panel_dim = [200, 200];
+const num_balls = 16;
 const ball_dim = 120;
 const pad = 15;
 
@@ -511,7 +558,7 @@ let in_scale_adjustment = false;
 
 // TODO: Solve the issue of setting the wpos of a mesh to the uunif_wpos buuffer
 
-export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_create = true, controls_render = false) {
+export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_create = true, controls_render = false, elastic_colisions_slider_values=[1, .54, .43]) {
 
    let total_height = 20;
 
@@ -535,14 +582,16 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    
    let generic_controls_parameters = null;
    
+   // const generic_controls_parameters_explosion_glow = elastic_colisions_slider_values;
    const generic_controls_parameters_explosion_glow = [1, .54, .43];
 
    const time=.88, ring_diameters=0, intensity=.23;
    const generic_controls_explosion_circle = [time, ring_diameters, intensity];
 
-   const generic_controls_simple_glow = [0, .32, .33];
+   // const generic_controls_simple_glow = [0, .32, .33];
+   const generic_controls_simple_glow = elastic_colisions_slider_values;
    
-   let scale_down = .03;
+   let scale_down = .05;
 
 
    for (let i = 0; i < num_balls; i++) {
@@ -553,12 +602,16 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       const size = ball_dim;
       const dim = [size, size]
       // const pos = random_positions[i];
-      const min_pos = [section.geom.pos[0], section.geom.pos[1]];
+      // const min_pos = [section.geom.pos[0], section.geom.pos[1]];
+      const min_pos = [0, 0];
       const max_pos = elastic_collisions_panel_dim;
       const pos = GetRandomPos(min_pos, max_pos);
 
 
       let zpos = 1;
+
+      console.log(pos[0], pos[1]);
+      // pos[1] = 0
 
       const color = GetSequencedColor(9);
       const ball = Create_rect_mesh(Style_rect_default_properties({pad:[5, 5], pos:[pos[0], pos[1], zpos++], dim:dim, col:color, name:'Ball' + i, }));
@@ -629,22 +682,17 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    /****************************************************************************************************************/
    // Render
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   
-   section.Render();
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-   
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   Widget_render(section);
+
    // Initialize values to uniforms
    if(enable_fx & SID.SHAD.FN_GLOW || enable_fx & SID.SHAD.FN_EXPLOSION_GLOW) balls_buffer[0].GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
-   // balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1.0]);
+   balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
 
 
-
-   for(let i=0; i<balls_buffer.length; i++) {
-      balls_buffer[i].geom.pos[0] = random_positions[i][0];
-      balls_buffer[i].geom.pos[1] = random_positions[i][1];
-   }
+   // for(let i=0; i<balls_buffer.length; i++) {
+   //    balls_buffer[i].geom.pos[0] = random_positions[i][0];
+   //    balls_buffer[i].geom.pos[1] = random_positions[i][1];
+   // }
    
    
    
@@ -807,18 +855,9 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       
       if (controls_render) {
          
-         controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
-         
          Align_nested_sections_pre(controls_section);
-         
-         controls_section.Render();
-         
-         controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-         
-         Construct_listen_events_from_mesh_tree(controls_section);
-         Construct_listen_events_relations_from_mesh_tree(controls_section);
-         
+         Widget_render(controls_section);
          
       }
       
@@ -836,7 +875,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    return {
       ellastic_collisions_balls: balls_buffer,
       controls_section: controls_section,
-      // info_section_panel: info_section_panel,
       mnemonics: mnemonics,
    };
 }
@@ -872,7 +910,7 @@ export function Create_elastic_collisions_controls(ball_mesh, color = GREY[2], s
       const texture_id = TEXTURES.MTSDF_CONSOLAS_1024;
 
       { // Set Speed
-         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:color, layout:LAYOUT.VERTICAL, texture_id:texture_id, name:'Speed'}));
+         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, theme:Color_theme_slider_auto(.24,1,.18,0), layout:LAYOUT.VERTICAL, texture_id:texture_id, name:'Speed'}));
          Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:slider_rcorners,})
          controls_buffer.push(slider);
          slider.SetInitialValue(slider_init_values[1] ? slider_init_values[0] : .0);
@@ -938,7 +976,6 @@ function Animate_elastic_collisions_balls(params) {
          // Calculate position relative to the new scaled size
          const ball_pos = [ ball.geom.pos[0], ball.geom.pos[1] ];
          const ball2_pos = [ ball2.geom.pos[0], ball2.geom.pos[1] ];
-
 
          // Cache the ball 1 and ball 2 center positions
          const p1 = [

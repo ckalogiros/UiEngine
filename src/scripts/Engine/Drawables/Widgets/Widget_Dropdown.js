@@ -452,9 +452,10 @@ export class Widget_Dropdown extends Rect_Mesh {
       if(this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
       const temp = (this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW) ? INT_NULL : specific_vb_groupidx
-      this.gfx = Gfx_generate_context(FLAGS, this, temp);
+      const ret = Gfx_generate_context(FLAGS, this, temp);
+      this.gfx = ret.gfx;
       // Add to view group
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
       
       const btn = this.children.buffer[0];
       btn.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, this.gfx.vb.groupidx); // Set button's area gfx same with dropDown mesh 

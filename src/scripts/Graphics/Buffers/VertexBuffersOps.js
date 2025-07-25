@@ -1468,7 +1468,7 @@ export function Gl_rotate_z_2d(gfx, dim, angle, num_faces = 1) {
 
 
 
-      Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+   Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
 /** */

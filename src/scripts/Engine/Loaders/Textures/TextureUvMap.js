@@ -109,7 +109,7 @@ export function Texture_metrics_get_calc_width_from_string(metrics_idx, str) {
 
    return width;
 }
-export function Texture_metrics_get_calc_dim_from_string(metrics_idx, str, face_count) { 
+export function Texture_metrics_get_calc_dim_from_string(metrics_idx, str) { 
 
    let width = 0;
    let max_width = 0;
@@ -119,7 +119,8 @@ export function Texture_metrics_get_calc_dim_from_string(metrics_idx, str, face_
    let row_faces = 1;
    let max_row_faces = 0;
 
-   for (let i = 0; i < face_count; i++) {
+   const len = str.length;
+   for (let i = 0; i < len; i++) {
 
       const char_code = str[i].charCodeAt(0) - CHAR_ARRAY_START_OFFSET;
 

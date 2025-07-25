@@ -1,5 +1,5 @@
 
-* Replace u_generic_ve3 with u_generic_controls (in effects)
+* Replace u_generic_vec3 with u_generic_controls (in effects)
 
 * Re think the root group, view group.
 * Implement a Gl_add and _set function, that runs once per vb and updates all consecutive meshes in the buffer for N meshes.

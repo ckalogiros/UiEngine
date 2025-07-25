@@ -1,7 +1,7 @@
 "use strict";
-import { FloorArr2, FloorArr3, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
+import { FloorArr2, FloorArr3, InterpolateToRange, Lerp, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_activate_all_vbs_in_renderqueue, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
+import { View_activate_all_vbs_in_renderqueue, View_destroy_render_group_and_meshes, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs, Root_group_resize_and_rerender, Root_group_view_buffer_add_mesh, Root_group_view_buffer_get } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated, ORANGEL } from '../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
@@ -13,12 +13,12 @@ import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_read
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_set_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { VBI_state_enable, Vertex_buffer_build_index_buffer_all, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get_render_groupidxs, Vertex_buffer_group_state_enable, } from '../Graphics/Buffers/VertexBuffers.js';
+import { VBI_state_enable, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get_render_groupidxs, Vertex_buffer_group_state_enable, } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Gl_set_angle, Gl_set_generic2, Gl_set_rgba, Gl_set_time } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer } from '../Engine/Timers/Timers.js';
-import { Demo_animations, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
+import { Create_menu_items_buttons, Demo_animations, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders, Test_noise_shader } from './Demo/DemoParticles.js';
@@ -34,12 +34,12 @@ import { Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_rotate_z, Mesh_set_color
 import { Mesh_event_callback_create, Mesh_get_name, Mesh_listener_create } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 import { Align_nested_sections_pre, Align_expand, Align_pre_simple___with_grow_containers } from '../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
-import { Demo_page } from './DemoPage.js';
+import { Demo_page, Demos_welcome_menu } from './DemoPage.js';
 import { Demo_chain_link } from './Demo/DemoChainLink.js';
 import { Tetris } from './Demo/Games/Tetris/Tetris.js';
 import { Game_snake } from './Demo/Games/Snake/Snake.js';
-import { Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
-import { Color_theme_label_auto, Color_theme_slider_1, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
+import { Scene_camera_scroll_set, Scene_store_window_resized_meshes } from '../Engine/Scenes.js';
+import { Color_theme_dropdown_auto, Color_theme_label_auto, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
 import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
@@ -52,7 +52,153 @@ import { Vertex_buffer_render_group_get_render_group } from '../Graphics/Buffers
 
 
 
+const big_text = 
+`Swelling, or edema, is a common reaction that follows an injury. 
+It's our body's way of signaling that something's gone awry. 
+When tissues get damaged, they release chemicals that trigger inflammation. 
+This inflammation leads to an increase in blood flow and fluid accumulation in the affected area. 
+The result? A noticeable puffiness around the injury site.
 
+Understanding why this happens requires a peek into the biological mechanisms at play. 
+When an injury occurs, whether it's a sprain, strain, or any other form of trauma, 
+the body's immune system kicks into high gear. 
+White blood cells rush to the site to fend off potential infections and begin the healing process. 
+This influx of cells brings along fluid, which contributes to swelling. 
+So, why does an injury swell? It's all about protection and healing
+
+
+# The Role of Inflammation in Healing
+
+Inflammation plays a crucial role in how injuries heal. 
+It's not just about swelling; it's part of a larger process 
+that involves various cellular activities aimed at repairing damaged tissues. 
+After an injury, blood vessels become more permeable, 
+allowing essential nutrients and immune cells to reach the affected area quickly. 
+This increased permeability is what causes fluid to leak into surrounding tissues, 
+leading to swelling.
+
+The inflammatory response can be broken down into several stages. 
+Initially, there's a vascular response where blood flow increases 
+to deliver immune cells and nutrients. Following this is a cellular 
+response where white blood cells migrate toward the injury site. 
+These cells work tirelessly to clear out debris and pathogens 
+while also releasing signals that further promote healing.
+
+The visible swelling serves as a protective barrier against further damage. 
+It helps immobilize the injured area, preventing unnecessary movement 
+that could exacerbate the injury. So when pondering why does an injury swell? 
+The answer lies in its multifaceted role in both protecting and facilitating healing.
+
+
+Swelling, or edema, is a common reaction that follows an injury. 
+It's our body's way of signaling that something's gone awry. 
+When tissues get damaged, they release chemicals that trigger inflammation. 
+This inflammation leads to an increase in blood flow and fluid accumulation in the affected area. 
+The result? A noticeable puffiness around the injury site.
+
+Understanding why this happens requires a peek into the biological mechanisms at play. 
+When an injury occurs, whether it's a sprain, strain, or any other form of trauma, 
+the body's immune system kicks into high gear. 
+White blood cells rush to the site to fend off potential infections and begin the healing process. 
+This influx of cells brings along fluid, which contributes to swelling. 
+So, why does an injury swell? It's all about protection and healing
+
+
+# The Role of Inflammation in Healing
+
+Inflammation plays a crucial role in how injuries heal. 
+It's not just about swelling; it's part of a larger process 
+that involves various cellular activities aimed at repairing damaged tissues. 
+After an injury, blood vessels become more permeable, 
+allowing essential nutrients and immune cells to reach the affected area quickly. 
+This increased permeability is what causes fluid to leak into surrounding tissues, 
+leading to swelling.
+
+The inflammatory response can be broken down into several stages. 
+Initially, there's a vascular response where blood flow increases 
+to deliver immune cells and nutrients. Following this is a cellular 
+response where white blood cells migrate toward the injury site. 
+These cells work tirelessly to clear out debris and pathogens 
+while also releasing signals that further promote healing.
+
+The visible swelling serves as a protective barrier against further damage. 
+It helps immobilize the injured area, preventing unnecessary movement 
+that could exacerbate the injury. So when pondering why does an injury swell? 
+The answer lies in its multifaceted role in both protecting and facilitating healing.
+
+
+Swelling, or edema, is a common reaction that follows an injury. 
+It's our body's way of signaling that something's gone awry. 
+When tissues get damaged, they release chemicals that trigger inflammation. 
+This inflammation leads to an increase in blood flow and fluid accumulation in the affected area. 
+The result? A noticeable puffiness around the injury site.
+
+Understanding why this happens requires a peek into the biological mechanisms at play. 
+When an injury occurs, whether it's a sprain, strain, or any other form of trauma, 
+the body's immune system kicks into high gear. 
+White blood cells rush to the site to fend off potential infections and begin the healing process. 
+This influx of cells brings along fluid, which contributes to swelling. 
+So, why does an injury swell? It's all about protection and healing
+
+
+# The Role of Inflammation in Healing
+
+Inflammation plays a crucial role in how injuries heal. 
+It's not just about swelling; it's part of a larger process 
+that involves various cellular activities aimed at repairing damaged tissues. 
+After an injury, blood vessels become more permeable, 
+allowing essential nutrients and immune cells to reach the affected area quickly. 
+This increased permeability is what causes fluid to leak into surrounding tissues, 
+leading to swelling.
+
+The inflammatory response can be broken down into several stages. 
+Initially, there's a vascular response where blood flow increases 
+to deliver immune cells and nutrients. Following this is a cellular 
+response where white blood cells migrate toward the injury site. 
+These cells work tirelessly to clear out debris and pathogens 
+while also releasing signals that further promote healing.
+
+The visible swelling serves as a protective barrier against further damage. 
+It helps immobilize the injured area, preventing unnecessary movement 
+that could exacerbate the injury. So when pondering why does an injury swell? 
+The answer lies in its multifaceted role in both protecting and facilitating healing.
+
+
+Swelling, or edema, is a common reaction that follows an injury. 
+It's our body's way of signaling that something's gone awry. 
+When tissues get damaged, they release chemicals that trigger inflammation. 
+This inflammation leads to an increase in blood flow and fluid accumulation in the affected area. 
+The result? A noticeable puffiness around the injury site.
+
+Understanding why this happens requires a peek into the biological mechanisms at play. 
+When an injury occurs, whether it's a sprain, strain, or any other form of trauma, 
+the body's immune system kicks into high gear. 
+White blood cells rush to the site to fend off potential infections and begin the healing process. 
+This influx of cells brings along fluid, which contributes to swelling. 
+So, why does an injury swell? It's all about protection and healing
+
+
+# The Role of Inflammation in Healing
+
+Inflammation plays a crucial role in how injuries heal. 
+It's not just about swelling; it's part of a larger process 
+that involves various cellular activities aimed at repairing damaged tissues. 
+After an injury, blood vessels become more permeable, 
+allowing essential nutrients and immune cells to reach the affected area quickly. 
+This increased permeability is what causes fluid to leak into surrounding tissues, 
+leading to swelling.
+
+The inflammatory response can be broken down into several stages. 
+Initially, there's a vascular response where blood flow increases 
+to deliver immune cells and nutrients. Following this is a cellular 
+response where white blood cells migrate toward the injury site. 
+These cells work tirelessly to clear out debris and pathogens 
+while also releasing signals that further promote healing.
+
+The visible swelling serves as a protective barrier against further damage. 
+It helps immobilize the injured area, preventing unnecessary movement 
+that could exacerbate the injury. So when pondering why does an injury swell? 
+The answer lies in its multifaceted role in both protecting and facilitating healing.`;
 
 
 
@@ -74,11 +220,35 @@ export function TestWidgetsGeneric() {
     // const section = Test_adding_mesh_to_a_view_group_after_has_been_rendered();
 
     // Test_on_hover_show_info(200, 300);
+    
+    // const a = .8
+    // const menu = Test_colored_labels_with_hsv(0, 10, 20, .2, a);
+    // // const menu = Test_colored_labels_with_hsv(0, 10, 20, .1, .1);
+    // const w = menu.geom.dim[0]*2;
+    // Test_colored_labels_with_hsv((w*1), 10, 20, .3, a);
+    // Test_colored_labels_with_hsv((w*2), 10, 20, .4, a);
+    // Test_colored_labels_with_hsv((w*3), 10, 20, .5, a);
+    // Test_colored_labels_with_hsv((w*4), 10, 20, .6, a);
+    // Test_colored_labels_with_hsv((w*5), 10, 20, .7, a);
+    // Test_colored_labels_with_hsv((w*6), 10, 20, .8, a);
+    // Test_colored_labels_with_hsv((w*7), 10, 20, .9, a);
+    // Test_colored_labels_with_hsv((w*8), 10, 20, 1., a);
+
+    // Test_colored_labels_with_hsv((w*9), 10, 20, .1, .1);
+    // Test_colored_labels_with_hsv((w*10), 10, 20, .2, .2);
+    // Test_colored_labels_with_hsv((w*11), 10, 20, .3, .3);
+    // Test_colored_labels_with_hsv((w*12), 10, 20, .4, .4);
+    // Test_colored_labels_with_hsv((w*13), 10, 20, .5, .5);
+    // Test_colored_labels_with_hsv((w*14), 10, 20, .6, .6);
+    // Test_colored_labels_with_hsv((w*15), 10, 20, .7, .7);
+    // Test_colored_labels_with_hsv((w*16), 10, 20, .8, .8);
+    // Test_colored_labels_with_hsv((w*17), 10, 20, .9, .9);
 
 
+
+    let yy = 0, pp = 23;
     { // Statistics
-        let yy = 0, pp = 23;
-        const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
+        // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
@@ -92,13 +262,14 @@ export function TestWidgetsGeneric() {
 
     // Test: New implementation -> VB render groups PLUS reset (by group) and rerender (by rendergroup) 
     // Test_create_render_groups_resize_and_rerender();
+    // Test_create_remove_render_groups();
 
 
-    // Demo_page();
+    Demo_page();
     // Demos_welcome_menu();
 
     { // Games
-        Arkanoid_initialize();
+        // Arkanoid_initialize(0);
         // Arkanoid_test_game_options();
 
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
@@ -194,19 +365,28 @@ export function TestWidgetsGeneric() {
     /*************************************************************************************************************************/
     // Test Widgets
     { // widget plain text
-        // CreateSimpleWidgetText()
+        // CreateSimpleWidgetText(200, 200)
         // CreateTextInSectionWithNewLine();
+        // CreateTextInSection(big_text, 5)
     }
 
     { // Widget: Label-buttons
 
-        // CreateLabel(_, '0', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
+        // const w = 45 
+        // CreateLabel(_, '0', TEXTURES.MTSDF_CONSOLAS_1024, _, w, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2', TEXTURES.MTSDF_CONSOLAS_1024, _, w*2, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3', TEXTURES.MTSDF_CONSOLAS_1024, _, w*3, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4', TEXTURES.MTSDF_CONSOLAS_1024, _, w*4, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5', TEXTURES.MTSDF_CONSOLAS_1024, _, w*5, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6', TEXTURES.MTSDF_CONSOLAS_1024, _, w*6, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6\n7', TEXTURES.MTSDF_CONSOLAS_1024, _, w*7, 100,_,_,_, 25);
         // CreateLabel(_, 'Qr|\`\'0123456789', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
-        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,398);
-        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
-        // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n|_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
+        // CreateLabel(_, '|_A\n|_a', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
+        // // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
+        // // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
         // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 50,_,_,_);
-        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5, 300, 150, _, _, _);
+        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5, 300, 190, _, _, _);
         // Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, 300, 100,18,_,_,_);
 
         // Render font symbols atlas texture
@@ -220,6 +400,8 @@ export function TestWidgetsGeneric() {
         { // MSDF with scale slider
             // Demo_widgets_msdf_text_rendering(10, 100);
         }
+
+
 
         { // With framebuffer. // TODO: re-implement
 
@@ -278,9 +460,10 @@ export function TestWidgetsGeneric() {
     { // Widget: Dropdown
 
         // CreateDropdownTree([30, 50, 0])
-
+        // Create_dropdown_hsv_coloring([30, 50, 0]);
+        
         // CreateDropdownTreeHorizontalLayout();
-
+        
         // Demo_complicated_widget_layout(0, 200)
     }
 
@@ -390,8 +573,8 @@ export function TestWidgetsGeneric() {
 
             // Create_smoke_particles();
 
-            // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
-            // Create_comet_particles(_, _, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, false, 28, );
+            // Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
+            // Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, false, 28, );
 
             // Test_noise_shader(); // NOT IMPLEMENTED
 
@@ -526,8 +709,8 @@ export function TestWidgetsGeneric() {
         {
 
             {
-                // // const HUE_COLOR = [ RED[9], RED[9], YELLOW[9], YELLOW[9],GREEN[9], GREEN[9],CYAN[9], CYAN[9],BLUE[9], BLUE[9],MAGENTA, MAGENTA,BLACK, BLACK,WHITE, WHITE,BLACK, BLACK,WHITE, WHITE,];
-                // const HUE_COLOR = [ BLUE[9], BLUE[9],CYAN[9], CYAN[9]];
+                // const HUE_COLOR = [ RED[9], RED[9], YELLOW[9], YELLOW[9],GREEN[9], GREEN[9],CYAN[9], CYAN[9],BLUE[9], BLUE[9],MAGENTA, MAGENTA,BLACK, BLACK,WHITE, WHITE,BLACK, BLACK,];
+                // // const HUE_COLOR = [ BLUE[9], BLUE[9], CYAN[9], CYAN[9], ];
                 // Multi_color_multi_vertex_mesh(HUE_COLOR)
             }
             { // Contrast (GOOD)
@@ -666,15 +849,10 @@ export function TestWidgetsGeneric() {
 
     }
 
-
+    //////////////////////////////////////////////////////////////////////////////////
     // NOT YET TESTED AND CORRECTED WITH NEW WIDGET CREATION STYLE
+    //////////////////////////////////////////////////////////////////////////////////
 
-    { // Shaders Tests
-        // Test_shaders_test1();
-        // Test_shaders_test2();
-        // Test_shaders_test3();
-        // Test_shaders_test4();
-    }
     // TODO: NEEDS REIMPLEMENTION
     { // Framebuffer
 
@@ -717,6 +895,43 @@ export function TestWidgetsGeneric() {
     // Vertex_buffer_build_index_buffer_all();
 }
 
+
+/** */
+function Test_colored_labels_with_hsv(x=100, y=10, num_colors=20, contrast=.28, saturation=.8) { // Coloring Labels
+
+    const menu_panel = Create_rect_mesh(Style_rect_default_properties({
+        is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[5, 10], 
+        pos:[x, y, 0],
+        col:Color_hsv_to_rgb_calibrated(.0, .0, 1., 1., .08, .0), 
+        name:'MenuLoadPanel', 
+        layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF,
+    }));
+    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}}); 
+    
+    let col = 0;
+    const grad = 1/num_colors;
+
+    for (let i = 0; i < num_colors; i++) { 
+        const button = Create_widget_button(Style_button_default_properties({ 
+            theme: Color_theme_label_auto(col, saturation, contrast, .0), 
+            // text:'Neuro',pos:[0, 0, 0], text_pad:[15, 8], font_size:11, 
+            text:'Neuro',pos:[0, 0, 0], text_pad:[8, 6], font_size:11, 
+            texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
+            layout:LAYOUT.VERTICAL
+        }));
+        Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: 12, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+        menu_panel.AddItem(button); 
+        col += grad
+    }
+    menu_panel.GenGfxCtx();
+
+    Align_nested_sections_pre(menu_panel);
+    // Align_expand(menu_panel);
+
+    Widget_render(menu_panel);
+
+    return menu_panel;
+}
 /** Test: New implementation -> VB render groups PLUS reset (by whole group or by render group) and rerender (by whole group or by render group) */
 function Test_create_render_groups_resize_and_rerender() {
 
@@ -944,6 +1159,122 @@ function Test_create_render_groups_resize_and_rerender() {
     // View_reset_rendering_buffer_specific_render_group(new_render_group_text_2.group_bufferidxs); // Reset rg 2 text
     // View_render_specific_render_group(new_render_group_mesh_0.group_bufferidxs[0], new_render_group_mesh_0.group_bufferidxs[1], new_render_group_mesh_0.group_bufferidxs[2],); // Re-render rg 2
     // View_render_specific_render_group(new_render_group_mesh_0.group_bufferidxs[0], new_render_group_mesh_0.group_bufferidxs[1], new_render_group_mesh_0.group_bufferidxs[2],); // Re-render rg 2 text
+
+}
+/** Test: Remove meshes */
+function Test_create_remove_render_groups() {
+
+    // Store parent meshes that are gonna be rendered in their own render group(for testing)
+    let new_render_group_mesh_0 = null;
+    let new_render_group_text_0 = null;
+    
+    {
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+        Widget_gfx_ready_enable({
+            mesh: section, enable_sdf_rect: 15,
+            listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        });
+        
+        let cnt = 1;
+        const font_size = 20;
+        
+        new_render_group_mesh_0 = section;
+    
+        {
+            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
+            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 }); 
+            // red.RenderToNewRenderGroup();
+            section.AddItem(red);
+    
+            {
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                red.AddItem(s1); 
+                // s1.RenderToNewRenderGroup();
+                {
+                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    s1.AddItem(l);
+    
+                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
+                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    s1.AddItem(sw);
+    
+                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                    s1.AddItem(sl);
+    
+                    // Any text will do..
+                    new_render_group_text_0 = l.text_mesh;
+                }
+            }
+        }
+    
+    
+        // Render
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section);
+        Widget_render(section);
+        
+    }    
+
+    // /*************************************************************************************************************************************************************************/
+    // // Remove all meshes and view render groups
+    // View_destroy_render_group_and_meshes(new_render_group_text_0.group_bufferidxs[0], new_render_group_text_0.group_bufferidxs[1], new_render_group_text_0.group_bufferidxs[2],);
+    // View_destroy_render_group_and_meshes(new_render_group_mesh_0.group_bufferidxs[0], new_render_group_mesh_0.group_bufferidxs[1], new_render_group_mesh_0.group_bufferidxs[2],);
+    
+    // // Remove from App reset all
+    // App_reset(); // Reset all 
+    // Scene_camera_scroll_set(_, 0);
+    // App_reinitialize();
+
+    {
+
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+        Widget_gfx_ready_enable({
+            mesh: section, enable_sdf_rect: 15,
+            listener: { type: LISTEN_EVENT_TYPES.MOVE },
+        });
+    
+        let cnt = 1;
+        const font_size = 20;
+
+        {
+            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
+            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 }); 
+            // red.RenderToNewRenderGroup();
+            section.AddItem(red);
+    
+            {
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+                red.AddItem(s1); 
+                // s1.RenderToNewRenderGroup();
+                {
+                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    s1.AddItem(l);
+    
+                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
+                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    s1.AddItem(sw);
+    
+                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
+                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                    s1.AddItem(sl);
+    
+                    // Any text will do..
+                    new_render_group_text_0 = l.text_mesh;
+                }
+            }
+        }
+        
+        // Render
+        section.GenGfxCtx();
+        Align_nested_sections_pre(section);
+        Widget_render(section);
+        
+    } 
 
 }
 
@@ -1578,7 +1909,8 @@ function Theme_color_hsv_sample_widget_slider_auto() {
 
     const font_size = 14;
 
-    const slider_mesh = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(.19, .2), pos: [0, 0, 0], dim: [200, 20], col: GREY[3], name: 'Sample Slider', layout: LAYOUT.VERTICAL, font_size: font_size, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 }));
+    // const slider_mesh = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(.19, .2), pos: [0, 0, 0], dim: [200, 20], col: GREY[3], name: 'Sample Slider', layout: LAYOUT.VERTICAL, font_size: font_size, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 }));
+    const slider_mesh = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(.19, .2, .18, 0), pos: [0, 0, 0], dim: [200, 20], col: GREY[3], name: 'Sample Slider', layout: LAYOUT.VERTICAL, font_size: font_size, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 }));
     Widget_gfx_ready_enable({ mesh: slider_mesh, enable_sdf_rect: 10, })
     slider_mesh.SetInitialValue(0.5);
     s1.AddItem(slider_mesh);
@@ -1636,6 +1968,7 @@ function Theme_color_hsv_sample_widget_slider_auto() {
         const contrast = .18;
         const hue_preservation = .0;
         const parameters = [hsv[0], hsv[1], hsv[2], contrast, hue_preservation];
+        // const parameters = [hsv[0], hsv[1], hsv[2], 0, hue_preservation];
 
         const params = {
             parameters: parameters,
@@ -2815,14 +3148,20 @@ function CreateSimpleWidgetText(x, y) {
         is_root: ROOT_WIDGETS.CREATE_ROOT,
         pos: [x, y, 0],
         col: ORANGER[9],
-        texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
-        font_size: 10,
-        text: `|Widget_Text inside a Section\n| This is a new line @#-$%`,
+        // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+        texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
+        font_size: 40,
+        // text: `1234567890`,
+        text: `12`,
         is_debug_mesh: 0x0,
-        variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0,
+        // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0,
         pad: [10, 6],
     });
-    Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false });
+    Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
+
+    // widget_text.sid.inst = (SID.ATTR.COL4);
+    widget_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    // widget_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.VPOS2);
 
     /********************************************************************************************************************************************************/
     // Render
@@ -2959,6 +3298,41 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         Align_nested_sections_pre(ctrl_panel);
     Widget_render(ctrl_panel);
     }
+}
+function CreateTextInSection(text, font_size) { // GOOD!! render text from widget text directly to a section or stand alone. ABLE TO create layout with VERTICAL alignment via the new implementation
+
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, options: SECTION.VERTICAL, pos: [50, 250, 0], col: TRANSPARENCY(GREY[7], .5) }));
+    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 1, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+
+
+    const text_mesh = Create_widget_text({
+        is_root: _,
+        pos: [0, 0, 0],
+        // col: Color_hsv_to_rgb_calibrated(.1, .8, 1, 1, 1., .0),
+        col: Color_hsv_to_rgb_calibrated(.0, .0, 1, 1, 1., .0),
+        // texture_id: TEXTURES.MTSDF_COMIC_1024,
+        texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
+        texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+        font_size: font_size,
+        text: text,
+        is_debug_mesh: 0x0,
+        variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5,
+        pad: [10, 6],
+        layout: LAYOUT.HORIZONTAL,
+    });
+    Widget_gfx_ready_enable({ mesh: text_mesh, enable_attr_dim: false });
+    section.AddItem(text_mesh);
+    // text_mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 2);
+
+
+    /********************************************************************************************************************************************************/
+    // Render
+    section.GenGfxCtx();
+    Align_nested_sections_pre(section);
+    Widget_render(section);
+    // text_mesh.GfxUniformSetAndUpdate('u_generic_controls', [.2, 1.]);
+    // text_mesh.GfxUniformSetAndUpdate('u_generic_controls', [.5, .4]);
+
 }
 
 
@@ -3371,6 +3745,7 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 
     const line = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: TRANSPARENCY(col, 1), name: 'sdf linem2', style: [0, 10, 1.8] }));
     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    // Widget_gfx_ready_enable({ mesh: line, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
 
     // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     line.GenGfxCtx();
@@ -3535,6 +3910,189 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
 
         dp.GenGfxCtx();
         Align_nested_sections_pre(dp);
+        Widget_render(dp);
+
+    }
+
+    return dp;
+}
+/** */
+function Create_dropdown_hsv_coloring(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
+
+    const text_pad = [12, 6];
+    const pad = [6, 6];
+    const font_size = 8;
+    const dp_rcorners = 7;
+    const menu_rcorners = 7;
+    const btn_rcorners = 7;
+    const dp_col = GREY[4];
+    const menu_col = GREY[2];
+
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
+        is_root: is_root, text: `Menu`, 
+        // theme: Color_theme_dropdown_auto(.12, 1., .18, 1.),
+        theme: Color_theme_dropdown_auto(.0, .0, .18, 1.0),
+        pos: pos, col: dp_col, 
+        pad: pad, text_pad: text_pad, font_size: font_size, 
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF 
+    }));
+    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
+    // dp.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
+
+
+    Dropdown_roots_set_root(dp, dp);
+
+    let zpos = 0;
+
+
+    zpos++
+    { // Many dps
+
+        const sub_dp1_count = 5;
+        // const sub_dp2_count = 1;
+
+        const increments = 1/sub_dp1_count; 
+        let contrast =  .18, saturation = 0;
+        for (let i = 0; i < sub_dp1_count; i++) {
+
+            { // Label
+                const count = 1; const brightness_increments = 1/count; let brightness =  0;
+                for (let i = 0; i < count; i++) {
+                    const l = Create_widget_label(Style_label_default_properties({ 
+                        theme: Color_theme_label_auto(.12, saturation, .18, 0), 
+                        text: `0123`, name:'label',
+                        pos: [0, 0, 1], 
+                        font_size: font_size, 
+                        text_pad: [6, 4], 
+                        layout:LAYOUT.VERTICAL, 
+                    }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    dp.AddToMenu(l);
+                    l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                    brightness += brightness_increments;
+                }
+            }
+
+            { // Label
+                const count = 1; const brightness_increments = 1/count; let brightness =  0;
+                for (let i = 0; i < count; i++) {
+                    const l = Create_widget_label(Style_label_default_properties({ 
+                        theme: Color_theme_label_auto(.12, .6, contrast, 0), 
+                        text: `0123`, name:'label',
+                        pos: [0, 0, 1], 
+                        font_size: font_size, 
+                        text_pad: [6, 4], 
+                        layout:LAYOUT.HORIZONTAL, 
+                    }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    dp.AddToMenu(l);
+                    l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                    brightness += brightness_increments;
+                }
+            }
+
+            // const dpsub1 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}`, pos: [0, 0, zpos + 1], col: dp_col, menu_col: menu_col, btn_col: col, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp2' }));
+            // Widget_gfx_ready_enable({ mesh: dpsub1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            // // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
+            // // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.RENDER_GROUP_NEW);
+            // dp.AddToMenu(dpsub1);
+            
+            // const col1 = TRANSPARENCY(PURPLEB[6], 1.);
+            // for (let j = 0; j < sub_dp1_count; j++) {
+                
+            //     const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp3' }));
+            //     Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //     // dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
+            //     dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //     dpsub1.AddToMenu(dpsub2);
+
+            //     const col2 = TRANSPARENCY(GREEN[6], 1.)
+
+            //     for (let k = 0; k < sub_dp2_count; k++) {
+
+            //         const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+            //         Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //         dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //         // dpsub3.RenderToNewRenderGroup();
+            //         dpsub2.AddToMenu(dpsub3);
+
+            //         { // Label
+
+            //             const d = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+            //             Widget_gfx_ready_enable({ mesh: d, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //             d.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //             // d.RenderToNewRenderGroup();
+            //             dpsub3.AddToMenu(d);
+
+            //             const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: 'label' }));
+            //             Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            //             d.AddToMenu(l);
+            //             l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+
+            //             { // Label
+            //                 const count = 4; const brightness_increments = 1 / count; let brightness = 0;
+            //                 for (let i = 0; i < count; i++) {
+            //                     const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: 'label' }));
+            //                     Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            //                     dpsub3.AddToMenu(l);
+            //                     l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //                     brightness += brightness_increments;
+            //                 }
+            //             }
+            //         }
+
+            //         // const col3 = TRANSPARENCY(YELLOW[6], 1.)
+            //         // for (let n = 0; n < sub_dp2_count; n++) {
+
+            //         //     const dpsub4 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col3, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //         //     Widget_gfx_ready_enable({ mesh: dpsub4, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //         //     dpsub4.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            //         //     dpsub3.AddToMenu(dpsub4);
+
+            //         //     const col4 = TRANSPARENCY(PURPLER[6], 1.)
+            //         //     for (let m = 0; m < 10; m++) {
+
+            //         //         const dpsub5 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${k}${n}${m}`, pos: [0, 0, zpos + 4], col: dp_col, menu_col: menu_col, btn_col: col4, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+            //         //         Widget_gfx_ready_enable({ mesh: dpsub5, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //         //         dpsub5.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+            //         //         dpsub4.AddToMenu(dpsub5);
+
+            //         //     }
+            //         // }
+            //     }
+            //     for (let k = 0; k < sub_dp2_count; k++) {
+
+            //         const dpsub3 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${j}${k}`, pos: [0, 0, zpos + 3], col: dp_col, menu_col: menu_col, btn_col: col2, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp4' }));
+            //         Widget_gfx_ready_enable({ mesh: dpsub3, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+            //         dpsub3.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //         // dpsub3.RenderToNewRenderGroup();
+            //         dpsub2.AddToMenu(dpsub3);
+
+            //         { // Label
+            //             const count = 4; const brightness_increments = 1 / count; let brightness = 0;
+            //             for (let i = 0; i < count; i++) {
+            //                 const l = Create_widget_label(Style_label_default_properties({ text: `${i}123`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: 'label' }));
+            //                 Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            //                 dpsub3.AddToMenu(l);
+            //                 l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.RENDER_GROUP_FROM_NEW);
+            //                 brightness += brightness_increments;
+            //             }
+            //         }
+            //     }
+            // }
+
+            contrast += .05;
+            saturation += increments;
+        }
+    }
+
+
+    if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
+        dp.GenGfxCtx();
+        Align_nested_sections_pre(dp);
+        // Align_expand(dp);
         Widget_render(dp);
 
     }
@@ -5756,356 +6314,6 @@ function Help() {
 }
 
 
-function Test_shaders_test1() { // Shaders Tests
-
-    const dim = 200
-    const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [0, VIEWPORT.HEIGHT - dim * 2, 0], dim: [75 * 1, 40 * 1], col: YELLOW[9], name: 'TEST-SHADERS', }));
-    Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
-
-
-    rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-    rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_1);
-    // rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_2);
-
-    // Use u_time to quicly establish a uniform for the testing
-    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-    // Render
-    rect.GenGfxCtx();
-
-    Widget_render(rect);
-    rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1, 1]);
-
-
-
-    { // Slider: unif 1
-        const slider = CreateSlider(_, 10, 20, .0, 'Smooth');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 20, 100, 1.0, 'Range');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 30, 200, 1.0, 'Brightness/Contrast');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
-
-        }, params,
-        );
-    }
-
-}
-function Test_shaders_test3() { // Shaders Tests
-
-    const dim = 200
-    const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT - dim * 2, 0], [dim, dim], BLACK, 'TEST-SHADERS',);
-    // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-    rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-    rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-    rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_3);
-    // rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_2);
-
-    // Use u_time to quicly establish a uniform for the testing
-    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-    // Render
-    rect.GenGfxCtx();
-
-    Widget_render(rect);
-    rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1, 1]);
-
-
-
-    { // Slider: unif 1
-        const slider = CreateSlider(_, 10, 20, .02, 'Smooth');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 20, 100, .18, 'Range');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 30, 200, .18, 'Brightness/Contrast');
-
-        const params = {
-            target_mesh: rect,
-        };
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh = params.clbk_params.target_mesh;
-            target_mesh.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
-
-        }, params,
-        );
-    }
-
-}
-function Test_shaders_test2() { // Shaders Tests
-
-    let rect1 = null;
-    {
-        // const dim=300
-        const dim = 180
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [0, VIEWPORT.HEIGHT-dim*2, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], YELLOW[9], 'TEST-SHADERS',);
-        const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[1], 'TEST-SHADERS',);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-        rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_2);
-
-        // Use u_time to quicly establish a uniform for the testing
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-        // Render
-        rect.GenGfxCtx();
-        Widget_render(rect);
-        rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
-
-        rect1 = rect;
-
-    }
-    let rect2 = null;
-    {
-        // const dim=300
-        const dim = 180
-        const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 400, 0], [100, 70], PURPLE[1], 'TEST-SHADERS',);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-        rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_2);
-
-        // Use u_time to quicly establish a uniform for the testing
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-        // Render
-        rect.GenGfxCtx();
-
-        Widget_render(rect);
-        rect.GfxUniformSetAndUpdate('u_generic_vec3', [4, 1]);
-
-        rect2 = rect;
-
-    }
-
-    const params = {
-        target_mesh1: rect1,
-        target_mesh2: rect2,
-    };
-
-    { // Slider: unif 1
-        const slider = CreateSlider(_, 10, 20, .1, 'Smooth');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            const target_mesh2 = params.clbk_params.target_mesh2;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
-            target_mesh2.GfxUniformSetAndUpdate('u_generic_vec3', slider_val * 2, 0);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 10, 60, .0, 'Range');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            const target_mesh2 = params.clbk_params.target_mesh2;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
-            target_mesh2.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 1);
-
-        }, params,
-        );
-    }
-    { // Slider: unif 3
-        const slider = CreateSlider(_, 10, 100, 1., '...');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            const target_mesh2 = params.clbk_params.target_mesh2;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
-            target_mesh2.GfxUniformSetAndUpdate('u_generic_vec3', slider_val, 2);
-
-        }, params,
-        );
-    }
-}
-function Test_shaders_test4() { // Shaders Tests
-
-    let rect1 = null;
-    {
-        // const dim=300
-        const dim = 180
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[1], 'TEST-SHADERS',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], PURPLE[9], 'TEST-SHADERS',);
-        // const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 200, 0], [dim, dim], WHITE, 'TEST-SHADERS',);
-        const rect = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [10, 10], [100, 300, 0], [dim, dim], BLUEL[9], 'TEST-SHADERS',);
-        rect.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-
-        // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-        rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-        rect.EnableGfx(MESH_ENABLE.GFX.TEST_SHADERS_4);
-
-        // Use u_time to quicly establish a uniform for the testing
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_vec3', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC4, UNIFORM.IN_FS);
-        // rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FVEC6, UNIFORM.IN_FS);
-        rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, 6);
-
-        // Render
-        rect.GenGfxCtx();
-        Widget_render(rect);
-        rect.GfxUniformSetAndUpdate('u_generic_controls', [1, 1, 1, 1, 1, 1]);
-
-        rect1 = rect;
-
-    }
-
-
-    const params = {
-        target_mesh1: rect1,
-    };
-
-    let ypos = 20;
-    const height = 45;
-
-    { // Slider: unif 1
-        const slider = CreateSlider(_, 10, ypos, 1., 'Smooth');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 0);
-
-        }, params,
-        );
-    } ypos += height;
-    { // Slider: unif 2
-        const slider = CreateSlider(_, 10, ypos, .98, 'Range');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 1);
-
-        }, params,
-        );
-    } ypos += height;
-    { // Slider: unif 3
-        const slider = CreateSlider(_, 10, ypos, 1., '...');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 2);
-
-        }, params,
-        );
-    } ypos += height;
-    { // Slider: unif 4
-        const slider = CreateSlider(_, 10, ypos, 1., '...');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 3);
-
-        }, params,
-        );
-    } ypos += height;
-    { // Slider: unif 5
-        const slider = CreateSlider(_, 10, ypos, .54, '...');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 4);
-
-        }, params,
-        );
-    } ypos += height;
-    { // Slider: unif 6
-        const slider = CreateSlider(_, 10, ypos, .44, 'Intensity');
-
-        // Connect sliders to gfx program uniforms 
-        Slider_connect(slider, (params, slider_val) => {
-
-            const target_mesh1 = params.clbk_params.target_mesh1;
-            target_mesh1.GfxUniformSetAndUpdate('u_generic_controls', slider_val, 5);
-
-        }, params,
-        );
-    } ypos += height;
-}
-
-
 /*******************************************************************************************************************************************************/
 // Test Shader InnerShadow-RhomboidEffect wit smoothin
 function Test_shader_operations_all_with_uncomment() {
@@ -6513,9 +6721,6 @@ function Shader_color_functions_voronoi_1_noise() { // Shaders Tests
     const x = 10
     const dim = [400, 400]
     const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [x, VIEWPORT.HEIGHT - dim[1] * 2, 0], dim: dim, col: BLUEL[9], name: 'Shader_color_functions_voronoi_1_noise', }));
-    // Widget_gfx_ready_enable({mesh:rect, enable_unif_scale:true, enable_sdf_rect:100,})
-    // Widget_gfx_ready_enable({mesh:rect, enable_sdf_rect:10, enable_unif_time:true})
-    // Widget_gfx_ready_enable({mesh:rect, enable_sdf_rect:100,})
     Widget_gfx_ready_enable({ mesh: rect, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
     rect.GfxEnableAttr(SID.ATTR.DIM2);
@@ -6523,13 +6728,12 @@ function Shader_color_functions_voronoi_1_noise() { // Shaders Tests
     rect.GfxEnableFn(SID.SHAD.FN_NOISE_VORONOI_1, { blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
     const control_values = [1, 1, 0,]
-
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
     rect.EnableGfxUniforms({ unif: SID.UNIF.FS_TIME_FLOAT }, 'u_time', UNIF_TYPE.FLOAT, UNIFORM.IN_FS);
 
     // Render
     rect.GenGfxCtx();
-Widget_render(rect);
+    Widget_render(rect);
     rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
     rect.GfxUniformsSetClbk('u_time', () => { return Timer_get_global_timer() + 1; }, rect.gfx.vb.groupidx);
 
@@ -6606,16 +6810,17 @@ function Shader_color_functions_explosion_glow(x = 20, y = 300, w = 200, h = 200
 }
 function Shader_color_functions_simple_glow(x = 20, y = 300, w = 200, h = 200, color = BLUEL[9]) {
 
-    const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
+    const mesh = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [x, y, 1], dim: [w, h], col: color, name: 'ExplosionMeshCircle', }));
     Widget_gfx_ready_enable({ mesh: mesh, });
 
     mesh.GfxEnableFn(SID.SHAD.FN_GLOW, { time: 0, });
+
     const generic_parameters = [1., 0, .15];
     mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_parameters.length);
 
     // Render
     mesh.GenGfxCtx();
-Widget_render(mesh);
+    Widget_render(mesh);
     mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_parameters);
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
@@ -6666,34 +6871,21 @@ function Shader_color_functions_noise_test() { // Shaders Tests
 
     // const dim=300
     const dim = 200
-    const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 200, 0], dim: [dim, dim], col: YELLOW[7], name: 'SHADER_FN:WORLEY-2-NOISE', }));
-
-    rect.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    const rect = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [10, 200, 0], dim: [dim, dim], col: YELLOW[7], name: 'SHADER_FN:NOISE TEST', }));
+    Widget_gfx_ready_enable({ mesh: rect, enable_unif_time: true, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
     rect.GfxEnableAttr(SID.ATTR.DIM2);
-
-    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 1);
-    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 2);
-    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_WORLEY, 3);
-    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 1);
-    // rect.EnableGfx(MESH_ENABLE.GFX.FN_NOISE_VORONOI, 2);
-
-    rect.GfxEnableAttr(MESH_ENABLE.GFX.ATTR_TIME, 0);
-    // rect.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
     rect.GfxEnableFn(SID.SHAD.FN_NOISE, { time: .3, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
-    rect.EnableGfxUniforms({ fx: SID.SHAD.FN_NOISE, }, 'u_noise_params', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
-
-    // rect.EnableGfx(MESH_ENABLE.GFX.BLEND_OPTIONS, SID.BLEND_OPTIONS.BLEND_MODE_MASK);
 
 
     // Use u_time to quicly establish a uniform for the testing
-    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_VEC3 }, 'u_generic_controls', UNIF_TYPE.FVEC3, UNIFORM.IN_FS);
+    const control_values = [.0, .02, .1, 1];
+    rect.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
     // Render
     rect.GenGfxCtx();
     Widget_render(rect);
-    rect.GfxUniformSetAndUpdate('u_generic_controls', [.0, .02, .1]);
-    // rect.GfxUniformSetAndUpdate('u_noise_params', [.0, 1, .13, 1]);
+    rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
 
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];

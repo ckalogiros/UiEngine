@@ -13,6 +13,7 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../..
 import { ARK_STATE } from "./ArkanoidConstants.js";
 import { Bricks_check_collision_column_only } from "./Bricks.js";
 import { Player_get } from "./Player.js";
+import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -110,43 +111,39 @@ export function Gun_disable() {
    }
 }
 /** */
-function Gun_create(x, y, vb_groupidx) {
+function Gun_create(x, y, groupidx, parent) {
 
    _gun.timer = 0;
    _gun.timer_limit = 0;
    _gun.timer_step = 0;
 
-   const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w, _gun.h], col:YELLOWR[9], name:'Bullet', }));
+   const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w, _gun.h], col:YELLOWR[9], name:'GunMesh1', }));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
-   // Render
-   // mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+      
+   mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup
+   mesh.SetViewGroupIndex(groupidx);
+   mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
    mesh.GenGfxCtx();
-
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-   mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+   View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
 
    Gl_set_alpha(mesh.gfx, 0);
-   vb_groupidx = mesh.gfx.vb.groupidx;
 
    _gun.mesh = mesh;
 
    // Create gun's mesh part 2
    y -= _gun.h + _gun.h * .7;
-   const mesh2 = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w * .5, _gun.h * .7], col:YELLOWR[9], name:'GunMeshn2', }));
+   const mesh2 = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[_gun.w * .5, _gun.h * .7], col:YELLOWR[9], name:'GunMesh2', }));
    Widget_gfx_ready_enable({mesh:mesh2, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
    // Render
-   // mesh2.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+   mesh2.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup
+   mesh2.SetViewGroupIndex(groupidx);
+   mesh2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
    mesh2.GenGfxCtx();
+   View_render_specific_render_group(mesh2.group_bufferidxs[0], mesh2.group_bufferidxs[1], mesh2.group_bufferidxs[2], true);
 
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(mesh2.group_bufferidxs[0]);
-   
-   mesh2.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh2.gfx.vb.groupidx);
    Gl_set_alpha(mesh2.gfx, 0);
 
    _gun.mesh2 = mesh2;
@@ -176,33 +173,22 @@ const _free_bullet_idx_buffer = New_int8_buffer(PRE_INITIALIZED_BULLET_MESHES, '
 /** */
 export class Bullet {
 
-   constructor(x = 0, y = 0, w = BULLET_INIT_DIM_X, h = BULLET_INIT_DIM_Y, color = WHITE, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, w = BULLET_INIT_DIM_X, h = BULLET_INIT_DIM_Y, color = WHITE, groupidx, parent=null) {
 
       this.timer = 0;
       this.timer_limit = 0;
       this.timer_step = 0;
 
-      // const mesh = Create_rect_mesh(_, [x, y, 1], [w, h], YELLOWR[9], 'Bullet',);
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[x, y, 10], dim:[w, h], col:YELLOWR[9], name:'Bullet', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:BULLET_INIT_DIM_X, });
 
-      // Render
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(mesh.group_bufferidxs[0]);
-   
-
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
-
-      // Initialize generic uniforms, only once(first mesh initialization)
-      if (vb_groupidx === INT_NULL) {
-         Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      }
-
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup
+      
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
+      mesh.GenGfxCtx();
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
       // If new mesh is created, add it to the effects buffer
       this.idx = _bullet_mesh_buffer.Add(this);
@@ -241,20 +227,20 @@ export function Bullet_destroy_byidx(idx = INT_NULL) {
    mesh.Destroy();
 }
 /** */
-export function Bullet_init_buffer(x, y, group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = PRE_INITIALIZED_BULLET_MESHES) {
+export function Bullet_init_buffer(x, y, groupidx, parent, num_effect_meshes = PRE_INITIALIZED_BULLET_MESHES) {
 
    let vb_groupidx = INT_NULL;
 
-   const gun = Gun_create(x, y, vb_groupidx);
+   const gun = Gun_create(x, y, groupidx, parent);
    vb_groupidx = gun.mesh.gfx.vb.groupidx;
    x = 0, y = 0; // Reset after the vb unif has been stored
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      const bullet = new Bullet(x, y, _, _, _, vb_groupidx);
+      const bullet = new Bullet(x, y, _, _, _, groupidx, parent);
 
       // Implement to draw wpos from a root uniform wpos 
-      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(bullet.mesh.gfx.vb.render_groupidx, parent_root_posidx, parent_mesh_bufferidx);
+      // if (parent !== null) Mesh_unif_hack_parent_root_wpos(bullet.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Bullet_remove_byidx(bullet.idx);
    }

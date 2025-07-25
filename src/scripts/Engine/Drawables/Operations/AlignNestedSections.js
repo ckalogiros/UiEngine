@@ -40,10 +40,12 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
    let row_max_size_y = 0
    let max_size_y = 0
 
-
    for (let i = 0; i <= mesh.children.boundary; i++) {
-
+      
       const cur_mesh = mesh.children.buffer[i];
+      
+      if(cur_mesh.mesh_bufferidx === 23)
+         console.log()
 
       const cur_pad_x = cur_mesh.StylesGetPad(STYLES.AXIS.X);
       const cur_pad_y = cur_mesh.StylesGetPad(STYLES.AXIS.Y);
@@ -93,8 +95,8 @@ function Align_pre_simple___(mesh, pos_x = 0, pos_y = 0, pad = [10, 10]) {
       }
       else {
 
-         // if(cur_mesh.type & MESH_TYPE.WIDGET_SCROLLER_BAR)
-         //    console.log()
+         if(cur_mesh.mesh_bufferidx === 23)
+            console.log()
          
          const ret = cur_mesh.AlignNEW(cur_pos_x, cur_pos_y);
          // console.log('::::::::::::::::::LAYOUT:::::::::::::::::::::::\n', cur_mesh.name, ret.dim_x, ret.dim_y)
@@ -168,7 +170,7 @@ export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y =
    let total_size_y = 0;
 
    let accum_row_size_x = 0
-   let max_size_x = 0
+   let accum_row_max_size_x = 0
    let accum_row_size_y = 0
    let max_size_y = 0
 
@@ -203,16 +205,6 @@ export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y =
          }
 
          const ret = Align_pre_simple___with_grow_containers(cur_mesh, cur_pos_x, cur_pos_y);
-
-         // if (cur_mesh.align.flags & LAYOUT.VERTICAL && (cur_mesh.align.flags & LAYOUT.GROW_VERTICAL)===0) {
-         //    // total_size_y += ret.dim_y + cur_pad_y;
-         //    accum_row_size_y += ret.dim_y + cur_pad_y;
-         //    accum_row_size_x = 0;
-         // }
-         // else if (cur_mesh.align.flags & LAYOUT.HORIZONTAL) {
-         //    total_size_x += ret.dim_x;
-         //    if (total_size_y < ret.dim_y + cur_pad_y) total_size_y = ret.dim_y + cur_pad_y;
-         // }
 
          const next_mesh = mesh.children.buffer[i + 1];
          if (next_mesh) {
@@ -271,12 +263,11 @@ export function Align_pre_simple___with_grow_containers(mesh, pos_x = 0, pos_y =
 
       }
 
-      if (max_size_x < accum_row_size_x) max_size_x = accum_row_size_x
-
+      if (accum_row_max_size_x < accum_row_size_x) accum_row_max_size_x = accum_row_size_x
    }
 
 
-   const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : max_size_x;
+   const size_x = (mesh.align.flags & LAYOUT.FIXED_WIDTH) ? mesh.geom.dim[0] : accum_row_max_size_x;
    const size_y = (mesh.align.flags & LAYOUT.FIXED_HEIGHT) ? mesh.geom.dim[1] : max_size_y > total_size_y ? max_size_y : total_size_y;
 
    return {

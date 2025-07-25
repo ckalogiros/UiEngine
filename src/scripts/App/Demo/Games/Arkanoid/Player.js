@@ -131,7 +131,7 @@ export function Player_create_animation_scale() {
    const glow_scalex = 1.;
    const glow_scaley = 2.2;
    const ring_diameter = .0, intensity = .2
-   const glow_fx_idx = Effects_create_explosion_circle(x, y, w * glow_scalex, h * glow_scaley, w, h, TRANSPARENCY(BLUEL[9], 0), ring_diameter, intensity);
+   const glow_fx_idx = Effects_create_explosion_circle(x, y, w * glow_scalex, h * glow_scaley, w, h, TRANSPARENCY(BLUEL[9], 0), ring_diameter, intensity, false);
    const glow_fx = Effect_explosion_circle_get_mesh_byidx(glow_fx_idx);
 
 

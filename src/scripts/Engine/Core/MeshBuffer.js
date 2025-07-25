@@ -6,6 +6,7 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../Drawables/DebugInfo/De
 import { Root_group_view_buffer_get, Root_group_view_is_widget_root, Root_group_view_buffer_remove_root_byidx } from "./Views/RootView.js";
 import { Mesh_get_real_pos_xy_obj_t } from "../Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Floor } from "../../Helpers/Math/MathOperations.js";
 
 
 
@@ -299,6 +300,50 @@ export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
    //    Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vb_groupidx);
 
 }
+/**SAVE */
+// export function Mesh_per_vb_remove_mesh(vb_groupidx, per_vb_bufferidx) {
+
+//    if (per_vb_bufferidx === INT_NULL || per_vb_bufferidx === null) {
+
+//       console.error('556188772354 \n per_vb_bufferidx is null'); 
+//       // alert('556188772354'); 
+//       return;
+//    }
+   
+//    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdx(per_vb_bufferidx);
+   
+//    // // Remove the mesh from the buffer, and sort by swaping with the last mesh
+//    // _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxNoGapsVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+   
+   
+//    // // Get the mesh (from the mesh_buffer), that is the last element of the '_mesh_per_vertex_buffer'.
+//    // const last_elem_idx = _mesh_per_vertex_buffer.buffer[vb_groupidx].boundary;
+//    // const swaped_mesh = _mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[last_elem_idx]];
+//    // // Case the vb buffer is empty
+//    // if(swaped_mesh === _ || swaped_mesh===null){
+//    //    // console.log('last_elem_idx', last_elem_idx, 'per_vb_bufferidx', per_vb_bufferidx)
+//    //    // console.log('buuffer', _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer)
+      
+//    //    // console.log('mesh to be removed', mesh.GetName())
+//    //    _mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx] = INT_NULL;
+//    //    _mesh_per_vertex_buffer.buffer[vb_groupidx].RemoveByIdxNoGapsVersion(per_vb_bufferidx, _, 'Mesh_per_vb_remove_mesh');
+
+//    //    // const mesh
+//    //    // if(_mesh_buffer.buffer[_mesh_per_vertex_buffer.buffer[vb_groupidx].buffer[per_vb_bufferidx]])
+
+
+//    //    return;
+//    // }
+
+//    // // Update the swaped mesh's .per_vb_bufferidx value to point to it's new place
+//    // if(last_elem_idx !== per_vb_bufferidx) 
+//    //    swaped_mesh.per_vb_bufferidx = per_vb_bufferidx; // Case the removed mesh is last in the _mesh_per_vertex_buffer, then there is no replacement and no need for setting the 'mesh.per_vb_bufferidx'
+
+
+//    // if (NOTIFICATIONS_ON)
+//    //    Notifications_send(NOTIFICATION_TYPE.MESH_PER_VB_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.DESTROY, vb_groupidx);
+
+// }
 
 
 
@@ -414,14 +459,15 @@ export function Mesh_buffer_print_loop() {
 
          console.log(i,
             'mbidx:', _mesh_buffer.buffer[i].mesh_bufferidx,
-            'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
-            'vbgroupidx:', vb_groupidx,
-            'per_vb_idx', _mesh_buffer.buffer[i].per_vb_bufferidx,
+            // 'rbidx:', _mesh_buffer.buffer[i].root_bufferidx,
+            'vbidx:', vb_groupidx,
+            'rgidx', _mesh_buffer.buffer[i].gfx.vb.render_groupidx,
             'groupidx:', _mesh_buffer.buffer[i].group_bufferidxs[0], _mesh_buffer.buffer[i].group_bufferidxs[1], _mesh_buffer.buffer[i].group_bufferidxs[2],
-            'child idx:', _mesh_buffer.buffer[i].idx,
-            'is active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE_FLAGS.ACTIVE,
-            'nameidx:', _mesh_buffer.buffer[i].nameidx,
-            'pos:', _mesh_buffer.buffer[i].geom.pos,
+            // 'child idx:', _mesh_buffer.buffer[i].idx,
+            'active:', _mesh_buffer.buffer[i].state.mask & MESH_STATE_FLAGS.ACTIVE,
+            'rootposidx:', _mesh_buffer.buffer[i].root_posidx,
+            // 'nameidx:', _mesh_buffer.buffer[i].nameidx,
+            'pos:', Floor(_mesh_buffer.buffer[i].geom.pos[0]), Floor(_mesh_buffer.buffer[i].geom.pos[1]),
             'name:', Mesh_get_name(_mesh_buffer.buffer[i]),
          );
       }

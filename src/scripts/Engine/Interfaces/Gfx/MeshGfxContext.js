@@ -5,17 +5,15 @@ import { Vertex_buffer_create, Vertex_buffer_group_get_byidx, Vertex_buffer_grou
 import { Index_buffer_info_create, Index_buffer_info_get_by_ibidx } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Shader_attributes_get_attribs_per_vertex } from "../../../Graphics/ShaderAttributes.js";
 import { Program_create_program, Program_store_index_buffer_idx, Progarm_get_program, Program_program_exists_from_sid, Program_get_webgl_program_object, Program_store_blend_mode_ubidx } from "../../../Graphics/ShaderPrograms.js";
-import { Mesh_per_vb_create_vb } from "../../Core/MeshBuffer.js";
 import { Renderqueue_Add, Renderqueue_set_active, Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../../Scenes.js";
 import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Root_group_vbidx_view_add, Root_group_view_is_widget_root } from "../../Core/Views/RootView.js";
+import { Root_group_vbidx_view_add } from "../../Core/Views/RootView.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
-import { Mesh_unif_set_from_existing_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 
 
 
@@ -34,6 +32,7 @@ export class GfxInfoMesh {
       this.attribsPerVertex = 0; // TODO: This value is wrong for meshes with instanced geometry in more than one vertex buffers 
       this.meshIdx = INT_NULL; // The index of the current mesh from scene's mesh buffer.
       this.vao = null;
+      this.is_root_widget_on_reused_vb = false;
 
       this.prog = {
          idx: INT_NULL,
@@ -103,7 +102,7 @@ export class GfxInfoMesh {
 
 }
 /** */
-function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1, render_groupidx) {
+function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_faces = 1) {
 
    const prog = Progarm_get_program(progidx);
    const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
@@ -184,7 +183,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    let vb_group = null;
    let vbidxs = null;
    let vb_groupidx = INT_NULL;
-   let render_groupidx = INT_NULL;
+   let is_root_widget_on_reused_vb = false; // That the vb group is already created and unused by the app
 
 
 
@@ -257,9 +256,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
    /** If no vbidx found from the mesh tree, search the vb pool if any apropriate vb exists. If none found, create a new one */
-   let is_vertex_buffer_created = false;
-   let is_vertex_buffer_from_pool_used = false;
 
+   let is_vertex_buffer_created = false;
    const pool_request_flags = mesh.gfx_pool_request;
 
    if (vb_groupidx === INT_NULL) {
@@ -275,7 +273,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
             vb_groupidx = Gfx_pool_find_vb_notActive_and_private(sid, pool_request_flags, mesh.gfx_ctx_flags);
             if (vb_groupidx !== INT_NULL) {
 
-               is_vertex_buffer_from_pool_used = true; // Denote that an unused vb is found
                Renderqueue_set_priority_by_vb(LAST, vb_groupidx);
 
                // For Debuging: Change the vb's name ith the new first mesh to be stored at the vb
@@ -304,15 +301,11 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // Here we store any scroller created vb for all scrollers in the program
          if (flags & GFX_CTX_FLAGS.SCROLLER_VB) GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX = vb_groupidx;
 
-         Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
+         // Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
 
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
 
 
-         // Create Gfx Buffer buffer. It will be created at the 'vbidx' index.
-         // Mesh_per_vb_create_vb(vb_groupidx);
-
-         
          /*******************************************************************************************************************/
          /** NEW IMPLEMENTATION-WITH RENDER GROUPS */
          // Create uniforms for each new vertex buffer
@@ -339,24 +332,10 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       }
       else {
-
-         const HAS_ABSOLUTE_POS = flags & GFX_CTX_FLAGS.ABSOLUTE_POSITION;
-         const HAS_STICKY_POS = (mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSX) | mesh.state.mask & MESH_STATE_FLAGS.STICKY_POSY;
-         const IS_VB_ROOT = Root_group_view_is_widget_root(mesh.root_bufferidx, mesh.mesh_bufferidx);
-         const IS_VB_USED = is_vertex_buffer_from_pool_used;
-
-         // If the vertex buffer already exists and is reused from the pool
-         // get the unif wpos that has already been created for this vb
-         mesh.root_posidx = Mesh_unif_set_from_existing_vb_root_wpos(
-            mesh.mesh_bufferidx, mesh.geom.pos, mesh.type, mesh.nameidx, mesh.parent, 
-            progidx, vb_groupidx, HAS_ABSOLUTE_POS, HAS_STICKY_POS, IS_VB_ROOT, IS_VB_USED
-         );
-         // Vertex_buffer_change_uniform_value_clbk_params(vb_groupidx, 'u_wposxy', mesh.root_posidx);
-
-         Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
-
-
+         is_root_widget_on_reused_vb = true; // Else vb has not been created, rather is found in the pool of un-used free vb's 
       }
+
+      Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
 
    }
 
@@ -394,29 +373,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
    }
 
+   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count);
 
-
-
-   // Add mesh to the root batch buffer for batch update
-   // if(!temp_is_particle_system) 
-   //    Root_group_per_vb_meshidx_view_assign_and_accum_to_vb(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, mesh_count);
-
-
-   // Store the root pos in each mesh. Assuumes the indexing of root_wpos and vbs are 1-1.
-   // mesh.root_posidx = vb_groupidx;
-   // mesh.root_posidx = render_groupidx;
-
-
-
-   // console.log(
-   //    '--', 
-   //    mesh.mesh_bufferidx,
-   //    'render_groupidx', render_groupidx,
-   //    mesh.name,
-   // )
-   const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count, render_groupidx);
-
-   return gfx;
+   return {gfx:gfx, is_root_widget_on_reused_vb:is_root_widget_on_reused_vb};
 
 }
 

@@ -78,10 +78,11 @@ export class Widget_Text extends Text_Mesh {
 	// Graphics
 	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
-		this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		this.gfx = ret.gfx;
 		
 		// Add to view group
-		View_add_mesh(this.group_bufferidxs[0], this);
+		View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
 		
 		return this.gfx;
 	}
@@ -497,10 +498,11 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
-		this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		this.gfx = ret.gfx;
 		
 		// Add to view group
-		View_add_mesh(this.group_bufferidxs[0], this);
+		View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
 		
 		// super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 		// We know that the 'this' is of type text, so we use the same gfx buffer index for all children texts

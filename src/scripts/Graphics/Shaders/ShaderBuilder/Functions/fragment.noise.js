@@ -1,6 +1,7 @@
 // export const frag_noise_call = `   final_color = blend_mode_vec4( final_color, Noise_procedural(scale_down) );`;
 // export const frag_noise_call = `   final_color = Noise_procedural(scale_down, u_gen_ctrl_map_cnt);`;
 export const frag_noise_call = '   final_color = blend_decider( final_color, Noise_procedural(scale_down, u_gen_ctrl_map_cnt), u_blend_mode );';
+// export const frag_noise_call = '   final_color = blend_decider( final_color, Noise_procedural(scale_down, u_gen_ctrl_map_cnt, u_blend_mode));';
 export const frag_noise = `\
 
 

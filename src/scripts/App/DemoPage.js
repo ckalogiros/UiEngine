@@ -2,18 +2,16 @@
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { View_render_from_view_NEW } from "../Engine/Core/Views/MeshBufferViews.js";
-import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, Color_hsv_to_rgb_calibrated, COLOR_THEME_BASIC, GREEN, GREENR, GREY, ORANGER, REDL, TRANSPARENT, WHITE } from "../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../Engine/Events/EventFunctions.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set, Scene_store_window_resized_meshes } from "../Engine/Scenes.js";
-import { Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
 import { Create_comet_particles, Create_glow_particles, Create_particles_controls, Comet_create_controls, Create_smoke_particles, Create_explosion_particles, Create_smoke_particles_controls, Demo_glow_particles_sparkles_effect } from "./Demo/DemoParticles.js";
@@ -25,11 +23,13 @@ import { Tetris, Tetris_reset } from "./Demo/Games/Tetris/Tetris.js";
 import { Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_rect_default_properties, Style_label_default_properties, Style_dropdown_default_properties } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_event_callback_create, Mesh_listener_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_expand, Align_nested_sections_pre } from "../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Align_expand, Align_nested_sections_pre, Align_pre_simple___with_grow_containers } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Dropdown_roots_set_root } from "../Engine/Drawables/Widgets/Widget_Dropdown.js";
-import { Color_theme_label_auto } from "../Engine/Drawables/Material/Themes.js";
+import { Color_theme_dropdown_auto, Color_theme_label_auto } from "../Engine/Drawables/Material/Themes.js";
 import { Demo_animations, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
+import { Widget_render } from "../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { View_destroy_view_group_and_meshes } from "../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -37,6 +37,13 @@ import { Demo_chain_link } from "./Demo/DemoChainLink.js";
 
 // TODO: Add grow containers
 // TODO: Add some shader noise examples
+
+
+const blue_btn_theme = Color_theme_label_auto(.61, .6, .18, .7);
+
+
+
+
 
 // const comet_noise_slider_values = new Float32Array([1, 0, .12, 1]);
 const comet_noise_slider_values = new Float32Array([0, .38, .12, .34]);
@@ -139,7 +146,7 @@ const _demo_categories_buffer = [
             self: null,
 
             Load: (total_height) => {
-               return Create_glow_particles(0, total_height + 150, ROOT_WIDGETS.CREATE_ROOT, false, 1, .36, glow_slider_values,);
+               return Create_glow_particles(0, total_height + 0, ROOT_WIDGETS.CREATE_ROOT, false, 1, .36, glow_slider_values,);
             },
             LoadControls: (self, controls_params) => {
                return Create_particles_controls(self.emitter, _, controls_params.slider_values, controls_params.u_generic_controls_parameters, 'u_generic_controls');
@@ -150,7 +157,7 @@ const _demo_categories_buffer = [
             controls_params: { slider_values: smoke_slider_values_transform_parameters, u_generic_controls_parameters: smoke_slider_values_shader_parameters },
             self: null,
             Load: (total_height) => {
-               return Create_smoke_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false);
+               return Create_smoke_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 1, smoke_slider_values_shader_parameters, smoke_slider_values_transform_parameters);
             },
             LoadControls: (self, controls_params) => {
                return Create_smoke_particles_controls(self.emitter, _, controls_params.slider_values, _, controls_params.u_generic_controls_parameters, 'u_generic_controls');
@@ -161,7 +168,6 @@ const _demo_categories_buffer = [
             controls_params: { slider_values: explosion_slider_values, u_generic_controls_parameters: explosion_generic_controls_parameters },
             self: null,
             Load: (total_height) => {
-               // return Create_explosion_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 256, explosion_generic_controls_parameters);
                return Create_explosion_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 256, _, explosion_slider_values);
             },
             LoadControls: (self, controls_params) => {
@@ -169,11 +175,10 @@ const _demo_categories_buffer = [
             },
          },
          {
-            name: 'Sparkles', id: bit <<= 0x1, idx: 3,
+            name: 'Sparkles', id: bit <<= 0x1, idx: 4,
             controls_params: { slider_values: sparkles_slider_values, u_generic_controls_parameters: _ },
             self: null,
             Load: (total_height) => {
-               // return Create_explosion_particles(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, 256, explosion_generic_controls_parameters);
                return Demo_glow_particles_sparkles_effect(0, total_height, ROOT_WIDGETS.CREATE_ROOT, _, false, 1, sparkles_slider_values, _);
             },
             LoadControls: (self, controls_params) => {
@@ -192,12 +197,13 @@ const _demo_categories_buffer = [
             controls_params: { slider_values:elastic_colisions_slider_values }, 
             self: null,
             Load: (total_height) => {
-               return Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, false);
+               // return Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, false, elastic_colisions_slider_values);
+               return Elastic_collisions(0, total_height, ROOT_WIDGETS.CREATE_ROOT, false, false, [0, .32, .33]);
             },
             LoadControls: (self, controls_params) => { 
 
                const params = { mnemonics:self.mnemonics};
-               return Create_elastic_collisions_controls(self.ellastic_collisions_balls, GREY[2],   controls_params.slider_values, params, 'u_generic_controls')
+               return Create_elastic_collisions_controls(self.ellastic_collisions_balls, GREY[2],   controls_params.slider_values, params, [0, .32, .33], 'u_generic_controls')
             },
          },
          {
@@ -302,9 +308,9 @@ const _demo_categories_buffer = [
             name: 'Arkanoid', id: bit <<= 0x1, idx: 2,
             controls_params: null,
             self: null,
-            Load: () => {
+            Load: (total_height) => {
                Arkanoid_reset();
-               Arkanoid_initialize();
+               Arkanoid_initialize(total_height);
                return null;
             },
             LoadControls: null,
@@ -412,8 +418,7 @@ export function Demos_welcome_menu() {
    let zpos = 10;
    const r_corners = 12;
 
-   // const menu_panel = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[3], .9), 'section', );
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [VIEWPORT.WIDTH / 2, VIEWPORT.HEIGHT / 2, 10], col: TRANSPARENCY(GREY[3], .9), name: 'MenuLoadPanel', }));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [100, 100, 10], col: TRANSPARENCY(GREY[3], .9), name: 'MenuLoadPanel', }));
    Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
    zpos++;
@@ -437,14 +442,14 @@ export function Demos_welcome_menu() {
 
    // const welcome_panel = Create_rect_mesh(_, _, [0,30], [VIEWPORT.WIDTH/2-dim[0], VIEWPORT.HEIGHT/2-dim[1], 10], dim, TRANSPARENCY(GREY[5], .9), 'section', );
    const welcome_panel = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 10], col: TRANSPARENCY(GREEN[5], .9), name: 'section', }));
-   Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: r_corners, });
+   Widget_gfx_ready_enable({ mesh: welcome_panel, enable_sdf_rect: r_corners, });
    menu_panel.AddItem(welcome_panel);
 
    {
       const col = BLUEL[7];
       // const welcome = Create_widget_label(_, 'Welcome,', _, _, _, TRANSPARENT, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
       const welcome = Create_widget_label(Style_label_default_properties({ text: 'Welcome', col: TRANSPARENT, text_pad: [11, 0], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 50 }));
-      Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: 31, });
+      Widget_gfx_ready_enable({ mesh: welcome, enable_sdf_rect: 31, });
       welcome_panel.AddItem(welcome);
    }
 
@@ -458,63 +463,74 @@ It's a testament to my passion for graphics programming
 and my dedication to performance-driven design.
 Explore the demos and discover the possibilities!`;
       const col = GREY[7];
-      const welcome = Create_widget_label(Style_label_default_properties({ text: text, col: TRANSPARENCY(col, .1), text_pad: [11, 0], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 50 }));
-      Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: 12, });
+      const welcome = Create_widget_label(Style_label_default_properties({ text: text, col: TRANSPARENCY(col, .1), text_pad: [11, 0], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 15, layout:LAYOUT.VERTICAL}));
+      Widget_gfx_ready_enable({ mesh: welcome, enable_sdf_rect: 12, });
       welcome_panel.AddItem(welcome);
 
    }
 
 
-   welcome_panel.options = SECTION.RESIZE_PARENT | SECTION.VERTICAL;
-   // welcome_panel.options = SECTION.RESIZE_PARENT|SECTION.VERTICAL|SECTION.INHERIT|SECTION.HORIZONTAL_CENTER;
-
-
-
-
    /*******************************************************************************************/
    // Start Game button
-   const close_btn = Create_widget_close_btn(Style_button_default_properties({ text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: ORANGER[8], text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 24, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.VERTICAL }));
-   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+   // const close_btn = Create_widget_close_btn(Style_button_default_properties({ text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: ORANGER[8], text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 24, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.VERTICAL }));
+   // Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+   const close_btn = Create_widget_button(Style_button_default_properties({ 
+      text: 'Continue', target_mesh: menu_panel, pos: [0, 0, zpos], col: close_btn_col, 
+      text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 22, 
+      texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
+      // layout: LAYOUT.HORIZONTAL, 
+      layout: LAYOUT.VERTICAL, 
+   }));
+   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP, } });
    menu_panel.AddItem(close_btn);
+   close_btn.Bind(
+      (params) => { // Click callback
+         // Destroy 'options' panel 
+         const root = params.params.root_mesh;
+         View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
 
+         Demo_page();
+
+         // params.snake_struct_controls_section = null;
+         // params.params.menu_panel = null;
+      },
+      _,
+      {root_mesh:menu_panel},
+      // {params:{params:params.params, root_mesh:menu_panel}},
+      _
+   );
 
    /*************************************************************************************************/
    // Render Menu 
    // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, menu_panel.mesh_bufferidx, true);
-   menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, menu_panel.mesh_bufferidx, true);
+   // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
    Align_nested_sections_pre(menu_panel);
+   Widget_render(menu_panel);
       
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
-
-
-   Construct_listen_events_from_mesh_tree(menu_panel);
-   Construct_listen_events_relations_from_mesh_tree(menu_panel);
-
-   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
-
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
 
 
-   // Create event callback for the close menu button
-   const evt_clbk_params = {
-      evt_clbks: () => {
-         Demo_page();
-      },
-   }
+   // // Create event callback for the close menu button
+   // const evt_clbk_params = {
+   //    evt_clbks: () => {
+   //       Demo_page();
+   //    },
+   // }
 
-   Mesh_event_callback_create(menu_panel, evt_clbk_params);
+   // Mesh_event_callback_create(menu_panel, evt_clbk_params);
 
 }
 
 
-// export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_category_idx = demo_categories.in_practise.arkanoid.idx) {
+// export function Demo_page(category_idx = demo_categories.widgets.idx, sub_category_idx = demo_categories.widgets.idx) {
+export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_category_idx = demo_categories.in_practise.arkanoid.idx) {
+// export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.comet.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.smoke.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.glow.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.sparkles.idx) {
-export function Demo_page(category_idx = demo_categories.physics.idx, sub_category_idx = demo_categories.physics.elastic_colisions.idx) {
+// export function Demo_page(category_idx = demo_categories.physics.idx, sub_category_idx = demo_categories.physics.elastic_colisions.idx) {
 // export function Demo_page(category_idx = demo_categories.animations.idx, sub_category_idx = demo_categories.animations.animations_button.idx) {
 // export function Demo_page(category_idx = demo_categories.animations.idx, sub_category_idx = demo_categories.animations.animations_rotating_rects.idx) {
 // export function Demo_page(category_idx = demo_categories.physics.idx, sub_category_idx = demo_categories.physics.elastic_colisions.idx) {
@@ -527,8 +543,14 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    /****************************************************************************************************************************************************/
    // Create the load demo button
    const menu_layout = LAYOUT.FIXED_WIDTH | LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_HORIZONTAL;
-   // const window_menu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [pad, pad], dim: [VIEWPORT.WIDTH / 2 - pad - 1, 0], col: TRANSPARENCY(GREY[5], .4), layout: menu_layout, name: 'window_menu' }));
-   const window_menu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [pad, pad], dim: [VIEWPORT.WIDTH / 2 - pad - 1, 0], col: COLOR_THEME_BASIC.GREY_DARK_BASE, layout: menu_layout, name: 'window_menu' }));
+   const window_menu = Create_rect_mesh(Style_rect_default_properties({ 
+      is_root: ROOT_WIDGETS.CREATE_ROOT, 
+      pad: [pad, pad], dim: [VIEWPORT.WIDTH / 2 - pad - 1, 0], 
+      // col: COLOR_THEME_BASIC.GREY_DARK_BASE, 
+      col: Color_hsv_to_rgb_calibrated(.0 , 0, 1, 1, .08, 0),
+      layout: menu_layout, 
+      name: 'window_menu' 
+   }));
    Widget_gfx_ready_enable({ mesh: window_menu, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } });
 
    Scene_store_window_resized_meshes(window_menu.mesh_bufferidx);
@@ -539,8 +561,11 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
 
    /*******************************************************************************************/
    // Load menu button
-   // const Load_menu_btn = Create_widget_button(Style_button_default_properties({ text: 'Demos', pos: [0, 0, 1], col: GREEN[7], text_pad: text_pad, font_size: font_size }));
-   const Load_menu_btn = Create_widget_button(Style_button_default_properties({ text: 'Demos', pos: [0, 0, 1], col: COLOR_THEME_BASIC.BLUE_LIGHT, text_pad: text_pad, font_size: font_size }));
+   const panel_col = Color_hsv_to_rgb_calibrated(.0 , 0, 0.9, 1, .18, 0);
+   const Load_menu_btn = Create_widget_button(Style_button_default_properties({ 
+      theme:blue_btn_theme, text: 'Demos', pos: [0, 0, 1], 
+      text_pad: text_pad, font_size: font_size 
+   }));
    Widget_gfx_ready_enable({ mesh: Load_menu_btn, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
    window_menu.AddItem(Load_menu_btn);
 
@@ -560,7 +585,17 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
 
    /*******************************************************************************************/
    // Local sub-category dropdown menu
-   const sub_category_buttons_panel = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Menu`, pos: [0, 0, 0], col: GREY[3], menu_col: GREY[5], btn_col: GREY[2], text_col: WHITE, pad: [5, 5], text_pad: [text_pad[0] - 5, text_pad[1] - 5], texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.EXPAND }));
+   const sub_category_buttons_panel = Create_widget_dropdown(Style_dropdown_default_properties({ 
+      text: `Menu`, pos: [0, 0, 0], 
+      theme: Color_theme_dropdown_auto(.0, .0, .18, 1.0),
+      col: GREY[3], 
+      menu_col: GREY[5], 
+      btn_col: GREY[2], 
+      text_col: WHITE, 
+      pad: [5, 5], text_pad: [text_pad[0] - 5, text_pad[1] - 5], 
+      texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: font_size, 
+      layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.EXPAND 
+   }));
    Widget_gfx_ready_enable({ mesh: sub_category_buttons_panel, enable_sdf_rect: 10 })
    Dropdown_roots_set_root(sub_category_buttons_panel, sub_category_buttons_panel);
    window_menu.AddItem(sub_category_buttons_panel);
@@ -589,8 +624,9 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    // 
    let total_height = 65;
    const info_ui = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, total_height);
-   total_height += info_ui.geom.dim[1]; // Space for the debug_info ui
-   total_height += 10; // Space for the debug_info ui
+   total_height += info_ui.geom.dim[1]*2; // Space for the debug_info ui
+   // total_height += 10; // Space for the debug_info ui
+   total_height += 4; // Space for the debug_info ui
 
 
    const self = demo.Load(total_height, demo.controls_params);
@@ -630,20 +666,9 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    // Render Menu Bar
    {
       window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, _, true);
-
-      
       window_menu.GenGfxCtx();
-      
       Align_nested_sections_pre(window_menu);
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(window_menu.group_bufferidxs[0]);
-
-
-      window_menu.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, window_menu.gfx.vb.groupidx)
-
-      Construct_listen_events_from_mesh_tree(window_menu)
-      Construct_listen_events_relations_from_mesh_tree(window_menu);
+      Widget_render(window_menu);
 
    }
 
@@ -652,13 +677,6 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    /****************************************************************************************************************************************************/
    { // Create the button for going to the top
 
-      // const btn = Create_widget_button(Style_button_default_properties({
-      //    is_root:ROOT_WIDGETS.CREATE_ROOT, 
-      //    text:'^', 
-      //    pos:[VIEWPORT.RIGHT - 100, VIEWPORT.BOTTOM - 80, 10], 
-      //    text_col:GREY[4], col:GREEN[9], text_pad:[12, 7], 
-      //    // texture_id:TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow2_up, 
-      // }));
       const size = 40;
       const btn = Create_rect_mesh(Style_rect_default_properties({
          is_root: ROOT_WIDGETS.CREATE_ROOT,
@@ -695,16 +713,7 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
 
       btn.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.ABSOLUTE_POSITION | GFX_CTX_FLAGS.FROM_ROOT_WIDGET;
       btn.GenGfxCtx();
-      
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(btn.group_bufferidxs[0]);
-
-
-      btn.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, btn.gfx.vb.groupidx)
-
-      Construct_listen_events_from_mesh_tree(btn)
-      Construct_listen_events_relations_from_mesh_tree(btn);
-
+      Widget_render(btn);
       Listeners_set_priority(E.C, btn.listeners);
 
    }
@@ -713,6 +722,8 @@ export function Demo_page(category_idx = demo_categories.physics.idx, sub_catego
    // Set focus
    Mesh_set_root_in_focus(info_ui.root_bufferidx);
    Mesh_set_root_in_focus(window_menu.root_bufferidx);
+
+   Listeners_set_priority(E.C, window_menu.listeners);
 
 }
 
@@ -730,7 +741,12 @@ function Create_menu_popup(params) {
 
    let zpos = 10;
 
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [30, 30], pos: [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim: dim, col: TRANSPARENCY(COLOR_THEME_BASIC.GREY_DARK_BASE, .9), name: 'MenuLoadPanel', }));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ 
+      is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [30, 30], 
+      pos: [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim: dim, 
+      col: TRANSPARENCY(COLOR_THEME_BASIC.GREY_DARK_BASE, .9), 
+      name: 'MenuLoadPanel', 
+   }));
    Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(menu_panel, LISTEN_EVENT_TYPES.MOVE);
 
@@ -744,8 +760,6 @@ function Create_menu_popup(params) {
    /*************************************************************************************************/
    // Menu Options
 
-   const btn_col = TRANSPARENCY(GREY[1], .8);
-
    // Calculate dimentions for small width device
    const dif = Abs((VIEWPORT.WIDTH / 2 - 10) - dim[0]);
    let log = (dif > 0) ? Math.log(dif) : .2;
@@ -753,11 +767,8 @@ function Create_menu_popup(params) {
    const pad = (20 * log)
 
 
-
-   // Setup Load Menu Panel callback on lod button click
+   // Setup Load Menu Panel callback on 'load' button click
    const load_clbk_params = {
-      // mnemonics: params.params.mnemonics, // Remember variable values between different pages
-
       // Remember variable values between different pages
       mnemonics: {
          category_idx: params.params.mnemonics.category_idx,
@@ -777,8 +788,8 @@ function Create_menu_popup(params) {
 
    /*******************************************************************************************/
    // Close button
-   const close_btn = Create_widget_close_btn(Style_button_default_properties({ text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: close_btn_col, text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 15, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.VERTICAL }));
-   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER } })
+   const close_btn = Create_widget_button(Style_button_default_properties({ text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: close_btn_col, text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.VERTICAL }));
+   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP} })
    menu_panel.AddItem(close_btn);
 
 
@@ -790,30 +801,63 @@ function Create_menu_popup(params) {
    menu_panel.GenGfxCtx();
    Align_nested_sections_pre(menu_panel);
    Align_expand(menu_panel);
+   Widget_render(menu_panel);
       
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
-
-   Construct_listen_events_from_mesh_tree(menu_panel);
-   Construct_listen_events_relations_from_mesh_tree(menu_panel);
-
-   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
-
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
+   Listeners_set_priority(E.C, menu_panel.listeners);
 
-
-   // Create event callback for the close menu button
    const evt_clbk_params = {
-      evt_clbks: () => { params.params.menu_panel = null; },
+      source_params: close_btn,
+      evt_params: menu_panel,
+      mnemonics:params.params,
+   }
+   close_btn.Bind(
+      (params) => {
+         console.error(params)
+         const target_mesh = params.params.evt_params;
+         View_destroy_view_group_and_meshes(target_mesh.group_bufferidxs[0]);
+         params.params.mnemonics.menu_panel = null; 
+      },
+      _, 
+      evt_clbk_params, 
+      _,
+   );
+
+}
+/** Temporary for calculating grow layout */
+function TEMP_Calculate_layout_grow_count(root) {
+
+   let hor_count = 1;
+   let vert_count = 1;
+
+   // Calculate 
+   for (let i = root.children.boundary; i >= 0; i--) {
+
+
+      const child = root.children.buffer[i];
+
+      if (child.children.boundary >= 0) {
+         TEMP_Calculate_layout_grow_count(child);
+      }
+
+      if (child.align.flags & LAYOUT.HORIZONTAL) {
+
+         child.align.hor_grow_count = hor_count;
+         hor_count++;
+         child.align.vert_grow_count = vert_count;
+      }
+      else if (child.align.flags & LAYOUT.VERTICAL) {
+
+         child.align.vert_grow_count = vert_count;
+         vert_count++;
+         child.align.hor_grow_count = hor_count;
+         hor_count = 1;
+      }
    }
 
-   Mesh_event_callback_create(menu_panel, evt_clbk_params);
 }
-
-
-
-
+/** Options Menu */
 function Options_menu_callback(params) {
 
 
@@ -832,7 +876,6 @@ function Options_menu_callback(params) {
    /*************************************************************************************************/
    // Menu Options
 
-   const btn_col = TRANSPARENCY(GREY[1], .8);
    const tr = .7;
 
    // Calculate dimentions for small width device
@@ -842,10 +885,17 @@ function Options_menu_callback(params) {
    const pad = (20 * log);
 
 
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim: dim, col: TRANSPARENCY(GREY[3], tr), name: 'MenuOptionsPanel', }));
-   // const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: [VIEWPORT.WIDTH / 2 - dim[0], VIEWPORT.HEIGHT / 2 - dim[1], 10], dim: [800, 200], col: TRANSPARENCY(GREY[3], tr), name: 'MenuOptionsPanel', }));
-   // const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: [0, 0, 10], dim: dim, col: TRANSPARENCY(GREY[3], tr), name: 'MenuOptionsPanel', }));
-   // const menu_panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [0, 0, 10], dim: dim, col: Color_hsv_to_rgb_calibrated(0, 0, 1, tr, .18, 0), name: 'MenuOptionsPanel', }));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({ 
+      is_root: ROOT_WIDGETS.CREATE_ROOT, 
+      pad: [10, 10], 
+      dim:[250, 400],
+      pos: [VIEWPORT.WIDTH / 2 - dim[0], 10, 10], dim: dim, 
+      col: TRANSPARENCY(GREY[3], tr), 
+      name: 'MenuOptionsPanel', 
+      // LAYOUT: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.TYPE_GROW_CONTAINER,
+      LAYOUT: LAYOUT.HORIZONTAL | LAYOUT.TYPE_GROW_CONTAINER | LAYOUT.FIXED_HEIGHT | LAYOUT.FIXED_WIDTH,
+      // LAYOUT: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.TYPE_GROW_CONTAINER,
+   }));
    Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: menu_panel.geom.dim[0] / 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP } });
    if (!PLATFORM.ANY_SMARTPHONE_DEVICE) Mesh_listener_create(menu_panel, LISTEN_EVENT_TYPES.MOVE);
 
@@ -856,49 +906,58 @@ function Options_menu_callback(params) {
 
 
    const rcorners = 10;
-   const slider_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 1], col: Color_hsv_to_rgb_calibrated(0, 0, 1, tr, .28, 0), name: 'SliderSection', }));
-   Widget_gfx_ready_enable({ mesh: slider_section, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
-
-
-   slider_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, slider_section.mesh_bufferidx, true);
-   slider_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
-   slider_section.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
-
 
    const category_idx = params.params.mnemonics.category_idx;
    const sub_category_idx = params.params.mnemonics.sub_category_idx;
    const demo = _demo_categories_buffer[category_idx].sub_cat[sub_category_idx];
 
    const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
-   // const grow_section_1 = Create_rect_mesh(Style_rect_default_properties({ pad: [pad, pad], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .38, 0), layout: layout_vert, name: 'grow_section_1' }));
-   const grow_section_1 = Create_rect_mesh(Style_rect_default_properties({ pad: [20, pad], dim: [200, 200], col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .38, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'grow_section_1' }));
+
+   const grow_section_1 = Create_rect_mesh(Style_rect_default_properties({ 
+      pad: [pad, pad], 
+      dim: [150, 230], 
+      pos:[0,0,0],
+      col: Color_hsv_to_rgb_calibrated(0, 0, 1, .3, .78, 0), 
+      layout: layout_vert, 
+      name: 'grow_section_1' 
+   }));
    Widget_gfx_ready_enable({ mesh: grow_section_1, enable_sdf_rect: rcorners });
+   // grow_section_1.align.proportion.y = .9;
    menu_panel.AddItem(grow_section_1);
-
+   
    if (demo.LoadControls) {
-
+      
       const controls = demo.LoadControls(demo.self, demo.controls_params);
       const controls_len = controls.length;
       for (let i = 0; i < controls_len; i++) {
          grow_section_1.AddItem(controls[i]);
       }
    }
-
-
-
-
-
-
+   
+   
+   
    /*******************************************************************************************/
    // Create close button
-
-   const grow_section_2 = Create_rect_mesh(Style_rect_default_properties({ pad: [pad, pad], dim: [0, 0], col: TRANSPARENT, layout: layout_vert, name: 'grow_section_2' }));
+   
+   const grow_section_2 = Create_rect_mesh(Style_rect_default_properties({ 
+      pad: [pad, pad], 
+      dim: [150, 150], 
+      col: Color_hsv_to_rgb_calibrated(0, 0, 1, .3, .78, 0), 
+      layout: layout_vert, 
+      name: 'grow_section_2',
+   }));
    Widget_gfx_ready_enable({ mesh: grow_section_2, enable_sdf_rect: rcorners });
    menu_panel.AddItem(grow_section_2);
 
-   const close_btn = Create_widget_close_btn(Style_button_default_properties({ text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: close_btn_col, text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 15, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.HORIZONTAL, }));
-   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-   // grow_section_2.align.proportion.y = .5;
+   const close_btn = Create_widget_button(Style_button_default_properties({ 
+      text: 'CLOSE', target_mesh: menu_panel, pos: [0, 0, zpos], col: close_btn_col, 
+      text_pad: [dim[0] / 2 - pad * 2, 6], font_size: 15, 
+      texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
+      layout: LAYOUT.HORIZONTAL, 
+      // layout: LAYOUT.VERTICAL, 
+   }));
+   Widget_gfx_ready_enable({ mesh: close_btn, enable_sdf_rect: close_btn.geom.dim[1], listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP } });
+   // grow_section_2.align.proportion.y = .1;
    grow_section_2.AddItem(close_btn);
 
 
@@ -908,36 +967,18 @@ function Options_menu_callback(params) {
    /*************************************************************************************************/
    // Render menu panel
 
-   Align_nested_sections_pre(menu_panel);
-   Align_expand(menu_panel);
-
-   // menu_panel.geom.pos[0] = VIEWPORT.WIDTH / 2 - dim[0];
-   // menu_panel.geom.pos[1] = VIEWPORT.HEIGHT / 2 - dim[1];
-
    menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, false);
    menu_panel.GenGfxCtx();
+   
+   Align_nested_sections_pre(menu_panel);
+   // Align_expand(menu_panel);
+   // TEMP_Calculate_layout_grow_count(menu_panel);
+   // Align_pre_simple___with_grow_containers(menu_panel);
 
-   // Build a group view of the scrolled section for the scroller
-   if (controls_section !== null) {
+     
+   Widget_render(menu_panel);
 
-      Align_nested_sections_pre(controls_section);
-      // const center = (menu_panel.geom.dim[0] - controls_section.geom.dim[0]);
-      // controls_section.MoveNoGfxUpdate(center, ypos); ypos += controls_section.geom.dim[1] * 2 + 10;
-
-   }
-      
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(menu_panel.group_bufferidxs[0]);
-
-
-   Construct_listen_events_from_mesh_tree(menu_panel);
-   Construct_listen_events_relations_from_mesh_tree(menu_panel);
-
-
-   menu_panel.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, menu_panel.gfx.vb.groupidx);
-   if (controls_section !== null) controls_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, controls_section.gfx.vb.groupidx);
-
-   Listeners_set_priority(E.C, close_btn.listeners);
+   Listeners_set_priority(E.C, menu_panel.listeners);
 
 
    // Create scroller
@@ -977,17 +1018,22 @@ function Options_menu_callback(params) {
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
 
-   // Create event callback for the close menu button to run
    const evt_clbk_params = {
-      evt_clbks: (clbk_params) => {
-         clbk_params.menu_panel = null; // Set menu_panel to null so the contols will be re-created ('Options_menu_callback' checks if menu_panel is null to create a new options menu)
-         const demo = _demo_categories_buffer[clbk_params.mnemonics.category_idx].sub_cat[clbk_params.mnemonics.sub_category_idx];
-         demo.controls_params = clbk_params.mnemonics.demo_controls_params;
-      },
-      params: params.params,
+      source_params: close_btn,
+      evt_params: menu_panel,
+      mnemonics:params.params,
    }
-
-   Mesh_event_callback_create(menu_panel, evt_clbk_params);
+   close_btn.Bind(
+      (params) => {
+         console.error(params)
+         const target_mesh = params.params.evt_params;
+         View_destroy_view_group_and_meshes(target_mesh.group_bufferidxs[0]);
+         params.params.mnemonics.menu_panel = null; 
+      },
+      _, 
+      evt_clbk_params, 
+      _,
+   );
 }
 
 
@@ -1016,7 +1062,7 @@ function Create_menu_items_demo_categories(params) {
       const category = _demo_categories_buffer[i];
 
       const item_btn = Create_widget_button(Style_button_default_properties({
-         theme: Color_theme_label_auto(.58, 1., .03, .0),
+         theme: blue_btn_theme,
          text: category.name, align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER,
          pos: [0, 0, 0], col: btn_col, text_col: text_col, text_pad: text_pad,
          texture_id: font, font_size: font_size, layout: LAYOUT.VERTICAL|LAYOUT.EXPAND
@@ -1060,7 +1106,8 @@ function Create_menu_items_demo_sub_categories(params, category_idx, sub_categor
          (sub_category.idx === sub_category_idx) ? new Float32Array([btn_col[0] * .4, btn_col[1] * .4, btn_col[2] * .4, 1]) : btn_col;
 
       const item_btn = Create_widget_button(Style_button_default_properties({
-         theme: Color_theme_label_auto(.58, 1., .08, .0),
+         // theme: Color_theme_label_auto(.58, 1., .08, .0),
+         theme: blue_btn_theme,
          text: sub_category.name, align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER,
          pos: [0, 0, 0], col: activated_color, text_col: text_col, text_pad: text_pad,
          texture_id: font, font_size: font_size, layout: LAYOUT.VERTICAL|LAYOUT.EXPAND

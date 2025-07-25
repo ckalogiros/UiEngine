@@ -8,6 +8,7 @@ import { Get_fasma_color, WHITE } from "../../Engine/Drawables/Material/Colors.j
 import { Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Style_rect_default_properties, Widget_gfx_ready_enable } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -59,12 +60,7 @@ export function Demo_chain_link(x=0, y=0) {
    
    head.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC;
    head.GenGfxCtx();
-   head.Render();
-   
-   Construct_listen_events_from_mesh_tree(head);
-   Construct_listen_events_relations_from_mesh_tree(head);
-   head.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, head.gfx.vb.groupidx);
-
+   Widget_render(head);
 
    
 

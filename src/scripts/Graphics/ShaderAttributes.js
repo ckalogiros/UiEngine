@@ -7,7 +7,7 @@ import { Shader_Attributes } from "./ShaderBitFlags.js";
 
 
 const DISABLE_DEBUG = true;
-const DEBUG_INFO = false;
+const DEBUG_INFO = true;
 
 
 

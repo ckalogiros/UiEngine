@@ -1,6 +1,6 @@
 "use starict";
 
-import { New_generic_buffer } from "../../Engine/Core/Buffers.js";
+import { Free_generic_buffer, New_generic_buffer } from "../../Engine/Core/Buffers.js";
 import { Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js";
 
 
@@ -26,10 +26,21 @@ import { Vertex_buffer_group_get_attributes_per_face } from "./VertexBuffers.js"
 const _render_groups = New_generic_buffer(_, 'GFX Vertex Buffer Render Groups');
 
 
+/******************************************************************************************************************************/
+// Reset-Destroy
+/** */
+export function Vertex_buffer_render_group_reset_g_buffer() {
+
+   _render_groups.ResetFull();
+}
+
 
 
 /** */
-// export function Vertex_buffer_render_group_create(start=0, count=0, size=0, draw_count=0, index_offset= 0,debug_vbidx=-1,) {
+export function Vertex_buffer_render_group_remove(render_groupidx) {
+   _render_groups.RemoveByIdx(render_groupidx);
+}
+/** */
 export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_faces=INT_NULL) {
 
    const render_groupidx = _render_groups.Add(
@@ -76,7 +87,10 @@ export function Vertex_buffer_render_group_get_size(render_groupidx) {
 export function Vertex_buffer_render_group_get_count(render_groupidx) { 
    return _render_groups.buffer[render_groupidx].count;
 }
-
+/** */
+export function Vertex_buffer_render_group_get_num_faces(render_groupidx) { 
+   return _render_groups.buffer[render_groupidx].num_faces;
+}
 
 // SETTERS
 /** */
@@ -95,6 +109,15 @@ export function Vertex_buffer_render_group_set_start(render_groupidx, start) {
 export function Vertex_buffer_render_group_reset_draw_count(render_groupidx) { 
    _render_groups.buffer[render_groupidx].draw_count = 0;
    _render_groups.buffer[render_groupidx].count = 0;
+}
+export function Vertex_buffer_render_group_reset(render_groupidx) { 
+   _render_groups.buffer[render_groupidx].start = 0;
+   _render_groups.buffer[render_groupidx].count = 0;
+   _render_groups.buffer[render_groupidx].num_faces = 0;
+   _render_groups.buffer[render_groupidx].draw_count = 0;
+   _render_groups.buffer[render_groupidx].draw_hint = 0;
+   _render_groups.buffer[render_groupidx].index_offset = 0;
+   _render_groups.buffer[render_groupidx].state = 0x0;
 }
 /** */
 export function Vertex_buffer_render_group_set_draw_count_from_num_faces(render_groupidx, num_faces) { 

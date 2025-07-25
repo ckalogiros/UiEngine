@@ -107,20 +107,21 @@ export class Rect_Mesh extends Mesh {
    /****************************************************************************************************************************************************/
    // OVERIDEN METHODS
    /** */
-   Destroy() {
+   // Destroy() {
 
-      let is_child_shifted = false;
-      for (let i = 0; i <= this.children.boundary; i++) {
+   //    let is_child_shifted = false;
+   //    for (let i = 0; i <= this.children.boundary; i++) {
 
-         if (this.children.buffer[i]) is_child_shifted = this.children.buffer[i].Destroy();
-         // IMPORTANT: Because of the (childrens) buffer shifts remaining children, the buffer is getting smaller, and we need to reduce the index too.           
-         if (is_child_shifted) {
-            i -= 1;
-            is_child_shifted = false;
-         }
-      }
-      return super.Destroy();
-   }
+   //       if (this.children.buffer[i]) 
+   //          is_child_shifted = this.children.buffer[i].Destroy();
+   //       // IMPORTANT: Because of the (childrens) buffer shifts remaining children, the buffer is getting smaller, and we need to reduce the index too.           
+   //       if (is_child_shifted) {
+   //          i -= 1;
+   //          is_child_shifted = false;
+   //       }
+   //    }
+   //    return super.Destroy();
+   // }
    /** */
    Activate() {
 
@@ -245,12 +246,12 @@ export class Rect_Mesh extends Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
 
       // Add to view group
       const view_groupidx = (specific_view_group !== INT_NULL) ? specific_view_group : this.group_bufferidxs[0];
-      // View_add_mesh(view_groupidx, this);
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
 
 
       for (let i = 0; i <= this.children.boundary; i++) {
@@ -606,7 +607,7 @@ export function Rect_mesh_on_move_clbk(params) {
    }
 
    const mouse_dif = Mouse_get_pos_dif();
-   if (mouse_dif.x === 0 && mouse_dif.y === 0) return;
+   if ((mouse_dif.x === 0 && mouse_dif.y === 0) || section.root_posidx === INT_NULL) return;
 
    Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y);
 

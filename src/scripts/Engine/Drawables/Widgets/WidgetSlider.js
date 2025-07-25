@@ -38,16 +38,18 @@ export class Widget_Slider_Simple extends Rect_Mesh {
     */
    constructor(mesh_bufferidx, properties) {
 
-      super(mesh_bufferidx, Style_rect_default_properties({
-         is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
-         pos: properties.pos,
-         dim: properties.dim,
-         col: properties.col,
-         pad: properties.pad,
-         name: properties.text!==undefined ? properties.text : 'SliderBar',
-         num_faces: properties.num_faces,
-         is_debug_mesh: properties.is_debug_mesh,
-      }));
+      // super(mesh_bufferidx, Style_rect_default_properties({
+      //    is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
+      //    pos: properties.pos,
+      //    dim: properties.dim,
+      //    col: properties.col,
+      //    pad: properties.pad,
+      //    name: properties.text!==undefined ? properties.text : 'SliderBar',
+      //    num_faces: properties.num_faces,
+      //    layout:properties.layout,
+      //    is_debug_mesh: properties.is_debug_mesh,
+      // }));
+      super(mesh_bufferidx, properties);
 
       this.mesh_bufferidx = mesh_bufferidx;
       this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
@@ -258,15 +260,17 @@ export class Widget_Slider_Simple extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
       // Add to view group
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
       
       const handle = this.children.buffer[0];
-      handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      const handle_ret = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      handle.gfx = handle_ret.gfx;
       // Add to view group
-      View_add_mesh(handle.group_bufferidxs[0], handle);
+      View_add_mesh(handle.group_bufferidxs[0], handle, handle_ret.is_root_widget_on_reused_vb);
       
       return this.gfx;
    }
@@ -965,21 +969,21 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
    // INHERITED METHODS
    /****************************************************************************************************************************************************/
 
-   Destroy() {
+   // Destroy() {
 
-      const bar = this.children.buffer[this.bar_idx];
-      const name_text = this.text_mesh;
-      const handle = bar.children.buffer[0];
-      const value_text = this.children.buffer[this.value_text_idx];
+   //    const bar = this.children.buffer[this.bar_idx];
+   //    const name_text = this.text_mesh;
+   //    const handle = bar.children.buffer[0];
+   //    const value_text = this.children.buffer[this.value_text_idx];
 
-      value_text.Destroy();
-      name_text.Destroy();
-      handle.Destroy();
-      bar.Destroy();
+   //    value_text.Destroy();
+   //    name_text.Destroy();
+   //    handle.Destroy();
+   //    bar.Destroy();
 
-      // Sliders's rect_mesh destruction
-      return super.Destroy();
-   }
+   //    // Sliders's rect_mesh destruction
+   //    return super.Destroy();
+   // }
 
 
    AddToWidgetRootBuffer(root_bufferidx) {
@@ -1248,32 +1252,37 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
       const rect_igfx = this.gfx.vb.groupidx; // Copy the gfx from the scroller area.
       // Add to view group
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
       
 
       const name_text = this.text_mesh;
-      name_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, name_text,);
+      const name_text_ret = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, name_text,);
+      name_text.gfx = name_text_ret.gfx;
       // Add to view group
-      View_add_mesh(name_text.group_bufferidxs[0], name_text);
+      View_add_mesh(name_text.group_bufferidxs[0], name_text, name_text_ret.is_root_widget_on_reused_vb);
       const text_igfx = name_text.gfx.vb.groupidx;
 
       const bar = this.children.buffer[this.bar_idx];
-      bar.gfx = Gfx_generate_context(FLAGS, bar, rect_igfx);
+      const bar_ret = Gfx_generate_context(FLAGS, bar, rect_igfx);
+      bar.gfx = bar_ret.gfx;
       // Add to view group
-      View_add_mesh(bar.group_bufferidxs[0], bar);
+      View_add_mesh(bar.group_bufferidxs[0], bar, bar_ret.is_root_widget_on_reused_vb);
 
       const handle = bar.children.buffer[0];
-      handle.gfx = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      const handle_ret = Gfx_generate_context(FLAGS, handle, rect_igfx);
+      handle.gfx = handle_ret.gfx;
       // Add to view group
-      View_add_mesh(handle.group_bufferidxs[0], handle);
+      View_add_mesh(handle.group_bufferidxs[0], handle, handle_ret.is_root_widget_on_reused_vb);
 
       const value_text = this.children.buffer[this.value_text_idx];
-      value_text.gfx = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
+      const value_text_ret = Gfx_generate_context(FLAGS | GFX_CTX_FLAGS.SPECIFIC, value_text, text_igfx);
+      value_text.gfx = value_text_ret.gfx;
       // Add to view group
-      View_add_mesh(value_text.group_bufferidxs[0], value_text);
+      View_add_mesh(value_text.group_bufferidxs[0], value_text, value_text_ret.is_root_widget_on_reused_vb);
 
       return this.gfx;
    }

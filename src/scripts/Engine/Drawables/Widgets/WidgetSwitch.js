@@ -246,13 +246,15 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
       // Add to view group
-      View_add_mesh(this.group_bufferidxs[0], this);
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
       
-      this.children.buffer[0].gfx = Gfx_generate_context(FLAGS, this.children.buffer[0], specific_vb_groupidx);
+      const child_ret = Gfx_generate_context(FLAGS, this.children.buffer[0], specific_vb_groupidx);
+      this.children.buffer[0].gfx = child_ret.gfx;
       // Add to view group
-      View_add_mesh(this.children.buffer[0].group_bufferidxs[0], this.children.buffer[0]);
+      View_add_mesh(this.children.buffer[0].group_bufferidxs[0], this.children.buffer[0], child_ret.is_root_widget_on_reused_vb);
       
       return this.gfx;
    }

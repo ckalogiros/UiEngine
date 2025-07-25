@@ -137,13 +137,13 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
     // }
 
 
-    // // Reorder listeners buffer
-    // const root = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
-    // // TODO: We need to insure that there is a root widget liste event in all root widgets
-    // if (root.listeners) {
-    //     Listeners_set_priority(E.H, root.listeners);
-    //     Listeners_set_priority(E.C, root.listeners);
-    // }
+    // Reorder listeners buffer
+    const root = Root_group_view_buffer_get_mesh_by_rootidx(root_bufferidx);
+    // TODO: We need to insure that there is a root widget liste event in all root widgets
+    if (root.listeners) {
+        Listeners_set_priority(E.H, root.listeners);
+        Listeners_set_priority(E.C, root.listeners);
+    }
 
 
     // // Do the same for any scrollers
@@ -163,7 +163,7 @@ export function Mesh_set_root_in_focus(root_bufferidx, scroller_comp_idx = INT_N
 
 
     // Set the global state
-    // State_mesh_set_focused(root);
+    State_mesh_set_focused(root);
 }
 /** */
 export function Mesh_create_style_from_values(rcorners = 0, feather = 0, border = 0) {

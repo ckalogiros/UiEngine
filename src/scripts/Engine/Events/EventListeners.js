@@ -15,6 +15,7 @@ import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.j
 
 
 let _cnt = 0x1;
+/** */
 export const LISTENERS_FLAGS = {
 	ANY_HOVER: _cnt <<= 0x1,
 	ANY_CLICK: _cnt <<= 0x1,
@@ -27,8 +28,6 @@ export const LISTENERS_FLAGS = {
 
 	mask: 0x0, // the variable to sto
 };
-
-
 
 
 /** // TODO!!: For efficiency
@@ -49,11 +48,11 @@ export const LISTENERS_FLAGS = {
  * We use two separate storage buffers for smaller memory footprint (faster) for listen events access
  */
 const _listeners_buffer_storage = New_generic_buffer(_, '_listeners_buffer_storage');
+/** */
 const _listeners_buffer_view_storage = New_generic_buffer(_, '_listeners_buffer_view_storage');
 
 
-
-
+/** */
 export function Listener_reset_event_storage_buffers() {
 
    for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
@@ -61,9 +60,7 @@ export function Listener_reset_event_storage_buffers() {
       _listeners_buffer_view_storage.buffer[i].ResetFull();
    }
 }
-
-
-
+/** */
 export function Listener_reset_event_storage_buffers_dealocate() {
 
    for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
@@ -76,24 +73,18 @@ export function Listener_reset_event_storage_buffers_dealocate() {
       _listeners_buffer_view_storage.buffer[i].ResetFull();
    }
 }
-
-
-
+/** */
 export function Listener_get_parent_event(TYPE_IDX, idx) {
    const parent_event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    return parent_event;
 }
-
-
-
+/** */
 export function Listener_get_parent_event_meshidx(TYPE_IDX, idx) {
    const parent_idx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[idx].parent_idx;
    const parent_meshidx = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[parent_idx].meshidx;
    return parent_meshidx;
 }
-
-
-
+/** */
 export function Listener_init_event_storage_buffers() {
 
    for (let i = 0; i < LISTEN_EVENT_TYPES_INDEX.SIZE; i++) {
@@ -103,10 +94,10 @@ export function Listener_init_event_storage_buffers() {
 }
 
 
-
-
 /**********************************************************************************************************************************************************/
 // Create Listener
+
+/** */
 export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params, is_fake) {
 
    /**DEBUG */const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
@@ -127,10 +118,6 @@ export function Listener_create_child_event(TYPE_IDX, meshidx, Clbk, evt_params,
 
    return event_idx;
 }
-
-
-
-
 /** Change an event's callback and parameters */
 export function Listener_change_child_event(TYPE_IDX, event_idx, Clbk, evt_params) {
 
@@ -139,7 +126,6 @@ export function Listener_change_child_event(TYPE_IDX, event_idx, Clbk, evt_param
    event.evt_params = evt_params;
 
 }
-
 
 
 /**********************************************************************************************************************************************************/
@@ -317,9 +303,6 @@ export function Listener_remove_event_by_idx(TYPE_IDX, event_idx) {
       LISTENERS_FLAGS[TYPE_IDX] = false;
 
 }
-
-
-
 // TODO: IMPLEMENT
 /** This function removes any tree view node from View storage buffer, but does not remove any listen events from the Listeners storage buffer */
 export function Listener_disable_event_view_and_all_children(TYPE_IDX, event_idx) {
@@ -351,9 +334,7 @@ export function Listener_disable_event_view_and_all_children(TYPE_IDX, event_idx
    event.view = null;
 
 }
-
-
-
+/** */
 function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 
    for (let i = 0; i <= view.boundary; i++) {
@@ -421,6 +402,7 @@ function Listener_remove_all_children_events_from_view(TYPE_IDX, view) {
 /**********************************************************************************************************************************************************/
 // HOVER CHECK
 
+/** */
 export function Listener_dispatch_check_hover_event() {
 
 
@@ -518,9 +500,7 @@ export function Listener_dispatch_check_hover_event() {
 
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.HoverListener);
 }
-
-
-
+/** */
 function Check_hover_recursive(view_children, px, py) {
 
    for (let i = 0; i <= view_children.boundary; i++) {
@@ -574,6 +554,7 @@ function Check_hover_recursive(view_children, px, py) {
 /**********************************************************************************************************************************************************/
 // CLICK CHECK(Only click for now)
 
+/** */
 export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.EventListener);
@@ -665,10 +646,7 @@ export function Listener_dispatch_event(TYPE_IDX, trigger_params) {
    }
 
 }
-
-
-
-
+/** */
 function Check_child_events_recursive(view_children, point) {
 
    for (let i = 0; i <= view_children.boundary; i++) {
@@ -910,11 +888,17 @@ function Set_priority_first(buffer, idx, TYPE_IDX) {
 
 /**************************************************************************************************************************/
 // Debug Info Callback functions
+/** */
 export function Listeners_get_count() { return _listeners_buffer_storage.active_count; }
+/** */
 export function Listeners_get_size() { return _listeners_buffer_storage.size; }
+/** */
 export function Listeners_hover_get_count() { return _listeners_buffer_storage.buffer[E.H].active_count; }
+/** */
 export function Listeners_hover_get_size() { return _listeners_buffer_storage.buffer[E.H].size; }
+/** */
 export function Listeners_click_get_count() { return _listeners_buffer_storage.buffer[E.C].active_count; }
+/** */
 export function Listeners_click_get_size() { return _listeners_buffer_storage.buffer[E.C].size; }
 
 
@@ -949,20 +933,21 @@ export function Listeners_click_get_size() { return _listeners_buffer_storage.bu
 /**********************************************************************************************************************************************************/
 // Debug Print
 
-
-
+/** */
 export function Listener_debug_print_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_storage.boundary; i++) {
       console.log('Events Storage (Linear) Buffer. Type:', i, '\n    ', _listeners_buffer_storage.buffer[i].buffer);
    }
 }
+/** */
 export function Listener_debug_print_view_storage_buffer() {
 
    for (let i = 0; i <= _listeners_buffer_view_storage.boundary; i++) {
       console.log('Events View Storage Buffer:type:', i, '\n   ', _listeners_buffer_view_storage.buffer[i].buffer);
    }
 }
+/** */
 export function Listener_debug_print_view_recursive() {
 
    for (let i = 0; i <= _listeners_buffer_view_storage.boundary; i++) {
@@ -977,7 +962,7 @@ export function Listener_debug_print_view_recursive() {
 }
 
 
-
+/** */
 function Listener_debug_print_info_recursive(TYPE_IDX, view, count) {
 
    if (view.active_count === 0) return count;
@@ -1017,9 +1002,7 @@ function Listener_debug_print_info_recursive(TYPE_IDX, view, count) {
 
    return total_count;
 }
-
-
-
+/** */
 export function TEMP_LISTENERS(count){
 
    for(let i=8; i<=10; i++){

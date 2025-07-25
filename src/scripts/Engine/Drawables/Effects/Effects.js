@@ -22,6 +22,7 @@ import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js"
 import { BLUEL, GREY } from "../Material/Colors.js";
 import { Mesh_set_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Widget_render } from "../Widgets/Helpers/WidgetRender.js";
+import { View_render_specific_render_group } from "../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -62,30 +63,28 @@ class Effect_Mesh_Explosion_Circle {
 
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], groupidx = INT_NULL, parent, ring_diameter, intensity) {
 
+      this.timer = 0;
+      this.timer_limit = 1;
+      this.timer_step = 0.01;
+      this.is_active = true;
+      this.needs_auto_update = false;
+
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[w, h], col:color, name:'ExplosionMeshCircle',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_src_color_in_main:false, });
 
       mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:0, generic:{a:.01, b:0}});
       
       // Must be set before GenGfxCtx call
-      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
-      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.parent = parent;
+      
       mesh.SetViewGroupIndex(groupidx);
-      
-      // mesh.geom.pos[0] = x;
-      // mesh.geom.pos[1] = y;
-      
-      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
       mesh.GenGfxCtx();
-      Widget_render(mesh);
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
       // If new mesh is created, add it to the effects buffer
       this.idx = _effect_explosion_circle_mesh_buffer.Add(this);
-
       this.mesh = mesh;
-
-
-      this.is_active = true;
       
    }
 
@@ -137,9 +136,6 @@ export function Effects_explosion_circle_init_buffer(groupidx, parent, num_effec
       effect = new Effect_Mesh_Explosion_Circle(_, _, w, h, _, groupidx, parent); 
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
-      // Implement to draw wpos from a root uniform wpos 
-      if(parent!==null) Mesh_unif_hack_parent_root_wpos(effect.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
-
       EFFECTS_TYPES.EXPLOSION_CIRCLE.VIEW_GROUP_IDX = groupidx;
       EFFECTS_TYPES.EXPLOSION_CIRCLE.PARENT = parent;
 
@@ -154,7 +150,7 @@ export function Effects_explosion_circle_init_buffer(groupidx, parent, num_effec
 }
 
 
-export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, color, ring_diameter=.1, intensity=.02) {
+export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, color, ring_diameter=.1, intensity=.02, needs_auto_update=true) {
 
    let idx = INT_NULL;
 
@@ -166,7 +162,8 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       idx = _free_effect_explosion_circle_idx_buffer.buffer[freeidx];
       const effect = _effect_explosion_circle_mesh_buffer.buffer[idx];
 
-      effect.is_active = true;
+      effect.is_active = true; 
+      effect.needs_auto_update = needs_auto_update; // Avoid updating effects. There might be cases of effects to be updated in a callback animation. 
 
       // TODO: Create a Gl_ function to update all attributes in one go
 
@@ -180,11 +177,9 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       Gl_set_wpos_xy(effect.mesh.gfx, effect.mesh.geom.pos[0]+w, effect.mesh.geom.pos[1]+h);
 
       Mesh_set_color_rgba(effect.mesh, color);
-      // effect.mesh.mat.col = color;
-      // Gl_set_rgba(effect.mesh.gfx, color)
       
-      effect.mesh.timer = 0.01;
-      Gl_set_time(effect.mesh.gfx, 0.01); // Reset attribute time
+      effect.timer = 0.0;
+      Gl_set_time(effect.mesh.gfx, effect.timer); // Reset attribute time
 
       effect.mesh.geom.generic.a = ring_diameter;
       effect.mesh.geom.generic.b = intensity;
@@ -200,15 +195,9 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
       const new_effect = new Effect_Mesh_Explosion_Circle(x-w+w_src, y-h+h_src, w, h, color, EFFECTS_TYPES.EXPLOSION_CIRCLE.VIEW_GROUP_IDX, EFFECTS_TYPES.EXPLOSION_CIRCLE.PARENT, ring_diameter, intensity); 
       idx = new_effect.idx;
 
-      // new_effect.mesh.timer = 0.01;
-      Gl_set_time(new_effect.mesh.gfx, 0.01); // Reset attribute time
+      new_effect.timer = 0.01;
+      Gl_set_time(new_effect.mesh.gfx, new_effect.timer); // Reset attribute time
       
-      
-      // new_effect.timer = 0;
-      // new_effect.timer_limit = 1;
-      // new_effect.timer_step = 0.01;
-      // Gl_set_time(new_effect.mesh.gfx, 0.01); // Reset attribute time
-      // new_effect.is_active = true;
       // console.log('idx', freeidx, 'vb start', new_effect.mesh.gfx.vb.starts.buffer[0])
    }
 
@@ -219,23 +208,23 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
 
 export function Effects_explosion_circle_update() {
    
-   // for(let i=0; i <= _effect_explosion_circle_mesh_buffer.boundary; i++) {
+   for(let i=0; i <= _effect_explosion_circle_mesh_buffer.boundary; i++) {
 
-   //    const ex = _effect_explosion_circle_mesh_buffer.buffer[i];
+      const ex = _effect_explosion_circle_mesh_buffer.buffer[i];
 
-   //    if(ex.is_active) {
+      if(ex.is_active && ex.needs_auto_update) {
 
-   //       // Stop exlposion animation if time limit is reached   
-   //       if (ex.timer >= ex.timer_limit + ex.timer_step) {
-   //          Effect_explosion_circle_remove_mesh_byidx(ex.idx);
-   //       }
+         // Stop exlposion animation if time limit is reached   
+         if (ex.timer >= ex.timer_limit + ex.timer_step) {
+            Effect_explosion_circle_remove_mesh_byidx(ex.idx);
+         }
          
-   //       ex.timer += ex.timer_step;
+         ex.timer += ex.timer_step;
          
-   //       // Update  time(attribute) for explosion animation
-   //       Gl_set_time(ex.mesh.gfx, ex.timer); // Update attribute time
-   //    }
-   // }
+         // Update  time(attribute) for explosion animation
+         Gl_set_time(ex.mesh.gfx, ex.timer); // Update attribute time
+      }
+   }
    
 }
 
@@ -260,7 +249,7 @@ export function Effects_explosion_circle_update() {
 
 const _effect_explosion_glow_mesh_buffer = New_generic_buffer(_, '_effect_explosion_glow_mesh_buffer');
 const _free_effect_explosion_glow_idx_buffer = New_int8_buffer(PRE_INITIALIZED_EXPLOSION_MESHES, '_free_effect_explosion_glow_idx_buffer');
-
+let eee = true;
 class Effect_Mesh_Explosion_Glow {
 
    constructor(x=0, y=0, w=35, h=35, color=GREY[7], groupidx = INT_NULL, parent=null) {
@@ -278,18 +267,20 @@ class Effect_Mesh_Explosion_Glow {
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
       
       // Must be set before GenGfxCtx call
-      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
-      parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
+      mesh.parent = parent; 
       mesh.SetViewGroupIndex(groupidx);
       
       
-      mesh.SetViewGroupIndex(groupidx);
-      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
       mesh.GenGfxCtx();
-      Widget_render(mesh);
+      // Widget_render(mesh);
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
       
       // Initialize generic uniforms, only once(first mesh initialization)
-      // mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
+      if(eee) {
+         mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
+         eee = false;
+      }
       
       Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
       
@@ -340,8 +331,7 @@ export function Effects_explosion_glow_init_buffer(groupidx, parent, num_effect_
       vb_groupidx = effect.mesh.gfx.vb.groupidx;
 
       // Implement to draw wpos from a root uniform wpos 
-      if(parent!==null) Mesh_unif_hack_parent_root_wpos(effect.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
-
+      // if(parent!==null) Mesh_unif_hack_parent_root_wpos(effect.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Effects_explosion_glow_remove_mesh_byidx(effect.idx);
    }
@@ -398,8 +388,6 @@ export function Effects_create_explosion_glow(x, y, w, h, w_src=0, h_src=0, colo
    }
    else { // If no apropriate free effect was found, create new effect
       
-      // alert('0090090095')
-
       const vb_groupidx = EFFECTS_TYPES.EXPLOSION_GLOW.VB_GROUP_IDX;
       const new_effect = new Effect_Mesh_Explosion_Glow(x-w+w_src, y-h+h_src, w, h, color, vb_groupidx); 
       idx = new_effect.idx;

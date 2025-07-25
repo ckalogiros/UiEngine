@@ -1478,6 +1478,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
+      // '  vec4 final_color = vec4(1.0);', // The final output color
       // '  final_color = src_color;', // The final output color
 
 

@@ -1,11 +1,10 @@
 "use strict";
 
 import { Create_rect_mesh, Create_widget_button, Create_widget_color_picker, Create_widget_dropdown, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from '../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_render_from_view_NEW } from '../../Engine/Core/Views/MeshBufferViews.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from '../../Engine/Core/MeshUniformsBuffer.js';
 import { BLUE, BLUEL, CYAN, Get_mix_color, GREEN, GREENL, GREY, MAGENTA, ORANGE, ORANGEL, ORANGER, PURPLE, PURPLEB, PURPLER, RED, REDL, WHITE, YELLOW, YELLOWL, YELLOWR } from '../../Engine/Drawables/Material/Colors.js';
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../../Engine/Events/EventFunctions.js';
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
+import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_gengfx_and_render, Scoller_component_set_scrolled_section, Scroller_component_calculate_handle_pos_dim } from '../../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Dropdown_roots_set_root } from '../../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { Slider_connect } from '../../Engine/Drawables/Widgets/WidgetSlider.js';
 import { Listeners_set_priority } from '../../Engine/Events/EventListeners.js';
@@ -70,7 +69,7 @@ pressing the \"p\" key on the keyboard.\
 
 
    /** Create the info for the user */
-   const s = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], col: TRANSPARENCY(GREY[1], .4), name:'Demo_widgets'}));
+   const s = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], col: TRANSPARENCY(GREY[1], .4), name:'Demo_widgets'}));
    Widget_gfx_ready_enable({ mesh: s, enable_sdf_rect: rcorners, });
    s.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
    section.AddItem(s);
@@ -113,17 +112,7 @@ pressing the \"p\" key on the keyboard.\
 
    Align_nested_sections_pre(section);
    Align_expand(section);
-
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-
-
+   Widget_render(section);
 
    info1.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 88, 5);
    info1.text_mesh.SetColorRGBSpecificIndex(BLUEL[9], 94, 5);
@@ -152,33 +141,75 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
    const rcorners = 10;
    const font_size = 10;
    const default_font = TEXTURES.MTSDF_CONSOLAS_1024;
-   // const text_pad = [20, 12];
    const text_pad = [20, 0];
 
 
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: root_widget, pad: [0, 0], pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], dim:[10, scroller_height], col: TRANSPARENCY(GREY[3], .2), name:'Demo_widgets_scrolled_labels', listener:{type:LISTEN_EVENT_TYPES.MOVE}}));
-   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE} });
-   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL | LAYOUT.FIXED_HEIGHT;
+   const section = Create_rect_mesh(Style_rect_default_properties({ 
+      is_root: root_widget, 
+      pad: [0, 0], 
+      pos: [pos[0] + l_pad, pos[1] + t_pad * 2, 0], 
+      dim:[10, scroller_height], 
+      col: TRANSPARENCY(GREY[3], .2), 
+      name:'Demo_widgets_scrolled_labels', 
+      listener:{type:LISTEN_EVENT_TYPES.MOVE},
+      layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+   }));
+   Widget_gfx_ready_enable({ 
+      mesh: section, 
+      enable_sdf_rect: rcorners, 
+      listener:{type:LISTEN_EVENT_TYPES.MOVE},
+      scroller:{width:10, max_height:100, parent:null}, 
+   });
+   section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.FIXED_HEIGHT;
    // section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
-
+   
    section.geom.dim[1] += section.StylesGetPad(STYLES.AXIS.Y); // Adding the pad
+   
+   
+   // const info = Create_widget_label(Style_label_default_properties({ 
+   //    text: text_sample_scroller, 
+   //    col: GREY[2], 
+   //    text_col: GREENL[9], 
+   //    text_pad: text_pad, 
+   //    texture_id: default_font, 
+   //    font_size: font_size, 
+   //    layout:LAYOUT.HORIZONTAL,
+   // }));
+   // Widget_gfx_ready_enable({ mesh: info, enable_sdf_rect: rcorners, });
+   // info.align.flags = LAYOUT.HORIZONTAL;
+   // info.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
+   // section.AddItem(info);
+   
+   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
+      pad: [0, 0], 
+      col: TRANSPARENCY(GREY[1], .8), 
+      name:'scrolled_section',
+      layout:LAYOUT.VERTICAL,
+   }));
+   Widget_gfx_ready_enable({ 
+      mesh: scrolled_section, enable_sdf_rect: rcorners, 
+   });
+   scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL;
+   
+   // scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
+   // scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
+   // scrolled_section.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
+   scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
+   section.AddItem(scrolled_section);
 
-
-   const info = Create_widget_label(Style_label_default_properties({ text: text_sample_scroller, col: GREY[2], text_col: GREENL[9], text_pad: text_pad, texture_id: default_font, font_size: font_size, }));
+   const info = Create_widget_label(Style_label_default_properties({ 
+      text: text_sample_scroller, 
+      col: GREY[2], 
+      text_col: GREENL[9], 
+      text_pad: text_pad, 
+      texture_id: default_font, 
+      font_size: font_size, 
+      layout:LAYOUT.HORIZONTAL,
+   }));
    Widget_gfx_ready_enable({ mesh: info, enable_sdf_rect: rcorners, });
    info.align.flags = LAYOUT.HORIZONTAL;
    info.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    section.AddItem(info);
-
-   const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], col: TRANSPARENCY(GREY[1], .8), name:'scrolled_section' }));
-   Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, scroller:{width:10, max_height:100, parent:section}, });
-   // Widget_gfx_ready_enable({ mesh: scrolled_section, enable_sdf_rect: rcorners, scroller:{width:10, max_height:100, }, });
-   scrolled_section.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.VERTICAL;
-
-   // scrolled_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC, scrolled_section.mesh_bufferidx, true);
-   scrolled_section.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE; // Remove the PRIVATE flag so that the scrolled section will
-   scrolled_section.gfx_ctx_flags = GFX_CTX_FLAGS.NEW;
-   section.AddItem(scrolled_section);
 
 
    // const color_array = [RED[9], YELLOW[9], GREEN[9], CYAN[9], BLUEL[9], PURPLE[9]]
@@ -200,20 +231,12 @@ export function Demo_widgets_scrolled_labels(root_widget = ROOT_WIDGETS.CREATE_R
 
    
    section.GenGfxCtx();
-   
    Align_nested_sections_pre(section);
+   Widget_render(section);
 
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
-   scrolled_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, scrolled_section.gfx.vb.groupidx);
-
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-
+   const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
+   Scoller_component_set_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
+   Scroller_component_calculate_handle_pos_dim(scroller_comp);
 
 
    // const height = scroller_height - info.geom.dim[1] * 2 + 10;
@@ -534,17 +557,7 @@ nested layouts with well-aligned items.\
    root_s.GenGfxCtx();
 
    Align_nested_sections_pre(root_s);
-
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(root_s.group_bufferidxs[0]);
-
-
-   root_s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, root_s.gfx.vb.groupidx);
-
-
-   Construct_listen_events_from_mesh_tree(root_s);
-   Construct_listen_events_relations_from_mesh_tree(root_s);
-
+   Widget_render(root_s);
 
    return root_s;
 }
@@ -814,16 +827,8 @@ ensuring they remain accessible when reopening a parent dropdown.\
    section.GenGfxCtx();
 
    Align_nested_sections_pre(section);
+   Widget_render(section);
 
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
 
    // Create group, to control the vertex buffer rendering by adding removing activated/deactivated dropdown meshes
 
@@ -1027,16 +1032,7 @@ export function Demo_widgets(root_widget = ROOT_WIDGETS.CREATE_ROOT, pos = [0, 0
    section.GenGfxCtx();
 
    Align_nested_sections_pre(section);
-
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-
+   Widget_render(section);
 
    return section;
 }
@@ -1106,21 +1102,12 @@ WIDGET: COLOR-PICKER\
       section.GenGfxCtx();
 
       Align_nested_sections_pre(section);
-
-      Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      View_render_from_view_NEW(section.group_bufferidxs[0]);
-
+      Widget_render(section);
 
       { // Must render ontop the text meshes, in case they found an existing vb to be inserted(searching from root) that is rendered bellow the labels.
          const color_picker_text_meshes = colorpicker.label_r.text_mesh;
          Renderqueue_set_priority_by_vb(LAST, color_picker_text_meshes.gfx.vb.groupidx);
       }
-
-      section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-
-      Construct_listen_events_from_mesh_tree(section)
-      Construct_listen_events_relations_from_mesh_tree(section);
 
    }
 
@@ -1213,21 +1200,8 @@ Adjust the font size using the slider.
    Align_expand(section)
    
    // Render
-   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-   View_render_from_view_NEW(section.group_bufferidxs[0]);
-
-
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx)
-
-   Construct_listen_events_from_mesh_tree(section)
-   Construct_listen_events_relations_from_mesh_tree(section);
-
-
-
+   Widget_render(section);
    info1.text_mesh.SetColorRGBSpecificIndex(YELLOWR[9], 0, 14);
-
-
-
 
    y += section.geom.dim[1] * 2 + 30;
 
@@ -1314,18 +1288,10 @@ export function Demo_widgets_colorpicker(root_widget = ROOT_WIDGETS.CREATE_ROOT,
 
       // // picker.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, picker.mesh_bufferidx, true);
       // picker.GenGfxCtx();
-      // Align_nested_sections_pre(picker);
 
-      // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-      // View_render_from_view_NEW(picker.group_bufferidxs[0]);
-
-      // picker.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, picker.gfx.vb.groupidx)
-
-      // Construct_listen_events_from_mesh_tree(picker);
-      // Construct_listen_events_relations_from_mesh_tree(picker);
 
       picker.GenGfxCtx();
-      Align_nested_sections_pre(picker)
+      Align_nested_sections_pre(picker);
       Widget_render(picker);
    }
 

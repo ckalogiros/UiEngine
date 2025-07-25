@@ -206,20 +206,20 @@ export function Arkanoid_initialize_stages_schema() {
    // Set the sequence of each consecutive stage
    // BRICK_STAGES[cnt++] = BRICKS_STAGE_NO_POWUPS_TEST;
    BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
-   // BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_2;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_3;
+   BRICK_STAGES[cnt++] = BRICKS_STAGE_1;
 }
 
 

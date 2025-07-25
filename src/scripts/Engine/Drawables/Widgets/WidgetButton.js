@@ -63,7 +63,7 @@ export class Widget_Button extends Widget_Label {
       const mesh = this;
 
       if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
-         
+
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
             Mesh_listener_add(mesh, E.H, null, null);
@@ -74,7 +74,7 @@ export class Widget_Button extends Widget_Label {
             Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
-      
+
       return false;
    }
 
@@ -95,7 +95,7 @@ export class Widget_Button extends Widget_Label {
 
             State_mesh_set_clickhold(mesh);
          }
-         else  {
+         else {
 
             const EventClbk = mesh.evt_params.EventClbk;
             EventClbk(mesh.evt_params);
@@ -115,7 +115,7 @@ export class Widget_Button extends Widget_Label {
 
    RemoveTimeInterval(idx) {
       const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
-      if(intervalIdx===-1){
+      if (intervalIdx === -1) {
          console.error('intervalIdx', intervalIdx, 'this.timeIntervalsIdxBuffer.buffer', this.timeIntervalsIdxBuffer.buffer)
          alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
       }
@@ -160,7 +160,7 @@ export class Widget_Switch extends Widget_Button {
 
       const max_text = properties.text_on.length > properties.text_off.length ? properties.text_on : properties.text_off;
 
-      super(mesh_bufferidx, Style_button_default_properties({is_root:properties.is_root, text:max_text, align:properties.align, pos:properties.pos, col:properties.col, text_col:properties.text_col, text_pad:properties.text_pad, font_size:properties.font_size,  texture_id:properties.txture_id}))
+      super(mesh_bufferidx, Style_button_default_properties({ is_root: properties.is_root, text: max_text, align: properties.align, pos: properties.pos, col: properties.col, text_col: properties.text_col, text_pad: properties.text_pad, font_size: properties.font_size, texture_id: properties.txture_id }))
 
       this.text_mesh.ReplaceText(properties.text_on);
 
@@ -179,9 +179,9 @@ export class Widget_Switch extends Widget_Button {
 
       this.align.flags = align_flags;
    }
-   
+
    AddLayout(align_flags) {
-      
+
       tthis.align.flags |= align_flags;
    }
 

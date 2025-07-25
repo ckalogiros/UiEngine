@@ -24,61 +24,53 @@ export function Arkanoid_create_ui_menu(x, y, dimx, dimy) {
     menu.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
     menu.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
+    const pad_y = 10;
+    const pad_x = 10;
     const pad = 10;
-    x = pad;
-    y = pad;
+    // x = pad;
+    // y = pad;
 
     // Score text
-    const score_text = Create_widget_label(Style_label_default_properties({ text: 'score', pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    const score_text = Create_widget_label(Style_label_default_properties({ text: 'score',  pad:[pad_x, pad_y], pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout:LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: score_text, enable_sdf_rect: 20, enable_pass_vpos: true });
     menu.AddItem(score_text);
     _arkanoid_struct.score_text = score_text;
-    score_text.text_mesh.mat.x
 
-    const score_num_text = Create_widget_label(Style_label_default_properties({ text: '000000000', pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    const score_num_text = Create_widget_label(Style_label_default_properties({ text: '000000000',  pad:[0, pad_y], pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout:LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: score_num_text, enable_sdf_rect: 20, enable_pass_vpos: true });
     menu.AddItem(score_num_text)
     _arkanoid_struct.score_num_text = score_num_text;
 
-    // Score modifier
-    x = pad;
-    y += score_text.text_mesh.geom.dim[1] * 2 + pad;
-    const score_mod_text = Create_widget_label(Style_label_default_properties({ text: 'score mod', pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
-    Widget_gfx_ready_enable({ mesh: score_mod_text, enable_sdf_rect: 20, enable_pass_vpos: true });
-    menu.AddItem(score_mod_text);
-    _arkanoid_struct.score_mod_text = score_mod_text;
-
-    x += score_mod_text.text_mesh.text_width * 2 + pad;
-    const score_mod_num_text = Create_widget_label(Style_label_default_properties({ text: '00000', pos: [0, 0, 0], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
-    Widget_gfx_ready_enable({ mesh: score_mod_num_text, enable_sdf_rect: 20, enable_pass_vpos: true });
-    menu.AddItem(score_mod_num_text)
-    _arkanoid_struct.score_mod_num_text = score_mod_num_text;
-
     // Coins counter
-    x += score_mod_num_text.text_mesh.text_width * 2 + pad + 130;
-    y = pad;
-    const coins_texture = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 4], col: WHITE, dim: [COIN_SIZE, COIN_SIZE], name: 'CoinCounterUi', texture_id: COIN_TEXTURE, layout: LAYOUT.VERTICAL }));
+    const coins_texture = Create_rect_mesh(Style_rect_default_properties({ pad:[50, pad_y], pos: [0, 0, 4], col: WHITE, dim: [COIN_SIZE, COIN_SIZE], name: 'CoinCounterUi', texture_id: COIN_TEXTURE, layout: LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: coins_texture, enable_sdf_rect: 20, enable_pass_vpos: true, });
     menu.AddItem(coins_texture);
     _arkanoid_struct.coins_texture = coins_texture;
 
-    x += coins_texture.geom.dim[0] * 2 + pad;
-    const coins_texture_text = Create_widget_label(Style_label_default_properties({ text: 'x000', pos: [0, 0, 4], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    const coins_texture_text = Create_widget_label(Style_label_default_properties({ text: 'x000',  pad:[0, pad_y], pos: [0, 0, 4], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 }));
     Widget_gfx_ready_enable({ mesh: coins_texture_text, enable_sdf_rect: 20, enable_pass_vpos: true })
     menu.AddItem(coins_texture_text)
     _arkanoid_struct.coins_num_text = coins_texture_text;
 
+    // Score modifier
+    const score_mod_text = Create_widget_label(Style_label_default_properties({ text: 'score mod', pad:[pad_x, 0], pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, layout: LAYOUT.VERTICAL}));
+    Widget_gfx_ready_enable({ mesh: score_mod_text, enable_sdf_rect: 20, enable_pass_vpos: true });
+    menu.AddItem(score_mod_text);
+    _arkanoid_struct.score_mod_text = score_mod_text;
+
+    const score_mod_num_text = Create_widget_label(Style_label_default_properties({ text: '00000', pad:[0, 0], pos: [0, 0, 0], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    Widget_gfx_ready_enable({ mesh: score_mod_num_text, enable_sdf_rect: 20, enable_pass_vpos: true });
+    menu.AddItem(score_mod_num_text)
+    _arkanoid_struct.score_mod_num_text = score_mod_num_text;
+
 
     // Combo counter
-    y += coins_texture.geom.dim[1] * 2 + pad;
-    x = coins_texture.geom.pos[0];
-    const combo_text = Create_widget_label(Style_label_default_properties({ text: 'combo', pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    const combo_text = Create_widget_label(Style_label_default_properties({ text: 'combo',  pad:[50, 0], pos: [0, 0, 4], col: TRANSPARENT, font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
     Widget_gfx_ready_enable({ mesh: combo_text, enable_sdf_rect: 20, enable_pass_vpos: true });
     menu.AddItem(combo_text);
     _arkanoid_struct.combo_text = combo_text;
 
-    x += combo_text.text_mesh.text_width * 2 + pad;
-    const combo_num_text = Create_widget_label(Style_label_default_properties({ text: 'x000', pos: [0, 0, 4], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
+    const combo_num_text = Create_widget_label(Style_label_default_properties({ text: 'x000',  pad:[0, 0], pos: [0, 0, 4], col: TRANSPARENT, text_col: GREEN[9], font_size: 12, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, }));
     Widget_gfx_ready_enable({ mesh: combo_num_text, enable_sdf_rect: 20, enable_pass_vpos: true })
     menu.AddItem(combo_num_text)
     _arkanoid_struct.combo_num_text = combo_num_text;

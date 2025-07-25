@@ -145,12 +145,12 @@ export class Widget_Label extends Rect_Mesh {
 
 
 
-    Destroy() {
+    // Destroy() {
 
-        this.text_mesh.Destroy();
-        this.text_mesh = null;
-        return super.Destroy();
-    }
+    //     this.text_mesh.Destroy();
+    //     this.text_mesh = null;
+    //     return super.Destroy();
+    // }
 
 
     AddToWidgetRootBuffer(root_bufferidx) {
@@ -227,15 +227,17 @@ export class Widget_Label extends Rect_Mesh {
 
         if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-        this.gfx = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
+        const ret = Gfx_generate_context(FLAGS, this, area_specific_vb_groupidx);
+        this.gfx = ret.gfx;
         
         // Add to view group
-        View_add_mesh(this.group_bufferidxs[0], this);
+        View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
         
         
-        this.text_mesh.gfx = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
+        const text_mesh_ret = Gfx_generate_context(this.text_mesh.gfx_ctx_flags, this.text_mesh, text_specific_vb_groupidx);
+        this.text_mesh.gfx = text_mesh_ret.gfx;
         // Add to view group
-        View_add_mesh(this.text_mesh.group_bufferidxs[0], this.text_mesh);
+        View_add_mesh(this.text_mesh.group_bufferidxs[0], this.text_mesh, text_mesh_ret.is_root_widget_on_reused_vb);
 
         // if (this.text_mesh.gfx_ctx_flags) {
 
@@ -261,19 +263,19 @@ export class Widget_Label extends Rect_Mesh {
     }
 
 
-    // Render() {
-    //     if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
-    //     if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
-    //     if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
-    // }
+    Render() {
+        if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
+        if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
+        if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
+    }
 
 
 
-    // Rerender() {
+    Rerender() {
 
-    //     this.AddToGfxFromReset();
-    //     this.text_mesh.AddToGfxFromReset();
-    // }
+        this.AddToGfxFromReset();
+        this.text_mesh.AddToGfxFromReset();
+    }
 
 
     // DeactivateGfx() {
@@ -529,20 +531,6 @@ export class Widget_Label extends Rect_Mesh {
 
 
     /*******************************************************************************************************************************************************/
-    // Core-Buffers
-    /*******************************************************************************************************************************************************/
-
-
-    // RemoveFromMeshPerVbBuffer() {
-    //     Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx);
-    //     Mesh_per_vb_remove_mesh(this.text_mesh.gfx.vb.groupidx, this.text_mesh.per_vb_bufferidx);
-    // }
-
-
-
-
-
-    /*******************************************************************************************************************************************************/
     // Listeners
     /*******************************************************************************************************************************************************/
 
@@ -595,7 +583,7 @@ export class Widget_Label extends Rect_Mesh {
              * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
             */
 
-            let is_resizesed = false;
+            let is_resized = false;
 
             // Check for Resize
             if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_RESIZEABLE)) {
@@ -623,12 +611,12 @@ export class Widget_Label extends Rect_Mesh {
                     }
 
                     mesh.StateEnable(MESH_STATE_FLAGS.IN_RESIZE);
-                    is_resizesed = true;
+                    is_resized = true;
                 }
             }
 
 
-            if (!is_resizesed) { // implement move 
+            if (!is_resized) { // implement move 
                 // const OnMoveFn = mesh.OnMove;
                 const OnMoveFn = Label_on_move_clbk;
                 const idx = Time_intervals_create(10, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);

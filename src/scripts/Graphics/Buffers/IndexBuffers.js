@@ -322,76 +322,16 @@ function Index_buffer_add_indices(ibidx, num_faces) {
    ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 /** */
-// export function Index_buffer_info_check_has_enough_indices(ibidx, draw_count, num_faces_to_insert) {
 export function Index_buffer_info_check_has_enough_indices(ibidx, vertices_count, num_faces_to_insert) {
 
    const ib_info = _index_buffers_info.buffer[ibidx];
 
-   // const total_draw_count = draw_count + (num_faces_to_insert * ib_info.indices_per_face);
    const total_draw_count = ((vertices_count/4) + num_faces_to_insert) * ib_info.indices_per_face;
 
 
    if (total_draw_count > ib_info.count) {
-
-      // Check for buffer realloc
-      if (total_draw_count > ib_info.size) {
-         ib_info.Realloc(total_draw_count);
-      }
-
       Index_buffer_add_indices_from_render_group(ibidx, num_faces_to_insert)
-
    }
-}
-/** DEPRECATED??? */
-export function Index_buffer_build_indices_from_render_group(ibidx, render_groupidxs, attribs_per_vertex, vertices_per_face) {
-
-   const ib_info = _index_buffers_info.buffer[ibidx];
-
-   let offset = 0;
-   let k = 0;
-   let total_attribs_size = 0;
-
-   for (let i = 0; i <= render_groupidxs.boundary; ++i) {
-
-      const rg = Vertex_buffer_render_group_get_render_group(render_groupidxs.buffer[i]);
-
-      const num_faces = (rg.count / attribs_per_vertex) / vertices_per_face;
-
-      // Check for buffer realloc
-      const total_draw_count = (num_faces*INDICES_PER_RECT)+ib_info.count;
-      if (total_draw_count >= ib_info.size) {
-         ib_info.Realloc(total_draw_count);
-      }
-      
-      const data = _index_buffers.buffer[ib_info.ibidx];
-      
-      for (let i = 0; i < num_faces; ++i) {
-         
-         for (let j = 0; j < 2; j++) {
-            
-            data[ib_info.count++] = k + j;
-            data[ib_info.count++] = k + j + 1;
-            data[ib_info.count++] = k + j + 2;
-         }
-         
-         k += ib_info.discontinue_offset;
-         ib_info.vCount += ib_info.discontinue_offset;
-         
-         k -= ib_info.connect_offset;
-         ib_info.vCount -= ib_info.connect_offset;
-      }
-      
-      k += ib_info.connect_offset;
-      ib_info.vCount += ib_info.connect_offset;
-      
-      rg.index_offset = offset;
-
-      total_attribs_size += rg.size;
-      offset += num_faces * INDICES_PER_RECT;
-      k = total_attribs_size / attribs_per_vertex;
-   }
-   
-   ib_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE;
 }
 /** */
 export function Index_buffer_add_indices_from_render_group(ibidx, num_faces) {

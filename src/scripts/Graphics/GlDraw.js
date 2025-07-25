@@ -5,6 +5,7 @@ import { Index_buffer_get_by_ibidx, Index_buffer_info_get_by_ibidx } from './Buf
 import { VBI_get_byidx, VBI_get_vbo, Vertex_buffer_get_by_vbidx, Vertex_buffer_group_get_byidx, Vertex_buffer_set_and_update_uniforms_no_vao_binding } from './Buffers/VertexBuffers.js';
 import { Program_get_programs } from './ShaderPrograms.js';
 import { Vertex_buffer_render_group_get_render_group } from './Buffers/RenderGroups.js';
+import { GL_GET_ERROR } from './ShaderBitFlags.js';
 
 
 
@@ -69,12 +70,12 @@ export function Gl_draw(gl) {
 
         for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
 
+            
             const rgidx = vb_group.render_groupidxs.buffer[j];
             const render_group = Vertex_buffer_render_group_get_render_group(rgidx);
 
             // TODO: Distinguish uniforms that will update with uniforms with constant value
             Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, rgidx);
-            // Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, j); 
 
             if (vb_group.has_scissorbox) {
                 gl.enable(gl.SCISSOR_TEST);
@@ -87,74 +88,34 @@ export function Gl_draw(gl) {
                 Gl_texture_unit_bind(gl, texture);
                 gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
             }
+            
+            for (let k = 0; k <= vb_group.vb_idxs.boundary; k++) {
 
-            // IMIDIATELY:  Remove all the crap for buffer data full update from the Draw loop
-            const vb_info = VBI_get_byidx(render_group.vb_data_idx);
-            if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
+                // const vb_info = VBI_get_byidx(render_group.vb_data_idx);
+                const vb_data_idx = vb_group.vb_idxs.buffer[k];
+                const vb_info = VBI_get_byidx(vb_data_idx);
 
                 const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
+
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                // console.log('BUFFER_DATA', vb_groupidx)
-            }
-            else if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
-                const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-                gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint); 
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-                console.log('FROM_REALLOC', vb_groupidx)
-            }
-            if(render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
-                
-                const vbo = VBI_get_vbo(render_group.vb_data_idx);
-                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                const vb_data = Vertex_buffer_get_by_vbidx(render_group.vb_data_idx);
-                // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
-                gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
-                // gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, 400);
-                
-                // console.log('!!: bufferSubData', vb_info.vbidx)
-                
                 render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
-                GL_STATE.BOUND_VBO = vbo;
-                GL_STATE.BOUND_VBIDX = render_group.vb_data_idx;
-
-
-                // console.log(
-                //     'render_group.vb_data_idx', render_group.vb_data_idx,
-                //     'rgidx', rgidx,
-                //     'vb_data', vb_data.length,
-                //     'render_group.start', render_group.start,
-                //     'render_group.count', render_group.count,
-                // )
-                
-                // console.log('SUB_DATA')
-
-                // console.log(render_group.start, render_group.count, vb_data.length);
-                // console.log(
-                //     'vb_idx', render_group.vb_data_idx,
-                //     'rg_idx', vb_group.render_groupidxs.buffer[j],
-                //     'start', render_group.start,
-                //     'coun', render_group.count
-                //     // render_group.
-                //     // render_group.
-                // )
+    
+                // gl.drawArraysInstanced(
+                //     gl.TRIANGLES,
+                //     0, // offset
+                //     5, // num vertices per instance
+                //     2, // num instances
+                // );
             }
 
-           
-            
-            /** The last param is the instance count.
-             * That means: draw that many instances ONLY from the vertex buffer of the instanced geometry,
-             * If instance count is 1, draw the first instanced geometry attributes. 
-             * If instance count is 2, draw the first instanced geometry attributes for the first instance and the second for the second. etc
-             * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
-            */
 
-            const instance_count = 1;
-            // gl.LINES, gl.POINTS, gl.TRIANGLES
-            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, instance_count)
-            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, instance_count)
-            // gl.drawElementsInstanced(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0, instance_count)
+            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 1)
+            // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 3)
+            // gl.drawElementsInstanced(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 2)
+
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
 
@@ -164,6 +125,157 @@ export function Gl_draw(gl) {
 
     // Renderer_webgl_end_timer_query(gfxCtx);
 }
+// export function Gl_draw(gl) {
+
+//     // Renderer_webgl_begin_timer_query(gfxCtx);
+
+
+//     const drawQueue = Renderqueue_get_active();
+//     const drawQueueCount = Renderqueue_active_get_count();
+
+//     // console.log(Hash(Timer_get_global_timer_cycle()).toFixed(1))
+
+//     gl.clearColor(R, G, B, 1.0);
+//     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+//     let progidx = INT_NULL;
+//     let progs = Program_get_programs();
+
+//     for (let i = 0; i < drawQueueCount; i++) {
+
+//         progidx = drawQueue[i].progidx;
+//         const vb_groupidx = drawQueue[i].vb_groupidx;
+//         const ibidx = drawQueue[i].ibidx;
+
+
+//         if (GL_STATE.BOUND_PROG_IDX !== progidx) {
+//             gfxCtx.gl.useProgram(progs.buffer[progidx].shader_program);
+//             GL_STATE.BOUND_PROG_IDX = progidx;
+//             GL_STATE.BOUND_PROG = progs.buffer[progidx].shader_program;
+//         }
+
+
+
+//         const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+//         const ib_info = Index_buffer_info_get_by_ibidx(ibidx);
+
+//         if (GL_STATE.BOUND_VAO !== vb_group.vao) {
+//             gl.bindVertexArray(vb_group.vao);
+//             GL_STATE.BOUND_VAO = vb_group.vao;
+//         }
+
+//         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
+//         if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_IBO !== ib_info.ibo) {
+//             const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
+//             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
+//             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+//             GL_STATE.BOUND_IBO = ib_info.ibo;
+//             GL_STATE.BOUND_IBIDX = ib_info.ibidx;
+//         }
+
+//         for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
+
+//             const rgidx = vb_group.render_groupidxs.buffer[j];
+//             const render_group = Vertex_buffer_render_group_get_render_group(rgidx);
+
+//             // TODO: Distinguish uniforms that will update with uniforms with constant value
+//             Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, rgidx);
+//             // Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, j); 
+
+//             if (vb_group.has_scissorbox) {
+//                 gl.enable(gl.SCISSOR_TEST);
+//                 gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);
+//             }
+
+//             // if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
+//             if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL) {
+//                 const texture = Texture_get_texture_unit_byidx(vb_group.texidx);
+//                 Gl_texture_unit_bind(gl, texture);
+//                 gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
+//             }
+
+//             // IMIDIATELY:  Remove all the crap for buffer data full update from the Draw loop
+
+//             const vb_info = VBI_get_byidx(render_group.vb_data_idx);
+//             if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC || render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
+
+//                 const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//                 gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
+//                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
+
+//                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+//                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+//                 render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
+//             }
+//             // if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
+
+//             //     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//             //     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
+//             //     gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
+//             //     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+//             //     console.log('BUFFER_DATA', vb_groupidx)
+//             //     GL_GET_ERROR(new Error().lineNumber, `vbidx:${vb_groupidx}, vbsize:${vb_info.size} vbcount:${vb_info.count} rgcount:${render_group.count} rgsize:${render_group.size} `)
+//             // }
+//             // else if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
+//             //     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//             //     gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint); 
+//             //     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+//             //     console.log('FROM_REALLOC', vb_groupidx);
+//             //     GL_GET_ERROR(new Error().lineNumber, `vbidx:${vb_groupidx}, vbsize:${vb_info.size} vbcount:${vb_info.count} rgcount:${render_group.count} rgsize:${render_group.size} `)
+//             // }
+//             // if(render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
+                
+//             //     // const vbo = VBI_get_vbo(render_group.vb_data_idx);
+//             //     const vbo = VBI_get_vbo(vb_info.vbidx);
+//             //     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+//             //     // const vb_data = Vertex_buffer_get_by_vbidx(render_group.vb_data_idx);
+//             //     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+//             //     // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
+//             //     gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
+                
+//             //     render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
+//             //     GL_STATE.BOUND_VBO = vbo;
+//             //     GL_STATE.BOUND_VBIDX = render_group.vb_data_idx;
+//             //     // GL_GET_ERROR(new Error().lineNumber, `vbidx:${vb_groupidx}, vbsize:${vb_info.size} vbcount:${vb_info.count} rgcount:${render_group.count} rgsize:${render_group.size} ${render_group.start*FLOAT32_BYTE_SIZE}`)
+//             //     GL_GET_ERROR(new Error().lineNumber, `vbidx:${vb_groupidx}, vbsize:${vb_info.size} vbcount:${vb_info.count} rgcount:${render_group.count} rgsize:${render_group.size} vbdata.length${vb_data.length} rgvbidx:${render_group.vb_data_idx}`)
+
+
+//             //     // console.log(
+//             //     //     'render_group.vb_data_idx', render_group.vb_data_idx,
+//             //     //     'rgidx', rgidx,
+//             //     //     'vb_data', vb_data.length,
+//             //     //     'render_group.start', render_group.start,
+//             //     //     'render_group.count', render_group.count,
+//             //     // )
+                
+//             //     // console.log(render_group.start, render_group.count, vb_data.length);
+    
+//             // }
+
+           
+            
+//             /** The last param is the instance count.
+//              * That means: draw that many instances ONLY from the vertex buffer of the instanced geometry,
+//              * If instance count is 1, draw the first instanced geometry attributes. 
+//              * If instance count is 2, draw the first instanced geometry attributes for the first instance and the second for the second. etc
+//              * So in order to use more than one meshe's attributes from any instanced buffer, the instance count is responsible 
+//             */
+
+//             const instance_count = 1;
+//             // gl.LINES, gl.POINTS, gl.TRIANGLES
+//             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, instance_count)
+//             // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, instance_count)
+//             // gl.drawElementsInstanced(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0, instance_count)
+
+//             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
+
+//         }
+
+//     }
+
+//     // Renderer_webgl_end_timer_query(gfxCtx);
+// }
 
 
 
@@ -173,6 +285,7 @@ export function Gl_draw(gl) {
 
 
 // Pass an array[] as 'gfx_queue' from which to draw gfx buffers. 'gfx_queue' must be of struct: [{groupidx, progidx, vbidx}, ...]
+/** */
 export function Gl_draw_specific(gl, gfx_queue, w, h) {
 
     // const gfx_group = Progarm_get_program();
@@ -274,57 +387,3 @@ export function Gl_draw_specific(gl, gfx_queue, w, h) {
 
 
 
-
-
-/********************************************************************/
-// OLD
-
-// Update vertex buffer data
-// // IMPORTANT: HERE!: Why check every frame and not update the vb AND ib at the location of the buffer data update??????
-// if (vb_group.needs_any_update) {
-//     for (let j = 0; j <= vb_group.vb_idxs.boundary; j++) {
-
-//         const vb_info = VBI_get_byidx(vb_group.vb_idxs.buffer[j]);
-//         if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
-
-//             const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-//             gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-//             gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW);
-//             if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) { 
-//                 gl.bufferData(gl.ARRAY_BUFFER, vb_data, gl.DYNAMIC_DRAW); 
-//                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-//             }
-//             else {
-                
-//                 // gl.bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
-//                 gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start, vb_data, render_group.start, render_group.count);
-
-//                 /**MAPPING DIRECTLY TO GPU MEMORY
-//                  * 
-//                  * Create a pointer to the gpu memory. 
-//                  * // 2. Map buffer to CPU memory
-//                      const ptr = gl.mapBufferRange(
-//                         gl.ARRAY_BUFFER,
-//                         0,                // byte offset
-//                         1024,             // byte length
-//                         gl.MAP_WRITE_BIT
-//                     );
-
-//                     // Then on update Draw(), just ch
-//                     // 3. Directly modify via typed array view
-//                     const view = new Float32Array(ptr);
-//                     view.set([1,2,3], 0); // Write at element offset 0
-
-//                     // 4. Unmap to sync changes
-//                     gl.unmapBuffer(gl.ARRAY_BUFFER);
-//                 */
-//             }
-
-//             vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-//             GL_STATE.BOUND_VBO = vb_info.vbo;
-//             GL_STATE.BOUND_VBIDX = vb_info.vbidx;
-
-//         }
-//     }
-//     vb_group.needs_any_update = false;
-// }

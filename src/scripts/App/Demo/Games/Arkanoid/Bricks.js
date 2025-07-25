@@ -5,7 +5,7 @@ import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int16_bu
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Effects_create_explosion_circle, Effects_create_explosion_glow, Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx } from "../../../../Engine/Drawables/Effects/Effects.js";
 import { BLUEL, GREY, PURPLE, TRANSPARENT, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Mesh_set_and_update_color_rgba, Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy, Set_color_a } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Gl_add_wpos_xy, Gl_add_wpos_y, Gl_set_dim_xy, Gl_set_rgba, Gl_set_time, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
@@ -219,12 +219,13 @@ export function Bricks_init_buffer(x=0, y=0, groupidx, parent, num_effect_meshes
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      brick = new Brick(x, y, _, _, _, groupidx, parent);
+      brick = new Brick(x, y, GREY[2], _, _, groupidx, parent);
 
       // Implement to draw wpos from a root uniform wpos 
       // if (parent !== null) Mesh_unif_hack_parent_root_wpos(brick.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Brick_remove_byidx(brick.idx);
+      // console.warn('brick remove', brick.idx)
    }
 
    
@@ -263,6 +264,7 @@ function Bricks_create(x, y, color, name, flags, groupidx) {
    const br_dim_x = BRICKS.DIM_X, br_dim_y = BRICKS.DIM_Y;
 
 
+
    if (freeidx >= 0) {
 
       idx = _free_brick_idxs_buffer.buffer[freeidx];
@@ -272,7 +274,8 @@ function Bricks_create(x, y, color, name, flags, groupidx) {
       brick.mesh.geom.pos[1] = brick.mesh.geom.defPos[1] = y;
       Gl_set_wpos_xy(brick.mesh.gfx, brick.mesh.geom.pos[0] + br_dim_x, brick.mesh.geom.pos[1] + brick.mesh.geom.dim[1]);
 
-      Mesh_set_color_rgba(brick.mesh, color);
+      // Mesh_set_color_rgba(brick.mesh, color);
+      Mesh_set_and_update_color_rgba(brick.mesh, color);
       Mesh_set_name(brick.mesh, name);
 
       brick.flags = flags;
@@ -296,6 +299,7 @@ function Bricks_create(x, y, color, name, flags, groupidx) {
          _free_brick_idxs_buffer.RemoveByIdx(new_elem_idx);
       }
    }
+      // console.warn('brick enable', freeidx)
 
 
    _bricks_counter.count++;
@@ -648,7 +652,8 @@ function Clbk_animation_push(brick, hit_posx, hit_posy, hit_w, hit_h, time_step 
    const x = brick.mesh.geom.pos[0];
    const y = brick.mesh.geom.pos[1];
 
-   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9], BRICKS.VB_GROUP_IDX, BRICKS.PARENT);
+   // const score_mod_idx = Score_mod_create(1.2, 'x1.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9], BRICKS.VB_GROUP_IDX, BRICKS.PARENT);
+   const score_mod_idx = Score_mod_create(1.2, 'x1.2', x, y, TEXTURES.MTSDF_COMIC_1024, 5, _, YELLOW[9], );
    const score_mod = Score_mod_get_text_mesh_byidx(score_mod_idx);
 
    // Resolve the hit direction to move the brick
@@ -869,7 +874,8 @@ function Animation_pull_stop(params) {
    params.brick.lock_squash_anim = false;
 
    // Create explosion circle
-   Arkanoid_create_explosion_circle(params.brick.mesh.mat.defCol, params,);
+   // Arkanoid_create_explosion_circle(params.brick.mesh.mat.defCol, params,);
+   Arkanoid_create_explosion_circle(params.brick.mesh.mat.col, params,);
 
 
    return false;
@@ -898,7 +904,7 @@ function Arkanoid_create_explosion_circle(color = BLUEL[9], params) {
    // Create explosion glow mesh
    {
       const ring_diameter = .4, intensity = .03;
-      const explosion_fx_idx = Effects_create_explosion_circle(x, y, h * 4, h * 4, w, h, color, ring_diameter, intensity);
+      const explosion_fx_idx = Effects_create_explosion_circle(x, y, h * 4, h * 4, w, h, color, ring_diameter, intensity, false);
       const explosion_fx = Effect_explosion_circle_get_mesh_byidx(explosion_fx_idx);
 
       const params_explosion = {

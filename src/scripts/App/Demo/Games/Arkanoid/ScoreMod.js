@@ -2,13 +2,11 @@
 
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { TRANSPARENT, YELLOW, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Gl_set_alpha } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_gfx_ready_enable, Style_label_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_score_calc } from "./Arkanoid.js";
 import { Mesh_set_color_rgba } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
@@ -25,6 +23,7 @@ const vb_groupidxs = {
 }
 /** */
 let score_mod_view_group_idx = INT_NULL;
+let score_mod_parent = INT_NULL;
 /** */
 export function Arkanoid_scoremod_reset() {
 
@@ -32,6 +31,7 @@ export function Arkanoid_scoremod_reset() {
    vb_groupidxs.text_mesh = INT_NULL;
 
    score_mod_view_group_idx = INT_NULL;
+   score_mod_parent = null;
 
    _text_mesh_buffer.ResetFull();
    _free_text_idx_buffer.Reset();
@@ -49,11 +49,10 @@ let aaa = true
 /** */
 class Score_Mod {
 
-   constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, vb_groupidxs = INT_NULL, groupidx, parent=null) {
+   constructor(score_mod_num, text, x = 0, y = 0, font = TEXTURES.MTSDF_COMIC_1024, font_size = 6, color, text_color, groupidx, parent=null) {
 
       const mesh = Create_widget_label(Style_label_default_properties({text:text, pos:[0, 0, 4], font_size:font_size, col:TRANSPARENT, text_col:text_color, texture_id:font,}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
-      // mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidxs.label, vb_groupidxs.text_mesh);
 
 
       const difx = x - mesh.geom.dim[0];
@@ -68,13 +67,22 @@ class Score_Mod {
 
       mesh.SetViewGroupIndex(groupidx);
       mesh.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_GROUP);
-      if(aaa) { // TODO: Find a more elegant way to set the first mesh to a new group
-         mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
-         aaa=false;
-      }
+      // if(aaa) { // TODO: Find a more elegant way to set the first mesh to a new group
+      //    // mesh.gfx_ctx_flags |= GFX_CTX_FLAGS.RENDER_GROUP_NEW;
+      //    mesh.GenGfxCtx();
+      //    mesh.Render();
+      //    aaa=false;
+      // }
+      // else {
+         
+      //    mesh.GenGfxCtx();
+      //    mesh.Rerender();
+      // }
       mesh.GenGfxCtx();
       View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
-
+      // View_render_from_view_NEW(mesh.group_bufferidxs[0]);
+      mesh.text_mesh.GenGfxCtx();
+      View_render_specific_render_group(mesh.text_mesh.group_bufferidxs[0], mesh.text_mesh.group_bufferidxs[1], mesh.text_mesh.group_bufferidxs[2], true);
 
       { // abilities
          // Shader_bit_flags_print_enabled_attributes(mesh.sid.attr, `ATTR:  ${mesh.GetName()}`)
@@ -140,7 +148,7 @@ export function Score_mod_init_buffer(group_idx, parent, num_effect_meshes = PRE
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, vb_groupidxs, group_idx, parent);
+      score_mod = new Score_Mod(1.2, 'x1.2', _, _, SCORE_TEXT_MOD_FONT, SCORE_TEXT_MOD_INITIAL_FONT_SIZE, _, SCORE_TEXT_MOD_TEXT_COLOR, group_idx, parent);
 
       if (vb_groupidxs.label === INT_NULL) {
 
@@ -152,13 +160,14 @@ export function Score_mod_init_buffer(group_idx, parent, num_effect_meshes = PRE
    }
 
    score_mod_view_group_idx = group_idx;
+   score_mod_parent = parent;
    // Implement to draw wpos from a root uniform wpos 
-   if (parent !== null) Mesh_unif_hack_parent_root_wpos(score_mod.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
+   // if (parent !== null) Mesh_unif_hack_parent_root_wpos(score_mod.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
    return vb_groupidxs;
 }
 /** */
-export function Score_mod_create(score_mod_number, text, x, y, font, font_size, color = TRANSPARENT, text_color = YELLOW[9], groupidx, parent=null) {
+export function Score_mod_create(score_mod_number, text, x, y, font, font_size, color = TRANSPARENT, text_color = YELLOW[9], ) {
 
    let idx = INT_NULL;
 
@@ -185,7 +194,7 @@ export function Score_mod_create(score_mod_number, text, x, y, font, font_size, 
 
       // TODO: How to find the vb idx if a new text needs to be created in the already created vb?
 
-      const score_mod = new Score_Mod(score_mod_number, text, x, y, font, font_size, color, text_color, vb_groupidxs, groupidx, parent);
+      const score_mod = new Score_Mod(score_mod_number, text, x, y, font, font_size, color, text_color, score_mod_view_group_idx, score_mod_parent);
       idx = score_mod.idx;
 
    }
