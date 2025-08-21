@@ -85,17 +85,15 @@ export function Callback_animations_create_specific(target_mesh, animation_type_
    };
 
 
-   const event_clbk_params = {
-      Clbk: Callback_animations_clbk,
-      clbk_params: {
-         Animation_run: _ready_animations_buffer[animation_type_idx].run,
-         Animation_stop: _ready_animations_buffer[animation_type_idx].stop,
-         Animation_back_run: _ready_animations_buffer[animation_type_idx + CALLBACK_ANIMATION_TYPE_IDX.COUNT].run, // The count is the offset to the back animation
-         Animation_back_stop: _ready_animations_buffer[animation_type_idx + CALLBACK_ANIMATION_TYPE_IDX.COUNT].stop,
-         animation_params: animation_params,
-         animation_name: `${animation_params.function_slope.slope_constant}`,
-      },
-   }
+   const Clbk = Callback_animations_clbk;
+   const clbk_params = {
+      Animation_run: _ready_animations_buffer[animation_type_idx].run,
+      Animation_stop: _ready_animations_buffer[animation_type_idx].stop,
+      Animation_back_run: _ready_animations_buffer[animation_type_idx + CALLBACK_ANIMATION_TYPE_IDX.COUNT].run, // The count is the offset to the back animation
+      Animation_back_stop: _ready_animations_buffer[animation_type_idx + CALLBACK_ANIMATION_TYPE_IDX.COUNT].stop,
+      animation_params: animation_params,
+      animation_name: `${animation_params.function_slope.slope_constant}`,
+   };
    const event_clbks_resolve_fn = function (target_mesh = null, event_handler_type) {
 
       // Call all the callbacks in the event_clbks buffer
@@ -105,7 +103,7 @@ export function Callback_animations_create_specific(target_mesh, animation_type_
          target_mesh.event_clbks.buffer[i].Clbk(clbk_params, event_handler_type);
       }
    }
-   Mesh_event_callback_create(target_mesh, event_clbk_params, event_clbks_resolve_fn);
+   Mesh_event_callback_create(target_mesh, Clbk, clbk_params, event_clbks_resolve_fn);
 
 }
 

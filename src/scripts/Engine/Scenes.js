@@ -5,7 +5,7 @@ import { Gl_set_dim_x } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { M_Buffer, New_generic_buffer, New_int16_buffer } from './Core/Buffers.js';
 import { Mesh_buffer_get_mesh_byidx } from './Core/MeshBuffer.js';
 import { Screen_wpos_add_y, Screen_wpos_set_y } from './Core/MeshUniformsBuffer.js';
-import { Align_pre_simple___with_grow_containers } from './Drawables/Operations/AlignNestedSections.js';
+import { Layout_grow_containers_pre_render } from './Drawables/Operations/AlignNestedSections.js';
 import { Mesh_add_wpos_x, Mesh_set_wpos_relative_x, Mesh_set_wpos_x, Mesh_update_set_dim_x, Mesh_update_set_dim_y } from './Drawables/Operations/MeshAttributesFunctions.js';
 import { HandleEvents } from './Events/Events.js';
 
@@ -159,7 +159,7 @@ export function Scene_window_resized_meshes_calculate_layout() {
         }
         if(root_mesh.align.flags & LAYOUT.GROW_VERTICAL) root_mesh.geom.dim[1] = VIEWPORT.HEIGHT/2 - 1;
 
-        Align_pre_simple___with_grow_containers(root_mesh);
+        Layout_grow_containers_pre_render(root_mesh);
     }
 }
 

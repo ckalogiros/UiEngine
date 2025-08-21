@@ -1,23 +1,17 @@
 "use strict";
 
-import { Create_rect_mesh, Create_widget_label, Create_widget_multi_text, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_buffer_print_w1, Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../Engine/Core/Views/RootView.js";
-import { BLUEL, Color_hsv_to_rgb_calibrated, GREEN, GREY, ORANGEL, ORANGER, PURPLE, PURPLER, RGB, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
+import { Create_rect_mesh, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { BLUEL, Color_hsv_to_rgb_calibrated, GREY, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Listeners_set_priority } from "../../Engine/Events/EventListeners.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
-import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_set_and_update_uniform } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_rotate_z_2d, Gl_set_angle, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
-import { GetRandomInt, GetRandomPos, GetSequencedColor } from "../../Helpers/Helpers.js";
-import { Abs, Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
+import { GetRandomPos, GetSequencedColor } from "../../Helpers/Helpers.js";
+import { Dot, Magnitude, Magnitude_2vectors } from "../../Helpers/Math/MathOperations.js";
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from "../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js";
-import { Widget_gfx_ready_enable, Style_multi_text_default_properties, Style_rect_default_properties, Style_text_default_properties, Style_slider_default_properties, Style_label_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Mesh_add_wpos_xy, Mesh_get_real_pos_y, Mesh_set_and_copy_wpos_y, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_text_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Mesh_add_wpos_xy, Mesh_update_set_wpos_xy } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Uniforms_buffer_get_uniform_byidx } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Color_theme_slider_auto } from "../../Engine/Drawables/Material/Themes.js";
@@ -54,9 +48,6 @@ const random_velocities = [
    -.2, .5, -.7, .9, -.6, -.9, .4, -1, 1, .3,
 ];
 
-// TODO: Must correct the issue of balls overlaping. 
-
-
 export function Sattelite_rotation(x = 0, y = 0) {
 
 
@@ -91,7 +82,7 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
    // Render
    controls_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   Align_nested_sections_pre(controls_section);
+   Layout_basic_pre_render(controls_section);
    Widget_render(controls_section);
 
    total_height += controls_section.geom.dim[1] * 2 + pad;
@@ -337,15 +328,6 @@ export function Sattelite_rotation(x = 0, y = 0) {
 
    //    // Render
 
-   //    info_section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
-   //    info_section.Render();
-
-   //    info_section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, info_section.gfx.vb.groupidx)
-
-   //    Construct_listen_events_from_mesh_tree(info_section)
-   //    Construct_listen_events_relations_from_mesh_tree(info_section);
-
-   //    total_height += info_section.geom.dim[1] + pad;
    // }
 
    return total_height;
@@ -417,74 +399,23 @@ function Animate_sattelite(params) {
       //    console.log(params.params.hits);
       // }
 
-      // const angle = Math.atan2(x*.5, y*.5); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
-      // Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
-      // const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
-      // Gl_set_angle(sat.gfx, normalizedAngle);
-
-      // const scale = .1;
-
-      // // const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      // const r = ball.geom.dim[0]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      // const cx = sat.geom.pos[0]; // Center to sattelites position
-      // const cy = sat.geom.pos[1];
-      // const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter  
-      // const b = (cy + (r * Math.cos(angle)));
-
-
-      //    const new_posx = ball.geom.pos[0]  + a;
-      //    const new_posy = ball.geom.pos[1]  + b;
-      //    // const new_posx = ball.geom.pos[0] + ball.geom.dim[0] + a;
-      //    // const new_posy = ball.geom.pos[1] + ball.geom.dim[1] + b;
-      //    // const new_posx = ball.geom.pos[0] + ball.geom.dim[0] + a;
-      //    // const new_posy = ball.geom.pos[1] + ball.geom.dim[1] + b;
-      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0]*2) + a;
-      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1]*2) + b;
-      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0]*2 - sat.geom.dim[0]) + a;
-      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1]*2 - sat.geom.dim[1]) + b;
-      //    // const new_posx = (ball.geom.pos[0] - ball.geom.dim[0] - sat.geom.dim[0]) + a;
-      //    // const new_posy = (ball.geom.pos[1] - ball.geom.dim[1] - sat.geom.dim[1]) + b;
-      //    // const new_posx = ball.geom.pos[0] + a - ball.geom.dim[0]*2;
-      //    // const new_posy = ball.geom.pos[1] + b - ball.geom.dim[0]*2;
-      //    // const new_posx = ball.geom.pos[0]+ ball.geom.dim[0];
-      //    // const new_posy = ball.geom.pos[1]+ ball.geom.dim[1];
-      //    // const new_posx = ball.geom.pos[0];
-      //    // const new_posy = ball.geom.pos[1];
-      //    // const new_posx = a;
-      //    // const new_posy = b;
-      
-      //    Gl_set_wpos_xy(sat.gfx, new_posx, new_posy, sat.geom.num_faces);
-
-         
-      // Mesh_add_wpos_xy(sat, ball.geom.pos[0] + ball.geom.dim[0], ball.geom.pos[1] + ball.geom.dim[1]);
-      // Mesh_add_wpos_xy(sat, a, b);
-
       const angle = Math.atan2(x, y); // !!! Get the angle of rotation from two [x,y] vector points with ATAN2 !!!
       {
-      Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
-      const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
-      Gl_set_angle(sat.gfx, normalizedAngle);
+         Gl_rotate_z_2d(sat.gfx, sat.geom.dim, angle, 1);
+         const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
+         Gl_set_angle(sat.gfx, normalizedAngle);
 
-      // const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      const r = ball.geom.dim[0]+10; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      // const r =  ball.geom.dim[0] + ball.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-      const cx = sat.geom.pos[0]; // Center to sattelites position
-      const cy = sat.geom.pos[1];
-      const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter  
-      const b = (cy + (r * Math.cos(angle)));
+         // const r = ball.geom.dim[0] + sat.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+         const r = ball.geom.dim[0]+10; // Set the radius in which the sattelite will be rotating (perimetricaly)
+         // const r =  ball.geom.dim[0] + ball.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+         const cx = sat.geom.pos[0]; // Center to sattelites position
+         const cy = sat.geom.pos[1];
+         const a = (cx + (r * Math.sin(angle))); // The rotation is the tangent of the outer ball's perimeter  
+         const b = (cy + (r * Math.cos(angle)));
 
-
-         // const new_posx = (ball.geom.pos[0] + ball.geom.dim[0] + a)-(sat.geom.pos[0]+sat.geom.dim[0]);
-         // const new_posy = (ball.geom.pos[1] + ball.geom.dim[1] + b)-(sat.geom.pos[1]+sat.geom.dim[1]);
          const new_posx = (ball.geom.pos[0] + ball.geom.dim[0] + a)-(sat.geom.pos[0]);
          const new_posy = (ball.geom.pos[1] + ball.geom.dim[1] + b)-(sat.geom.pos[1]);
-         // const new_posx = ball.geom.pos[0] + a;
-         // const new_posy = ball.geom.pos[1] + b;
-         // const new_posx = ball.geom.pos[0];
-         // const new_posy = ball.geom.pos[1];
-         // const new_posx = a;
-         // const new_posy = b;
-      
+
          Gl_set_wpos_xy(sat.gfx, new_posx, new_posy, sat.geom.num_faces);
       }
 
@@ -689,12 +620,6 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    balls_buffer[0].GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
 
 
-   // for(let i=0; i<balls_buffer.length; i++) {
-   //    balls_buffer[i].geom.pos[0] = random_positions[i][0];
-   //    balls_buffer[i].geom.pos[1] = random_positions[i][1];
-   // }
-   
-   
    
    
    
@@ -791,7 +716,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
    
    //    // Render
    
-   //    Align_nested_sections_pre(info_section_panel);
+   //    Layout_basic_pre_render(info_section_panel);
    
    //    info_section_panel.geom.pos[0] = section.geom.pos[0] + section.geom.dim[0] * 2 + pad + pad;
    //    info_section_panel.geom.pos[1] = y + total_height;
@@ -856,7 +781,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       if (controls_render) {
          
          controls_section.GenGfxCtx();
-         Align_nested_sections_pre(controls_section);
+         Layout_basic_pre_render(controls_section);
          Widget_render(controls_section);
          
       }

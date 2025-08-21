@@ -176,7 +176,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
 
 
 export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
-   if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
+   // if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
 
    let changes_hapened = false;
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }

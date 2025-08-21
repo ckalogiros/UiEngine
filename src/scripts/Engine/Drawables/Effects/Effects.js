@@ -17,11 +17,9 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../Widge
 import { Gl_set_dim_xy, Gl_set_generic2, Gl_set_time, Gl_set_vpos_xy, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Create_rect_mesh } from "../Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { BLUEL, GREY } from "../Material/Colors.js";
 import { Mesh_set_color_rgba } from "../Operations/MeshAttributesFunctions.js";
-import { Widget_render } from "../Widgets/Helpers/WidgetRender.js";
 import { View_render_specific_render_group } from "../../Core/Views/MeshBufferViews.js";
 
 

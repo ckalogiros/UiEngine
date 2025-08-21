@@ -1,7 +1,7 @@
 "use strict";
 import { Time_intervals_destroy_byidx } from "../../../Timers/TimeIntervals.js";
 import { Free_generic_buffer, Free_generic_char_buffer, Free_int16_buffer, Free_int8_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../../../Core/Buffers.js";
-import { Mesh_buffer_remove_mesh_byidx, Mesh_per_vb_remove_mesh } from "../../../Core/MeshBuffer.js";
+import { Mesh_buffer_remove_mesh_byidx } from "../../../Core/MeshBuffer.js";
 import { Gfx_pool_remove_geometry } from "../../../Interfaces/Gfx/GfxPool.js";
 import { Styles_create, Styles_remove_byidx, Styles_hover_margin_get, Styles_hover_margin_set, Styles_margin_get, Styles_margin_set, Styles_pad_get, Styles_pad_set, Styles_pad_x_set, Styles_pad_y_set } from "../../../Styles.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfoUiNotifications.js";
@@ -16,25 +16,8 @@ import { Mesh_get_name, Mesh_listener_remove } from "../../Operations/MeshProper
 
 const NOTIFICATIONS_ON = true;
 
-/** SAMPLE
- class BitMask {
- 
-    mask;
-    constructor() { this.mask = 1 | 0; }
-    set(channel) { this.mask = (1 << channel | 0) >>> 0; }
-    enable(channel) { this.mask |= 1 << channel | 0; }
-    enableAll() { this.mask = 0xffffffff | 0; }
-    toggle(channel) { this.mask ^= 1 << channel | 0; }
-    disable(channel) { this.mask &= ~(1 << channel | 0); }
-    disableAll() { this.mask = 0; }
-    test(layers) { return (this.mask & layers.mask) !== 0; }
-    isEnabled(channel) { return (this.mask & (1 << channel | 0)) !== 0; }
-}
-*/
 
-
-
-
+/** */
 export class Mesh {
 
     /**
@@ -47,7 +30,6 @@ export class Mesh {
     // sid;        // BitField: Shader Program Unique Identifier
     // type;       // BitField: All different class types of this mesh. 
     // state;      // BitField: Mesh state. 
-    // event_flags;// Bitfield: Event flags
     // gfx_pool_request;  // BitField: 
 
     // gfx_ctx_flags;     // BitField: Help on choosing the gfx buffers conditionaly 
@@ -142,7 +124,6 @@ export class Mesh {
         this.fbidx = INT_NULL; // This should render the current mesh to the default gl framebuffer. 
         this.mesh_bufferidx = INT_NULL;
         this.root_bufferidx = INT_NULL;
-        // this.per_vb_bufferidx = INT_NULL;
         this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
         this.nameidx = INT_NULL;
 
@@ -158,7 +139,7 @@ export class Mesh {
             margin_y: 0,
             row: 0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
         };
-
+''
         this.parent = null;
 
         this.listeners = null;
@@ -301,8 +282,6 @@ export class Mesh {
             this.is_gfx_inserted = false;
         }
 
-        // Mesh_per_vb_remove_mesh(this.gfx.vb.groupidx, this.per_vb_bufferidx)
-
 
         /**
          * Case 'this' is a child, remove it from parent's children buffer.
@@ -382,9 +361,9 @@ export class Mesh {
     StylesSetPadY(pad_y) { Styles_pad_y_set(this.styles, pad_y); }
 
     /** */
-    SetUpdateFrameBuffer() {
-        if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
-    }
+    // SetUpdateFrameBuffer() {
+    //     if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
+    // }
 
 
     /**

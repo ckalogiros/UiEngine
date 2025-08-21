@@ -4,21 +4,20 @@ import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Geometry2D } from "../Geometry/Geometry.js";
 import { Material, Material_Atlas_Texture, Material_Texture } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_group_create_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_add_vertices_from_render_group } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
-import { Root_group_reset_gfxs, Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
+import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
-import { Mesh_unif_add_vb_root_wpos, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_movexy, Scroller_component_resize_y, Scroller_component_set_pos_from_scrolled_section } from "../Widgets/ScrollerComponent.js";
+import { Components_create_scroller_component, Scroller_component_movexy, Scroller_component_resize_y } from "../Widgets/ScrollerComponent.js";
 import { Mesh_get_real_pos_xy_obj_t } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
-import { Align_pre_simple___with_grow_containers } from "../Operations/AlignNestedSections.js";
-import { View_add_mesh, View_buffer_remove_group, View_create_new_group, View_remove_mesh, View_render_from_view_NEW, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
+import { Layout_grow_containers_pre_render, Layout_grow_containers_pre_render_with_item_reposition } from "../Operations/AlignNestedSections.js";
+import { View_add_mesh, View_create_new_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
 
 
 export class Rect_Mesh extends Mesh {
@@ -67,9 +66,7 @@ export class Rect_Mesh extends Mesh {
       this.align.flags |= align_flags;
    }
    /** */
-   AddItem(mesh, options = 0x0) {
-
-      this.options |= options;
+   AddItem(mesh) {
 
       const idx = this.children.Add(mesh);
       mesh.idx = idx;
@@ -84,44 +81,26 @@ export class Rect_Mesh extends Mesh {
          mesh.AddToWidgetRootBuffer(this.root_bufferidx);
       }
 
-      // if(this.state.mask & MESH_STATE_FLAGS.ACTIVE) 
-      //    mesh.StateEnable(this.state.mask & MESH_STATE_FLAGS.ACTIVE);
-            
       if((this.state.mask & MESH_STATE_FLAGS.ACTIVE)===0) 
          mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
 
       return idx;
    }
    /** */
-   AddChild(mesh) {
+   // AddChild(mesh) {
 
-      mesh.idx = this.children.Add(mesh);
+   //    mesh.idx = this.children.Add(mesh);
 
-      mesh.parent = this;
+   //    mesh.parent = this;
 
-      return mesh.idx;
-   }
+   //    return mesh.idx;
+   // }
 
 
 
    /****************************************************************************************************************************************************/
    // OVERIDEN METHODS
-   /** */
-   // Destroy() {
 
-   //    let is_child_shifted = false;
-   //    for (let i = 0; i <= this.children.boundary; i++) {
-
-   //       if (this.children.buffer[i]) 
-   //          is_child_shifted = this.children.buffer[i].Destroy();
-   //       // IMPORTANT: Because of the (childrens) buffer shifts remaining children, the buffer is getting smaller, and we need to reduce the index too.           
-   //       if (is_child_shifted) {
-   //          i -= 1;
-   //          is_child_shifted = false;
-   //       }
-   //    }
-   //    return super.Destroy();
-   // }
    /** */
    Activate() {
 
@@ -141,14 +120,7 @@ export class Rect_Mesh extends Mesh {
          if (this.children.buffer[i]) this.children.buffer[i].Deactivate();
       }
    }
-   /** */
-   SetRenderGroup(render_groupidx) {
 
-      this.gfx.vb.render_groupidx = render_groupidx; // #181716
-      for (let i = 0; i <= this.children.boundary; i++) {
-         if (this.children.buffer[i]) this.children.buffer[i].SetRenderGroup(render_groupidx);
-      }
-   }
    /** */
    StateEnable(MASK = 0x0) { this.state.mask |= MASK; }
    /** */
@@ -170,10 +142,6 @@ export class Rect_Mesh extends Mesh {
    }
    /** */
    SetViewGroupIndex(view_groupidx) {
-
-      // if(this.group_bufferidxs[0] !== INT_NULL) {
-      //    View_buffer_remove_group(this.group_bufferidxs[0]);
-      // }
 
       this.group_bufferidxs[0] = view_groupidx;
 
@@ -305,9 +273,6 @@ export class Rect_Mesh extends Mesh {
       Vertex_buffer_add_vertices_from_render_group(this.gfx, this.geom, this.mat, _, Mesh_get_name(this));
       this.is_gfx_inserted = true;
 
-      // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
       return this.gfx.vb.start;
    }
    AddToGfxFromReset() {
@@ -318,20 +283,11 @@ export class Rect_Mesh extends Mesh {
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AddToGfxRect)
       this.is_gfx_inserted = true;
 
-      // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-
    }
    /** */
    EnableScroller(scroller_params) {
 
       const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, this, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
-      // const scroller = Components_create_scroller_component(scroller_params.width, scroller_params.max_height, scroller_params.scrolled_section, scroller_params.bar_col, scroller_params.handle_col, scroller_params.parent);
-
-      // this.gfx_ctx_flags &= ~GFX_CTX_FLAGS.PRIVATE;
-      // this.gfx_ctx_flags |= GFX_CTX_FLAGS.NEW;
-
-      // this.AddChild(scroller);
       this.AddItem(scroller);
    }
 
@@ -398,52 +354,58 @@ export class Rect_Mesh extends Mesh {
             const evt_params = { target_mesh: mesh, };
             Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
+         if (mesh.listeners && mesh.listeners.buffer[E.K] === INT_NULL) {
+            const evt_params = { target_mesh: mesh, };
+            // HACK: Assuming mesh has no other callbacks stored, 0 index is used 
+            if(mesh.event_clbks.buffer[0]) Mesh_listener_add(mesh, E.K, mesh.event_clbks.buffer[0], evt_params);
+            else alert('99187223332. Constructing KEY_PRESS listener->No callback is set.');
+         }
       }
 
       return true;
    }
    OnClick(params) {
 
-      const section = params.evt_params.target_mesh;
+      const mesh = params.evt_params.target_mesh;
 
-      State_mesh_set_clicked(section);
+      State_mesh_set_clicked(mesh);
 
-      // This is to bind a click event to a section.
-      if (section.evt_params && section.evt_params.EventClbk) {
+      // This is to bind a click event to a mesh.
+      if (mesh.evt_params && mesh.evt_params.EventClbk) {
 
-         // Create time interval to continuosly press the button
-         if (Mesh_state_check(section, MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
+         // Create time interval to continuously press the button
+         if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
-            const EventClbk = section.evt_params.EventClbk;
-            const target_params = section.evt_params.params.target_params
+            const EventClbk = mesh.evt_params.EventClbk;
+            const target_params = mesh.evt_params.params.target_params
             const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
-            section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
+            mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
-            State_mesh_set_clickhold(section);
+            State_mesh_set_clickhold(mesh);
          }
          else {
 
-            const EventClbk = section.evt_params.EventClbk;
-            EventClbk(section.evt_params);
+            const EventClbk = mesh.evt_params.EventClbk;
+            EventClbk(mesh.evt_params);
          }
       }
       // This is for move and/or resize events
-      else if (section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
+      else if (mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-         const pos = Mesh_get_real_pos_xy_obj_t(section);
-         const right = pos.x + section.geom.dim[0] * 2;
-         const bottom = pos.y + section.geom.dim[1] * 2;
+         const pos = Mesh_get_real_pos_xy_obj_t(mesh);
+         const right = pos.x + mesh.geom.dim[0] * 2;
+         const bottom = pos.y + mesh.geom.dim[1] * 2;
 
          const point = Mouse_get_pos();
-         if (section.state.mask & MESH_STATE_FLAGS.IS_RESIZEABLE && (point.x > right - TEMP_RESIZE_MARGIN[0] || point.y > bottom - TEMP_RESIZE_MARGIN[1])) {
+         if (mesh.state.mask & MESH_STATE_FLAGS.IS_RESIZEABLE && (point.x > right - TEMP_RESIZE_MARGIN[0] || point.y > bottom - TEMP_RESIZE_MARGIN[1])) {
 
             // We have Resize
             if (point.x > right - TEMP_RESIZE_MARGIN[0] && point.y > bottom - TEMP_RESIZE_MARGIN[1]) { // Its a width&height resize
                // console.log('X Y RESIZE');
 
-               const OnResizeFn = section.OnResize;
-               const idx = Time_intervals_create(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, section);
-               section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+               const OnResizeFn = mesh.OnResize;
+               const idx = Time_intervals_create(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+               mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
             else if (point.x > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
                // console.log('X RESIZE');
@@ -452,11 +414,11 @@ export class Rect_Mesh extends Mesh {
                // console.log('Y RESIZE');
             }
 
-            section.state.mask |= MESH_STATE_FLAGS.IN_RESIZE | MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS;
-            State_mesh_set_grabed(section);
-            // State_mesh_set_focused(section);
+            mesh.state.mask |= MESH_STATE_FLAGS.IN_RESIZE | MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS;
+            State_mesh_set_grabed(mesh);
+            // State_mesh_set_focused(mesh);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            Mesh_set_root_in_focus(section.root_bufferidx);
+            Mesh_set_root_in_focus(mesh.root_bufferidx);
 
             return true;
          }
@@ -466,15 +428,15 @@ export class Rect_Mesh extends Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, section);
-         section.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
+         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, mesh);
+         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (Mesh_state_check(section, MESH_STATE_FLAGS.IS_GRABABLE)) {
+         if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-            State_mesh_set_grabed(section);
-            State_mesh_set_focused(section);
+            State_mesh_set_grabed(mesh);
+            State_mesh_set_focused(mesh);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            section.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
+            mesh.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
             // TODO: Create a set focus function, that repositions the vertex buffers in the render queue
 
          }
@@ -554,13 +516,14 @@ export class Rect_Mesh extends Mesh {
 
 
          if(root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) 
-            Align_pre_simple___with_grow_containers(root);
+            Layout_grow_containers_pre_render_with_item_reposition(root);
+            // Layout_grow_containers_pre_render(root);
 
 
          // Clipy_from_group(root.group_bufferidxs[0], clip_top, clip_bottom);
-         for (let i = 0; i <= root.children.boundary; i++) {
-            // Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
-         }
+         // for (let i = 0; i <= root.children.boundary; i++) {
+         //    // Clipy_from_tree_recursive(root.children.buffer[i], clip_top, clip_bottom);
+         // }
          // Clipx_from_group(root.group_bufferidxs[0], 0, clip_right);
 
          // First reset the buffer that holds all meshes(per vertex buffer), because the 'AddFromGfx' is gonna populate the buuffer with the added mesh

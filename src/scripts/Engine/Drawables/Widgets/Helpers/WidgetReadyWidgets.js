@@ -129,7 +129,7 @@ export function Widget_ready_switch_button(is_root = 0x0, x = 0, y = 0, col = GR
    return switch1;
 }
 /** */
-export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = TEXTURES.MTSDF_CONSOLAS_1024, x = 0, y = 0, font_size = 10, color = GREY[3], text_pad = [10, 6], color_text = WHITE, event_hover = true, event_move = false) {
+export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = TEXTURES.MTSDF_CONSOLAS_1024, x = 0, y = 0, font_size = 10, color = GREY[3], text_pad = [10, 6], color_text = WHITE, event_hover = true, event_move = false, theme=_) {
 
    const pos = [x, y, 0];
 
@@ -137,6 +137,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = T
    const label = Create_widget_label(Style_label_default_properties({
       is_root: is_root,
 
+      theme:theme,
       pos: pos,
       col: color,
       text_pad: text_pad,

@@ -14,8 +14,8 @@ import { Rect_Mesh, Rect_mesh_on_move_clbk } from "../Meshes/Rect_Mesh.js";
 import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { Sid_check_match, State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
-import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_pos_from_scrolled_section } from "./ScrollerComponent.js";
+import { Layout_basic_pre_render, Layout_grow_containers_pre_render_with_item_reposition } from "../Operations/AlignNestedSections.js";
+import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
 
 
@@ -320,17 +320,7 @@ export class Widget_Dropdown extends Rect_Mesh {
       mesh.idx = this.menu.AddItem(mesh);
 
    }
-   /** */
-   OptionsEnable(MASK=0x0){
 
-      this.options |= MASK;
-      this.menu.options |= MASK;
-      for(let i=0; i <= this.menu.children.boundary; i++){
-      
-         const child = this.menu.children.buffer[i];
-         if(child && child.options) child.OptionsEnable(MASK);
-      }
-   }
    /** */
    EnableGfx(which, params=null, menu_params=null, button_params=null){
       
@@ -681,73 +671,6 @@ alert('00000111119999922222')
          btn.SetPosXYNoGfxUpdate(x, y);
       }
    }
-   // TEMP_recalc(x, y) {
-
-   //    const btn = this.children.buffer[0];
-
-   //    const dx = btn.geom.pos[0] - this.geom.pos[0];
-   //    const dy = btn.geom.pos[1] - this.geom.pos[1];
-
-   //    this.geom.pos[0] = x;
-   //    this.geom.pos[1] = y;
-
-   //    const pad = this.StylesGetPad();
-   //    btn.TEMP_recalc(x + dx + pad[0], y + dy + pad[1]);
-
-
-   //    if(this.isOn & DP_MENU_STATE.ON){
-
-   //       // this.menu.SetPosXYNoGfxUpdate(x, y)
-   //       // this.menu.TEMP_recalc(x, y);
-         
-   //       const widget_root = Dropdown_roots_get_root_by_idx(this.rootidx)
-   //       Calculate_sizes_recursive(widget_root, widget_root.options, );
-      
-      
-   //       if (widget_root.type & MESH_TYPE.WIDGET_DROP_DOWN) {
-   //          CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root dp.
-   //          CopyArr2(widget_root.geom.defDim, widget_root.max_size); // Store to default for the root.
-   //       }
-   //       else {
-   //          if (widget_root.options & SECTION.RESIZE_PARENT) CopyArr2(widget_root.geom.dim, widget_root.max_size); // Set size for the root.
-   //          else if (widget_root.options & SECTION.RESIZE_PARENTX) widget_root.geom.dim[0] = widget_root.max_size[0];
-   //          else if (widget_root.options & SECTION.RESIZE_PARENTY) widget_root.geom.dim[1] = widget_root.max_size[1];
-   //       }
-         
-   //       widget_root.SectionSetPad();
-         
-   //       // Calculate positions for dropdown
-   //       const cur_pos = [0,0];
-   //       cur_pos[0] = this.geom.pos[0]; 
-   //       cur_pos[1] = this.geom.pos[1]; 
-         
-   //       Dp_calc_pos_tree_up_recursive(this, this.options, cur_pos, _, _, this.options & SECTION.INDEPENDENT);
-   //    }
-   // }
-   // TEMP_recalc_x(x) {
-
-   //    const btn = this.children.buffer[0];
-   //    this.geom.pos[0] = x;
-
-   //    // TODO: Conceptualize how to implement the code below that will reflect a broader context.
-
-   //    const pad = this.StylesGetPad();
-   //    const xp = x + pad[0];
-   //    const yp = this.geom.pos[1] + pad[1]*2;
-   //    const dx = btn.text_mesh.geom.pos[0]-btn.geom.pos[0];
-   //    const dy = btn.text_mesh.geom.pos[1]-btn.geom.pos[1];
-   //    btn.geom.pos[0] = xp;
-   //    btn.geom.pos[1] = yp;
-   //    btn.text_mesh.geom.pos[0] = xp+dx;
-   //    btn.text_mesh.geom.pos[1] = yp+dy;
-
-   //    if(this.isOn & DP_MENU_STATE.ON){
-   //       // HACK
-   //       this.menu.geom.pos[0] = this.geom.pos[0] + pad[0];
-   //       this.menu.geom.pos[1] = this.geom.pos[1] + this.geom.dim[1]*2
-   //       this.menu.Recalc_no_gfx_update();
-   //    }
-   // }
    /** */
    SetType(type_flag) {
 
@@ -779,9 +702,6 @@ alert('00000111119999922222')
    /** */
    AlignNEW(pos_x, pos_y) {
 
-      const pad_x = this.StylesGetPad(STYLES.AXIS.X);
-      const pad_y = this.StylesGetPad(STYLES.AXIS.Y);
-
       this.geom.pos[0] = pos_x;
       this.geom.pos[1] = pos_y;
 
@@ -793,8 +713,6 @@ alert('00000111119999922222')
       return {
          dim_x: this.geom.dim[0],
          dim_y: this.geom.dim[1],
-         // pad_x: pad_x / 2,
-         // pad_y: pad_y / 2,
       };
    }
 
@@ -882,9 +800,12 @@ alert('00000111119999922222')
 
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+      
       // Re-calculate layout
-      Align_nested_sections_pre(widget_root);
-      // Align_expand(menu);
+      if(widget_root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) Layout_grow_containers_pre_render_with_item_reposition(widget_root);
+      else Layout_basic_pre_render(widget_root);
+
+      // Layout_expand_x_axis(menu);
       
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(menu);
@@ -965,9 +886,12 @@ alert('00000111119999922222')
 
       const root_meshidx = Root_group_view_buffer_get_root_meshidx(this.root_bufferidx);
       const widget_root = Mesh_buffer_get_mesh_byidx(root_meshidx);
+     
       // Re-calculate layout
-      Align_nested_sections_pre(widget_root);
-      // Align_expand(menu);
+      if(widget_root.align.flags & LAYOUT.TYPE_GROW_CONTAINER) Layout_grow_containers_pre_render_with_item_reposition(widget_root);
+      else Layout_basic_pre_render(widget_root);
+      
+      // Layout_expand_x_axis(menu);
       
       // Re-create listen events 
       Construct_listen_events_from_mesh_tree(menu);

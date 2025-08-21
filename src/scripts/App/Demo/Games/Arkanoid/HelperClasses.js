@@ -1,5 +1,7 @@
 "use strict";
 
+import { GetSign } from "../../../../Helpers/Helpers.js";
+
 
 
 
@@ -15,6 +17,9 @@ export class Physics {
 
       this.speed = speed;
       // this.mass = 0;
+
+      this.signx = GetSign(accelx); // The x direction
+      this.signy = GetSign(accely); // The y direction
    }
 
    Reset(velx = 0, vely = 0, accelx = 0, accely = 0, speed = 1) {
@@ -25,6 +30,9 @@ export class Physics {
       this.accely = accely;
 
       this.speed = speed;
+
+      this.signx = GetSign(accelx);
+      this.signy = GetSign(accely);
    }
 
    SetVelocityXY(velx, vely) { this.velx = velx; this.vely = vely; }

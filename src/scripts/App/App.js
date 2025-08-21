@@ -14,7 +14,7 @@ import { Listener_init_event_storage_buffers, Listener_reset_event_storage_buffe
 import { Notifications_initialize, Notifications_reset } from '../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js';
 import { Callback_animations_destroy, Callback_animations_initialize } from '../Engine/Animations/CallbackAnimations.js';
 import { Gfx_pool_vb_reset } from '../Engine/Interfaces/Gfx/GfxPool.js';
-import { Mesh_unif_wpos_debug_names_reset, Mesh_unif_wpos_reset, Mesh_unif_wpos_ubidxs_reset } from '../Engine/Core/MeshUniformsBuffer.js';
+import { Mesh_unif_wpos_debug_names_reset, Mesh_unif_wpos_reset } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Mesh_animations_reset } from '../Engine/Animations/MeshAnimations.js';
 import { Mesh_buffer_reset, Mesh_per_vb_reset_dealocate } from '../Engine/Core/MeshBuffer.js';
 import { Str_buffer_mesh_names_index_buffer_reset, Str_buffer_mesh_names_reset, Str_buffer_reset } from '../Engine/Core/StringBuffer.js';
@@ -139,7 +139,7 @@ export function App_reset(){
     Uv_texture_reset_buffers();
     
     Mesh_unif_wpos_reset();
-    Mesh_unif_wpos_ubidxs_reset();
+    // Mesh_unif_wpos_ubidxs_reset();
     Mesh_unif_wpos_debug_names_reset();
     
     

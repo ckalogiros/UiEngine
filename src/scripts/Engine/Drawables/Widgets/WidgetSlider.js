@@ -77,7 +77,8 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       this.StylesSetHoverMargin(properties.hover_margin);
 
 
-      this.AddChild(handle)
+      // this.AddChild(handle)
+      this.AddItem(handle)
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
@@ -546,9 +547,6 @@ function Slider_horizontal_move_handle(bar, handle) {
       Mesh_add_wpos_x(handle, x,);
    }
 
-   // TODO: It is very complicated that we do not have a pipeline for the "mesh update gfx buffers". We need something more concrete  as to where the updates are passing through
-   handle.SetUpdateFrameBuffer();
-
    return true;
 }
 /** */
@@ -562,8 +560,6 @@ function Slider_vertical_move_handle(bar, handle) {
       handle.geom.pos[1] += y;
       Mesh_add_wpos_y(handle, y,);
    }
-
-   handle.SetUpdateFrameBuffer();
 
    return true;
 }
@@ -730,31 +726,18 @@ export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
 
    const bar = slider_bar;
 
-
-   const params = {
-      Clbk: Clbk,
-      clbk_params: clbk_params,
-   }
-
-   // bar.CreateEventCallback(params);
-   Mesh_event_callback_create(bar, params);
+   Mesh_event_callback_create(bar, Clbk, clbk_params);
 
    // Run the callback to set the sliders initial value.
    Clbk(params, bar.slider_val);
 
 }
 /** Connect a slider of class Slider, with panel and text name/value */
-export function Slider_connect(slider, Clbk, clbk_params, call_immediately = true) {
+export function Slider_connect(slider, Clbk, clbk_params, call_immediately = false) {
 
    const bar = slider.children.buffer[slider.bar_idx];
 
-
-   const params = {
-      Clbk: Clbk,
-      clbk_params: clbk_params,
-   }
-
-   Mesh_event_callback_create(bar, params);
+   Mesh_event_callback_create(bar, Clbk, clbk_params);
 
    // Run the callback to set the sliders initial value.
    if (call_immediately) Clbk(params, bar.slider_val);
@@ -924,8 +907,10 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
       name_text.parent = this;
 
       
-      this.value_text_idx = this.AddChild(value_text)
-      this.bar_idx = this.AddChild(bar)
+      // this.value_text_idx = this.AddChild(value_text)
+      // this.bar_idx = this.AddChild(bar)
+      this.value_text_idx = this.AddItem(value_text)
+      this.bar_idx = this.AddItem(bar)
 
       this.text_mesh = name_text;
 

@@ -16,7 +16,7 @@ import { Demo_widgets_colorpicker } from './DemoWidgets.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer } from '../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js';
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties, Style_particles_system_default_properties, Style_dropdown_default_properties } from '../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Mesh_add_wpos_xy } from '../../Engine/Drawables/Operations/MeshAttributesFunctions.js';
-import { Align_nested_sections_pre } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
+import { Layout_basic_pre_render } from '../../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Color_theme_label_auto, Color_theme_slider_auto, Color_theme_switch_auto } from '../../Engine/Drawables/Material/Themes.js';
 import { Widget_render } from '../../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
 import { View_destroy_view_group_and_meshes } from '../../Engine/Core/Views/MeshBufferViews.js';
@@ -88,11 +88,11 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
    const generic_controls_parameters = [.0, 1., 1.];
    emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
+   emitter.GfxEnableFn(SID.SHAD.FN_GLOW, { time: 0, });
 
    emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
    emitter.EnableProperties(PARTICLES.HAS_FADE);
 
-   emitter.GfxEnableFn(SID.SHAD.FN_GLOW, { time: 0, });
 
 
    {
@@ -225,7 +225,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 
       // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
    }
 
@@ -407,7 +407,7 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
    }
@@ -563,7 +563,7 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
       
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
    }
@@ -713,7 +713,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
    }
@@ -1119,7 +1119,7 @@ export function Create_smoke_particles(x = 0, y = 0, root_widget = ROOT_WIDGETS.
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) { // Create slider controls only if this is to be rendered from this function
 
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
    }
@@ -1383,7 +1383,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    particles_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, particles_panel.mesh_bufferidx, true);
 
    particles_panel.GenGfxCtx();
-   // Align_nested_sections_pre(particles_panel);
+   // Layout_basic_pre_render(particles_panel);
    Widget_render(particles_panel);
 
 
@@ -1535,7 +1535,7 @@ export function Create_comet_particles(x = 0, y = 0, width = VIEWPORT.WIDTH / 2 
    
          controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
          controls_section.GenGfxCtx();
-         Align_nested_sections_pre(controls_section);
+         Layout_basic_pre_render(controls_section);
          Widget_render(controls_section);
    
       }
@@ -1651,85 +1651,6 @@ export function Create_comet_glow_contols(glow_emitter_buffer, color = GREY[2], 
       
       controls_buffer = Controls_create_slider_controls_from_shader_uniform_buffer(emitter, slider_dim, parameters, uniform_name);
 
-
-   //    const slider_rcorners = 10;
-
-   //    { // SHADER UNIFORMS: Particle Glow Distance
-   //       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: 'Distance', layout:LAYOUT.VERTICAL }));
-   //       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: slider_rcorners, });
-   //       controls_buffer.push(slider);
-   //       slider.SetInitialValue(parameters ? parameters[0] : 1.);
-
-   //       Slider_connect(slider, (params, slider_val) => {
-
-   //          const val_idx = 0;
-   //          // Find the ubidx
-   //          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-   //          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[0] = slider_val;
-
-   //       }, { mnemonics: { parameters: parameters }, },
-   //       );
-
-   //    }
-   //    { // SHADER UNIFORMS: Particle Glow Brightness
-   //       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: 'Brighter', layout:LAYOUT.VERTICAL }));
-   //       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: slider_rcorners, });
-   //       controls_buffer.push(slider);
-   //       slider.SetInitialValue(parameters ? parameters[1] : 0);
-
-   //       Slider_connect(slider, (params, slider_val) => {
-
-   //          const val_idx = 1;
-   //          // Find the ubidx
-   //          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-   //          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[1] = slider_val;
-
-   //       }, { mnemonics: { parameters: parameters }, },
-   //       );
-
-   //    }
-   //    { // SHADER UNIFORMS: Particle Glow Intensity
-   //       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: 'Intensity', layout:LAYOUT.VERTICAL }));
-   //       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: slider_rcorners, });
-   //       controls_buffer.push(slider);
-   //       slider.SetInitialValue(parameters ? parameters[2] : .13);
-
-   //       Slider_connect(slider, (params, slider_val) => {
-
-   //          const val_idx = 2;
-   //          // Find the ubidx
-   //          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-   //          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[2] = slider_val;
-
-   //       }, { mnemonics: { parameters: parameters }, },
-   //       );
-
-   //    }
-   //    { // SHADER UNIFORMS: Particle Scale
-   //       const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: 'Particle Scale', layout:LAYOUT.VERTICAL }));
-   //       Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: slider_rcorners, });
-   //       controls_buffer.push(slider);
-   //       slider.SetInitialValue(parameters ? parameters[4] : scale_down);
-
-   //       // Connect sliders to gfx program uniforms 
-   //       Slider_connect(slider, (params, slider_val) => {
-
-   //          const val_idx = 0;
-   //          // Find the ubidx
-   //          const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
-   //          Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, slider_val, val_idx);
-
-   //          if (params.clbk_params.mnemonics.parameters) params.clbk_params.mnemonics.parameters[4] = slider_val;
-
-   //       }, { mnemonics: { parameters: parameters }, },
-   //       );
-   //    }
    }
 
 
@@ -2147,7 +2068,6 @@ export function Test_noise_shader() {
    { // Emitter switch and label
 
       const emitter_section = Create_rect_mesh(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Emitter Test', label_style);
-      emitter_section.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
       const label = Create_widget_label(_, 'Emitter Test', (TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
       emitter_section.AddItem(label);
@@ -2170,7 +2090,6 @@ export function Test_noise_shader() {
 
       zpos = -1
       const color_picker = Create_rect_mesh(_, SECTION.HORIZONTAL, section_pad, [0, 0, zpos + 1], [0, 0], section_col, 'Color Picker', label_style);
-      color_picker.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN;
 
       // Create label
       const label = Create_widget_label(_, 'Color Picker', (TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER), [0, 0, zpos + 2], clp_fontsize, label_col, label_text_col, label_pad, _, label_style, _, _);
@@ -2371,14 +2290,13 @@ export function Test_noise_shader() {
    // Render properties panel
    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
 
-   // section.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
    // section.gfx_ctx_flags |= GFX_CTX_FLAGS.ABSOLUTE_POSITION;
    // section.GfxCtxAddFlag(GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx);
    section.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, controls_section.mesh_bufferidx, true);
 
 
    section.GenGfxCtx();
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
    Widget_render(section);
 
 
@@ -2402,19 +2320,8 @@ export function Test_noise_shader() {
 
 
    s.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // // s.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENTX
-   // s.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT
-   // s.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-   // s.Calc_no_gfx_update();
-   // s.Render();
-
-   // s.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, s.gfx.vb.groupidx);
-
-   // Construct_listen_events_from_mesh_tree(s);
-   // Construct_listen_events_relations_from_mesh_tree(s);
-
    s.GenGfxCtx();
-   Align_nested_sections_pre(s);
+   Layout_basic_pre_render(s);
    Widget_render(s);
 
 }

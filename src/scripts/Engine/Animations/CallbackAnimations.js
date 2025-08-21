@@ -6,7 +6,8 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js
 
 
 
-const MAX_ANIMATIONS_SIZE = 80;
+// const MAX_ANIMATIONS_SIZE = 80;
+const MAX_ANIMATIONS_SIZE = 256;
 
 
 
@@ -149,6 +150,7 @@ export function Callback_animations_replace_byidx(anim_idx, animationClbk, stopA
 /** */
 function Get_next_free() {
 
+   // console.log(_clbk_animations_buffer)
    for (let i = 0; i <= _clbk_animations_buffer.boundary; i++) {
 
       const anim = _clbk_animations_buffer.buffer[i];

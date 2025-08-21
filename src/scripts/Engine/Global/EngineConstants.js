@@ -226,6 +226,7 @@ const MESH_STATE_FLAGS = {
 	IN_GRAB: _CNT <<= 1,
 	IN_HOVER_COLOR: _CNT <<= 1,
 	IN_HOLD_CLICK: _CNT <<= 1,
+	IN_KEY_PRESS: _CNT <<= 1,
 	
 	IS_HOVERABLE: _CNT <<= 1,
 	IS_CLICKABLE: _CNT <<= 1,
@@ -237,6 +238,7 @@ const MESH_STATE_FLAGS = {
 	IS_FAKE_CLICKABLE: _CNT <<= 1,
 	IS_HOVER_COLORABLE: _CNT <<= 1,
 	IS_HOLD_CLICK: _CNT <<= 1,
+	IS_KEY_PRESSABLE: _CNT <<= 1,
 
 	IN_SCALE: _CNT <<= 1,
 	HAS_POPUP: _CNT <<= 1,
@@ -541,6 +543,8 @@ const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 const TEXTURE_SMOKE1 = 'smoke_1_256';
 const TEXTURE_COIN = 'Coin_1_32';
 const TEXTURE_TEST_APPLE = 'apple_1_64x73';
+// const TEXTURE_SNAKE_BG = 'snake_bg_ai2_1024x1024';
+const TEXTURE_SNAKE_BG = 'snake_bg_cartoon2_474x474';
 // Textures Atlases with variant font sizes
 const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
 
@@ -599,6 +603,7 @@ const TEXTURES = {
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
 	COIN:g_cnt++, 
 	TEST_APPLE:g_cnt++, 
+	SNAKE_BG:g_cnt++, 
 	
 	COUNT: g_cnt,
 }
@@ -890,6 +895,7 @@ const LISTEN_EVENT_TYPES = {
 	HOVER: _CNT <<= 1,
 	CLICK_UP: _CNT <<= 1,
 	MOVE: _CNT <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+	KEY_PRESS: _CNT <<= 1,
 
 	NULL: _CNT <<= 1,
 
@@ -908,6 +914,7 @@ _CNT = 0;
 const LISTEN_EVENT_TYPES_INDEX = {
 	HOVER: _CNT++, // HOVER event belongs to another class, that is the Listener_Hover class.
 	CLICK: _CNT++,
+	KEY_PRESS: _CNT++,
 	// MOVE event registers with the CLICK event, no need to create new event in the ListeEvents buffer.
 	SIZE: _CNT,
 };
@@ -921,6 +928,7 @@ const LISTEN_EVENT_TYPES_INDEX = {
 const E = {
 	H: LISTEN_EVENT_TYPES_INDEX.HOVER,
 	C: LISTEN_EVENT_TYPES_INDEX.CLICK,
+	K: LISTEN_EVENT_TYPES_INDEX.KEY_PRESS,
 }
 
 
@@ -938,6 +946,8 @@ const EVENT_HANDLER_TYPE = {
 	MOUSE_CLICK_UP: _CNT <<= 0x1,
 	MOUSE_HOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
 	MOUSE_UNHOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+
+	KEY_PRESS: _CNT <<= 0x1, // Keyboard events
 
 };
 
@@ -1101,6 +1111,7 @@ const STYLES = { // Default access indices for style arrays
 
 /***********************************************************************************************************************************************/
 // INPUT - KEYBOARD
+const INPUT_KEYCODE_SPACE_BAR = 32;
 const INPUT_KEYCODE_LEFT = 37;
 const INPUT_KEYCODE_UP = 38;
 const INPUT_KEYCODE_RIGHT = 39;

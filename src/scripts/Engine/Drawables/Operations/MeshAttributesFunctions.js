@@ -3,7 +3,7 @@
 
 
 import { Uniforms_buffer_set_uniform, Uniforms_buffer_update_uniform } from '../../../Graphics/Buffers/UniformBuffers.js';
-import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y, Gl_rotate_z_2d, Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_set_angle, Gl_set_rgb } from '../../../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_rgba_per_vertex, Gl_set_alpha, Gl_set_rgba, Gl_set_wpos_x, Gl_set_vpos_y, Gl_set_wpos_xy, Gl_set_wpos_y, Gl_set_vpos_xy, Gl_set_vpos_x, Gl_add_wpos_xy, Gl_add_wpos_x, Gl_add_wpos_y, Gl_add_vpos_xy, Gl_add_vpos_x, Gl_add_vpos_y, Gl_rotate_z_2d, Gl_rotate_add_z_2d, Gl_rotate_y_2d, Gl_set_angle, Gl_set_rgb, Gl_rotate_z_2d_from_pivot } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Shader_builder_create_attribs_info } from '../../../Graphics/Shaders/ShaderBuilder/ShaderBuilder.js';
 import * as math from '../../../Helpers/Math/MathOperations.js'
 import { Mesh_unif_get_vb_root_wpos, Mesh_unif_get_vb_root_wpos_obj_t, Mesh_unif_get_vb_root_wposx, Mesh_unif_get_vb_root_wposy } from '../../Core/MeshUniformsBuffer.js';
@@ -143,7 +143,6 @@ export function Set_color_rgba(mesh, col) {
 /** */
 export function Set_color_rgb(mesh, col) {
 
-   // mesh.SetUpdateFrameBuffer();
    const color = col;
    math.CopyArr3(mesh.mat.col, color); // BUG: The pervertex color is a Mat4
    math.CopyArr3(mesh.mat.defCol, color); // BUG: The pervertex color is a Mat4
@@ -218,6 +217,7 @@ export function Mesh_get_real_pos_xy_obj_t(mesh) {
    return p;
    // return [p.x, p.y];
 }
+/** */
 export function Mesh_get_real_pos_xy(mesh) {
 
    const p = Mesh_unif_get_vb_root_wpos(mesh.gfx.vb.render_groupidx);
@@ -281,7 +281,7 @@ export function Mesh_update_set_wpos_y(mesh,) {
 }
 /** */
 export function Mesh_set_wpos_xy(mesh, x, y) {
-   Gl_set_wpos_xy(mesh.gfx, x + mesh.geom.dim[0], y + mesh.geom.dim[1] + y, mesh.geom.num_faces);
+   Gl_set_wpos_xy(mesh.gfx, x + mesh.geom.dim[0], y + mesh.geom.dim[1], mesh.geom.num_faces);
    // Gl_set_wpos_xy(mesh.gfx, x + x, y + y, mesh.geom.num_faces);
 }
 /** */
@@ -313,12 +313,14 @@ export function Mesh_add_and_copy_wpos_xy(mesh, x, y) {
 /** */
 export function Mesh_add_and_copy_wpos_x(mesh, x) {
    mesh.geom.pos[0] += x;
-   Gl_add_wpos_x(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.num_faces);
+   // Gl_add_wpos_x(mesh.gfx, mesh.geom.pos[0] + mesh.geom.dim[0], mesh.geom.num_faces);
+   Gl_add_wpos_x(mesh.gfx, x, mesh.geom.num_faces);
 }
 /** */
 export function Mesh_add_and_copy_wpos_y(mesh, y) {
    mesh.geom.pos[1] += y;
-   Gl_add_wpos_y(mesh.gfx, mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces);
+   // Gl_add_wpos_y(mesh.gfx, mesh.geom.pos[1] + mesh.geom.dim[1], mesh.geom.num_faces);
+   Gl_add_wpos_y(mesh.gfx, y, mesh.geom.num_faces);
 }
 /** Set position to mesh and vertex buffer */
 export function Mesh_set_and_copy_wpos_xy(mesh, x, y) {
@@ -412,6 +414,23 @@ export function Mesh_add_dim_y(mesh, y) {
 export function Mesh_rotate_z(mesh, angle) {
    Gl_rotate_z_2d(mesh.gfx, mesh.geom.dim, angle);
    Gl_set_angle(mesh.gfx, angle);
+}
+/** */
+export function Mesh_rotate_z_with_pivot(mesh, angle, pivotx, pivoty) {
+   /** 
+    * If pivot x = mesh dimx then the mesh rotates on its left side. 
+    * If pivot x = mesh -dimx then the mesh rotates on its right side. 
+    * If pivot x > mesh |dimx| then rotation pivot is outside the mesh dimentions. 
+    * If pivot x < mesh |dimx| then rotation pivot is inside the mesh dimentions. 
+    * 
+    * If pivot y = mesh dimy then the mesh rotates on its top side. 
+    * If pivot y = mesh -dimy then the mesh rotates on its bottom side. 
+    * Same as pivot x
+    * */
+   const vertex_positions = Gl_rotate_z_2d_from_pivot(mesh.gfx, mesh.geom.dim, angle, pivotx, pivoty);
+   Gl_set_angle(mesh.gfx, angle);
+
+   return vertex_positions;
 }
 /** */
 export function Mesh_rotate_add_z(mesh, angle) {

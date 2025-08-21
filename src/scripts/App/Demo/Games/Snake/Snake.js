@@ -1,31 +1,25 @@
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Mouse_android_deactivate_scrolling, Mouse_get_pos_difx } from "../../../../Engine/Controls/Input/Mouse.js";
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../../../../Engine/Core/Views/RootView.js";
-import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, Interpolate_rgb_to_01, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_calc_pos_dif, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim, Scroller_component_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/ScrollerComponent.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Switch_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSwitch.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
-import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
 import { Time_intervals_create } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Vertex_buffer_group_create_scissorbox } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_set_attr_round_corners, Gl_rotate_z_2d, Gl_set_attr_feather, Gl_set_dim_xy, Gl_add_dim_xy, Gl_add_vpos_y, Gl_add_vpos_x, Gl_set_angle, Gl_add_vpos_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetRandomPos, GetSequencedColor } from "../../../../Helpers/Helpers.js";
 import { Digitize, Linear_interpolation, Logarithmic_interpolation, Normalize } from "../../../../Helpers/Math/MathFunctions.js";
 import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/MathOperations.js";
-import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_button_default_properties, Style_switch_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
-import { Mesh_add_dim_xy, Mesh_add_wpos_xy, Mesh_set_and_copy_wpos_xy, Mesh_set_color_rgb, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_event_callback_create, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Mesh_add_wpos_xy, Mesh_set_and_copy_wpos_xy, Mesh_set_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_calc_pos_dif, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_destroy_view_group_and_meshes } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { Color_theme_label_auto, Color_theme_slider_auto, Color_theme_switch_auto } from "../../../../Engine/Drawables/Material/Themes.js";
+import { Color_theme_label_auto, Color_theme_label_auto2, Color_theme_slider_auto, Color_theme_switch_auto } from "../../../../Engine/Drawables/Material/Themes.js";
 import { Vertex_buffer_render_group_get_num_faces, Vertex_buffer_render_group_set_count_from_num_faces } from "../../../../Graphics/Buffers/RenderGroups.js";
 
 
@@ -56,8 +50,9 @@ const DISTANCE_FACTOR = 1.; // The overlap between snake body meshes. The smalle
 const TIMER_STEP = .0015;
 const SCALE_UP_FACTOR = 1.7;
 
-const score_font = TEXTURES.MTSDF_CONSOLAS_1024;
-const score_size = 12;
+// const score_font = TEXTURES.MTSDF_CONSOLAS_1024;
+const score_font = TEXTURES.MTSDF_COMIC_1024;
+const score_size = 14;
 
 // const def_tex_id = TEXTURES.CONSOLA_VARIANT_FONT, def_sub_tex_id = ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0;
 const def_tex_id = TEXTURES.MTSDF_CONSOLAS_1024, def_sub_tex_id = INT_NULL;
@@ -99,7 +94,7 @@ class Body_Mesh_Properties {
 // 
 
 /** */
-export function Game_snake(y = 0, controls_create = true) {
+export function Game_snake(y = 0, controls_create = true, controls_render=true) {
 
 
    const snake = {
@@ -196,9 +191,12 @@ export function Game_snake(y = 0, controls_create = true) {
    }
 
    // const board_color = TRANSPARENCY(Interpolate_rgb_to_01(26, 70, 30), 1.);
-   const board_color = Color_hsv_to_rgb_calibrated(.3, .4, 1., 1, .2, .0);
-   // const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[VIEWPORT.WIDTH / 2 - board_width, vertical_space, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', }));
-   const section = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[0, y, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', }));
+   // const board_color = Color_hsv_to_rgb_calibrated(.3, .4, 1., 1, .2, .0);
+   const board_color = Color_hsv_to_rgb_calibrated(0, 0, 1., 1, .7, 1);
+   const section = Create_rect_mesh(Style_rect_default_properties({
+      is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[10, y, 0], dim:[board_width - board_pad, board_height], col:board_color, name:'section', 
+      texture_id:TEXTURES.SNAKE_BG
+   }));
    Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, });
 
 
@@ -207,10 +205,17 @@ export function Game_snake(y = 0, controls_create = true) {
 
 
 
+
+   /*************************************************************************************************/
+   // Create the snake head's nose mesh (Shows the direction of the snke)
+   const nose = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[4, 8], col:TRANSPARENCY(BLUEL[9], 1.), name:'Nose'}));
+   Widget_gfx_ready_enable({mesh:nose, enable_sdf_rect:10, enable_attr_angle:0, });
+   section.AddItem(nose);
+   
+
+
    /*************************************************************************************************/
    // Create the Collectible mesh
-
-   const collectable_size = 20;
 
    const collectable = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 0], dim:collectable_dim, col:REDL[3], name:'collectable', }));
    Widget_gfx_ready_enable({mesh:collectable, enable_sdf_rect:collectable_dim[0], enable_unif_scale:true});
@@ -235,15 +240,6 @@ export function Game_snake(y = 0, controls_create = true) {
 
 
 
-   /*************************************************************************************************/
-   // Create the snake head's nose mesh (Shows the direction of the snke)
-   const nose = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 1], dim:[4, 8], col:TRANSPARENCY(BLUEL[9], 1.), name:'Nose'}));
-   Widget_gfx_ready_enable({mesh:nose, enable_sdf_rect:10, enable_attr_angle:0, });
-   section.AddItem(nose);
-
-
-
-
 
 
 
@@ -252,6 +248,7 @@ export function Game_snake(y = 0, controls_create = true) {
 
    let next_posx = 20;
    let next_posy = 40;
+   const generic_controls_parameters = [.0, .7, .5];
 
    for (let i = 0; i < INITIAL_BODY_COUNT; i++) {
 
@@ -266,9 +263,12 @@ export function Game_snake(y = 0, controls_create = true) {
       style.rcorners = calc_size;
       style.feather = snake.style.feather;
       const col = GetSequencedColor(9);
-      // const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[next_posx, next_posy, 1], dim:[calc_size, calc_size], col:col, name:'body_mesh', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
       const body_mesh = Create_rect_mesh(Style_rect_default_properties({pad:[0, 0], pos:[0, 0, 1], dim:[calc_size, calc_size], col:col, layout:LAYOUT.VERTICAL}));
       Widget_gfx_ready_enable({mesh:body_mesh, enable_sdf_rect:style.rcorners, enable_unif_scale:true});
+
+      // body_mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
+      // body_mesh.GfxEnableFn(SID.SHAD.FN_GLOW, { time: 0, });
+
       section.AddItem(body_mesh);
 
       const bodyidx = snake.body.Add(new Body_Mesh_Properties(body_mesh, snake.glow_intensity));
@@ -310,7 +310,9 @@ export function Game_snake(y = 0, controls_create = true) {
             const head = snake.body.buffer[0].mesh;
 
 
-            if (snake.body.buffer[0].in_animation === false) { // Let user been able to rotate immidiately after user input, instead of waiting the snake animation to take place 
+
+            if (snake.body.buffer[0].in_animation === false) 
+            { // Let user been able to rotate immidiately after user input, instead of waiting the snake animation to take place 
 
                snake.rotation.amt += mouse_xdif * mod;
 
@@ -319,24 +321,25 @@ export function Game_snake(y = 0, controls_create = true) {
 
                const rot_amt = snake.rotation.amt;
                Gl_rotate_z_2d(nose.gfx, nose.geom.dim, rot_amt, 1);
-
+               
                const angle = Math.atan2(snake.vel[0], snake.vel[1]);
                const normalizedAngle = angle >= 0 ? angle : (2 * Math.PI + angle); // Normalize from -π,π to 0,π
                Gl_set_angle(nose.gfx, normalizedAngle);
-
-
-               // // Rotate nose
+               
+               
                // const scale = .9;
-               // const r = head.geom.dim[0] * scale + nose.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
-               // const cx = nose.geom.pos[0]; // Center to sattelites position
-               // const cy = nose.geom.pos[1]
-               // const a = (cx + (r * Math.sin(rot_amt))) * scale; // The rotation is the tangent of the outer head's perimeter 
-               // const b = (cy + (r * Math.cos(rot_amt))) * scale;
-
-               // const new_posx = head.geom.pos[0] + head.geom.dim[0] + a;
-               // const new_posy = head.geom.pos[1] + head.geom.dim[1] + b;
-
-               // Gl_set_wpos_xy(nose.gfx, new_posx, new_posy, nose.geom.num_faces);
+               const scale = 1.;
+               
+               const r = head.geom.dim[0] * scale; // Set the radius in which the sattelite will be rotating (perimetricaly)
+               const cx = nose.geom.pos[0]; // Center to sattelites position
+               const cy = nose.geom.pos[1]
+               const a = (cx + (r * Math.sin(angle))) * scale; // The rotation is the tangent of the outer head's perimeter 
+               const b = (cy + (r * Math.cos(angle))) * scale;
+               
+               const new_posx = head.geom.pos[0] + head.geom.dim[0] + a;
+               const new_posy = head.geom.pos[1] + head.geom.dim[1] + b;
+               
+               Gl_set_wpos_xy(nose.gfx, new_posx, new_posy, nose.geom.num_faces);
 
             }
          }
@@ -360,8 +363,8 @@ export function Game_snake(y = 0, controls_create = true) {
    // const digit1_label = Create_widget_label(Style_label_default_properties({text:'0', pos:[0, 0, 0], col:TRANSPARENCY(YELLOWR[9], 1.), text_pad:[text_pad_x, text_pad_y], font_size:score_font}));
    const digit1_label = Create_widget_label(Style_label_default_properties({
       is_root: _, 
-      pos: [0,0, 0], col: PURPLER[7], text_pad: [text_pad_x, text_pad_x], text: '0',
-      texture_id: score_font, font_size:12, layout: LAYOUT.VERTICAL,
+      pos: [0,0,0], col:TRANSPARENCY(YELLOWR[9], 1.), text_pad: [text_pad_x, text_pad_y], text: '0',
+      texture_id: score_font, font_size:score_size, layout: LAYOUT.VERTICAL,
       
    }));
    Widget_gfx_ready_enable({mesh:digit1_label, enable_sdf_rect:digit1_label.geom.dim[0]});
@@ -373,8 +376,9 @@ export function Game_snake(y = 0, controls_create = true) {
    // const score_label = Create_widget_label(Style_label_default_properties({text:'score', col:GREEN[7], text_pad:[text_pad_x, text_pad_y], font_size:score_font}));
    const score_label = Create_widget_label(Style_label_default_properties({
       is_root: _, 
-      text:'score', col:GREEN[7], text_pad:[text_pad_x, text_pad_y],
-      texture_id: score_font, font_size:12, layout: LAYOUT.VERTICAL,
+      // text:'score', col:GREEN[7], text_pad:[text_pad_x, text_pad_y],
+      text:'score', col:TRANSPARENT, text_pad:[text_pad_x, text_pad_y],
+      texture_id: score_font, font_size:score_size, layout: LAYOUT.VERTICAL,
    }));
    Widget_gfx_ready_enable({mesh:score_label, enable_sdf_rect:score_label.geom.dim[1]});
    score_label.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
@@ -398,6 +402,11 @@ export function Game_snake(y = 0, controls_create = true) {
    section.GenGfxCtx();
    Widget_render(section);
 
+
+   // Set callback for uniform update
+   // const body_0 = snake.body.buffer[0].mesh;
+   // body_0.GfxUniformSetAndUpdate('u_scale2', [.5, 1,]);
+   // body_0.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
 
 
 
@@ -436,6 +445,7 @@ export function Game_snake(y = 0, controls_create = true) {
    const options_clbk_params = {
       menu_panel: null,
       snake: snake,
+      controls_render:controls_render,
 
       // Menu sliders are created on menu activation, so there is no refference to any previous sliders.
       // For that we need to store the changes of all sliders in 'mnemonics' variable.
@@ -514,7 +524,8 @@ export function Game_snake(y = 0, controls_create = true) {
    snake.Color_set_fn(snake);
 
    return {
-      Snake_options_callback: Snake_options_callback,
+      // Snake_options_callback: Snake_options_callback,
+      Snake_options_controls: Snake_options_controls,
       options_clbk_params: options_clbk_params,
    };
 
@@ -537,7 +548,6 @@ function Snake_start_menu(params) {
    const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[100, 100, 10], col:Color_hsv_to_rgb_calibrated(0,0,1,1,.08,0), name:'StartMenuPanel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:r_corners, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
-   menu_panel.options = SECTION.VERTICAL | SECTION.RESIZE_PARENT;
 
    zpos++;
 
@@ -564,30 +574,20 @@ click mouse button.`;
 
    const left_pad = 10;
 
-   const play_contols_info = Create_rect_mesh(Style_rect_default_properties({pad:[left_pad, 10], pos:[0, 0, 4], dim:[0, 0], col:TRANSPARENCY(GREY[5], tr), name:'play_contols_info', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   const play_contols_info = Create_rect_mesh(Style_rect_default_properties({pad:[left_pad, 10], pos:[0, 0, 4], dim:[0, 0], col:Color_hsv_to_rgb_calibrated(0,0,1,1,.18,0), name:'play_contols_info', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
    Widget_gfx_ready_enable({mesh:play_contols_info, enable_sdf_rect:r_corners});
    menu_panel.AddItem(play_contols_info);
    {
       const text_pad = [11, 6];
 
-      {
-         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[1], .0), name:'Controls section', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
-         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10});
-         play_contols_info.AddItem(info);
 
-         // const col = BLUEL[9];
-         const col = BLACK;
-         const ctrl = Create_widget_label(Style_label_default_properties({text:info_text_use_options, col:col, text_col:TRANSPARENCY(WHITE, .5), text_pad:text_pad, texture_id:def_tex_id, font_size:font_size}));
-         Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
-         info.AddItem(ctrl);
-      }
       {
-         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[0], .0), name:'Controls section', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF}));
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], dim:[0, 0], col:TRANSPARENCY(GREY[0], .0), name:'Controls section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
          Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:menu_panel.geom.dim[0] / 10});
          play_contols_info.AddItem(info);
 
          const col = BLUEL[9];
-         const ctrl = Create_widget_label(Style_label_default_properties({text:'CONTROLS', col:TRANSPARENT, text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size}));
+         const ctrl = Create_widget_label(Style_label_default_properties({text:'CONTROLS', col:TRANSPARENT, text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:18, layout:LAYOUT.VERTICAL}));
          Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
       }
@@ -597,11 +597,15 @@ click mouse button.`;
          play_contols_info.AddItem(info);
 
          const col = PURPLER[9];
-         const ctrl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size}));
+         const ctrl = Create_widget_label(Style_label_default_properties({theme:Color_theme_label_auto2(.2,1,.3,.2), text:'Rotate Left', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size, layout:LAYOUT.VERTICAL}));
          Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
 
-         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_left, col:TRANSPARENCY(GREY[4], 0), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size}));
+         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.2,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise, layout:LAYOUT.HORIZONTAL }));
+         Widget_gfx_ready_enable({ mesh: rotate_symbol, enable_sdf_rect: 10, })
+         info.AddItem(rotate_symbol);
+
+         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_left, col:TRANSPARENT, text_col:Color_hsv_to_rgb_calibrated(0,0,1,.5,1,1), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size, layout:LAYOUT.VERTICAL}));
          Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10});
          info.AddItem(expl);
       }
@@ -611,13 +615,27 @@ click mouse button.`;
          play_contols_info.AddItem(info);
 
          const col = PURPLEB[9];
-         const ctrl = Create_widget_label(Style_label_default_properties({text:'Rotate Right', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size}));
+         const ctrl = Create_widget_label(Style_label_default_properties({theme:Color_theme_label_auto2(.78,1,.3,.2), text:'Rotate Right', col:col, text_col:GREY[3], text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size, layout:LAYOUT.VERTICAL}));
          Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
+         
+         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.78,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise, layout:LAYOUT.HORIZONTAL }));
+         Widget_gfx_ready_enable({ mesh: rotate_symbol, enable_sdf_rect: 10, })
+         info.AddItem(rotate_symbol);
 
-         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_right, col:TRANSPARENCY(GREY[4], 0), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size}));
+         const expl = Create_widget_label(Style_label_default_properties({text:info_text_rot_right, col:TRANSPARENT, text_col:Color_hsv_to_rgb_calibrated(0,0,1,.5,1,1), text_pad:text_pad, texture_id:def_tex_id, sub_texture_id:def_sub_tex_id, font_size:font_size, layout:LAYOUT.VERTICAL}));
          Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10});
          info.AddItem(expl);
+      }
+      {
+         const info = Create_rect_mesh(Style_rect_default_properties({pad:[18, 18], pos:[0, 0, 10], col:Color_hsv_to_rgb_calibrated(0,0,1,1,.18, 0), name:'Controls section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+         Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:50});
+         play_contols_info.AddItem(info);
+
+         const col = BLACK;
+         const ctrl = Create_widget_label(Style_label_default_properties({theme:Color_theme_label_auto(.2,0,.08,0), text:info_text_use_options, col:col, text_col:TRANSPARENCY(WHITE, .5), text_pad:text_pad, texture_id:def_tex_id, font_size:font_size}));
+         Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]-6});
+         info.AddItem(ctrl);
       }
    }
    
@@ -653,7 +671,7 @@ click mouse button.`;
    // Render Menu 
    // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
-   Align_nested_sections_pre(menu_panel);
+   Layout_basic_pre_render(menu_panel);
    Widget_render(menu_panel);
 
    // Set menu in focus
@@ -819,9 +837,14 @@ function Animate_snake(params) {
             pos[0] = last_digit_label.geom.pos[0] - (last_digit_label.geom.dim[0] * 2) - pad;
 
             const digit_label = Create_widget_label(Style_label_default_properties({text:'0', pos:pos, font_size:score_size, col:TRANSPARENCY(YELLOWR[9], 1.), text_pad:[7, 3], texture_id:score_font}));
-            Widget_gfx_ready_enable({mesh:digit_label, enable_sdf_rect:digit_label.geom.dim[0]})
+            Widget_gfx_ready_enable({mesh:digit_label, enable_sdf_rect:digit_label.geom.dim[0]});
+            digit_label.SetViewGroupIndex(snake.body.buffer[0].mesh.group_bufferidxs[0]);
+
+            section.AddItem(digit_label);
             // digit_label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC | GFX_CTX_FLAGS.FROM_PARENT_DSC, last_digit_label.gfx.vb.groupidx, last_digit_label.text_mesh.gfx.vb.groupidx);
-            digit_label.GenGfxCtx();
+            // digit_label.GenGfxCtx(GFX_CTX_FLAGS.SPECIFIC, last_digit_label.gfx.vb.groupidx, last_digit_label.text_mesh.gfx.vb.groupidx);
+            digit_label.GenGfxCtx(GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC, );
+            // digit_label.GenGfxCtx();
             digit_label.Render();
 
             score_digit_meshes.push(digit_label);
@@ -924,14 +947,12 @@ function Animate_snake(params) {
 
    // const scale = snake.glow_scale_down_factor;
    // const scale = snake.distance_factor;
-   const scale = .9;
-
-   // const r = head.geom.dim[0] * snake.glow_scale_down_factor + nose.geom.dim[1]; // Set the radius in which the sattelite will be rotating (perimetricaly)
+   // const scale = .9;
+   const scale = 1.;
+   
    const r = head.geom.dim[0] * scale; // Set the radius in which the sattelite will be rotating (perimetricaly)
    const cx = nose.geom.pos[0]; // Center to sattelites position
    const cy = nose.geom.pos[1]
-   // const a = (cx + (r * Math.sin(angle))) * snake.glow_scale_down_factor; // The rotation is the tangent of the outer head's perimeter 
-   // const b = (cy + (r * Math.cos(angle))) * snake.glow_scale_down_factor;
    const a = (cx + (r * Math.sin(angle))) * scale; // The rotation is the tangent of the outer head's perimeter 
    const b = (cy + (r * Math.cos(angle))) * scale;
 
@@ -976,7 +997,6 @@ function Animation_scale_up_run(params) {
    body.prev_slope = slope;
    body.mesh.geom.dim[0] += res;
    body.mesh.geom.dim[1] += res;
-   // Mesh_add_dim_xy(body.mesh, res, res);
    Gl_add_vpos_xy(body.mesh.gfx, res, res);
    Gl_add_dim_xy(body.mesh.gfx, res, res);
 
@@ -1187,6 +1207,7 @@ function Animation_scale_down_stop(params) {
       Gl_add_vpos_xy(body.mesh.gfx, pos_dif, pos_dif);
 
    }
+   
 
    // snake.in_scale_animation = false;
    const bodyidx = params.body_mesh_idx;
@@ -1420,7 +1441,7 @@ function Snake_options_callback(params) {
          const root = params.params.params.root_mesh;
          View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
 
-         params.snake_struct_controls_section = null;
+         // params.snake_struct_controls_section = null;
          params.params.menu_panel = null;
       },
       _,
@@ -1432,61 +1453,14 @@ function Snake_options_callback(params) {
    /*************************************************************************************************/
    // Render Section 
 
-   menu_panel.GenGfxCtx();
-   Align_nested_sections_pre(menu_panel);
-   Widget_render(menu_panel);
+   if(params.params.controls_render) {
 
-   // // Create event callback for when the close menu button has been pressed
-   // const evt_clbk_params = {
-   //    evt_clbks: () => {
-   //       params.snake_struct_controls_section = null;
-   //       params.params.menu_panel = null;
-
-   //       const root = params.params.params.root_mesh;
-   //       View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
-   //    },
-   // }
-
-   // Mesh_event_callback_create(menu_panel, evt_clbk_params);
+      menu_panel.GenGfxCtx();
+      Layout_basic_pre_render(menu_panel);
+      Widget_render(menu_panel);
+   }
 
 
-   /*************************************************************************************************************/
-   // Create scroller before listeners, so that the listen events of clipped meshes will not register
-   // let scroller_component = null;
-   // const clean_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
-   // const needs_scroller = (controls_section !== null)
-   //    ? (controls_section.geom.dim[1] > clean_height) ? true : false
-   //    : false;
-   // if (needs_scroller) {
-
-
-   //    const scroller_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
-   //    scroller_component = Components_create_scroller_component(10, scroller_height, controls_section, );
-   //    Scoller_component_gengfx_and_render(scroller_component, controls_section, GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-   //    Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(controls_section.root_posidx, scroller_component.root_posidx);
-   //    Listeners_set_priority(E.C, scroller_component.listeners);
-   //    menu_panel.AddChildScrollerIdx(controls_section.scroller_comp_idx);
-
-   //    Scroller_component_calculate_handle_pos_dim(scroller_component);
-
-
-   //    /**************************************************************************************************************************/
-   //    // Set scissor box
-   //    const mx = controls_section.mesh_bufferidx;
-   //    const my = scroller_component.mesh_bufferidx;
-   //    const mw = controls_section.mesh_bufferidx;
-   //    const mh = scroller_component.mesh_bufferidx;
-   //    Vertex_buffer_group_create_scissorbox(controls_section.gfx.vb.groupidx, mx, my, mw, mh);
-   //    const scrolled_section_text_mesh = controls_section.children.buffer[0].text_mesh
-   //    Vertex_buffer_group_create_scissorbox(scrolled_section_text_mesh.gfx.vb.groupidx, mx, my, mw, mh);
-
-   //    // Unfortunately must Re-render the menu_panel for the clipping of the scroller to take place
-   //    Root_group_reset_gfxs(controls_section.root_bufferidx);
-   //    Root_group_rerender_from_root_reconstruct_listeners(controls_section.root_bufferidx, true);
-
-   //    Renderqueue_set_active(scroller_component.gfx.vb.groupidx, true);
-
-   // }
 
 
 
@@ -1685,11 +1659,337 @@ function Snake_options_callback(params) {
 
 
 
-   params.snake_struct_controls_section = controls_section;
+   // params.snake_struct_controls_section = controls_section;
 
 
 
-   return menu_panel;
+   // return menu_panel;
+   // return controls_section.children.buffer;
+
+}
+export function Snake_options_controls(params) {
+
+
+   if (params.params.menu_panel !== null) return;
+
+   const snake = params.params.snake;
+   const head = snake.body.buffer[0].mesh;
+
+   const mn = params.params.mnemonics;
+   const feather_slider_val = mn.feather_slider.slider_val;
+   const speed_slider_val = mn.speed_slider.slider_val;
+   const slope_slider_val = mn.slope_slider.slider_val;
+   const next_anim_slider_val = mn.next_anim_slider.slider_val;
+   const reduce_size_slider_val = mn.reduce_size_slider.slider_val;
+   const distance_size_slider_val = mn.distance_factor_slider.slider_val;
+   const max_scale_factor_slider_val = mn.max_scale_factor_slider.slider_val;
+   const anim_step_slider_val = mn.anim_step_slider.slider_val;
+   const wideness_color_slider_val = mn.color_slider.wideness.slider_val;
+   const offset_color_slider_val = mn.color_slider.offset.slider_val;
+   const brightness_color_slider_val = mn.color_slider.brightness.slider_val;
+
+
+
+
+   const dim = [
+      (VIEWPORT.WIDTH / 2 >= 180) ? 180 : VIEWPORT.WIDTH / 2 - 10,
+      (VIEWPORT.HEIGHT / 2 >= 250) ? 250 : VIEWPORT.HEIGHT / 2 - 10,
+   ];
+
+
+   const controls_section =[];
+
+
+
+   /*************************************************************************************************/
+   // Menu Options
+
+   // Calculate dimentions for small width device
+   const dif = Abs((VIEWPORT.WIDTH / 2 - 10) - dim[0]);
+   let log = (dif > 0) ? Math.log(dif) : .2;
+   (log > 1) ? log = 1 : log = log;
+   const pad = (20 * log);
+
+
+
+   const feather_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Feather', layout:LAYOUT.VERTICAL}));
+   Widget_gfx_ready_enable({mesh:feather_slider, enable_sdf_rect: 6});
+   feather_slider.SetInitialValue(feather_slider_val);
+   controls_section.push(feather_slider);
+   
+   const speed_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Speed', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:speed_slider, enable_sdf_rect: 6});
+   speed_slider.SetInitialValue(speed_slider_val);
+   controls_section.push(speed_slider);
+
+   const slope_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Slope', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:slope_slider, enable_sdf_rect: 6});
+   slope_slider.SetInitialValue(slope_slider_val);
+   controls_section.push(slope_slider);
+
+   const next_anim_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Next Animation Start', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:next_anim_slider, enable_sdf_rect: 6});
+   next_anim_slider.SetInitialValue(next_anim_slider_val);
+   controls_section.push(next_anim_slider);
+
+   const reduce_size_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Reduce Size', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:reduce_size_slider, enable_sdf_rect: 6});
+   reduce_size_slider.SetInitialValue(reduce_size_slider_val);
+   controls_section.push(reduce_size_slider);
+
+   const distance_factor_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Distance Ammount', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:distance_factor_slider, enable_sdf_rect: 6});
+   distance_factor_slider.SetInitialValue(distance_size_slider_val);
+   controls_section.push(distance_factor_slider);
+
+   const max_scale_factor_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Scale Ammount', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:max_scale_factor_slider, enable_sdf_rect: 6});
+   max_scale_factor_slider.SetInitialValue(max_scale_factor_slider_val);
+   controls_section.push(max_scale_factor_slider);
+
+   const anim_step_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Timer Step', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:anim_step_slider, enable_sdf_rect: 6});
+   anim_step_slider.SetInitialValue(anim_step_slider_val);
+   controls_section.push(anim_step_slider);
+
+   /*****************************************************************************************************************************************/
+   // Sliders for color change
+   const enable_panel = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 1], col:Color_hsv_to_rgb_calibrated(0, 0, 1,1,.12, 0), name:'SwitchEnable', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
+   Widget_gfx_ready_enable({mesh:enable_panel, enable_sdf_rect:6, });
+   controls_section.push(enable_panel);
+   {
+
+      const label = Create_widget_label(Style_label_default_properties({text:'Color Options', theme:Color_theme_label_auto(.08,1,.18,0), text_pad:[14, 10], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      Widget_gfx_ready_enable({mesh:label, enable_sdf_rect:label.geom.dim[1]});
+      enable_panel.AddItem(label);
+      
+      const color_switch = Create_widget_switch_simple(Style_switch_default_properties({pos:[0, 0, 1], size:20, theme:Color_theme_switch_auto(0,0,.18,0), name:'Color Switch'}));
+      Widget_gfx_ready_enable({mesh:color_switch, enable_sdf_rect:color_switch.geom.dim[1]});
+      enable_panel.AddItem(color_switch);
+
+
+      const color_switch_params = {
+         snake: snake,
+         // mnemonics:{transparency:0.5, hue:0.5, color:null},
+      };
+      color_switch.Bind(
+         (params) => {
+
+            const switch_mesh = params.target_mesh;
+            const isOn = switch_mesh.isOn;
+            const snake = params.params.snake;
+
+
+            if (snake.Color_set_fn === Snake_body_set_color) {
+
+               snake.Color_set_fn = Snake_body_set_color_from_color_palete;
+               snake.Color_set_fn(snake);
+            }
+            else {
+
+               snake.Color_set_fn = Snake_body_set_color;
+               snake.Color_set_fn(snake);
+            }
+
+         },
+         null, color_switch_params, _,
+      );
+   }
+
+   const wideness_color_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Color Wideness', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:wideness_color_slider, enable_sdf_rect: 6});
+   wideness_color_slider.SetInitialValue(wideness_color_slider_val);
+   controls_section.push(wideness_color_slider);
+
+   const offset_color_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'Color Offset', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:offset_color_slider, enable_sdf_rect: 6});
+   offset_color_slider.SetInitialValue(offset_color_slider_val);
+   controls_section.push(offset_color_slider);
+
+   const brightness_color_slider = Create_widget_slider(Style_slider_default_properties({dim:[dim[0] - pad * 2, 10], theme:Color_theme_slider_auto(0,0,.18, 0), name:'brightness', layout:LAYOUT.VERTICAL}))
+   Widget_gfx_ready_enable({mesh:brightness_color_slider, enable_sdf_rect: 6});
+   brightness_color_slider.SetInitialValue(brightness_color_slider_val);
+   controls_section.push(brightness_color_slider);
+
+
+
+   /*************************************************************************************************/
+
+   { // Sliders Connection 
+      Slider_connect(feather_slider, (params, slider_val) => {
+
+         const target_mesh = params.clbk_params.target_mesh;
+         const snake = params.clbk_params.snake;
+         const num_meshes = snake.count;
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         Gl_set_attr_feather(target_mesh.gfx, val, num_meshes);
+
+
+         params.clbk_params.snake.style.feather = val;
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, target_mesh: head, mnemonics: params.params.mnemonics.feather_slider });
+
+
+      Slider_connect(speed_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.speed = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.speed_slider });
+
+
+      Slider_connect(slope_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.init_slope = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.slope_slider });
+
+
+      Slider_connect(next_anim_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.start_next_anim = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.next_anim_slider });
+
+      // TODO:
+      // IMPORTANT: Reducing the ratio-size of body meshes should NOT take place in 'scale animation'
+      Slider_connect(reduce_size_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         if (snake.in_scale_animation) return;
+
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.reduce_mod = val;
+
+         for (let i = 1; i <= snake.body.boundary; i++) {
+
+            const body = snake.body.buffer[i];
+            let reduce_size = (i) * val;
+            let calc_size = snake.size - reduce_size;
+            if (calc_size < snake.min_size) {
+               calc_size = snake.min_size;
+            }
+
+            const pos_dif = body.mesh.geom.dim[0] - calc_size;
+            body.mesh.geom.pos[0] += pos_dif;
+            body.mesh.geom.pos[1] += pos_dif;
+            Gl_add_vpos_y(body.mesh.gfx, pos_dif);
+            Gl_add_vpos_x(body.mesh.gfx, pos_dif);
+
+            
+            body.size = calc_size;
+            body.mesh.geom.dim[0] = calc_size;
+            body.mesh.geom.dim[1] = calc_size;
+            Mesh_update_set_dim_xy(body.mesh);
+            Gl_set_dim_xy(body.mesh.gfx, calc_size, calc_size);
+
+
+            body.mesh.mat.style.rcorners = calc_size;
+            Gl_set_attr_round_corners(body.mesh.gfx, calc_size)
+         }
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.reduce_size_slider });
+
+
+      Slider_connect(distance_factor_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         if (snake.in_scale_animation) return;
+
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.distance_factor = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.distance_factor_slider });
+
+
+      // TODO: Set limits to slider val. below a body scale size threshold, the animation stops
+      Slider_connect(max_scale_factor_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.scale_factor = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.max_scale_factor_slider });
+
+
+      Slider_connect(anim_step_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+         const val = Linear_interpolation(params.clbk_params.mnemonics.min, params.clbk_params.mnemonics.max, slider_val);
+         snake.step = val;
+
+         params.clbk_params.mnemonics.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.anim_step_slider });
+
+
+      Slider_connect(wideness_color_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         const wideness = params.clbk_params.mnemonics.wideness;
+         const wideness_val = Linear_interpolation(wideness.min, wideness.max, slider_val);
+         wideness.val = wideness_val;
+         snake.Color_set_fn(snake);
+         wideness.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
+
+
+      Slider_connect(offset_color_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         const offset = params.clbk_params.mnemonics.offset;
+         const offset_val = Linear_interpolation(offset.min, offset.max, slider_val);
+
+         offset.val = offset_val;
+         snake.Color_set_fn(snake);
+
+         offset.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
+
+
+      Slider_connect(brightness_color_slider, (params, slider_val) => {
+
+         const snake = params.clbk_params.snake;
+
+         const brightness = params.clbk_params.mnemonics.brightness;
+         const brightness_val = Linear_interpolation(brightness.min, brightness.max, slider_val);
+
+         brightness.val = brightness_val;
+         snake.Color_set_fn(snake);
+
+         brightness.slider_val = slider_val;
+
+      }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
+
+   }
+
+
+   return controls_section;
 
 }
 

@@ -82,13 +82,12 @@ export class Widget_Label extends Rect_Mesh {
         }
 
     }
-
-
+    /** */
     SetLayout(align_flags) {
 
         this.align.flags = align_flags;
     }
-
+    /** */
     AddLayout(align_flags) {
 
         this.align.flags |= align_flags;
@@ -99,6 +98,7 @@ export class Widget_Label extends Rect_Mesh {
     // INHERITED METHODS
     /****************************************************************************************************************************************************/
 
+    /** */
     Activate() {
 
         this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
@@ -106,8 +106,7 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.state.mask |= MESH_STATE_FLAGS.ACTIVE;
         
     }
-    
-    
+    /** */
     Deactivate() {
         
         this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
@@ -116,42 +115,29 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
         // View_remove_mesh(this.text_mesh.group_bufferidxs, this.text_mesh.geom.num_faces);
     }
-
-
+    /** */
     StateEnable(MASK = 0x0) {
 
         this.state.mask |= MASK;
         this.text_mesh.state.mask |= MASK;
     }
-
-
+    /** */
     StateDisable(MASK = 0x0) {
 
         this.state.mask &= ~MASK;
         this.text_mesh.state.mask &= ~MASK;
     }
-
-
+    /** */
     SetTypeDebug() {
         this.type |= MESH_TYPE.DEBUG_MESH;
         this.text_mesh.type |= MESH_TYPE.DEBUG_MESH;
     }
-
-
+    /** */
     StateEnable(bit) { this.state.mask |= bit; this.text_mesh.state.mask |= bit; }
-
-
+    /** */
     StateDisable(bit) { this.state.mask &= ~bit; this.text_mesh.state.mask &= ~bit; }
 
-
-
-    // Destroy() {
-
-    //     this.text_mesh.Destroy();
-    //     this.text_mesh = null;
-    //     return super.Destroy();
-    // }
-
+    /** */
 
     AddToWidgetRootBuffer(root_bufferidx) {
 
@@ -166,30 +152,18 @@ export class Widget_Label extends Rect_Mesh {
         this.group_bufferidxs[0] = view_groupidx;
         this.text_mesh.group_bufferidxs[0] = view_groupidx;
     }
-
-
+    /** */
     SetGfxEnable(which, params) {
         alert('777\nSetGfxEnableAttributes\nWidgetLabel')
     }
-
-
-    // /** Must run for every mesh */
-    // GfxUniformsEnable(flags, name, type, shader_flags) {
-
-    //     super.EnableGfxUniforms(flags, name, type, shader_flags);
-    //     this.text_mesh.EnableGfxUniforms(flags, name, type, shader_flags);
-
-    // }
-
-
+    /** */
     GfxUniformsSetClbk(unif_name, Clbk, clbk_params) {
 
         // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
         this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
         // this.text_mesh.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
     }
-
-
+    /** */
     GfxCtxSetFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
         if (this.gfx_ctx_parent === INT_NULL) {
@@ -202,8 +176,7 @@ export class Widget_Label extends Rect_Mesh {
             this.text_mesh.gfx_ctx_parent = gfx_ctx_parent;
         }
     }
-
-
+    /** */
     GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
         if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
@@ -218,11 +191,11 @@ export class Widget_Label extends Rect_Mesh {
 
 
 
-
-
     /*******************************************************************************************************************************************************/
     // Graphics
     /*******************************************************************************************************************************************************/
+    
+    /** */
     GenGfxCtx(FLAGS = GFX_CTX_FLAGS.ANY, area_specific_vb_groupidx = INT_NULL, text_specific_vb_groupidx = INT_NULL) {
 
         if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
@@ -261,31 +234,18 @@ export class Widget_Label extends Rect_Mesh {
 
         return this.gfx;
     }
-
-
+    /** */
     Render() {
         if (this.gfx.is_gfx_inserted) console.error('Already gfx inserted!!!');
         if (!this.is_gfx_inserted && (this.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.AddToGfx(); }
         if (!this.text_mesh.is_gfx_inserted && (this.text_mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)) { this.text_mesh.AddToGfx(); }
     }
-
-
-
+    /** */
     Rerender() {
 
         this.AddToGfxFromReset();
         this.text_mesh.AddToGfxFromReset();
     }
-
-
-    // DeactivateGfx() {
-
-    //     // Deactivate label's area
-    //     super.DeactivateGfx();
-
-    //     // Deactivate for label's text 
-    //     this.text_mesh.DeactivateGfx();
-    // }
 
 
 
@@ -295,12 +255,7 @@ export class Widget_Label extends Rect_Mesh {
     // Setters-Getters
     /*******************************************************************************************************************************************************/
 
-
-    SetUpdateFrameBuffer() {
-        if (this.isFramebufferRendered !== INT_NULL) FramebufferSetUpdate(this.isFramebufferRendered);
-    }
-
-
+    /** */
     SetFrameBufferIdx(fbidx) {
         this.isFramebufferRendered = fbidx;
         this.text_mesh.isFramebufferRendered = fbidx;
@@ -313,6 +268,7 @@ export class Widget_Label extends Rect_Mesh {
     // Alignment
     /*******************************************************************************************************************************************************/
 
+    /** */
     Align(flags, pad = [0, 0]) { // Align pre-added to the vertexBuffers
 
         const move_dif = Align_self_get_dif(flags, this.geom, this.text_mesh.geom, pad, this.text_mesh.geom.num_faces, this.StylesGetPad());
@@ -328,7 +284,7 @@ export class Widget_Label extends Rect_Mesh {
         }
 
     }
-
+    /** */
     AlignNEW(pos_x, pos_y) {
 
         const pad_x = this.StylesGetPad(STYLES.AXIS.X);
@@ -355,13 +311,13 @@ export class Widget_Label extends Rect_Mesh {
     /*******************************************************************************************************************************************************/
     // Transformations
 
+    /** */
     AddWposXY(x, y) {
 
         Mesh_add_and_copy_wpos_xy(this, x, y,);
         Mesh_add_and_copy_wpos_xy(this.text_mesh, x, y,);
     }
-
-
+    /** */
     AddWposX(x) {
 
         this.geom.pos[0] += x;
@@ -369,8 +325,7 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[0] += x;
         Mesh_add_wpos_x(this.text_mesh, x);
     }
-
-
+    /** */
     AddWposY(y) {
 
         this.geom.pos[1] += y;
@@ -378,31 +333,26 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[1] += y;
         Mesh_add_wpos_y(this.text_mesh, y,);
     }
-
-
+    /** */
     SetWposXY(x, y) {
         this.geom.pos[0] = x;
         this.geom.pos[1] = y;
         Mesh_update_set_wpos_xy(this);
         Mesh_set_wpos_relative_xy(this.text_mesh, x, y);
     }
-
-
+    /** */
     SetWposX(x) {
         this.geom.pos[0] = x;
         Mesh_update_set_wpos_x(this);
         Mesh_set_wpos_relative_x(this.text_mesh, x);
     }
-
-
+    /** */
     SetWposY(y) {
         this.geom.pos[1] = y;
         Mesh_update_set_wpos_y(this);
         Mesh_set_wpos_relative_y(this.text_mesh, y);
     }
-
-
-
+    /** */
     MoveNoGfxUpdate(x, y) {
 
         this.geom.pos[0] += x;
@@ -410,8 +360,7 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[0] += x;
         this.text_mesh.geom.pos[1] += y;
     }
-
-
+    /** */
     TEMP_recalc(x, y) {
 
         const dx = this.text_mesh.geom.pos[0] - this.geom.pos[0];
@@ -421,32 +370,28 @@ export class Widget_Label extends Rect_Mesh {
         this.text_mesh.geom.pos[0] = x + dx;
         this.text_mesh.geom.pos[1] = y + dy;
     }
-
-
+    /** */
     TEMP_recalc_x(x) {
 
         const dx = this.text_mesh.geom.pos[0] - this.geom.pos[0];
         this.geom.pos[0] = x;
         this.text_mesh.geom.pos[0] = x + dx;
     }
-
-
+    /** */
     MoveYNoGfxUpdate(y) {
 
         this.geom.pos[1] += y;
         this.text_mesh.geom.pos[1] += y;
 
     }
-
-
+    /** */
     MoveXNoGfxUpdate(x) {
 
         this.geom.pos[0] += x;
         this.text_mesh.geom.pos[0] += x;
 
     }
-
-
+    /** */
     SetPosXYNoGfxUpdate(x, y) {
 
         if (Mesh_unif_is_vb_root_wpos(this.root_posidx, this.mesh_bufferidx)) { // If this pos is the 'root wpos', must update the root wpos buffer.
@@ -461,8 +406,7 @@ export class Widget_Label extends Rect_Mesh {
             this.text_mesh.geom.pos[1] = y;
         }
     }
-
-
+    /** */
     SetPosXNoGfxUpdate(x) {
 
         this.geom.pos[0] = x;
@@ -478,8 +422,7 @@ export class Widget_Label extends Rect_Mesh {
             this.text_mesh.geom.pos[0] = x;
         }
     }
-
-
+    /** */
     SetPosYNoGfxUpdate(y) {
 
         this.geom.pos[1] = y;
@@ -495,21 +438,18 @@ export class Widget_Label extends Rect_Mesh {
             this.text_mesh.geom.pos[1] = y;
         }
     }
-
-
+    /** */
     SetPosZNoGfxUpdate(z) {
         this.geom.pos[2] = z;
         this.text_mesh.geom.pos[2] = z + 1;
     }
-
-
+    /** */
     SetGfxInserted(flag) {
 
         if (this.is_gfx_inserted !== flag) this.is_gfx_inserted = flag; // If true then set false
         if (this.text_mesh.is_gfx_inserted !== flag) this.text_mesh.is_gfx_inserted = flag;
     }
-
-
+    /** */
     SetColorAlpha(btn_alpha = 1, text_alpha = 1) {
 
         // super.SetColorAlpha(btn_alpha);
@@ -517,8 +457,7 @@ export class Widget_Label extends Rect_Mesh {
         Set_color_a(this, btn_alpha);
         Set_color_a(this.text_mesh, text_alpha);
     }
-
-
+    /** */
     SetPosY(posy) {
 
         super.SetPosY(posy);
@@ -563,8 +502,7 @@ export class Widget_Label extends Rect_Mesh {
             }
         }
     }
-
-
+    /** */
     OnClick(params) {
 
         const mesh = params.evt_params.target_mesh;
@@ -633,8 +571,7 @@ export class Widget_Label extends Rect_Mesh {
         }
         return true;
     }
-
-
+    /** */
     OnResize(params) {
 
         const mesh = params.params;
@@ -716,7 +653,5 @@ function Label_on_move_clbk(params) {
         Mesh_add_wpos_xy(mesh.text_mesh, mouse_dif.x, -mouse_dif.y);
     }
 
-
-    // mesh.SetUpdateFrameBuffer();
 }
 

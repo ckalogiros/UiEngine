@@ -23,6 +23,7 @@ export const LISTENERS_FLAGS = {
 
 	HOVER: _cnt <<= 0x1,
 	CLICK: _cnt <<= 0x1,
+	KEY_PRESS: _cnt <<= 0x1,
 	ALL: _cnt <<= 0x1,
 
 
@@ -685,6 +686,144 @@ function Check_child_events_recursive(view_children, point) {
    return null;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************************************/
+// KEY-PRESS CHECK
+
+/** */
+export function Listener_dispatch_check_keypress_event(TYPE_IDX, trigger_params) {
+
+
+   let view_buffer = _listeners_buffer_view_storage.buffer[TYPE_IDX];
+
+
+   for (let i = 0; i <= view_buffer.boundary; i++) {
+
+      if (view_buffer.buffer[i]) {
+
+         /**DEBUG*/if(_listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].event_idx] === null){
+            /**
+             * Catch Error Issue
+             * It happens that we miss to remove an event tree view, on event listen destroy.
+             * This is a temporary guard, against null mesh.
+             */
+
+            console.error('671187334 \nEvent has been removed but the Listeners tree view still holds a refference');
+            alert('671187334 \nEvent has been removed but the Listeners tree view still holds a refference');
+
+            console.error('event:', view_buffer.buffer[i]);
+            console.error('listeners buffer:', _listeners_buffer_storage.buffer[TYPE_IDX].buffer);
+            console.error('view_buffer:', view_buffer);
+            console.error('REMOVING THE EVENT FROM THE VIEW');
+
+            Listener_debug_print_view_recursive();
+
+            return;
+         }
+
+         // Get the event (which has all the event data) from the listeners storage buffer
+         const event = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[view_buffer.buffer[i].event_idx];
+
+
+         // Check all children (recursive)
+         if (view_buffer.buffer[i].children) {
+
+            const event_found = Check_child_keypress_events_recursive(view_buffer.buffer[i].children, point);
+            if (event_found) { // If the child event is found but does not have a Callback, handle the parent event
+
+               // Get the the event (which has all the event data) from the listeners storage buffer
+               const e = _listeners_buffer_storage.buffer[TYPE_IDX].buffer[event_found.event_idx];
+
+               const dispatch_params = {
+                  meshidx: e.meshidx,
+                  evt_params: e.evt_params,
+                  trigger_params: trigger_params,
+                  event_type: TYPE_IDX,
+               }
+
+               if (e.Clbk) {
+
+                  e.Clbk(dispatch_params);
+
+                  return; // Return if at least one event is handled. Also return so that any event of the main event will not run.
+               }
+            }
+         }
+
+         // Else if child events do not exist, handle parent's event
+         if (event.Clbk) {
+
+            const dispatch_params = {
+               meshidx: event.meshidx,
+               evt_params: event.evt_params,
+               trigger_params: trigger_params,
+               event_type: TYPE_IDX,
+               clbk_params: event.Clbk.clbk_params,
+            }
+            // FIXME: Reduce the doubling of the "Clbk"
+            event.Clbk.Clbk(dispatch_params); // Call the event
+
+            return;
+         }
+      }
+   }
+
+}
+/** */
+function Check_child_keypress_events_recursive(view_children, point) {
+
+   for (let i = 0; i <= view_children.boundary; i++) {
+
+      const child_evt = view_children.buffer[i];
+      if (child_evt) {
+
+         const bounding_box = Mesh_buffer_get_mesh_bounding_box(child_evt.meshidx);
+
+         // If and only if mouse is intersecting with the current mesh(mouse hover) ...
+         const intersects = Intersection_point_rect(point.x, point.y, bounding_box.l, bounding_box.r, bounding_box.t, bounding_box.b, );
+
+         if (intersects) {
+
+            if (child_evt.children) { // Check all of its children(recursively)
+
+               const evt = Check_child_keypress_events_recursive(view_children.buffer[i].children, point)
+
+               if (evt) { // I has Callback then it is not a FAKE event, so its ok to return the event
+                  
+                  // Get the the event (which has all the event data) from the listeners storage buffer
+                  const e = _listeners_buffer_storage.buffer[E.K].buffer[evt.event_idx];
+
+                  // Because its a recursive procedure, when the mesh is found we must return it recursively immidiately after the return of the each recursion.
+                  if (evt && e.Clbk) return evt; // I has Callback then it is not a FAKE event, so its ok to return the event
+                  // Else continue
+               }
+            }
+            else
+               return child_evt;
+         }
+
+      }
+
+   }
+   return null;
+}
 
 
 

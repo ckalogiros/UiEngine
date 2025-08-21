@@ -1,29 +1,25 @@
 "use strict";
 
 import { Callback_animations_create } from "../Engine/Animations/CallbackAnimations.js";
-import { Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_dropdown, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_rerender_from_root_reconstruct_listeners, Root_group_reset_gfxs } from "../Engine/Core/Views/RootView.js";
+import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label } from "../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
-import { BLUEL, Color_hsv_to_rgb_calibrated, COLOR_THEME_BASIC, GREEN, GREENR, GREY, ORANGER, REDL, TRANSPARENT, WHITE } from "../Engine/Drawables/Material/Colors.js";
+import { BLUEL, Color_hsv_to_rgb_calibrated, COLOR_THEME_BASIC, GREEN, GREENR, GREY, REDL, TRANSPARENT, WHITE } from "../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Engine/Drawables/Widgets/ScrollerComponent.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
-import { Renderqueue_set_active } from "../Engine/Renderers/Renderer/RenderQueue.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set, Scene_store_window_resized_meshes } from "../Engine/Scenes.js";
-import { Vertex_buffer_group_create_scissorbox } from "../Graphics/Buffers/VertexBuffers.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "./App.js";
 import { Create_comet_particles, Create_glow_particles, Create_particles_controls, Comet_create_controls, Create_smoke_particles, Create_explosion_particles, Create_smoke_particles_controls, Demo_glow_particles_sparkles_effect } from "./Demo/DemoParticles.js";
 import { Create_elastic_collisions_controls, Elastic_collisions, Sattelite_rotation } from "./Demo/DemoPhysics.js";
 import { Demo_widgets, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from "./Demo/DemoWidgets.js";
-import { Game_snake } from "./Demo/Games/Snake/Snake.js";
+import { Game_snake, Snake_options_controls } from "./Demo/Games/Snake/Snake.js";
 import { Board_rotations } from "./Demo/DemoBoardRotations.js";
 import { Tetris, Tetris_reset } from "./Demo/Games/Tetris/Tetris.js";
 import { Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_rect_default_properties, Style_label_default_properties, Style_dropdown_default_properties } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Mesh_event_callback_create, Mesh_listener_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_expand, Align_nested_sections_pre, Align_pre_simple___with_grow_containers } from "../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Mesh_listener_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Layout_expand_x_axis, Layout_basic_pre_render } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Dropdown_roots_set_root } from "../Engine/Drawables/Widgets/Widget_Dropdown.js";
 import { Color_theme_dropdown_auto, Color_theme_label_auto } from "../Engine/Drawables/Material/Themes.js";
 import { Demo_animations, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope } from "./Demo/DemoAnimations.js";
@@ -289,9 +285,13 @@ const _demo_categories_buffer = [
             controls_params: {},
             self: null,
             Load: (total_height) => {
-               return Game_snake(total_height, false);
+               return Game_snake(total_height, false, false);
             },
-            LoadControls: (self, controls_params) => { },
+            LoadControls: (self, controls_params) => { 
+               // self.options_clbk_params.snake_struct_controls_section
+               // return self.Snake_options_callback({params:self.options_clbk_params}); // returns the contol pael ui
+               return self.Snake_options_controls({params:self.options_clbk_params}); // returns the contol pael ui
+            },
          },
          {
             name: 'Tetris', id: bit <<= 0x1, idx: 1, Load: () => { },
@@ -505,27 +505,18 @@ Explore the demos and discover the possibilities!`;
    // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_DSC, menu_panel.mesh_bufferidx, true);
    // menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
-   Align_nested_sections_pre(menu_panel);
+   Layout_basic_pre_render(menu_panel);
    Widget_render(menu_panel);
       
    // Set menu in focus
    Mesh_set_root_in_focus(menu_panel.root_bufferidx, menu_panel.scroller_comp_idx);
 
-
-   // // Create event callback for the close menu button
-   // const evt_clbk_params = {
-   //    evt_clbks: () => {
-   //       Demo_page();
-   //    },
-   // }
-
-   // Mesh_event_callback_create(menu_panel, evt_clbk_params);
-
 }
 
 
 // export function Demo_page(category_idx = demo_categories.widgets.idx, sub_category_idx = demo_categories.widgets.idx) {
-export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_category_idx = demo_categories.in_practise.arkanoid.idx) {
+export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_category_idx = demo_categories.in_practise.snake.idx) {
+// export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_category_idx = demo_categories.in_practise.arkanoid.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.comet.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.smoke.idx) {
 // export function Demo_page(category_idx = demo_categories.particles.idx, sub_category_idx = demo_categories.particles.glow.idx) {
@@ -667,7 +658,7 @@ export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_ca
    {
       window_menu.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, _, true);
       window_menu.GenGfxCtx();
-      Align_nested_sections_pre(window_menu);
+      Layout_basic_pre_render(window_menu);
       Widget_render(window_menu);
 
    }
@@ -799,8 +790,8 @@ function Create_menu_popup(params) {
    // Render Menu 
    menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
-   Align_nested_sections_pre(menu_panel);
-   Align_expand(menu_panel);
+   Layout_basic_pre_render(menu_panel);
+   Layout_expand_x_axis(menu_panel);
    Widget_render(menu_panel);
       
    // Set menu in focus
@@ -930,7 +921,8 @@ function Options_menu_callback(params) {
       const controls = demo.LoadControls(demo.self, demo.controls_params);
       const controls_len = controls.length;
       for (let i = 0; i < controls_len; i++) {
-         grow_section_1.AddItem(controls[i]);
+         // if(controls[i])
+            grow_section_1.AddItem(controls[i]);
       }
    }
    
@@ -970,48 +962,15 @@ function Options_menu_callback(params) {
    menu_panel.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, false);
    menu_panel.GenGfxCtx();
    
-   Align_nested_sections_pre(menu_panel);
-   // Align_expand(menu_panel);
+   Layout_basic_pre_render(menu_panel);
+   // Layout_expand_x_axis(menu_panel);
    // TEMP_Calculate_layout_grow_count(menu_panel);
-   // Align_pre_simple___with_grow_containers(menu_panel);
+   // Layout_grow_containers_pre_render(menu_panel);
 
      
    Widget_render(menu_panel);
 
    Listeners_set_priority(E.C, menu_panel.listeners);
-
-
-   // Create scroller
-   const clean_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
-   const needs_scroller = (controls_section !== null) ? (controls_section.geom.dim[1] > clean_height) ? true : false : false;
-   if (needs_scroller) {
-
-      const scroller_height = menu_panel.geom.dim[1] - (close_btn.geom.dim[1] * 2 + 10);
-      const scroller_component = Components_create_scroller_component(10, scroller_height, controls_section,);
-      Scoller_component_gengfx_and_render(scroller_component, controls_section, GFX_CTX_FLAGS.ABSOLUTE_POSITION);
-      Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos(controls_section.root_posidx, scroller_component.root_posidx);
-      Listeners_set_priority(E.C, scroller_component.listeners);
-      menu_panel.AddChildScrollerIdx(controls_section.scroller_comp_idx);
-
-      Scroller_component_calculate_handle_pos_dim(scroller_component);
-
-
-      /**************************************************************************************************************************/
-      // Set scissor box
-      const mx = controls_section.mesh_bufferidx;
-      const my = scroller_component.mesh_bufferidx;
-      const mw = controls_section.mesh_bufferidx;
-      const mh = scroller_component.mesh_bufferidx;
-      Vertex_buffer_group_create_scissorbox(controls_section.gfx.vb.groupidx, mx, my, mw, mh);
-
-      // Unfortunately must Re-render the menu_panel for the clipping of the scroller to take place
-      Root_group_reset_gfxs(controls_section.root_bufferidx);
-      Root_group_rerender_from_root_reconstruct_listeners(controls_section.root_bufferidx);
-
-      Renderqueue_set_active(scroller_component.gfx.vb.groupidx, true);
-
-   }
-
 
 
 

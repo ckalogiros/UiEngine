@@ -3,9 +3,9 @@
 import { State_mesh_set_clickhold, State_mesh_set_grabed, State_mesh_set_hovered } from "../../GlobalFunctions.js";
 import { MOUSE } from "../Controls/Input/Mouse.js";
 import { Set_default_color_rgba, Set_hover_color_rgba } from "../Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_remove_time_interval } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { Mesh_state_check } from "../Drawables/Operations/MeshPropertiesFunctions.js";
-import { Listener_dispatch_check_hover_event, Listener_dispatch_event, LISTENERS_FLAGS } from "./EventListeners.js";
+import { Time_intervals_destroy_byidx } from "../Timers/TimeIntervals.js";
+import { Listener_dispatch_check_hover_event, Listener_dispatch_check_keypress_event, Listener_dispatch_event, LISTENERS_FLAGS } from "./EventListeners.js";
 
 
 
@@ -79,8 +79,10 @@ export function HandleEvents() {
                      * intersection between the mouse and the button
                      */
 
-                    Mesh_remove_time_interval(STATE.mesh.click_hold, INTERVALS.UPDATE);
-                    // STATE.mesh.click_hold.RemoveTimeInterval(INTERVALS.UPDATE);
+                    // Mesh_remove_time_interval(STATE.mesh.click_hold, INTERVALS.UPDATE);
+                    const intervalIdx = STATE.mesh.click_hold.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+                    Time_intervals_destroy_byidx(intervalIdx);
+                    STATE.mesh.click_hold.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
                     
                     // if (LISTENERS_FLAGS[E.C] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
                     //     Listener_dispatch_event(E.C, e.params.mouseButton);
@@ -92,12 +94,19 @@ export function HandleEvents() {
             // e.type += ' HANDLED'; e.params = {}; evtsIdx--;
 
         }
+        else if(e.type & EVENT_HANDLER_TYPE.KEY_PRESS) {
+            
+            // console.log(e.params.key);
+
+            // if (LISTENERS_FLAGS[E.K] === true)  // NOTE: Avoid dispatching if there are no listeners in the ListenersBuffer
+                Listener_dispatch_check_keypress_event(E.K, e.params.key);
+        }
     
 
         i++;
     } // End of events for loop
 
-    evtsIdx = 0;
+    evtsIdx = 0; // Reset evemts buffer
 }
 
 
@@ -189,3 +198,8 @@ export function Events_handle_immidiate(e) {
 
 }
 
+
+
+export function Events_buffer_print() {
+    console.log(events);
+}

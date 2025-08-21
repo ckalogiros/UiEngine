@@ -26,7 +26,7 @@ import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel }
 import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_set_wpos_x, Mesh_update_set_wpos_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_change_clbk, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Arkanoid_create_ui_menu } from "./ArkanoidUi.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
@@ -216,7 +216,7 @@ function Arkanoid_initialize_start_menu(x, y) {
    /*******************************************************************************************/
    // Render
    section.GenGfxCtx();
-   // Align_nested_sections_pre(section);
+   // Layout_basic_pre_render(section);
    Widget_render(section);
    
    section.GfxUniformSetAndUpdate('u_generic_controls', control_values);
@@ -264,7 +264,7 @@ function Arkanoid_initialize_game(x, y) {
    
    // Render
    game_panel.GenGfxCtx();
-   Align_nested_sections_pre(game_panel);
+   Layout_basic_pre_render(game_panel);
    Widget_render(game_panel);
    
    const group_idx = game_panel.group_bufferidxs[0];
@@ -774,7 +774,7 @@ export function Arkanoid_test_game_options() {
    controls_panel.AddItem(panel);
 
    controls_panel.GenGfxCtx(); 
-   Align_nested_sections_pre(controls_panel);
+   Layout_basic_pre_render(controls_panel);
    Widget_render(controls_panel);
 
 

@@ -435,9 +435,11 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
       }
 
+
    }
 
    return shader_ops_code;
+   // return len;
 
 }
 
@@ -1278,6 +1280,7 @@ function Fragment_shader_resolve_attributes_in() {
 export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=null) {
 
    Fragment_shader_resolve_attributes_in();
+   // const has_shader_ops = Resolve_function_operations_called_from_main(shader_ops);
 
    const fs_chunks = [
       '#version 300 es',
@@ -1479,11 +1482,12 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
       // '  vec4 final_color = vec4(1.0);', // The final output color
+      // '  vec4 final_color = vec4(1.0);', // The final output color
       // '  final_color = src_color;', // The final output color
 
-
-
-      Resolve_function_operations_called_from_main(shader_ops),
+      // If no operations in shaer, then the final_color(0) should be additive otherwise is gonna be 0
+      (shader_ops!==null) ? Resolve_function_operations_called_from_main(shader_ops) : 
+      `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, src_color );`,
 
 
 

@@ -68,8 +68,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
       this.AlignNEW.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
 
       // Multi color vertex
-      this.options |= SECTION.RESIZE_PARENT;
-
       this.label_r = null;
       this.label_g = null;
       this.label_b = null;
@@ -107,15 +105,11 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: color_pick, enable_sdf_rect: properties.rcorners.color_pick, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
-      // color_pick.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
-      // color_pick.align.flags = LAYOUT.VERTICAL;
-
 
 
       /******************************************************************************/
       // Create panel for the color presentation and info labels
-      // const panel2 = Create_widget_section(Style_section_default_properties({options:SECTION.VERTICAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
       const panel2 = Create_rect_mesh(Style_rect_default_properties({ 
          pad: [20 * scale, 20 * scale], pos: [0, 0, 1], col: COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), 
          name: 'Inner Panel 1', num_meshes: 1, is_debug_mesh: properties.is_debug_mesh, 

@@ -80,7 +80,8 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       switch_handle.mat.style.rcorners = properties.size - pad;
       // switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
-      this.AddChild(switch_handle);
+      // this.AddChild(switch_handle);
+      this.AddItem(switch_handle);
       this.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
 
       this.SetLayout(properties.layout);
@@ -397,10 +398,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
+   SetHoverColor() { Set_hover_color_rgba(this.children.buffer[0]); }
 
 
-   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this.children.buffer[0]); }
+   SetHoverColorDefault() { Set_default_color_rgba(this.children.buffer[0]); }
 
 
 
@@ -451,7 +452,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       const switch_handle = mesh.children.buffer[0];
 
       mesh.isOn ^= 0x1;
-      mesh.SetUpdateFrameBuffer();
       State_mesh_set_clicked(mesh);
 
       if (mesh.isOn) {

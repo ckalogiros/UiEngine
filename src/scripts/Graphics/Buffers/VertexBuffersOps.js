@@ -1,6 +1,6 @@
 "use strict";
 
-import { RotateY, RotateZ } from "../../Helpers/Math/Matrix.js";
+import { RotateY, RotateZ, RotateZ_with_pivot } from "../../Helpers/Math/Matrix.js";
 import { Shader_attributes_get_attribs_offset_attribs_per_vertex, Shader_attributes_get_attribs_offset_size_attribs_per_vertex } from "../ShaderAttributes.js";
 import { Index_buffer_get_by_ibidx } from "./IndexBuffers.js";
 import { Vertex_buffer_render_group_set_state } from "./RenderGroups.js";
@@ -1442,6 +1442,35 @@ export function Gl_add_generic2(gfx, geom, num_faces = 1) {
 }
 
 
+/** */
+export function Gl_rotate_z_2d_from_pivot(gfx, dim, angle, pivotx, pivoty, num_faces = 1) {
+
+
+   const vbidx = gfx.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfx.vb.idxs.buffer[vbidx]);
+   const vpos_attr_idx = vb_info.attribs_indexing.VPOS2; // The index of the offset to access the correct attribute.
+   const vb_data = Vertex_buffer_get_by_vbidx(gfx.vb.idxs.buffer[vbidx]);
+
+
+   let index = gfx.vb.starts.buffer[vbidx] + vb_info.attribs_info.offsets[vpos_attr_idx];
+   let stride = vb_info.attribs_info.count - vb_info.attribs_info.sizes[vpos_attr_idx];
+
+   const newPos = RotateZ_with_pivot(dim, angle, pivotx, pivoty);
+
+   vb_data[index++] = newPos[0];
+   vb_data[index++] = newPos[1]; index += stride;
+   vb_data[index++] = newPos[2];
+   vb_data[index++] = newPos[3]; index += stride;
+   vb_data[index++] = newPos[4];
+   vb_data[index++] = newPos[5]; index += stride;
+   vb_data[index++] = newPos[6];
+   vb_data[index++] = newPos[7];
+
+
+   Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+
+   return newPos;
+}
 /** */
 export function Gl_rotate_z_2d(gfx, dim, angle, num_faces = 1) {
 

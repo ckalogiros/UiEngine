@@ -482,7 +482,6 @@ export function Ball_animation_scale() {
          size: emitter_size,
          current_size: emitter_size,
          vb_groupidx: emitter.gfx.vb.groupidx,
-         // ubidx: Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_noise_params'),
          ubidx: Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls'),
          shader_uniform_index: 2,
       },

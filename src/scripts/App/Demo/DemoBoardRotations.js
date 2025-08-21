@@ -3,7 +3,7 @@
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
 import { Mesh_animations_create } from "../../Engine/Animations/MeshAnimations.js";
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { BLUE, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Colors.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -11,7 +11,7 @@ import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/Ma
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_rotate_z } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
 
@@ -22,63 +22,6 @@ import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../
 
 
 let rotation = 0;
-
-
-// let ID = 0;
-// function Get_ID() { return ID++; }
-
-
-
-// class Function_Slope {
-//    constructor(slope_constant = 1.0, time_step = 0.1, scale = 100, name = ID) {
-
-//       this.slope_constant = slope_constant;
-//       this.time_step = time_step;
-//       this.timer = 0.0;
-//       this.scale = scale;
-//       this.in_animation = false;
-
-//       if (name) this.name = name;
-//       else name = Get_ID();
-//    }
-
-//    GetSlope() {
-//       return this.slope_constant;
-//    }
-
-//    SetSlope(val) {
-//       this.slope_constant = val;
-//    }
-
-//    GetTimer() {
-//       return this.timer;
-//    }
-
-//    SetTimer(val) {
-//       this.timer = val;
-//    }
-
-//    IncrementTimer() {
-//       this.timer += this.time_step;
-//    }
-
-//    GetAmmount() {
-//       return this.scale;
-//    }
-
-//    SetAmmount(val) {
-//       this.scale = val;
-//    }
-
-//    GetInAnimation() {
-//       return this.in_animation;
-//    }
-
-//    SetInAnimation(val) {
-//       this.in_animation = val;
-//    }
-// }
-
 
 
 
@@ -135,16 +78,13 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, transparency = 
          equalize: equalize,
       };
 
-      const event_clbk_params = {
-         Clbk: (params_c) => {
+
+      const Clbk = (params_c) => {
             if (params_c.o.in_animation === false)
                Callback_animations_create(Animation_rotate_run, Animation_rotate_stop, params, `Run`);
-         },
-         clbk_params: {
-            o: slope_params_pointer,
-         },
-      }
-      Mesh_event_callback_create(mesh, event_clbk_params);
+         }
+      const clbk_params = { o: slope_params_pointer, };
+      Mesh_event_callback_create(mesh, Clbk, clbk_params);
 
    }
 
@@ -154,12 +94,11 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, transparency = 
    // Render
    section.GenGfxCtx();
    
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
 
    Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
 
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
 
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -275,7 +214,7 @@ function Animation_rotate_back_run(params) {
 
    Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
-   rotation = rot;
+   // rotation = rot;
 
    if (slope < 1.) return true;
    else return false

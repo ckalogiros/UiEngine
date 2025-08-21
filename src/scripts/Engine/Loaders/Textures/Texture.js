@@ -97,6 +97,13 @@ const TEXTURE_PATHS = [
 		img_type: 'png',
 		
 	},
+	{
+		img_path: 'textures',
+		img_name: TEXTURE_SNAKE_BG,
+		// img_type: 'png',
+		img_type: 'jpg',
+		
+	},
 
 ];
 /** */

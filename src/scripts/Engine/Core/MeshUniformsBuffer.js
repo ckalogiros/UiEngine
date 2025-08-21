@@ -60,15 +60,11 @@ export function Screen_wpos_set_y(y) { _screen_wpos[1] = y; }
 /** */
 const _per_vb_mesh_unif_wpos = New_generic_buffer(_, '_per_vb_mesh_unif_wpos');
 /** */
-const _per_vb_mesh_unif_wpos_ubidxs = New_generic_buffer(_, '_per_vb_mesh_unif_wpos_ubidxs');
-/** */
 const _debug_names_per_vb_mesh_unif_wpos = New_generic_buffer(_, '_debug_names_per_vb_mesh_unif_wpos');
 
 
 /** */
 export function Mesh_unif_wpos_reset() { _per_vb_mesh_unif_wpos.ResetFull(); }
-/** */
-export function Mesh_unif_wpos_ubidxs_reset(){ _per_vb_mesh_unif_wpos_ubidxs.ResetFull(); }
 /** */
 export function Mesh_unif_wpos_debug_names_reset(){ _debug_names_per_vb_mesh_unif_wpos.ResetFull(); }
 
@@ -89,11 +85,8 @@ export function Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS=0x0,
 
    const mesh_bufferidx = mesh.mesh_bufferidx, 
          mesh_pos = mesh.geom.pos, 
-         mesh_type = mesh.type, 
          mesh_nameidx = mesh.nameidx, 
          mesh_parent = mesh.parent, 
-         progidx = mesh.gfx.prog.idx, 
-         rgidx = mesh.gfx.vb.render_groupidx, 
          debug_vb_groupidx = mesh.gfx.vb.groupidx;
 
    // Decide if the mesh has a 'root wpos' position to anothers mesh 'root wpos' position. If yes, set the new wpos's parent field with the index of the parent wpos 
@@ -131,15 +124,6 @@ export function Mesh_unif_create_rg_root_wpos(mesh, ubidx, HAS_ABSOLUTE_POS=0x0,
    
    const idx = _per_vb_mesh_unif_wpos.Add(entry);
    
-   
-   // Store the uniform's index, for updating the uniforms on position change
-   const wpos_ubidx_idx = _per_vb_mesh_unif_wpos_ubidxs.Add(ubidx);
-   if(wpos_ubidx_idx !== idx) alert('unif wpos index does not match the ubidx index');
-   // if(rgidx !== idx) alert('unif wpos index does not match the rendergroup index');
-   
-   // Mesh_set_and_update_wpos_uniform(progidx, debug_vb_groupidx, root_wpos, null)
-
-
    return idx;
 }
 /** */
@@ -176,20 +160,14 @@ export function Mesh_unif_set_from_existing_vb_root_wpos(mesh, HAS_ABSOLUTE_POS=
    // const unif_wpos = _per_vb_mesh_unif_wpos.buffer[vb_groupidx];
    const unif_wpos = _per_vb_mesh_unif_wpos.buffer[rgidx];
 
-   // if(IS_VB_ROOT || IS_VB_USED){
-
-      unif_wpos.wpos[0] = wpos[0];
-      unif_wpos.wpos[1] = wpos[1];
-      unif_wpos.meshidx = meshidx;
-      unif_wpos.parent_posidx = parent_posidx;
-      unif_wpos.debug_vb_groupidx = mesh.gfx.vb.groupidx;
-      unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
-      unif_wpos.sticky_pos = HAS_STICKY_POS;
-      unif_wpos.scroll_bar = INT_NULL;
-
-      // _per_vb_mesh_unif_wpos_ubidxs.buffer[rgidx] = ubidx;
-
-   // }
+   unif_wpos.wpos[0] = wpos[0];
+   unif_wpos.wpos[1] = wpos[1];
+   unif_wpos.meshidx = meshidx;
+   unif_wpos.parent_posidx = parent_posidx;
+   unif_wpos.debug_vb_groupidx = mesh.gfx.vb.groupidx;
+   unif_wpos.has_absolute_pos = HAS_ABSOLUTE_POS;
+   unif_wpos.sticky_pos = HAS_STICKY_POS;
+   unif_wpos.scroll_bar = INT_NULL;
 
 
    // const dbg_for_unifwpos = _debug_names_per_vb_mesh_unif_wpos.buffer[vb_groupidx];
@@ -440,100 +418,6 @@ export function Mesh_unif_get_all_root_wpos_indexes(root_posidx){
    // return _per_vb_mesh_unif_wpos.buffer[root_posidx];
    return _per_vb_mesh_unif_wpos.buffer;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*******************************************************************************************************************************************************************************/
-// Widget Root Colors as uniforms per vertex buffer 
-/*******************************************************************************************************************************************************************************/
-
-// per_vb_mesh_unif_#type
-
-const _per_vb_mesh_unif_col = New_generic_buffer(_, '_per_vb_mesh_unif_col');
-/** */
-export function Mesh_unif_col_reset() {
-   _per_vb_mesh_unif_col.ResetFull();
-}
-/** */
-export function Mesh_unif_col_get_count() { return _per_vb_mesh_unif_col.active_count; }
-/** */
-export function Mesh_unif_col_get_size() { return _per_vb_mesh_unif_col.size; }
-/** */
-// Each element(uniform color) has the same index as the index of the vertex buffer. Cause each vertex buuffer has a 'u_col'. 
-export function Mesh_unif_create_vb_root_col(mesh_col) {
-
-   const entry = {
-      col: [0, 0, 0, 0],
-      // meshidx: meshidx, // Is needed to have a ref to the mesh from inside the '_per_vb_mesh_unif_col' buffer
-   }
-
-   entry.col[0] += mesh_col[0];
-   entry.col[1] += mesh_col[1];
-   entry.col[2] += mesh_col[2];
-   entry.col[3] += mesh_col[3];
-
-   // _debug_names_per_vb_mesh_unif_col.Add({ nameidx: mesh_nameidx, parent_meshidx: parent_meshidx, vbidx:debug_vbidx });
-
-   const idx = _per_vb_mesh_unif_col.Add(entry);
-   // console.log('ROOT PER VB MESH UNIFORM COLOR BUFFER', _per_vb_mesh_unif_col.buffer, entry)
-   return idx;
-}
-/** */
-export function Mesh_unif_store_vb_root_col(idx, pos) {
-   // TODO: check NULL object
-
-   _per_vb_mesh_unif_col.buffer[idx].col[0] = pos[0];
-   _per_vb_mesh_unif_col.buffer[idx].col[1] = pos[1];
-   _per_vb_mesh_unif_col.buffer[idx].col[2] = pos[2];
-   _per_vb_mesh_unif_col.buffer[idx].col[3] = pos[3];
-}
-
-
-
-
-/*********************************************************************************************************/
-// SETTERS
-/** */
-export function Mesh_unif_set_vb_root_col(idx, rgba) {
-   _per_vb_mesh_unif_col.buffer[idx].col[0] = rgba[0];
-   _per_vb_mesh_unif_col.buffer[idx].col[1] = rgba[1];
-   _per_vb_mesh_unif_col.buffer[idx].col[2] = rgba[2];
-   _per_vb_mesh_unif_col.buffer[idx].col[3] = rgba[3];
-}
-/** */
-export function Mesh_unif_add_vb_root_col(idx, rgba) {
-   _per_vb_mesh_unif_col.buffer[idx].col[0] += rgba[0];
-   _per_vb_mesh_unif_col.buffer[idx].col[1] += rgba[1];
-   _per_vb_mesh_unif_col.buffer[idx].col[2] += rgba[2];
-   _per_vb_mesh_unif_col.buffer[idx].col[3] += rgba[3];
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

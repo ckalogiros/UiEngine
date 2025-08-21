@@ -115,6 +115,29 @@ export function Color_theme_label_auto(hue=.50, sat=0, base_contrast=.20, base_c
    return theme;
 }
 /** */
+export function Color_theme_label_auto2(hue=.50, sat=0, base_contrast=.20, base_contrast_mult=.0) {
+
+   const contrast = Min(base_contrast, .7); // Max contrast for slider and bar. Avoid too less contrast to handle and texts
+   // Use default 'hue_preserve' value([.5 to .7]) if 'base_contrast_mult = 0'
+   const hue_preserve = (base_contrast_mult <= 0) ? Lerp( .5, .7, base_contrast_mult) : base_contrast_mult;
+   // const text_cal_sat = Max(sat-.3, 0);
+
+   // Some calibartion for handle and texts. Gives more contrast on darker contrast values
+   // const calibrate = 1 - (contrast * contrast * contrast * contrast * contrast);
+   // const contrast_cal = (contrast+.5)*calibrate;
+   // const contrast_cal = Min((contrast+.5)*calibrate, 1.8);
+   const contrast_cal = 1;
+
+
+   const theme =  {
+      // Calibrated colors
+      col:      Color_hsv_to_rgb_calibrated(hue, sat , 1.0, 1, contrast, hue_preserve),
+      text_col: Color_hsv_to_rgb_calibrated(.0 , 0, 1, 1, contrast_cal, hue_preserve),
+   };
+
+   return theme;
+}
+/** */
 export function Color_theme_dropdown_auto(hue=.50, sat=0, base_contrast=.20, base_contrast_mult=.0) {
 
    const contrast = Min(base_contrast, .7); // Max contrast for slider and bar. Avoid too less contrast to handle and texts

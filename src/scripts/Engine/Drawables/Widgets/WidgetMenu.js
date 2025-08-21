@@ -7,8 +7,8 @@ import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
-import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
-import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_button_default_properties } from "./Helpers/WidgetEnableProperties.js";
+import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
@@ -414,8 +414,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
    AddToMenuBar(mesh, RelPosAlign) {
 
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
-      // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
-      if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
+      // if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
 
 
       // Set the height of the menu item to be the same across all other items
@@ -476,7 +475,7 @@ export class Close_Button extends Widget_Button {
       }
 
       // Pass the root and the callback for destroying the parent widget
-      Mesh_event_callback_create(this, params);
+      Mesh_event_callback_create(this, Clbk, clbk_params);
    }
 
 
@@ -544,7 +543,7 @@ export class Widget_Minimize extends Widget_Button {
          evt_params: root,
       }
 
-      Mesh_event_callback_create(this, params);
+      Mesh_event_callback_create(this, Clbk, clbk_params);
 
    }
 
@@ -596,7 +595,7 @@ export class Widget_Minimize extends Widget_Button {
 
 
             // Reset Graphics buffers;
-            Root_group_reset_gfxs(root.root_bufferidx)
+            // Root_group_reset_gfxs(root.root_bufferidx)
 
             // Store the root children tree structure to a temporary place, so that can be retrieved on maximize
             const menu_bar = root.children.buffer[0]; // CAUTION: First child suppose to be the menu_bar. What happens if it is at a different index???
@@ -610,7 +609,8 @@ export class Widget_Minimize extends Widget_Button {
             }
 
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
-            root.AddChild(menu_bar);
+            // root.AddChild(menu_bar);
+            root.AddItem(menu_bar);
 
 
             // Store pos and dim of the un-munimized root mesh
@@ -645,7 +645,7 @@ export class Widget_Minimize extends Widget_Button {
          else { // Maximize - toggle on
 
             // Gfx_deactivate_no_listeners_touch(root);
-            Root_group_reset_gfxs(root.root_bufferidx)
+            // Root_group_reset_gfxs(root.root_bufferidx)
 
             root.children.Reset();
             root.children = minim_mesh.stored_children_meshes;

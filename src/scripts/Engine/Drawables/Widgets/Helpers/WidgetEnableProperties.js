@@ -88,6 +88,7 @@ export function Widget_gfx_ready_enable({
    if (enable_attr_angle !== undefined) {
       mesh.GfxEnableAttr(SID.ATTR.ANGLE, enable_attr_angle);
       mesh.GfxPassAttr(SID.ATTR.ANGLE);
+      // mesh.GfxEnableAttr(SID.ATTR.DIM2); mesh.GfxPassAttr(SID.ATTR.DIM2);
    }
 
    if (enable_blend_mode !== undefined) {
@@ -106,9 +107,11 @@ export function Widget_gfx_ready_enable({
    }
 
    if (listener.type !== 0x0) {
-      if(listener.type &  LISTEN_EVENT_TYPES.HOVER) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.HOVER, listener.Clbk, listener.params);
-      if(listener.type &  LISTEN_EVENT_TYPES.MOVE) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.MOVE, listener.Clbk, listener.params);
-      if(listener.type &  LISTEN_EVENT_TYPES.CLICK_UP) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.CLICK_UP, listener.Clbk, listener.params);
+      Mesh_listener_create(mesh, listener.type, listener.Clbk, listener.params);
+      // if(listener.type &  LISTEN_EVENT_TYPES.HOVER) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.HOVER, listener.Clbk, listener.params);
+      // if(listener.type &  LISTEN_EVENT_TYPES.MOVE) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.MOVE, listener.Clbk, listener.params);
+      // if(listener.type &  LISTEN_EVENT_TYPES.CLICK_UP) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.CLICK_UP, listener.Clbk, listener.params);
+      // if(listener.type &  LISTEN_EVENT_TYPES.KEY_PRESS) Mesh_listener_create(mesh, LISTEN_EVENT_TYPES.KEY_PRESS, listener.Clbk, listener.params);
    }
 
    if (scroller) {
@@ -496,53 +499,6 @@ export function Style_switch_default_properties(user_properties) {
  * 
  * @param {*} user_properties:{
  * // TODO
- *       name:'' 
- *       pos:[3] float
- *       col:[4] FloatArray32
- *       pad:[2] float
- *       font_size: float
- *    }
- *     
- * @returns 
- */
-export function Style_section_default_properties(user_properties) {
-   /** (is_root, options, pad, pos, dim, col, name, style, num_faces, texture_id, sub_texture_id, is_debug_mesh) { */
-
-
-   const style = { rcorners: 8, feather: 0, border: 0 };
-
-   const properties = { // Button||Label class
-
-      // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
-      is_root:user_properties.is_root,
-      name: user_properties.name !== undefined ? user_properties.name : 'Section UNAMED',
-      
-      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
-      col: user_properties.col !== undefined ? user_properties.col : BLUEL[4],
-      dim:user_properties.dim,
-
-      options:user_properties.options, 
-      pad:user_properties.pad !== undefined ? user_properties.pad : [0,0],
-
-      style:style, 
-      num_faces:user_properties.num_faces !== undefined ? user_properties.num_faces : 1, 
-      
-      font_size:user_properties.font_size, 
-      texture_id:user_properties.texture_id, 
-      sub_texture_id:user_properties.sub_texture_id,
-      variant_idx:user_properties.variant_idx,
-            
-      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
-
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
-   };
-
-   return properties;
-}
-/**
- * 
- * @param {*} user_properties:{
- * // TODO
  *       pad:[2] float
  *       name:'' 
  *       pos:[3] float
@@ -563,7 +519,6 @@ export function Style_dropdown_default_properties(user_properties) {
    const properties = {
       dp: {
          is_root:user_properties.is_root,
-         options:SECTION.VERTICAL, 
          
          pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
 
@@ -586,9 +541,9 @@ export function Style_dropdown_default_properties(user_properties) {
       },
       menu: { // Section class
          is_root:0x0,
-         options:SECTION.VERTICAL, 
          
-         pos:[0, 0, user_properties.pos[2]+1], 
+         // pos:[0, 0, user_properties.pos[2]+1], 
+         pos:[0, 0, 0], 
          dim:[100, 100],
          col:user_properties.menu_col !== undefined ? user_properties.menu_col : YELLOWL[4],
          
@@ -609,7 +564,8 @@ export function Style_dropdown_default_properties(user_properties) {
          // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
          is_root:0x0,
          
-         pos:[0, 0, user_properties.pos[2]+2], 
+         // pos:[0, 0, user_properties.pos[2]+2], 
+         pos:[0, 0, 0], 
          // col: GREY[6],
          col: user_properties.btn_col !== undefined ? user_properties.btn_col : user_properties.col !== undefined ? user_properties.col : BLUEL[4],
          // col: BLUEL[4],

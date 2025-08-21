@@ -214,7 +214,6 @@ export class Widget_Switch extends Widget_Button {
 
       mesh.isOn ^= 0x1;
       text_mesh.RenderTextFromString(mesh.state_text[mesh.isOn]);
-      mesh.SetUpdateFrameBuffer();
       State_mesh_set_clicked(mesh);
 
       /**

@@ -11,7 +11,6 @@ import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/Unifor
 import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Root_group_vbidx_view_add } from "../../Core/Views/RootView.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
@@ -368,8 +367,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       // POTENTIAL_BUG: In case we reuse a created VB from gfx Pool, we need to insert it to the new widget root gfx buffer.
-      if(!temp_is_particle_system) 
-         Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
+      // if(!temp_is_particle_system) 
+      //    Root_group_vbidx_view_add(root_bufferidx, mesh_bufferidx, progidx, vb_groupidx, vbidxs);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
    }
 

@@ -7,7 +7,7 @@ import { Slider_connect } from "../WidgetSlider.js";
 import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_get_uniform_from_name } from "../../../../Graphics/ShaderPrograms.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_default_properties } from "./WidgetEnableProperties.js";
-import { Align_nested_sections_pre } from "../../Operations/AlignNestedSections.js";
+import { Layout_basic_pre_render } from "../../Operations/AlignNestedSections.js";
 import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Color_theme_slider_auto } from "../../Material/Themes.js";
 import { Gl_set_generic2, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -298,7 +298,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer_with_
 
       // // controls_section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, controls_section.mesh_bufferidx, true);
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
    }

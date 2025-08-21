@@ -3,25 +3,20 @@
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from "../../Engine/Animations/CallbackAnimationsReadyAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { BLACK, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, Color_hsv_to_rgb_calibrated, Get_fasma_color, GREEN, GREENL, GREY, PURPLEB, PURPLER, RED, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
+import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, Get_fasma_color, GREEN, GREENL, GREY, RED, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
-import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners, Gl_set_vpos_y } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_set_angle, Gl_set_dim_xy, Gl_set_attr_round_corners } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSequencedColor } from "../../Helpers/Helpers.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Widget_ready_label } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
-import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_bottom_vertices_up, move_y_upper_vertices_down, pos_x_set, pos_x_set_default, pos_y_set, pos_y_set_default, text_animation_gfx_vertex_set_sqeeze_x_axis, vertex_y_set, vertex_y_set_default, text_animation_gfx_vertex_set_vpos_x_by_value, text_animation_gfx_vertex_set_vpos_x_default, move_y_upper_vertices_up, move_y_bottom_vertices_down, set_y_vertices, set_x_vertices, set_x, set_y_vpos, set_y } from "./DemoTextAnimations.js";
+import { move_x, move_x_right_vertices_right, move_x_left_vertices_right, move_y, move_y_upper_vertices_down, text_animation_gfx_vertex_set_sqeeze_x_axis, text_animation_gfx_vertex_set_vpos_x_by_value, move_y_bottom_vertices_down, set_y_vertices, set_x_vertices, set_x, set_y_vpos, set_y } from "./DemoTextAnimations.js";
 import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y, Mesh_update_set_wpos_x } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Align_expand, Align_nested_sections_pre } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Layout_expand_x_axis, Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.js";
-import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
-import { Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Floor } from "../../Helpers/Math/MathOperations.js";
 import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
@@ -87,7 +82,6 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
          const layout = i===0 ? LAYOUT.VERTICAL : LAYOUT.HORIZONTAL;
          const ret = Demo_clbk_animations_scale(0x0, true, 0, 100, size, 0.01, slope, scale, color, layout, pad_x);
          const anim_mesh =ret.target_mesh;
-         // anim_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, panel_scale.gfx_ctx_parent, true);
          panel_scale.AddItem(anim_mesh);
          temp_buffer_animated.push(anim_mesh); // HACK: We need to Align the meshes scaled, and before Render to scale them down
 
@@ -101,8 +95,8 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       panel.GenGfxCtx();
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size+scale; temp_buffer_animated[i].geom.dim[1] = size+scale; }
       
-      Align_nested_sections_pre(panel);
-      Align_expand(panel);
+      Layout_basic_pre_render(panel);
+      Layout_expand_x_axis(panel);
 
       // HACK: Scale down before render
       for (let i = 0; i < temp_buffer_animated.length; i++) { temp_buffer_animated[i].geom.dim[0] = size; temp_buffer_animated[i].geom.dim[1] = size; }
@@ -169,8 +163,8 @@ export function Demo_animations(x = 10, y = 60, num_meshes = 5, scale = 20, size
       
       // Render
       panel.GenGfxCtx();
-      Align_nested_sections_pre(panel);
-      Align_expand(panel);
+      Layout_basic_pre_render(panel);
+      Layout_expand_x_axis(panel);
       Widget_render(panel);
 
       total_height += panel.geom.dim[1] * 2;
@@ -225,7 +219,6 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    const angle = Math.PI;
    color = Get_fasma_color(offset, num_items, 2);
    const ret2 = Demo_clbk_animations_rotate(0x0, true, 0, 0, anim_mesh_size, 0.01, 0.05, angle, color);
-   // ret2.target_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, ret2.target_mesh.gfx_ctx_parent, true);
    ret2.target_mesh.align.flags = LAYOUT.VERTICAL;
    ret2.slider_mesh.align.flags = LAYOUT.VERTICAL;
    panel.AddItem(ret2.slider_mesh);
@@ -240,7 +233,7 @@ export function Demo_animations_with_slider_slope(x = 0, y = 0) {
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
    ret1.target_mesh.geom.dim[1] = size+scale; // HACK: We need that the scaled size is calculated for the panel's dimentions
-   Align_nested_sections_pre(panel);
+   Layout_basic_pre_render(panel);
    ret1.target_mesh.geom.dim[1] = size; // HACK:And then render it to normal size
    Widget_render(panel);
 
@@ -279,7 +272,7 @@ export function Demo_animations_text(x = 0, y = 0, create_controls = true, font_
    panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
    panel.GenGfxCtx();
 
-   Align_nested_sections_pre(panel);
+   Layout_basic_pre_render(panel);
    Widget_render(panel);
 
    return {
@@ -325,9 +318,9 @@ export function Demo_animations_ready_button_with_panel(root_widget=0x0,  x = 0,
       // panel.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       panel.GenGfxCtx();
       
-      // Align_nested_sections_pre(panel, panel.geom.pos[0], panel.geom.pos[1]);
-      Align_nested_sections_pre(panel);
-      Align_expand(panel);
+      // Layout_basic_pre_render(panel, panel.geom.pos[0], panel.geom.pos[1]);
+      Layout_basic_pre_render(panel);
+      Layout_expand_x_axis(panel);
       Widget_render(panel);
    }
 
@@ -407,8 +400,8 @@ export function Demo_animations_ready_button_anim(root_widget=0x0,  x = 0, y = 0
       menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx);
       menu_panel.GenGfxCtx();
 
-      Align_nested_sections_pre(menu_panel);
-      Align_expand(menu_panel);
+      Layout_basic_pre_render(menu_panel);
+      Layout_expand_x_axis(menu_panel);
 
       Widget_render(menu_panel);
 
@@ -586,7 +579,7 @@ export function Demo_clbk_animations_scale(root_widget = 0x0, create_slider = fa
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
 
-      Align_nested_sections_pre(mesh);
+      Layout_basic_pre_render(mesh);
 
       Widget_render(mesh);
             
@@ -748,7 +741,7 @@ export function Demo_clbk_animations_rotate(root_widget = 0x0, create_slider = f
       mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC;
       mesh.GenGfxCtx();
 
-      Align_nested_sections_pre(mesh);
+      Layout_basic_pre_render(mesh);
       
       Widget_render(mesh);
 
@@ -887,7 +880,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    if (create_contols && (root_widget & ROOT_WIDGETS.CREATE_ROOT)) { // Create slider controls only if this is to be rendered from this function
       
       controls_section.GenGfxCtx();
-      Align_nested_sections_pre(controls_section);
+      Layout_basic_pre_render(controls_section);
       Widget_render(controls_section);
 
 
@@ -931,7 +924,7 @@ export function Demo_clbk_animations_text_counter(root_widget = 0x0, create_cont
    if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
 
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
       
       total_height += section.geom.dim[1] * 2;
@@ -1078,7 +1071,6 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    //    // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    //    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   //    panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
    //    contols_buffer.push(panel);
 
@@ -1124,7 +1116,6 @@ export function Demo_clbk_animations_text_create_contols(slope_params_pointer, a
    //    // panel.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
    //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
    //    panel.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   //    panel.options = SECTION.HORIZONTAL | SECTION.TOP_DOWN | SECTION.RESIZE_PARENT;
    //    panel.EnableGfx(MESH_ENABLE.GFX.ATTR_COL4_PER_VERTEX, COLOR_GRADIENT_VERTICAL(GREY[5], GREY[2]));
    //    contols_buffer.push(panel);
 

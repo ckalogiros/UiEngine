@@ -3,7 +3,7 @@
 import { Dropdown_roots_set_root } from "../Widgets/Widget_Dropdown.js";
 import { PerformanceTimersGetFps, PerformanceTimersGetMilisec, PerformanceTimersGetWorstFps, Performance_timer_create_secondary_timer, Performance_timers_get_avg_1sec_reset } from "../../Timers/PerformanceTimers.js";
 import { Create_rect_mesh, Create_widget_dropdown, Create_widget_label, Create_widget_multi_text, Create_widget_scroller, Create_widget_text } from "../Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size, Mesh_per_vb_get_count, Mesh_per_vb_get_size, Mesh_per_vb_get_vb_byidx } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_get_count, Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_size } from "../../Core/MeshBuffer.js";
 import { Time_intervals_create, } from "../../Timers/TimeIntervals.js";
 import { Ui_create_label_switch } from "./DebugInfoUiFactory.js";
 import { BLUEL, GREEN, GREY, PURPLEB, WHITE, YELLOW, YELLOWR } from "../Material/Colors.js";
@@ -14,8 +14,8 @@ import { VBI_get_byidx, Vertex_buffer_calculate_vertexbuffer_render_group_starts
 import { Str_buffer_get_count, Str_buffer_get_size, Str_buffer_mesh_names_get_by_idx, Str_buffer_mesh_names_get_count, Str_buffer_mesh_names_get_size } from "../../Core/StringBuffer.js";
 import { GetRandomColor } from "../../../Helpers/Helpers.js";
 import { DEBUG_INFO_STRUCTS, Generic_buffers_container_get_active_count, Generic_buffers_container_get_boundary, Generic_buffers_container_get_size, New_generic_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { RENDER_QUEUE_FLAGS, Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
-import { Mesh_unif_col_get_count, Mesh_unif_col_get_size, Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size, Screen_wpos_get_y } from "../../Core/MeshUniformsBuffer.js";
+import { Renderqueue_active_get_count, Renderqueue_get_byidx, Renderqueue_get_count, Renderqueue_get_size } from "../../Renderers/Renderer/RenderQueue.js";
+import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_get_vb_root_wpos, Mesh_unif_wpos_get_count, Mesh_unif_wpos_get_size, Screen_wpos_get_y } from "../../Core/MeshUniformsBuffer.js";
 import { Listeners_click_get_count, Listeners_hover_get_count, Listeners_set_priority } from "../../Events/EventListeners.js";
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
@@ -24,7 +24,7 @@ import { Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_grou
 import { Widget_gfx_ready_enable, Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_set_name } from "../Operations/MeshPropertiesFunctions.js";
-import { Align_nested_sections_pre } from "../Operations/AlignNestedSections.js";
+import { Layout_basic_pre_render } from "../Operations/AlignNestedSections.js";
 import { Widget_render } from "../Widgets/Helpers/WidgetRender.js";
 
 
@@ -294,7 +294,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -361,7 +361,7 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -420,7 +420,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -488,7 +488,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -554,7 +554,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
       
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -619,7 +619,7 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -683,7 +683,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
 
       section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
       section.GenGfxCtx();
-      Align_nested_sections_pre(section);
+      Layout_basic_pre_render(section);
       Widget_render(section);
    }
 
@@ -823,7 +823,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
 
       dp.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
       dp.GenGfxCtx();
-      Align_nested_sections_pre(dp);
+      Layout_basic_pre_render(dp);
       Widget_render(dp);
 
    }
@@ -1078,15 +1078,15 @@ function Debug_info_create_ui_stats() {
 
       }
       { // COL Buffers
-         multi_text_properties.text = 'COL:';
-         const i2 = Create_widget_multi_text(multi_text_properties);
-         i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
-         i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_col_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+         // multi_text_properties.text = 'COL:';
+         // const i2 = Create_widget_multi_text(multi_text_properties);
+         // i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
+         // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_col_get_count, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
 
-         i2.CreateNewText('Size', fontsize, GREY[7], dt_pad, .9);
-         i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
-         i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_col_get_size, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
-         section.AddItem(i2);
+         // i2.CreateNewText('Size', fontsize, GREY[7], dt_pad, .9);
+         // i2.CreateNewText('0000', fontsizedynamic, YELLOW[9], dt_pad, .9);
+         // i2.SetDynamicText(`ms${ms} Stats MeshCount`, ms, Mesh_unif_col_get_size, _, _, generic_time_interval); // idx param is for use in creating separate timer for each widget dynamic text.
+         // section.AddItem(i2);
 
       }
 
@@ -1125,7 +1125,7 @@ function Debug_info_create_ui_stats() {
    }
 
    section.GenGfxCtx();
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
    Widget_render(section);
 
    // Root_group_set_render_queue_flags(section.root_bufferidx, RENDER_QUEUE_FLAGS.SKIP_PRIORITY);
@@ -1539,7 +1539,7 @@ function Debug_info_create_ui_performance_timers() {
    }
 
    section.GenGfxCtx();
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
    Widget_render(section);
 
 
@@ -1634,7 +1634,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
    infomesh.gfx_pool_request &= ~GFX_POOL_REQUESTS.ANY; // Disable the default.
 
    section.GenGfxCtx();
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
    Widget_render(section);
 
    DEBUG_INFO.UI_MOUSE.MESH_BUFFER_IDX = section.mesh_bufferidx;
@@ -1727,16 +1727,11 @@ export function Debug_info_create_ui_focused() {
    /********************************************************************************************************************************/
    // Create the scroller
 
-   // section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-   // section.options = SECTION.HORIZONTAL | SECTION.INHERIT;
-   // section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
-
-
    section.GenGfxCtx();
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
    Widget_render(section);
-// ERROR: Older implementation needed a group to clip meshes from, buthere the Widget_render is called before
-alert('9918133321467615\nERROR: Older implementation needed a group to clip meshes from, buthere the Widget_render is called before')
+   // ERROR: Older implementation needed a group to clip meshes from, buthere the Widget_render is called before
+   alert('9918133321467615\nERROR: Older implementation needed a group to clip meshes from, buthere the Widget_render is called before')
    const clip_top = Mesh_get_real_pos_y(section);
    const clip_bottom = clip_top + section.geom.dim[1] * 2;
    Clipy_from_group(section.group_bufferidxs[0], clip_top, clip_bottom);
@@ -2325,7 +2320,7 @@ function Debug_info_mesh_update(params) {
       const gfx_idxs = [root_info_dp.menu.gfx.prog.idx, root_info_dp.menu.gfx.vb.idx];
       dp_mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, dp_mesh.mesh_bufferidx, true);
       dp_mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, gfx_idxs);
-      Align_nested_sections_pre(dp_mesh);
+      Layout_basic_pre_render(dp_mesh);
 
       Vertex_buffer_calculate_vertexbuffer_render_group_starts();
       View_render_from_view_NEW(section.group_bufferidxs[0]);
@@ -2412,7 +2407,7 @@ function Debug_info_create_batch_info(params) {
 
    section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC);
 
-   Align_nested_sections_pre(section);
+   Layout_basic_pre_render(section);
 
    Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
@@ -2744,7 +2739,7 @@ function Dbg_info_ui_create_ui(pos, name) {
    scrolled.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET, scrolled.mesh_bufferidx, true);
    scrolled.GenGfxCtx();
 
-   Align_nested_sections_pre(scrolled);
+   Layout_basic_pre_render(scrolled);
 
    Vertex_buffer_calculate_vertexbuffer_render_group_starts();
    View_render_from_view_NEW(section.group_bufferidxs[0]);
@@ -2992,7 +2987,6 @@ function Dbg_ui_mesh_tree_create_entry(params) {
    //       new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
    //       /*****************************************************/
 
-   //       entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
    //       entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    //       entry_mesh.SetTypeDebug();
    //       const idx = root_dp.AddToMenu(entry_mesh);
@@ -3069,7 +3063,6 @@ function TEMPORARY(mesh, parent, root_entry_dp) {
       // // new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
       // /*****************************************************/
 
-      // entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
       // entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       // entry_mesh.SetTypeDebug();
       // const idx = root_dp.AddToMenu(entry_mesh);
@@ -3077,8 +3070,6 @@ function TEMPORARY(mesh, parent, root_entry_dp) {
       // // Create a dropdown for the mesh, and then create some info of the mesh as text and add it to the dropdown's menu
       // const dp_mesh = Create_widget_dropdown(_, `${mesh.GetName()}`, [0, 0, parent.geom.pos[2] + 1], TRANSPARENCY(GREY[5], .5), TRANSPARENCY(GREY[1], .8), WHITE, temp_btnpad, _, _, _, _, [4, 4]);
       // parent.AddToMenu(dp_mesh);
-      // dp_mesh.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.RESIZE_PARENT;
-      // dp_mesh.menu.options = SECTION.EXPAND | SECTION.TOP_DOWN | SECTION.VERTICAL; // Set menu to expand to the dropdown's width
 
       // const fontsize = 10;
 
@@ -3244,7 +3235,6 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
 
 
    const scrolled = params.root;
-   scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
    const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
@@ -3313,7 +3303,7 @@ function Dbg_ui_mesh_buffer_create_entry(params) {
    }
 
 
-   Align_nested_sections_pre(scrolled);
+   Layout_basic_pre_render(scrolled);
    // scrolled.Recalc_no_gfx_update();
    /********************************************************************************************************************/
    // Re-create listen events 
@@ -3520,7 +3510,6 @@ function Dbg_ui_string_buffer_create_entry(params) {
          new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
          /*****************************************************/
 
-         // entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
@@ -3569,7 +3558,6 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
       const view = Create_widget_dropdown(_, `view`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       view.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
       view.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      // view.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.EXPAND;
       view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       view.Deactivate();
@@ -3585,7 +3573,6 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
       const view = Create_widget_dropdown(_, `geometry`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       view.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
       view.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      // view.options = SECTION.TOP_DOWN | SECTION.EXPAND | SECTION.VERTICAL | SECTION.INHERIT;
       view.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       view.SetTypeDebug();
       parent.AddToMenu(view)
@@ -3597,7 +3584,6 @@ function Helper_string_buffer_info_create_more_info(parent, info_data, zindex, c
       const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
       gfx.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
       gfx.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      // gfx.options = SECTION.TOP_DOWN | SECTION.EXPAND  | SECTION.VERTICAL | SECTION.INHERIT;
       gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
       gfx.SetTypeDebug();
       gfx.Deactivate();
@@ -3708,7 +3694,6 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
    // const scroller = params.root;
    const scrolled = params.root;
-   scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
    const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
@@ -3723,7 +3708,7 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
    for (let i = 0; i <= len; i++) {
 
-      const info_data = Mesh_per_vb_get_vb_byidx(new_entries.buffer[i][0]);
+      // const info_data = Mesh_per_vb_get_vb_byidx(new_entries.buffer[i][0]);
 
 
       const is_inserted = (flags.buffer[i] & NOTIFICATION_TYPE.FLAGS.IS_INSERTED);
@@ -3739,7 +3724,6 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
          new_entries.buffer[i][1] = entry_mesh.mesh_bufferidx;
          /*****************************************************/
 
-         entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
@@ -3775,7 +3759,7 @@ function Dbg_ui_mesh_per_vb_buffer_create_entry(params) {
 
    // Update size and count info of the mesh buffer
    const buffer_info = root_dp.menu.children.buffer[0];
-   const size = Mesh_per_vb_get_count(), count = Mesh_per_vb_get_size();
+   // const size = Mesh_per_vb_get_count(), count = Mesh_per_vb_get_size();
    const text = `count:${size} size:${count}`;
    if (root_dp.isOn & DP_MENU_STATE.ON) buffer_info.RenderTextFromString(text)
    else buffer_info.SetText(text);
@@ -3791,7 +3775,6 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
       const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex], _, GREEN[4], 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
       info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
       info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
       info_mesh.SetTypeDebug();
       info_mesh.Deactivate();
       parent.AddToMenu(info_mesh);
@@ -3808,7 +3791,6 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
          const all_meshes_buffer = Create_widget_dropdown(_, `meshes`, [100, 100, zindex + 1], GREY[1], GREY[2], _, [2, 1], _, _, _, style, margin, MESH_TYPE.DEBUG_MESH);
          all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
          all_meshes_buffer.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-         all_meshes_buffer.options = SECTION.TOP_DOWN | SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          all_meshes_buffer.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          all_meshes_buffer.SetTypeDebug();
          all_meshes_buffer.Deactivate();
@@ -3835,7 +3817,6 @@ function Helper_mesh_per_vb_buffer_info_create_more_info(parent, info_data, zind
 
    // { // Gfx info
    //    const gfx = Create_widget_dropdown(_, `gfx`, [100, 100, zindex], col_dp, col_menu, _, [2, 1], _, _, style, margin, MESH_TYPE.DEBUG_MESH);
-   //    gfx.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
    //    gfx.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
    //    gfx.SetTypeDebug();
    //    parent.AddToMenu(gfx)
@@ -3944,7 +3925,6 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
 
    // const scroller = params.root;
    const scrolled = params.root;
-   scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
    const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
@@ -3977,7 +3957,6 @@ function Dbg_ui_vertex_buffer_create_entry(params) {
          new_entries.buffer[i][MESH_IDX] = entry_mesh.mesh_bufferidx;
 
          /*****************************************************/
-         entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
          entry_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE)
          entry_mesh.SetTypeDebug();
          root_dp.AddToMenu(entry_mesh);
@@ -4024,7 +4003,6 @@ function Helper_vertex_buffer_info_create_more_info(parent, vb_group, zindex, co
    const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'vb_info', style, _, _, MESH_TYPE.DEBUG_MESH);
    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
-   info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
    info_mesh.SetTypeDebug();
    parent.AddToMenu(info_mesh);
 
@@ -4131,7 +4109,6 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
 
    // const scroller = params.root;
    const scrolled = params.root;
-   scrolled.options |= SECTION.RESIZE_PARENT
    const root_dp = scrolled.children.buffer[0];
    const new_entries = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries;
    const flags = _ui_info_buffer.buffer[params.type_idxs.ENTRIES].entries_flags;
@@ -4178,7 +4155,6 @@ function Dbg_ui_render_queue_buffer_create_entry(params) {
 
          if (root_dp.menu.is_gfx_inserted) {
 
-            entry_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT | SECTION.RESIZE_PARENT;
             root_dp.Recalc_no_gfx_update();
 
             const scroller = scrolled.scroller_comp;
@@ -4218,7 +4194,6 @@ function Helper_render_queue_buffer_info_create_more_info(parent, info_data, zin
    const info_mesh = Create_widget_section(_, SECTION.VERTICAL, margin, [0, 0, zindex + 1], _, col_menu, 'rq_info', style, _, _, MESH_TYPE.DEBUG_MESH);
    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 1.8);
    info_mesh.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 5);
-   info_mesh.options = SECTION.TOP_DOWN | SECTION.VERTICAL | SECTION.INHERIT;
    info_mesh.SetTypeDebug();
    info_mesh.Deactivate();
    parent.AddToMenu(info_mesh);

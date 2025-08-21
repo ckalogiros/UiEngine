@@ -5,7 +5,6 @@ import { CalculateSdfOuterFromDim } from "../../../Helpers/Helpers.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Material_Font } from "../Material/Material.js";
 import { Mesh } from "./Base/Mesh.js";
-import { Mesh_per_vb_store_mesh } from "../../Core/MeshBuffer.js";
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Gl_set_uv, Gl_set_rgb_specific_index, Gl_set_vpos_xy, Gl_set_wpos_xy } from "../../../Graphics/Buffers/VertexBuffersOps.js";
@@ -148,10 +147,6 @@ export class Text_Mesh extends Mesh {
       if (this.mat.temp_max_chars_inserted_in_gfx <= this.mat.char_buffer.boundary + 1)
          this.mat.temp_max_chars_inserted_in_gfx = this.mat.char_buffer.boundary + 1;
 
-      
-      // Add entry to Gfx Buffer
-      // this.per_vb_bufferidx = Mesh_per_vb_store_mesh(this.gfx.vb.groupidx, this.mesh_bufferidx);
-      
       this.is_gfx_inserted = true;
 
 

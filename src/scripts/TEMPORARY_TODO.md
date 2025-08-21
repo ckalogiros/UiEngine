@@ -1,6 +1,6 @@
 TODO
 
-All games that use an interval for their gam loop should be replaced by:
+All games that use an interval for their game loop should be replaced by:
 We already have an app loop. Construct a mechanism that uses that loop 
 
 #BUG: If a text begins with a new line character, then any change to the text is aborted
@@ -15,64 +15,21 @@ We already have an app loop. Construct a mechanism that uses that loop
 # "Debug_info_ui()"
    See the architecture for removing meshes from rendering
 
-# Re-implement all DEPRECATED functions in RootView.js in the MeshBufferViews.js
-
-# Align_expand() doubles the expansion in "function Test_alignment_slider_vert_hor_with_expand(x, y)"
-
-# All Rect mesh construction must tell explicitly to RESIZE_SELF
-
-# IMIDIATELY:  Check the uniform_bindings for each vb to be equal to 1 per uniform and not 1 per uniform per RG
-   because I think I found 3 u_wpos bindings for 1 vb.
-   And also we are gonna need to pass the rgidx from the bindings update to all Clbk's
-   and handle which values should get at the Clbk site 
-
-# Correct the root_posidx. The idx value is the same with rgidx
-   Should the Mesh store the root_posidx???
-
-# IMIDIATELY:  Mesh per vb is DEPRECATED
-
-# IMIDIATELY:  Mesh root_widget is DEPRECATED ????????
-
-# IMIDIATELY:  Render multi vertex color
-
-# IMIDIATELY:  Remove calling "Mesh_listener_create()" instaed use from widgetEnableProperties
-
-# IMIDIATELY:  In Dropdown: the menu is added/removed from dp's children.
-   Do we need to set active/deactive all of the menu's children??????
+# Layout_expand_x_axis() doubles the expansion in "function Test_alignment_slider_vert_hor_with_expand(x, y)"
 
 # Should we unite gfx context creation with render groups creation???
    Since both run for each mesh
 
 # Implement uniforms and u_wpos for each render group 
 
-# IMIDIATELY:  I think '_per_vb_mesh_unif_wpos_ubidxs' is unused and must  be deleted
 # IMIDIATELY:  Fix Resize rect function
 # IMIDIATLY:  Remove all the crap for buffer data full update from the Draw loop
       1. Use  of a command buffer
-      2. HACK: us a one time interval
-      3. In Darw, but updates only for NEEDS_UPDATE_FROM_REALLOC, and once on vb construction
-
-# View groups
- * implement set vertex buffer initial size, to match the mesh data
- * Do we need the .vb field of the mesh view group?????
+      2. HACK: use one time_interval
+      3. In Draw, vb updates happen only for NEEDS_UPDATE_FROM_REALLOC, and once on vb construction
 
 # Render groups
  * implement resize-realloc
-
-# IMIDIATELY 
- * MUST implement IndexBuffer insertion, for meshes that are added after application creation(widget dropdown). 
- * MeshBufferViews.js:
-   many more...
- * Remove the per vb mesh buffer
-
-
-
-   
- * Scroller should be rendered at the mesh site
-   When that happens do:
-      Remove Vertex_buffer_group_state_enable(vb_groupidx, BUFFER_STATE.IS_ACTIVE); and delete the function also
-
-
 
 
 # Resizable containers
@@ -82,34 +39,11 @@ We already have an app loop. Construct a mechanism that uses that loop
    4. Proportional %
    5. Has minimum, according to its items(The use scrolled area)
 
-# For scroller implementation
-{
-   1. Fix the initial position of the scroller.
-      Where and how to set it up
-
-   2. Deal with the VBs of the scrolled mesh's children, must not take any parents gfx
-      especially for text, we need to create new vb
-}
-
-# Deal with many VBs 
-{
-   If it is necessary to create a new vb to group some meshes:
-   * Build groups (cpu side) and even if the vb is one, 
-   we could create group Draw(), update with buffeSubData, and update the u_wposxy before every Draw call
-
-   That means:
-   1. Besides the renderqueue, we would need mesh-groups (possibly from group-view system) with all data (draw count, start-end, etc)
-} 
 
 * The 'Gl_set_dim_xy' maybe should be abstracted to Mesh_update_attr_dimentions
 Also instead of dim for vpos we should use vpos
 
-* Remove functions from {geom, mat}, {mesh} and if possible create functions and not methods
-   Also reduce the memory footprint of Mesh etc.
-
 * Re-implement 'current_event_callback_idx' and 'event_clbks_resolve_fn' for many callbacks in a Mesh
-
-* Align_NEW rename to align or layout and remove Align() if it is unused(check to see)
 
 * IMMIDIATELY: Separate font-symbols and texture rendering shaders
 

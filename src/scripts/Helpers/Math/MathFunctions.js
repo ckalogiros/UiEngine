@@ -35,11 +35,12 @@ export function Logarithmic_interpolation(t, a) {
    
    return res;
 }
-
+/** */
 export function Linear_interpolation(min, max, val) {
    // /**ERROR*/if(val<min || val>max) alert('776776776 Linear interpolation: val is not in the boundaries of min-max')
    return min + (val * (max - min));
 }
+/** */
 export function Linear_interpolation_vector2(p0, p1, val) {
 
    const x = p0[0] + (p1[0] - p0[0]) * val;
@@ -59,14 +60,12 @@ export function Quadratic_interpolation(min_, max_, val_) {
    // const res = ((max - min) * (val * val)) + min;
    return res;
 }
-
+/** */
 export function Normalize(min, max, t) {
    if (t === min) return 0;
    return (t - min) / (max - min);
 }
-
-
-
+/** */
 // Analyze a number into discrete digits
 export function Digitize(n, base = 10) {
 
@@ -100,7 +99,10 @@ export function Digitize(n, base = 10) {
 
 
 
+
+
 /***************************************************************************************************************************************/
+/** */
 let ID = 0;
 function Get_ID() { return ID++; }
 

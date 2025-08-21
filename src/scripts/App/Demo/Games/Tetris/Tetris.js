@@ -3,17 +3,13 @@
 import { Callback_animations_create, Callback_animations_destroy } from "../../../../Engine/Animations/CallbackAnimations.js";
 import { Input_keyboard_bind_keydown_callback, Input_keyboard_bind_keyup_callback } from "../../../../Engine/Controls/Input/Keyboard.js";
 import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_particle_emitter, Create_rect_mesh, Create_widget_button, Create_widget_close_btn, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Mesh_unif_get_vb_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { BLUEL, GREEN, GREY, PURPLE, PURPLEB, PURPLER, WHITE, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_add_dim_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_set_and_update_color_rgb, Mesh_set_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_get_uniform_ubidx_from_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
-import { Mesh_event_callback_create } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../../Engine/Events/EventFunctions.js";
-import { Particle_system_create_emitter, Particle_system_emitt, Particle_system_init_particles, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import { Create_particle_emitter, Create_rect_mesh, Create_widget_button, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { BLUEL, GREEN, GREY, PURPLEB, PURPLER, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_add_dim_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_set_and_update_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
+import { Particle_system_emitt, Particle_system_init_particles, Particles_gen_gfx_ctx } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
-import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_add_dim_xy, Gl_add_wpos_y, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_rgb, Gl_set_wpos_xy, Gl_set_wpos_y } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Bubble_sort } from "../../../../Helpers/Helpers.js";
 import { Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
@@ -21,7 +17,7 @@ import { Abs, Floor, Fract } from "../../../../Helpers/Math/MathOperations.js";
 import { App_reinitialize, App_reset } from "../../../App.js";
 import { Demo_page } from "../../../DemoPage.js";
 import { Style_button_default_properties, Style_label_default_properties, Style_particles_system_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Align_nested_sections_pre } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_destroy_view_group_and_meshes, View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
@@ -1409,7 +1405,6 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(col_inner, tr), name:'section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}));
       Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10 });
-      // info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
       play_contols_info.AddItem(info);
 
       const col = PURPLER[7];
@@ -1425,7 +1420,6 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(col_inner, tr), name:'section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}))
       Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10 });
-      // info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
       play_contols_info.AddItem(info);
 
       const col = PURPLEB[9];
@@ -1443,7 +1437,6 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(col_inner, tr), name:'section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}))
       Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10 });
-      // info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
       play_contols_info.AddItem(info);
 
       const col = BLUEL[9];
@@ -1460,7 +1453,6 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(col_inner, tr), name:'section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}))
       Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10 });
-      // info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
       play_contols_info.AddItem(info);
 
       const col = BLUEL[9];
@@ -1478,7 +1470,6 @@ function Tetris_start_menu(section_, emitter_) {
    {
       const info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(col_inner, tr), name:'section', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF}))
       Widget_gfx_ready_enable({mesh:info, enable_sdf_rect:10 });
-      // info.options = SECTION.HORIZONTAL | SECTION.RESIZE_PARENT | SECTION.EXPAND;
       play_contols_info.AddItem(info);
 
       const col = YELLOW[7];
@@ -1527,7 +1518,7 @@ function Tetris_start_menu(section_, emitter_) {
    // Render Menu 
    menu_panel.GfxCtxAddFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC | GFX_CTX_FLAGS.ABSOLUTE_POSITION, menu_panel.mesh_bufferidx, true);
    menu_panel.GenGfxCtx();
-   Align_nested_sections_pre(menu_panel);
+   Layout_basic_pre_render(menu_panel);
    Widget_render(menu_panel);
 
    menu_panel.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1]);
@@ -2147,10 +2138,8 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4, n
    /****************************************************************************************************************/
    // Create Particles Particles Emitter
    const particles_size = 30;
-   // num_particles_per_frame = 128;
    num_particles_per_frame = 32;
 
-   // const max_explosions = (num_grid_locs / 3) * 2 
    const max_explosions = MAX_COLUMNS * 4; //  
 
    const emitter = Create_particle_emitter(Style_particles_system_default_properties({
@@ -2167,9 +2156,6 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4, n
    emitter.EnableProperties(PARTICLES.HAS_FADE);
    
    emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.8, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
-   // emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, {time:.3, generic:{a:.0, b:.23}, blend_mode:SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY});
-
-   // emitter.SetConeOfDirection(-.1, .1, .05, -.05);
 
 
    Particles_gen_gfx_ctx(emitter, _);
@@ -2178,68 +2164,9 @@ export function Particles_explosion(x = 0, y = 0, num_particles_per_frame = 4, n
 
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
-   // emitter.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
-   // emitter.GfxUniformsSetClbk('u_blend_mode', () => {
-   //    return emitter.sid.blend_options;
-   // }, emitter.gfx.vb.groupidx);
-
-
-   /****************************************************************************************************************/
-   // Create Smoke Particles
-   // const particles_size = 5;
-   // num_particles_per_frame=4;
-
-   // const emitter_idx = Particle_system_create_emitter('Particle System Glow Emitter', BLUEL[9], [x, y, 10], [particles_size, particles_size], .014, 1, 1, .96, -.1, 3, TEXTURES.SMOKE_1, num_particles_per_frame);
-   // const emitter = Particles_get_particle_system(emitter_idx);
-
-   // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-   // emitter.EnableProperties(PARTICLES.HAS_ROTATION);
-   // emitter.EnableProperties(PARTICLES.HAS_SCALE, 14);
-   // emitter.speed = .8;
-
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TIME);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_DIM2);
-   // emitter.EnableGfx(MESH_ENABLE.GFX.ATTR_TEX2);
-
-   // emitter.SetConeOfDirection(-.1, .1, .1, -.1);
-
-   // Particles_gen_gfx_ctx(emitter, );
 
 
 
-
-
-
-   // { // SHADER UNIFORMS: Distance
-   //    const val = .5;
-   //    const val_idx = 0;
-   //    // Find the ubidx
-   //    // const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_glow_params');
-   //    const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //    Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
-   // }
-   // { // SHADER UNIFORMS: Brightness
-   //    const val = 0.0;
-   //    const val_idx = 1;
-   //    // Find the ubidx
-   //    const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //    Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
-   // }
-   // { // SHADER UNIFORMS: Intensity
-   //    // const val = 0.05;
-   //    const val = 0.15;
-   //    const val_idx = 2;
-   //    // Find the ubidx
-   //    const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_generic_controls');
-   //    Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
-   // }
-   // { // SHADER UNIFORMS: Particle Scale
-   //    const val = 0.08;
-   //    const val_idx = 0;
-   //    // Find the ubidx
-   //    const ubidx = Mesh_get_uniform_ubidx_from_name(emitter.uniforms, 'u_scale2');
-   //    Vertex_buffer_set_and_update_uniform(emitter.gfx.vb.groupidx, ubidx, val, val_idx);
-   // }
    { // Gravity
       const val = 0.;
       emitter.gravity = val;
