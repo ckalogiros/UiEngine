@@ -368,6 +368,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
 
+
+      ///// msdjhdhjhsdjkhsjhd
+
       // const eee = Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       // Vertex_buffer_group_set_render_queueidx(vb_groupidx, eee);
       
