@@ -123,6 +123,7 @@ alert('IMPLEMENT:\n a function that checs if a vbidx exists in the framebuffer q
 
 const _fb_buffer = []; // A buffer to store all of the scenes framebuffers.
 
+/** */
 export function Gl_framebuffer_render_mesh(FBID = FB.NEW, FB_TYPE = FRAMEBUFFER_TYPE.SCREEN_DIMENTION, scene = null, mesh = null) {
 
    const gl = gfxCtx.gl
@@ -184,9 +185,7 @@ export function Gl_framebuffer_render_mesh(FBID = FB.NEW, FB_TYPE = FRAMEBUFFER_
 
    return fb;
 }
-
-
-
+/** */
 // gl, gl_target, ATACHMENT, render_target,  
 function Gl_framebuffer_create(gl = null, TEMP_WHICH_RENDER_TARGET = null, ATTACHMENT = INT_NULL, width = VIEWPORT.WIDTH, height = VIEWPORT.HEIGHT) {
 
@@ -228,16 +227,12 @@ function Gl_framebuffer_create(gl = null, TEMP_WHICH_RENDER_TARGET = null, ATTAC
 
    return framebuffer;
 }
-
-
-
+/** */
 export function Framebuffer_get(fbidx) {
    // IMPORTANT: Check for error fbidx !exists
    return _fb_buffer[fbidx];
 }
-
-
-
+/** */
 export function FramebufferSetUpdate(fbidx) {
    /**DEBUG */ if (!_fb_buffer[fbidx]) {
       console.error('Not valid Framebuffer index. @ function FramebufferSetUpdate(fbidx)', fbidx);
@@ -247,9 +242,7 @@ export function FramebufferSetUpdate(fbidx) {
    _fb_buffer[fbidx].needs_update = true;
    // _pt_framebuffer_rendering.timer.Stop();
 }
-
-
-
+/** */
 // TODO: Remove export.
 export function Gl_framebuffer_render(gl, framebuffer, gfx_queue) { // Renders geometry(from gfx buffers) to a spesific framebuffer target(to texture or to renderbuffer)
    // _pt_framebuffer_rendering.timer.Start();
@@ -288,9 +281,7 @@ export function Gl_framebuffer_render(gl, framebuffer, gfx_queue) { // Renders g
    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
    // _pt_framebuffer_rendering.timer.Stop();
 }
-
-
-
+/** */
 // This draws or updates the framebuffer texture 
 export function Framebuffer_update_draw() { // HOT-PATH
 
@@ -312,20 +303,16 @@ export function Framebuffer_update_draw() { // HOT-PATH
 // Helpers
 
 const _framebuffer_names = [];
-
+/** */
 function Framebuffer_store_name(str_name) {
    const idx = _framebuffer_names.push(str_name);
    return idx - 1;
 }
-
-
-
+/** */
 function Framebuffer_change_name(idx, new_name) {
    _framebuffer_names[idx] = new_name;
 }
-
-
-
+/** */
 function Framebuffer_get_name(idx) {
    return _framebuffer_names[idx];
 }
@@ -334,6 +321,7 @@ function Framebuffer_get_name(idx) {
 
 /*************************************************************************************************/
 // Debug-Print
+/** */
 export function FramebufferPrintBuffer(){
    const count = _fb_buffer.length;
    for(let i=0; i<count; i++){
@@ -341,9 +329,7 @@ export function FramebufferPrintBuffer(){
    }
    console.log(_fb_buffer[i]);
 }
-
-
-
+/** */
 export function FramebufferPrintBufferAll(){
    console.log(_fb_buffer);
 }

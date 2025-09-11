@@ -188,7 +188,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = T
    return label;
 }
 /** */
-export function Widget_ready_rect(render = false, is_root = 0x0, x = 0, y = 0, dim = [20, 20], col = BLUEL[5], pad = [10, 10]) {
+export function Widget_ready_rect(render = false, is_root = 0x0, x = 0, y = 0, dim = [20, 20], col = BLUEL[5], pad = [10, 10], r_corners=4) {
 
    const pos = [x, y, 0];
    const rect = Create_rect_mesh(Style_rect_default_properties({
@@ -200,7 +200,7 @@ export function Widget_ready_rect(render = false, is_root = 0x0, x = 0, y = 0, d
    }));
 
 
-   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER }, });
+   Widget_gfx_ready_enable({ mesh: rect, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER }, });
 
 
    /********************************************************************************************************************************************************/

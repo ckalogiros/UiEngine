@@ -4,7 +4,6 @@ import { Callback_animations_create } from "../../Engine/Animations/CallbackAnim
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from "../../Engine/Animations/CallbackAnimationsReadyAnimations.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, Get_fasma_color, GREEN, GREENL, GREY, RED, WHITE, YELLOW, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
-import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Slider_connect } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Texture_metrics_get_sub_tex_width, Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height } from "../../Engine/Loaders/Textures/TextureUvMap.js";
@@ -18,6 +17,7 @@ import { Mesh_rotate_z, Mesh_set_dim_xy, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh
 import { Layout_expand_x_axis, Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Color_theme_label_auto } from "../../Engine/Drawables/Material/Themes.js";
 import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { Mesh_set_root_in_focus } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 

@@ -5,7 +5,6 @@ import { Mesh_animations_create } from "../../Engine/Animations/MeshAnimations.j
 import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { BLUE, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Colors.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventFunctions.js";
 import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
@@ -14,6 +13,7 @@ import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/Me
 import { Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventListeners.js";
 
 
 

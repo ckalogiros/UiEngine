@@ -188,20 +188,6 @@ export function Gfx_pool_find_vb_notPrivate(sid, pool_request_flags, has_absolut
 
    return INT_NULL;
 }
-// /** */
-// export function Gfx_pool_find_ib_match_any(shad) {
-
-//    const ib_buffer = Index_buffer_info_get();
-//    for (let i = 0; i <= ib_buffer.boundary; i++) {
-
-//       if(shad === ib_buffer.buffer[i].sid.shad && (ib_buffer.buffer[i].state.mask & BUFFER_STATE.IS_ACTIVE) === 0){
-
-//          ib_buffer.buffer[i].state.mask |= BUFFER_STATE.IS_ACTIVE;
-//          return i;
-//       }
-//    }
-//    return INT_NULL;
-// }
 /** */
 export function Gfx_pool_find_ib_match_any(shad) {
 

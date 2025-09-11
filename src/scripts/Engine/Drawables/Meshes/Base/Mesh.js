@@ -156,6 +156,14 @@ export class Mesh {
         this.children_scrollers_buffer = New_int16_buffer(_, 'Mesh children_scrollers_buffer');
         this.has_children_scrollers = false;
 
+        this.physics = {
+            idx:INT_NULL,
+            collision:{
+                group_idx:INT_NULL,
+                collision_idx:INT_NULL,
+            }
+        };
+
 
         this.styles = Styles_create();
         this.clamp = [0, [0, 10000, DEFAULT_CLAMP_THRESHOLD]]; // TODO: do the same for the clamx too

@@ -3,7 +3,7 @@
 import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Index_buffer_reset } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Vertex_buffer_render_group_create, Vertex_buffer_render_group_get_size, Vertex_buffer_render_group_remove, Vertex_buffer_render_group_reset_draw_count, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces } from "../../../Graphics/Buffers/RenderGroups.js";
-import { Vertex_buffer_calculate_starts_per_render_group, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_get, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_ibidx, Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Vertex_buffer_calculate_starts_per_render_group, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_ibidx, Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_group_update_scissorbox, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "../MeshBuffer.js";
@@ -447,137 +447,6 @@ function View_create_uniforms_for_reused_render_group(mesh) {
 
 
 /** Add mesh to view-group. Create vertex buffer render-group */
-// export function View_add_mesh(groupidx, mesh, is_root_widget_on_reused_vb=false) {
-// // TODO: Comment logic
-//    const mesh_bufferidx = mesh.mesh_bufferidx;
-//    const num_faces = mesh.geom.num_faces;
-//    const vb_groupidx = mesh.gfx.vb.groupidx;
-//    const view = _view_buffer.buffer[groupidx];
-
-//    const vb = Vertex_buffer_group_get_byidx(vb_groupidx);
-
-//    // Enable copying the mesh's wpos if it is the view group root or if it is a root by it's self(added afterwards to the group)
-//    const is_root_group = (view.rootidx === mesh.mesh_bufferidx) ? true : (Root_group_view_is_widget_root(mesh.root_bufferidx, mesh_bufferidx)) ? true : false ;  // Set u_wpos on the root mesh, from which all root's meshes position will draw from
-//    // let view_vbidx = View_vb_exists(groupidx, vbidx, mesh);
-//    // if (view_vbidx !== INT_NULL) render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
-//    let render_groups = null;
-   
-//    for(let i = 0; i <= mesh.gfx.vb.idxs.boundary; i++) {
-      
-//       const vbidx = mesh.gfx.vb.idxs.buffer[i];
-//       let view_vbidx = View_vb_exists(groupidx, vbidx, mesh);
-//       if (view_vbidx === INT_NULL) render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
-
-
-   
-//       // Find meshidxs for vertex buffer, if exists
-//       let view_rgidx = INT_NULL;
-//       let view_meshidx = INT_NULL;
-   
-//       if (view_vbidx !== INT_NULL) { // Vb buffer found
-   
-//          if (mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_NEW) {
-   
-//             const new_render_groupidx = Vertex_buffer_render_group_create(vbidx, num_faces);
-//             Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
-            
-//             view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
-//                render_groupidx: new_render_groupidx,
-//                start: 0,
-//                num_faces: num_faces,
-//                meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
-//             });
-            
-//             mesh.gfx.vb.render_groupidx = new_render_groupidx;
-   
-//             View_create_uniforms_for_render_group(mesh, is_root_group);
-            
-//          }
-//          else {
-            
-//             let rgidx_found_match = INT_NULL;
-   
-//             if((mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP)) {
-//                rgidx_found_match = Find_match_gfx_from_view_vb(mesh, groupidx, view_vbidx);
-//             }
-//             else if((mesh.gfx_ctx_flags & GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_GROUP)) {
-//                rgidx_found_match = Find_match_gfx_from_view_group(mesh, groupidx);
-//             }
-//             else {
-//                rgidx_found_match = Find_match_gfx_from_parent_ascending_search_all(mesh, mesh.parent);
-//             }
-            
-//             if (rgidx_found_match !== INT_NULL) {
-//                view_rgidx = rgidx_found_match;
-//                mesh.gfx.vb.render_groupidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx;
-//                view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces += num_faces;
-//                Vertex_buffer_render_group_set_num_faces(view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].render_groupidx, view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].num_faces);
-//             }
-//             else {
-   
-//                const new_render_groupidx = Vertex_buffer_render_group_create(vbidx, num_faces);
-//                Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
-   
-//                view_rgidx = view.vb.buffer[view_vbidx].rg.Add({
-//                   render_groupidx: new_render_groupidx,
-//                   start: 0,
-//                   num_faces: num_faces,
-//                   meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
-//                });
-               
-//                mesh.gfx.vb.render_groupidx = new_render_groupidx;
-   
-//                View_create_uniforms_for_render_group(mesh, is_root_group);
-//             }
-            
-//          }
-   
-//          view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
-//          // return [groupidx, view_vbidx, view_rgidx, view_meshidx]; // return the indexes
-         
-//       }
-//       else { // Else if not found, create new View vb.
-   
-//          // const render_groups = New_generic_buffer(_, 'MeshViewGroup-RenderGroupBuffer');
-   
-//          const new_render_groupidx = Vertex_buffer_render_group_create(vbidx, num_faces);
-//          Vertex_buffer_group_store_render_groupidx(vb_groupidx, new_render_groupidx);
-   
-//          view_rgidx = render_groups.Add({
-//             state: 0x0, // SEE: VIEW_GROUP_STATE_FLAGS
-//             render_groupidx: new_render_groupidx,
-//             start: 0,
-//             num_faces: num_faces,
-//             meshidxs: New_int16_buffer(_, 'MeshBufferViews-mesh_data'),
-//          });
-         
-         
-//          view_vbidx = view.vb.Add({
-//             state: 0x0, // SEE: VIEW_GROUP_STATE_FLAGS
-//             vb_groupidx: vbidx,
-//             rg: render_groups,
-//          });
-         
-//          view_meshidx = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx].meshidxs.Add(mesh_bufferidx);
-         
-//          mesh.gfx.vb.render_groupidx = new_render_groupidx;
-   
-         
-//          if(is_root_widget_on_reused_vb) {
-//             View_create_uniforms_for_reused_render_group(mesh, is_root_widget_on_reused_vb)
-//          }
-//          else {
-//             View_create_uniforms_for_render_group(mesh, is_root_group);
-//          }
-         
-//       }
-//    }
-   
-//    mesh.group_bufferidxs[0] = groupidx; // Groups buffer index.
-//    mesh.group_bufferidxs[1] = view_vbidx; // VB buffers index, which vb buffer the mesh belongs.
-//    mesh.group_bufferidxs[2] = view_rgidx; // Render group.
-//    mesh.group_bufferidxs[3] = view_meshidx; // Mesh's index in the  view group buffer.
-// }
 export function View_add_mesh(groupidx, mesh, is_root_widget_on_reused_vb=false) {
 // TODO: Comment logic
    const mesh_bufferidx = mesh.mesh_bufferidx;
@@ -1039,6 +908,28 @@ export function View_render_specific_render_group(groupidx, view_vbidx, view_rgi
    //    const sub_groupidx = view.sub_groups_idxs.buffer[i];
    //    View_render_from_view_NEW(sub_groupidx)
    // }
+}
+/** */
+export function View_create_scissorbox(groupidx, mx, my, mw, mh) {
+
+   const view = _view_buffer.buffer[groupidx];
+   for (let k = 0; k <= view.vb.boundary; k++) { // Vertex Attribute Buffering.
+      
+      const vb_groupidx = view.vb.buffer[k].vb_groupidx;
+      Vertex_buffer_group_create_scissorbox(vb_groupidx, mx, my, mw, mh);
+   }
+
+}
+/** */
+export function View_update_scissorbox(groupidx) {
+
+   const view = _view_buffer.buffer[groupidx];
+   for (let k = 0; k <= view.vb.boundary; k++) { // Vertex Attribute Buffering.
+      
+      const vb_groupidx = view.vb.buffer[k].vb_groupidx;
+      Vertex_buffer_group_update_scissorbox(vb_groupidx);
+   }
+
 }
 
 

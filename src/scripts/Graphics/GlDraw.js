@@ -103,15 +103,16 @@ export function Gl_draw(gl) {
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
                 render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
     
-                // gl.drawArraysInstanced(
-                //     gl.TRIANGLES,
-                //     0, // offset
-                //     5, // num vertices per instance
-                //     2, // num instances
-                // );
             }
-
-
+            
+            
+            /* gl.drawArraysInstanced(
+             *      gl.TRIANGLES,
+             *      0, offset
+             *      5, num vertices per instance
+             *      2, num instances
+             *  );
+             */
             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 1)
             // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 3)
             // gl.drawElementsInstanced(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 2)

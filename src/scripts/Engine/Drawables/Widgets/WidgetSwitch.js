@@ -536,9 +536,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 }
-
-
-
 /** A callback function calls another callback that must be called via 'timeInterval'. 
  * Is responsible for creation/destruction of the timeInterval that in its turn 
  * will run automaticaly a callback from the application */
@@ -563,8 +560,7 @@ export function Switch_simple_time_interval_callback(params) {
       this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
    }
 }
-
-
+/** */
 export function Switch_set_listeners_priority(switch1) {
 
    const handle = switch1.children.buffer[0];
@@ -581,8 +577,7 @@ export function Switch_set_listeners_priority(switch1) {
    // } 
 
 }
-
-
+/** */
 function Switch_click_default_callback(params) {
    console.log(params, ' Clicked!');
 }

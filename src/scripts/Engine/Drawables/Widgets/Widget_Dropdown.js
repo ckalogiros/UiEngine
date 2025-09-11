@@ -6,7 +6,6 @@ import { Time_intervals_create } from "../../Timers/TimeIntervals.js";
 import { Create_rect_mesh, Create_widget_button } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { View_calculate_rendergroup_draw_count, View_add_mesh, View_reset_rendergroup_draw_count, View_render_from_view_NEW, View_render_specific_render_group, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventFunctions.js";
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get_root_meshidx } from "../../Core/Views/RootView.js";
@@ -17,6 +16,7 @@ import { Mesh_get_name, Mesh_listener_add, Mesh_listener_remove, Mesh_set_name, 
 import { Layout_basic_pre_render, Layout_grow_containers_pre_render_with_item_reposition } from "../Operations/AlignNestedSections.js";
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from "./ScrollerComponent.js";
 import { Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_set_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Events/EventListeners.js";
 
 
 
@@ -48,27 +48,22 @@ export function Dropdown_roots_reset() { _root_dropdown.ResetFull(); }
 
 
 
+/** */
 export function Dropdown_roots_set_root(root, dropdown) {
    dropdown.rootidx = _root_dropdown.Add(root);
    return dropdown.rootidx;
 }
-
-
-
+/** */
 function Dropdown_roots_get_root_by_idx(rootidx) {
    const root = _root_dropdown.buffer[rootidx];
    return root;
 }
-
-
-
+/** */
 function Dropdown_roots_destroy_byidx(rootidx, caller_mesh_bufferidx) {
    // Destroy only if the caller dropdown is the root
    if (caller_mesh_bufferidx === _root_dropdown.buffer[rootidx].mesh_bufferidx)
       _root_dropdown.RemoveByIdx(rootidx);
 }
-
-
 
 /**Debug-Print */
 export function Dropdown_roots_print_root_buffer() {
@@ -640,7 +635,6 @@ alert('00000111119999922222')
          State_mesh_set_focused(dp);
          Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: dp })
          dp.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
-         // Mesh_set_root_in_focus(dp.root_bufferidx);
       }
 
 

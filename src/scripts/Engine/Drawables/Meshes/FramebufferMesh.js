@@ -4,7 +4,7 @@ import { Framebuffer_get } from "../../../Graphics/Buffers/FrameBuffers.js";
 
 
 
-
+/** */
 export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
 
    alert('3331444133321. Framebuffer: implement new ')
@@ -41,9 +41,7 @@ export function Create_mesh_for_framebuffer(mesh, fb, pos, dim) {
 
    return rect;
 }
-
-
-
+/** */
 export function Framebuffer_moveY(fbidx, y, move_ratio){
 
    const fb = Framebuffer_get(fbidx);

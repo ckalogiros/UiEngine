@@ -13,6 +13,7 @@ import { Input_reset } from "../Controls/Input/Input.js";
 import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
 import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
+import { Physics2D_update } from "../Physics2D/Physics2D.js";
 
 
 
@@ -21,21 +22,7 @@ const WEB_GL_PERFORMANCE_MEASURE_ENABLED = false;
 
 
 var _renderer = null;
-
-export function Renderer_create_renderer(scene, camera) {
-
-   _renderer = new Renderer(scene, camera);
-   return _renderer;
-}
-
-
-
-
-export function Renderer_create_gl_context(){
-   _renderer.CreateGlContext();
-}
-
-
+/** */
 export class Renderer {
 
    // scene
@@ -86,17 +73,20 @@ export class Renderer {
    Render() {
 
       if (STATE.loop.paused === false) {
-
+         
          Time_update();
-
+         
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GameLoop);
-
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate)
          Time_intervals_update(); // Update and run callbacks for each interval timer that has been set.
          Timers_update_global_timer(); // This is a globbal timer, going only forward
          Timers_update();
          // // Step_timers_update();
          Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.AllTimersUpdate);
+
+         Physics2D_update();
+         
+         
 
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Animations);
          Mesh_animations_run();
@@ -124,18 +114,24 @@ export class Renderer {
          Performance_timers_update_tick();
 
          Time_sample();
-
+         
       }
 
    }
 
 
 }
+/** */
+export function Renderer_create_renderer(scene, camera) {
 
-
-
-
-
+   _renderer = new Renderer(scene, camera);
+   return _renderer;
+}
+/** */
+export function Renderer_create_gl_context(){
+   _renderer.CreateGlContext();
+}
+/** */
 export function Renderer_set_canvas_size(width, height) {
 
    _renderer.SetCanvasSize(width, height);
@@ -145,8 +141,7 @@ export function Renderer_set_canvas_size(width, height) {
    gfxCtx.gl.viewport(0, 0, width, height);
 
 }
-
-
+/** */
 function Renderer_create_webgl_context(canvas) {
 
    console.log('Initializing Graphics.')
@@ -315,12 +310,7 @@ function Renderer_create_webgl_context(canvas) {
    //    counter:0,
    // };
 
-   
-   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_get_performance_timer_query_avaraged(gfxCtx);}, 100)
-   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_get_performance_timer_query_avaraged(gfxCtx);}, 100)
-   // if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) setInterval(()=>{Renderer_webgl_check_query_results(gfxCtx);}, 20)
-
-   // NOTE: Gets the maximum allowed attributes count
+   // Get the maximum allowed attributes count for webgl vertex shader
    // const MAX_VERTEX_ATTRIBS = gfxCtx.gl.getParameter(gfxCtx.gl.MAX_VERTEX_ATTRIBS); // Get the max available attributes for a shader.
 
 
@@ -336,72 +326,4 @@ function Renderer_create_webgl_context(canvas) {
       ext:gfxCtx.ext,
    };
 }
-
-
-// export function Renderer_webgl_check_query_results() {
-
-//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED) {
-      
-//       const ext_gpu_timer_query = gfxCtx.ext.ext_gpu_timer_query;
-//       const timer_query = gfxCtx.ext.timer_query_obj;
-//       const gl = gfxCtx.gl;
-
-//       const available = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_AVAILABLE_EXT);
-//       const disjoint = gl.getParameter(ext_gpu_timer_query.GPU_DISJOINT_EXT);
-   
-//       if (available && !disjoint) 
-//       {
-//          // Retrieve the result (in nanoseconds)
-//          const timeElapsed = ext_gpu_timer_query.getQueryObjectEXT(timer_query, ext_gpu_timer_query.QUERY_RESULT_EXT);
-//          gfxCtx.ext.elapsed = timeElapsed;
-//          gfxCtx.ext.accum_timer += timeElapsed;
-//          gfxCtx.ext.counter++;
-//          // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms");
-//          // console.log("Time elapsed: " + (timeElapsed / 1000000.0) + " ms", 'avarage', (avarage / 1000000.0) + " ms", 'accum_timer', gfxctx.ext.accum_timer/ 1000000.0, 'counter', gfxctx.ext.counter);
-//       } 
-
-//    }
-
-// }
-
-// export function Renderer_get_performance_timer_query_avaraged(gfxctx) {
-
-//    const avarage_time = gfxctx.ext.accum_timer / gfxctx.ext.counter;
-//    gfxctx.ext.accum_timer = 0; 
-//    gfxctx.ext.counter = 0;
-//    return avarage_time * NANOSEC;
-
-// }
-
-// export function Renderer_get_performance_timer_query(gfxctx) {
-
-//    return gfxctx.ext.elapsed;
-// }
-
-
-// export function Renderer_webgl_begin_timer_query(gfxctx) {
-
-//    const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
-//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
-//       const timer_query = gfxctx.ext.timer_query_obj;
-//       ext_gpu_timer_query.beginQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT, timer_query);
-//    }
-   
-// }
-
-
-// export function Renderer_webgl_end_timer_query(gfxctx) {
-   
-//    const ext_gpu_timer_query = gfxctx.ext.ext_gpu_timer_query;
-//    if(WEB_GL_PERFORMANCE_MEASURE_ENABLED && ext_gpu_timer_query) {
-//       ext_gpu_timer_query.endQueryEXT(ext_gpu_timer_query.TIME_ELAPSED_EXT);
-//       // gfxctx.ext.counter++;
-//    }
-
-
-// }
-
-
-
-
 

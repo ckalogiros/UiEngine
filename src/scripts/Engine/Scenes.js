@@ -10,7 +10,7 @@ import { Mesh_add_wpos_x, Mesh_set_wpos_relative_x, Mesh_set_wpos_x, Mesh_update
 import { HandleEvents } from './Events/Events.js';
 
 
-
+/** */
 class Scene {
 
     // sceneidx: Scene ID (of type: SCENE const structure).
@@ -46,9 +46,7 @@ class Scene {
     }
 
 };
-
-
-
+/** */
 class Scenes extends M_Buffer {
 
     constructor() {
@@ -66,41 +64,27 @@ class Scenes extends M_Buffer {
 
 }
 
-
-
 const _scenes = new Scenes();
 _scenes.Init(1);
-
-
-
+/** */
 export function Scenes_get_scene_by_idx(sceneidx) { return _scenes.buffer[sceneidx]; }
-
-
-
+/** */
 export function Scenes_create_scene() { return _scenes.Create(); }
-
-
-
-
+/** */
 export function Scenes_get_count() { return _scenes.active_count; }
-
-
-
+/** */
 export function Scene_set_projection_matrix(sceneidx) {
 
     const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
-
-
-
+/** */
 export function Scene_set_screen_res_uniform() {
 
     const unifidx = Uniforms_block_get_uniform_by_name('u_screen_res');
     Uniforms_block_set_uniform(unifidx, [VIEWPORT.WIDTH, VIEWPORT.HEIGHT]);
 }
-
-
+/** */
 export function Scene_camera_zoom(sceneidx, value) {
 
     _scenes.buffer[sceneidx].camera.Zoom(value);
@@ -108,9 +92,7 @@ export function Scene_camera_zoom(sceneidx, value) {
     const unifidx = Uniforms_block_get_uniform_by_name('u_projection');
     Uniforms_block_set_uniform(unifidx, _scenes.buffer[sceneidx].camera.matrix);
 }
-
-
-
+/** */
 export function Scene_camera_scroll_set(sceneidx, value) {
 
     // Set the screen wpos
@@ -118,9 +100,7 @@ export function Scene_camera_scroll_set(sceneidx, value) {
 
     Vertex_buffer_group_update_scissorbox_all_vb();
 }
-
-
-
+/** */
 export function Scene_camera_scroll_add(sceneidx, value) {
 
     // Set the screen wpos
@@ -129,17 +109,20 @@ export function Scene_camera_scroll_add(sceneidx, value) {
     Vertex_buffer_group_update_scissorbox_all_vb();
 }
 
-
 const _on_window_resize_roots = New_int16_buffer(1, '_on_window_resize_roots');
+/** */
 export function Scene_store_window_resized_meshes(mesh_bufferidx) {
     _on_window_resize_roots.Add(mesh_bufferidx);
 }
+/** */
 export function Scene_get_window_resized_meshes() {
     return _on_window_resize_roots;
 }
+/** */
 export function Scene_reset_window_resized_meshes() {
     _on_window_resize_roots.Reset();
 }
+/** */
 export function Scene_window_resized_meshes_calculate_layout() {
 
     for(let i=0; i<=_on_window_resize_roots.boundary; i++){

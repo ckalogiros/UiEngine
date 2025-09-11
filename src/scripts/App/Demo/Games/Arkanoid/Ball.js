@@ -6,7 +6,6 @@ import { Create_particle_emitter, Create_rect_mesh } from "../../../../Engine/Dr
 import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { BLUEL, PURPLEB, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_set_color_rgba, Mesh_update_set_dim_xy, Mesh_update_set_wpos_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Particle_system_emitt, Particle_system_emitter_get_position_xy, Particle_system_emitter_get_size, Particle_system_emitter_set_position_xy, Particle_system_emitter_set_prev_position_xy, Particle_system_emitter_set_size, Particle_system_init_particles, Particles_gen_gfx_ctx, Particles_get_particle_system } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_xy, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { GetSign } from "../../../../Helpers/Helpers.js";
@@ -19,6 +18,7 @@ import { Bricks_check_collision } from "./Bricks.js";
 import { Physics } from "./HelperClasses.js";
 import { Player_get } from "./Player.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import { Mesh_get_uniform_ubidx_from_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 

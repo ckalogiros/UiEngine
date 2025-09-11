@@ -23,8 +23,9 @@ import { Floor } from "../../../Helpers/Math/MathOperations.js";
 
 
 const root_group_view_buffer = New_generic_buffer(_, 'Root group view');
+/** */
 export function Root_group_buffer_reset() { root_group_view_buffer.ResetFull(); }
-
+/** */
 export function Root_group_buffer_reset_dealocate() {
 
    for (let i = 0; i <= root_group_view_buffer.boundary; i++) {

@@ -62,4 +62,6 @@ export function Time_update() { _g_timer.Update(); }  // HOT-PATH
 export function Time_sample() { _g_timer.Sample(); }  // HOT-PATH
 /** */
 export function Time_get_delta_time_in_ms() { return _g_timer.GetDelta(); } 
+/** */
+export function Time_get_time() { return _g_timer.GetTimer(); } 
 

@@ -11,15 +11,11 @@ import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.j
 
 let g_timer_linear = 0;
 
-
+/** */
 export function Timer_update_global_timer() { g_timer_linear += .01; }  // HOT-PATH
-
-
-
+/** */
 export function Timer_get_global_timer() { return g_timer_linear; }
-
-
-
+/** */
 export function Timer_reset_global_timer() { g_timer_linear = 0.0; }
 
 
@@ -30,6 +26,7 @@ let g_timer_cycle_lower_limit = .01;
 let g_timer_cycle = g_timer_cycle_lower_limit;
 let g_timer_cycle_rate = 0.01;
 
+/** */
 export function Timer_update_global_timer_cycle() {  // HOT-PATH
 
     if (g_timer_cycle > g_timer_cycle_upper_limit)
@@ -38,9 +35,7 @@ export function Timer_update_global_timer_cycle() {  // HOT-PATH
         g_timer_cycle_rate = 0.01;
     g_timer_cycle += g_timer_cycle_rate;
 }
-
-
-
+/** */
 export function Timer_get_global_timer_cycle() {
     return g_timer_cycle;
 }
@@ -52,22 +47,18 @@ export function Timer_get_global_timer_cycle() {
 let g_timer_0_1 = 0.0;
 const g_timer_0_1_rate = 0.01;
 
+/** */
 export function Timer_update_global_timer_0_1() {  // HOT-PATH
 
     if (g_timer_0_1 > 1.0)
         g_timer_0_1 = 0.0;
     g_timer_0_1 += g_timer_0_1_rate;
 }
-
-
-
+/** */
 export function Timer_get_global_timer_0_1() {
     return g_timer_0_1;
 }
-
-
-
-
+/** */
 export function Timers_update_global_timer() {
     Timer_update_global_timer();
     Timer_update_global_timer_cycle();
@@ -79,13 +70,17 @@ export function Timers_update_global_timer() {
 
 
 let g_timer_sine = 0;
+/** */
 export function Timer_get_global_timer_sine() { return g_timer_sine; }
+/** */
 export function Timer_update_global_timer_sine() { g_timer_sine = Math.sin(g_timer_linear); }
 
 
 
 let g_timer_cosine = 0;
+/** */
 export function Timer_get_global_timer_cosine() { return g_timer_cosine; }
+/** */
 export function Timer_update_global_timer_cosine() { g_timer_cosine = Math.cos(g_timer_linear * 4); }
 
 
@@ -113,6 +108,7 @@ export function Timer_update_global_timer_cosine() { g_timer_cosine = Math.cos(g
 
 const MAX_TIMERS_COUNT = 100;
 
+/** */
 class Timer {
 
     t;
@@ -253,27 +249,21 @@ _timers.Init();
  */
 
 /** Getters-Setters */
+/** */
 export function Timers_get_timers() {
     return _timers;
 }
-
-
-
+/** */
 export function Timers_get_timer(idx) {
     return _timers.buffer[idx];
 }
-
-
-
+/** */
 export function Timers_create_timer(start, duration, step, name, clbk, params) {
     // Catch wrong parameters(name is a valid param only for debugging)
     if (!(typeof name === 'string' || name instanceof String))
         alert('--NAME FOR TIMERS NOT PASSED--')
     return _timers.CreateTimer(start, duration, step, name, clbk, params);
 }
-
-
-
 /**
  * Update all _timers used by the game here.
  * Must run for each render iteration(frame)
@@ -294,9 +284,6 @@ export function Timers_update() {
         }
     }
 }
-
-
-
 /**
  * Debug
  */

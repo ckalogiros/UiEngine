@@ -8,13 +8,18 @@ import { Abs, Clamp, Fract, Max, Min, Mod, Mult_arr3_scalar, Pow } from "../../.
 
 
 
+/** */
 function Saturate(a) { 
 	const final = Clamp(a, 0., 1.); 
 	return final;
 }
+/** */
 function u2(a){ 			return a * 2.0 - 1.; }
+/** */
 function u5(a){ 			return a * 0.5 + .5; }
+/** */
 function kHer(a){ 		return a * a * (3.0 - 2.0 *a); }
+/** */
 function khsv(int){    	
 
 	const GB = 0, RG=1, RB=2;
@@ -27,8 +32,7 @@ function khsv(int){
 	return final;
 	// return Saturate( u2( Abs( Mod(int*3. + vec3(0,2,1), 3.)-1.5))); 
 }
-// function hsv2rgb1(vec3){ return vec3[2] * Mix_vec3_float32Array(1, kHer(khsv(vec3[0])), vec3[1]); }
-// function hsv2rgb2(vec2){ return mix(vec3(1), kHer(khsv(vec2[0])), vec2[1]); }
+/** */
 function hsv2rgb3(int){ 	
 
 	const c = khsv(int);
@@ -43,7 +47,7 @@ function hsv2rgb3(int){
 	return final; 
 	// return kHer( khsv(int) ); 
 }
-
+/** */
 export function RGB(int, widness=0, color_offset=5, brightness=1.3) { 
 	
 	// const o = .945
@@ -63,32 +67,7 @@ export function RGB(int, widness=0, color_offset=5, brightness=1.3) {
 	Mult_arr3_scalar(final, brightness); 
 	return final;
 } 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** */
 export function  Color_hsv_to_rgb(h, s, v, a=1) {
 
 	const c = v * s;
@@ -107,7 +86,7 @@ export function  Color_hsv_to_rgb(h, s, v, a=1) {
 	const m = v - c;
 	return new Float32Array([r + m, g + m, b + m, a]);
 }
-
+/** */
 export function Color_hsv_to_rgb_calibrated(h, s, v, alpha=1, contrast=75, hue_preservation=.3) {
 
 	let c = v * s;
@@ -153,11 +132,11 @@ export function Color_hsv_to_rgb_calibrated(h, s, v, alpha=1, contrast=75, hue_p
 	return color;
 
 }
-
-
+/** */
 export function Contrast_calibrated(c, contrast=1, a) {
 	return c * contrast + (1 - contrast) * a;
 }
+/** */
 export function Contrast_calibrated_rgba(c, contrast=1, a=.5) {
 	return new Float32Array([
 		c[0] * contrast + (1 - contrast) * a,
@@ -166,12 +145,11 @@ export function Contrast_calibrated_rgba(c, contrast=1, a=.5) {
 		c[3],
 	]);
 }
-
+/** */
 export function Contrast(c, contrast=1) {
 	return c * contrast + (1 - contrast) * 0.5;
 }
-
-
+/** */
 export function Contrast_rgba(color, contrast=1) {
 	return new Float32Array([
 		color[0] * contrast + (1 - contrast) * 0.5,
@@ -190,6 +168,7 @@ export function Contrast_rgba(color, contrast=1) {
 // const lum_r = 1.0 - 0.2126, lum_g = 1.0 - 0.7152, lum_b = 1.0 - 0.0722;
 const lum_r = 1.0 - 0.299, lum_g = 1.0 - 0.587, lum_b = 1.0 - 0.114;
 
+/** */
 export function Luminance_rgb(color, makeup=1.8) {
 	return new Float32Array([
 		Math.sqrt(color[0] * lum_r) * makeup,
@@ -198,8 +177,7 @@ export function Luminance_rgb(color, makeup=1.8) {
 		color[3],
 	]);
 }
-
-
+/** */
 export function Color_calculate_luminance_from_hsv(h, s, v, alpha, contrast, hue_preservation) {
 
 	const color = Color_hsv_to_rgb_calibrated(h, s, v, alpha, contrast, hue_preservation)
@@ -209,34 +187,12 @@ export function Color_calculate_luminance_from_hsv(h, s, v, alpha, contrast, hue
 	// const Lum = color[0] * color[1] * color[2];
 	return Lum;
 }
+/** */
 export function Color_calculate_luminance_from_rgb(rgb) {
 
 	const Lum = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 	return Lum;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -504,6 +460,7 @@ export const CYAN = [CYAN0, CYAN1, CYAN2, CYAN3, CYAN4, CYAN5, CYAN6, CYAN7, CYA
 
 
 
+/** */
 export const COLOR_ARRAY3 = [
 	BLUEL,
 	YELLOW,
@@ -515,13 +472,7 @@ export const COLOR_ARRAY3 = [
 	ORANGEL,
 	// RED,
 ];
-// export const COLOR_ARRAY = {
-
-// 	c1:BLUE[9],		index:0,
-// 	c2:GREEN[9],	index:1,	
-// 	c3:RED[9],		index:2,
-// 	c4:YELLOW[9],	index:3,	
-// }
+/** */
 export const COLOR_ARRAY = [
 
 	BLUE[9],
@@ -529,7 +480,7 @@ export const COLOR_ARRAY = [
 	YELLOW[9],
 	RED[9],
 ]
-
+/** */
 export function Get_fasma_color(index, max_count, num_colors = 4, brightness=1, alpha=1) {
 
 	if(num_colors > COLOR_ARRAY.length) num_colors = COLOR_ARRAY.length;
@@ -583,57 +534,7 @@ export function Get_fasma_color(index, max_count, num_colors = 4, brightness=1, 
 
 	return color;
 }
-/**SAVE 1 */
-// export function Get_fasma_color(index, max_count, num_colors = 4) {
-
-// 	const color_wide = max_count / num_colors;
-// 	const overlap = 0;
-
-
-// 	const step = (1 / (color_wide + overlap));
-
-// 	if (index === 0) console.log('max_count', max_count, 'num_colors', num_colors, 'color_wide', color_wide, 'step', step, 'overlap', overlap,)
-
-// 	if (index === 0)
-// 		for (let i = 0; i < num_colors; i++) {
-// 			const center = color_wide * i;
-// 			console.log(i, ' center:', center)
-// 		}
-
-// 	const r = [];
-// 	let info_msg = `index:${index} `;
-// 	for (let i = 0; i < num_colors; i++) {
-
-// 		const color_index = i;
-// 		let center = color_wide * color_index;
-// 		// if(i>1) center = (color_wide * color_index) + color_wide
-// 		r[i] = Calculate_color_ratio(index, center, color_wide, step, color_index);
-
-// 		if (index % color_wide === 0 && i === 0) console.log('-- center:', index,)
-// 		info_msg += `	${r[i].toFixed(2)}  `;
-// 	}
-
-// 	console.log(info_msg);
-
-// 	const color = new Float32Array([0, 0, 0, 1]);
-
-// 	for (let i = 0; i < num_colors; i++) {
-
-// 		const c = COLOR_ARRAY[i];
-
-// 		color[0] += c[0] * r[i];
-// 		color[1] += c[1] * r[i];
-// 		color[2] += c[2] * r[i];
-// 	}
-
-// 	color[0] = Clamp(color[0], 0, 1);
-// 	color[1] = Clamp(color[1], 0, 1);
-// 	color[2] = Clamp(color[2], 0, 1);
-
-
-// 	return color;
-// }
-
+/** */
 function Calculate_color_ratio(index, color_center, color_wide, step, color_index) {
 
 	const idx = (index <= color_wide) ? index : (index % color_wide);
@@ -648,8 +549,7 @@ function Calculate_color_ratio(index, color_center, color_wide, step, color_inde
 
 	return ratio
 }
-
-
+/** */
 export function Get_mix_color(index, max_count, color_array) {
 
 	// TODO: implement: Draw colors from a color buffer, also passed by the user as: @color_array 
@@ -792,11 +692,12 @@ const ORANGE_240_75_10 = Interpolate_rgb_to_01(255, 75, 10);
 // GRADIENT Colors (Only for per vertex color)
 /***************************************************************************************************************************************************/
 
+/** */
 export function COLOR_GRADIENT_HORIZONTAL(color1, color2) {
 
 	return [color1, color1, color2, color2];
 }
-
+/** */
 export function COLOR_GRADIENT_VERTICAL(color1, color2) {
 
 	const ret = [
@@ -818,6 +719,7 @@ export function COLOR_GRADIENT_VERTICAL(color1, color2) {
 // Themes: Ready colors
 /***************************************************************************************************************************************************/
 
+/** */
 export const COLOR_THEME_BASIC = {
 
 	GREY_DARK_BASE: new Float32Array([0.12, 0.12, 0.12, 1.0]),

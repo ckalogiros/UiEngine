@@ -19,55 +19,37 @@ const NOTIFICATIONS_ON = true;
 
 const _str_buffer = New_generic_buffer(_, 'String buffer');
 _str_buffer.Add(''); // Empty string
+/** */
 export function Str_buffer_reset() { _str_buffer.ResetFull(); } 
-
-
-
-
+/** */
 export function Str_buffer_get_count() { return _str_buffer.active_count; }
+/** */
 export function Str_buffer_get_size() { return _str_buffer.size; }
-
-
-
+/** */
 export function Str_buffer_get_DEBUG() {
    return _str_buffer;
 }
-
-
-
-
+/** */
 export function Str_buffer_store(str) {
 
    const idx = _str_buffer.Add(str);
    return idx;
 }
-
-
-
-
+/** */
 export function Str_buffer_get_by_idx(nameidx) {
    return _str_buffer.buffer[nameidx];
 }
-
-
-
-
+/** */
 export function Str_buffer_get_empty_string() {
    return _str_buffer.buffer[0];
 }
-
-
-
-
+/** */
 export function Str_buffer_change(nameidx, new_name) {
    _str_buffer.RemoveByIdx(nameidx);
    const idx = _str_buffer.Add(new_name);
    return idx;
 }
-
-
-
-
+/** */
 export function Str_buffer_destroy(nameidx) {
    _str_buffer.RemoveByIdx(nameidx);
 }
@@ -83,36 +65,28 @@ export function Str_buffer_destroy(nameidx) {
 
 
 const _str_buffer_mesh_names = New_generic_buffer(_, 'String buffer names');
+/** */
 export function Str_buffer_mesh_names_reset() { _str_buffer_mesh_names.ResetFull(); } 
-
-
-
-
-
-// A buffer to index the string buffer. Stores the mesh's idx (mesh_bufferidx).
-// These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
-// Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
+/** A buffer to index the string buffer. Stores the mesh's idx (mesh_bufferidx). 
+ * These 2 buffers must be 1to1. If a mesh name is stored at inde 3, then the '_str_buffer_mesh_names_index_buffer' must have the meshe's 'mesh_bufferidx' at index 3 also.
+ * Usage of indices buffer to string names buffer: We need a connection back to the mesh, so we can change any mesh's name on the sorted buffers. 
+*/
 const _str_buffer_mesh_names_index_buffer = New_int16_buffer(512, 'StringBuffer-mesh names buffer');
+/** */
 export function Str_buffer_mesh_names_index_buffer_reset() { _str_buffer_mesh_names_index_buffer.Reset(); } 
-
-
+/** */
 export function Str_buffer_mesh_names_get_count() { return _str_buffer_mesh_names.active_count; }
+/** */
 export function Str_buffer_mesh_names_get_size() { return _str_buffer_mesh_names.size; }
-
-
-
+/** */
 export function Str_buffer_mesh_names_get_DEBUG() {
    return _str_buffer_mesh_names;
 }
-
-
-
-
+/** */
 export function Str_buffer_mesh_names_get_by_idx(nameidx) {
    return _str_buffer_mesh_names.buffer[nameidx];
 }
-
-
+/** */
 function Mesh_name_exists(meshidx) {
 
    for (let i = 0; i <= _str_buffer_mesh_names_index_buffer.boundary; i++) {
@@ -123,10 +97,7 @@ function Mesh_name_exists(meshidx) {
    }
    return INT_NULL;
 }
-
-
-
-
+/** */
 export function Str_buffer_mesh_names_store(str, mesh_bufferidx, is_debug_mesh) {
 
    const existsidx = Mesh_name_exists(mesh_bufferidx);
@@ -159,10 +130,7 @@ export function Str_buffer_mesh_names_store(str, mesh_bufferidx, is_debug_mesh) 
    }
 
 }
-
-
-
-
+/** */
 export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
 
 
@@ -218,21 +186,21 @@ export function Str_buffer_mesh_names_remove_by_idx(nameidx) {
 /****************************************************************************************************************************************************/
 // DEBUG-PRINT
 /****************************************************************************************************************************************************/
-
+/** */
 export function Str_buffer_print() {
    console.log(_str_buffer);
 }
-
+/** */
 export function Str_buffer_print_loop() {
    for (let i = 0; i <= _str_buffer.boundary; i++) {
       console.log('i:', i, _str_buffer.buffer[i]);
    }
 }
-
+/** */
 export function Str_buffer_mesh_names_print() {
    console.log(_str_buffer_mesh_names);
 }
-
+/** */
 export function Str_buffer_mesh_names_print_loop() {
    for (let i = 0; i <= _str_buffer_mesh_names.boundary; i++) {
       console.log('i:', i, 'meshidx', _str_buffer_mesh_names_index_buffer.buffer[i], _str_buffer_mesh_names.buffer[i]);

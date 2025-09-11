@@ -6,7 +6,6 @@ import { New_generic_buffer, New_int16_buffer } from "../../../../Engine/Core/Bu
 import { Create_particle_emitter, Create_rect_mesh, Create_widget_button, Create_widget_label } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { BLUEL, GREEN, GREY, PURPLEB, PURPLER, YELLOW } from "../../../../Engine/Drawables/Material/Colors.js";
 import { Mesh_add_dim_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_set_and_update_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Particle_system_emitt, Particle_system_init_particles, Particles_gen_gfx_ctx } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
 import { Scene_camera_scroll_set } from "../../../../Engine/Scenes.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
@@ -20,6 +19,7 @@ import { Style_button_default_properties, Style_label_default_properties, Style_
 import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_destroy_view_group_and_meshes, View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import { Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -40,7 +40,7 @@ const TETRIS_TOKEN_IDS = {
  * NEEDS TO BE RE-IMPLEMENTED
  * 
  * On one hand we need tokens, to abstract 4 meshes to a token(move, rotate, same color)
- * On the other hand, when a token is placed, then it needs to be abstacted as rows.
+ * On the other hand, when a token is placed, then it needs to be abstacted in a row-like structure.
  * That means the tokens when created must use a pool of free meshes (rects) instead of only free tokens,
  * otherwise there will be conflicts of tokens that one of its mesh should be removed and not the other
  */
@@ -74,8 +74,6 @@ const TETRIS_PANEL_WIDTH = TOKEN_SIZE * MAX_COLUMNS;
 const tetris_panel_pad = 10;
 let speed = 1.;
 const def_speed = speed;
-// const cell_round_corners = TOKEN_SIZE;
-// const cell_round_corners = TOKEN_SIZE/2;
 const cell_round_corners = 10;
 const cell_feather = 2.6;
 const scale_down = 1.;
@@ -101,12 +99,12 @@ const TOKEN_TYPE = {
  * 
  * Example:
  * Token: Line [1, 2, 2, 0]
- * 1 is the second cell of the line token.
- * 1 is at index 0, which means is addressing the rotation state of 'ROTATION_STATES.UP'.
- * In conclusion, for a line token, in the rotation state 'UP', the pivot is the cell with index 1. 
+ * 1 is the second cell of the line of tokens.
+ * 1 is at index 0, which means it is addressing the rotation state of 'ROTATION_STATES.UP'.
+ * In conclusion, for a line of tokens, in the rotation state 'UP', the pivot is the cell with index 1. 
  *    
  */
-const _token_rotation_states_pivots = [
+const _token_rotation_state_pivots = [
    [2, 2, 2, 2], // Rotation state: Rect
    [2, 2, 2, 2], // Rotation state: Line
    [2, 2, 2, 2], // Rotation state: L
@@ -156,6 +154,7 @@ function Gen_array_check_for_existing_element(arr, elem) {
 
 /*********************************************************************************************************/
 // Keyboard input
+
 /** */
 function Keyboard_input_keydown(params) {
 
@@ -192,10 +191,7 @@ function Keyboard_input_keydown(params) {
 /** */
 function Keyboard_input_keyup(params) {
 
-   const key = params.key;
    const keycode = params.event.keyCode;
-   // console.log(key, keycode);
-
 
    if (keycode === INPUT_KEYCODE_DOWN) {
       speed = def_speed;
@@ -301,7 +297,7 @@ function Grid_remove_row(row_idx) {
       // Store all removed cells as to a buffer 'free'
       Cell_store_free_cell(_grid_columns.buffer[i].buffer[row_idx]);
 
-      // Shift elements left from the row index and after
+      // Shift elements left from the row index buffer for all elements after 'row_idx
       _grid_columns.buffer[i].buffer[row_idx] = INT_NULL;
       _grid_columns.buffer[i].active_count--;
 
@@ -309,8 +305,8 @@ function Grid_remove_row(row_idx) {
 
 }
 /** */
-function TEMP_recalc_boundary() {
-   // Recalc the boundary
+function Recalc_boundary() {
+   // Recalc the boundary of the 2D array of collumns-rows
    for (let i = 0; i < MAX_COLUMNS; i++) {
       _grid_columns.buffer[i].boundary = INT_NULL;
       const min = _grid_columns.buffer[i].size - 1;
@@ -321,34 +317,8 @@ function TEMP_recalc_boundary() {
          }
       }
    }
-}
-/** */
-function TEMP_find_max_val_from_arr(arr) {
 
-   let max = arr[0];
-   const len = arr.length;
-
-   for (let i = 1; i < len; i++) {
-      if (arr[i] > max)
-         max = arr[i];
-   }
-
-   return max;
-}
-/** */
-function TEMP_find_min_val_from_arr(arr) {
-
-   let min = arr[0];
-   const len = arr.length;
-
-   for (let i = 1; i < len; i++) {
-      if (arr[i] !== INT_NULL && arr[i] < min)
-         min = arr[i];
-   }
-
-   return max;
-}
-/** */
+}/** On row completion, move all active tokens to row 0 */
 function Grid_move_all_down(row_idxs) {
 
    const num_rows = row_idxs.length;
@@ -391,7 +361,7 @@ function Grid_move_all_down(row_idxs) {
    }
 
    // TODO: Avoid recalc by correcting the whole proccess of cell rows removal
-   TEMP_recalc_boundary();
+   Recalc_boundary();
 
    GRID.top_row -= move_rows;
 
@@ -487,7 +457,6 @@ function Grid_check_row_completion(token_cells_rows, emitter) {
 
 
    if (is_row_complete) {
-      if (DEBUG_PRINT) console.log('@#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$ @#$@#$');
       if (DEBUG_PRINT) console.log('complete_rows_cell_idxs', complete_rows_cell_idxs, 'complete_rows_idxs', complete_rows_idxs);
       const rows = Bubble_sort(complete_rows_idxs);
       Create_row_animation(complete_rows_cell_idxs, rows, emitter);
@@ -514,7 +483,6 @@ function Cell_create(offsetx = 0, offsety = 0, col) {
    const color = col !== undefined ? col : YELLOW[9];
    const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[tetris_panel_pad + (TOKEN_SIZE * 2 * offsetx), tetris_panel_pad + (TOKEN_SIZE * 2 * offsety), 0], dim:[TOKEN_SIZE, TOKEN_SIZE], col:color, name:'mesh'}));
    Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:cell_round_corners, enable_unif_scale:true, })
-   // mesh.EnableGfxUniforms({ unif: SID.UNIF.U_SCALE_VEC2 }, 'u_scale2', UNIF_TYPE.FVEC2, UNIFORM.IN_FS);
    mesh.gfx_ctx_flags = GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL;
 
    const cell = new Cell_Properties(mesh);
@@ -663,7 +631,7 @@ class Token {
    RotateLeft() {
 
       // Pivot cell for center of rotation
-      let pivot = _token_rotation_states_pivots[this.token_type][this.rotation_state];
+      let pivot = _token_rotation_state_pivots[this.token_type][this.rotation_state];
 
       if (DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
@@ -736,7 +704,7 @@ class Token {
    }
    RotateRight() {
 
-      let pivot = _token_rotation_states_pivots[this.token_type][this.rotation_state];
+      let pivot = _token_rotation_state_pivots[this.token_type][this.rotation_state];
 
       if (DEBUG_PRINT2) console.log('this.right_most_col', this.right_most_col);
 
@@ -1343,7 +1311,7 @@ function Tetris_create_token_line2(section, token) {
 
 
 
-/** */
+/** For demo purposes we create a predetermined token buffer to cycle through, and not using an algorythm to decide the next token */
 const token_cycle = [Tetris_create_token_line4, Tetris_create_token_shape_L_mirror, Tetris_create_token_shape_L, Tetris_create_token_square]
 // const token_cycle = [Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4, Tetris_create_token_line4]
 
@@ -1370,14 +1338,14 @@ function Tetris_start_menu(section_, emitter_) {
 
 
    const dim = [
-      (VIEWPORT.WIDTH / 2 >= 180) ? 180 : VIEWPORT.WIDTH / 2 - 10,
+      (VIEWPORT.WIDTH / 2 >= 180) ? 300 : VIEWPORT.WIDTH / 2 - 10,
       (VIEWPORT.HEIGHT / 2 >= 250) ? 250 : VIEWPORT.HEIGHT / 2 - 10,
    ];
 
    let zpos = 10;
    const r_corners = 20;
 
-   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[VIEWPORT.WIDTH / 2, Mesh_get_real_pos_y(section_), 10], col:TRANSPARENCY(GREY[3], .9), name:'MenuLoadPanel',}));
+   const menu_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[20, 20], pos:[VIEWPORT.WIDTH / 2 - dim[0], Mesh_get_real_pos_y(section_), 10], col:TRANSPARENCY(GREY[3], .9), name:'MenuLoadPanel',}));
    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect:r_corners, enable_unif_scale:true, });
 
    zpos++;
@@ -1397,6 +1365,7 @@ function Tetris_start_menu(section_, emitter_) {
 
    const tr = .3;
    const col_inner = GREY[0];
+   const font_size = 12;
 
    const play_contols_info = Create_rect_mesh(Style_rect_default_properties({pad:[10, 10], pos:[0, 0, 10], col:TRANSPARENCY(GREEN[5], .9), name:'play_contols_info',}));
    Widget_gfx_ready_enable({mesh:play_contols_info, enable_sdf_rect:r_corners });
@@ -1408,12 +1377,12 @@ function Tetris_start_menu(section_, emitter_) {
       play_contols_info.AddItem(info);
 
       const col = PURPLER[7];
-      const ctrl = Create_widget_label(Style_label_default_properties({text:'A', col:col, text_pad:[11, 6], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const ctrl = Create_widget_label(Style_label_default_properties({text:'A', col:col, text_pad:[11, 6], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:32 });
       info.AddItem(ctrl);
 
       // const expl = Create_widget_label(_, 'Rotate Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10 });
       info.AddItem(expl);
    }
@@ -1424,12 +1393,12 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = PURPLEB[9];
       // const ctrl = Create_widget_label(_, 'D', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      const ctrl = Create_widget_label(Style_label_default_properties({text:'D', col:col, text_pad:[11, 6], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const ctrl = Create_widget_label(Style_label_default_properties({text:'D', col:col, text_pad:[11, 6], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:32 });
       info.AddItem(ctrl);
 
       // const expl = Create_widget_label(_, 'Rotate Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10 });
       info.AddItem(expl);
 
@@ -1441,12 +1410,12 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = BLUEL[9];
       // const ctrl = Create_widget_label(_, '<', _, _, _, col, WHITE, [11, 6], _, _, TEXTURES.CONSOLAS_32px);
-      const ctrl = Create_widget_label(Style_label_default_properties({text:'<', col:col, text_pad:[11, 6], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const ctrl = Create_widget_label(Style_label_default_properties({text:'<', col:col, text_pad:[11, 6], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:32 });
       info.AddItem(ctrl);
 
       // const expl = Create_widget_label(_, 'Move Left', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const expl = Create_widget_label(Style_label_default_properties({text:'Rotate Left', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10 });
       info.AddItem(expl);
    }
@@ -1457,12 +1426,12 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = BLUEL[9];
       // const ctrl = Create_widget_label(_, '>', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      const ctrl = Create_widget_label(Style_label_default_properties({text:'>', col:col, text_pad:[11, 6], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const ctrl = Create_widget_label(Style_label_default_properties({text:'>', col:col, text_pad:[11, 6], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:32 });
       info.AddItem(ctrl);
 
       // const expl = Create_widget_label(_, 'Move Right', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      const expl = Create_widget_label(Style_label_default_properties({text:'Move Right', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const expl = Create_widget_label(Style_label_default_properties({text:'Move Right', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10 });
       info.AddItem(expl);
 
@@ -1474,12 +1443,12 @@ function Tetris_start_menu(section_, emitter_) {
 
       const col = YELLOW[7];
       // const ctrl = Create_widget_label(_, 'V', _, _, _, col, WHITE, [12, 6], _, _, TEXTURES.CONSOLAS_32px);
-      const ctrl = Create_widget_label(Style_label_default_properties({text:'V', col:col, text_pad:[11, 6], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const ctrl = Create_widget_label(Style_label_default_properties({text:'V', col:col, text_pad:[11, 6], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:32 });
       info.AddItem(ctrl);
 
       // const expl = Create_widget_label(_, 'Move Down', _, _, _, TRANSPARENCY(GREY[4], 0), WHITE, [10, 4], _, _, TEXTURES.CONSOLAS_24px);
-      const expl = Create_widget_label(Style_label_default_properties({text:'Move Down', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
+      const expl = Create_widget_label(Style_label_default_properties({text:'Move Down', col:TRANSPARENCY(GREY[4], 0), text_pad:[10, 4], font_size:font_size, texture_id:TEXTURES.MTSDF_CONSOLAS_1024}));
       Widget_gfx_ready_enable({mesh:expl, enable_sdf_rect:10 });
       info.AddItem(expl);
 
@@ -1495,7 +1464,7 @@ function Tetris_start_menu(section_, emitter_) {
       pos:[0, 0, zpos], col:btn_col, 
       text_pad:[dim[0] / 2 - pad * 2, 10], 
       texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-      font_size:10, 
+      font_size:font_size+2, 
       layout:LAYOUT.VERTICAL, 
    }));
    Widget_gfx_ready_enable({mesh:start_btn, enable_sdf_rect:start_btn.geom.dim[1], listener:{type:LISTEN_EVENT_TYPES.HOVER}});
@@ -1506,7 +1475,7 @@ function Tetris_start_menu(section_, emitter_) {
          const root = params.params.root_mesh;
          View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
          // Start the game loop
-         Time_intervals_create(1, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params.params.params);
+         game_loop_time_interval_idx = Time_intervals_create(1, 'Tetris', TIME_INTERVAL_REPEAT_ALWAYS, Tetris_game_loop, params.params.params);
       },
       _,
       {root_mesh:menu_panel, params:{section: section_, emitter: emitter_}},
@@ -1851,7 +1820,7 @@ function Animation_end_game_stop(params_) {
    App_reinitialize();
 
    if (is_activated_by_demo) 
-      Demo_page(demo_sub_category_idx);
+      Demo_page(demo_category_idx, demo_sub_category_idx);
    else Tetris(ROOT_WIDGETS.CREATE_ROOT, tetris_panel_posx, tetris_panel_posy, false, demo_sub_category_idx);
 
    return false;

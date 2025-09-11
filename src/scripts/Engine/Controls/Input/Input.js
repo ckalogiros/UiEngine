@@ -15,20 +15,13 @@ import { Scene_window_resized_meshes_calculate_layout } from "../../Scenes.js";
 
 
 
+/** */
 export function Input_reset() {  // HOT-PATH
-  Mouse_reset_dif(.5);
+  // Mouse_reset_dif(.5);
+  Mouse_reset_dif(0);
   MouseResetWheel();
 }
-
-
-
-// function OnWindowResize(e) {
-
-//   On_window_resize();
-// }
-
-
-
+/** */
 function On_window_resize() {
 
   
@@ -71,9 +64,7 @@ function On_window_resize() {
   // TODO: Run a function that hass all root meshes that will resize onWindowResize
   Scene_window_resized_meshes_calculate_layout();
 }
-
-
-
+/** */
 export function Input_create_user_input_listeners() {
 
   const canvas = document.getElementById('canvas');
@@ -139,9 +130,7 @@ export function Input_create_user_input_listeners() {
   document.addEventListener('keyup', OnKeyUp, false);
 
 }
-
-
-
+/** */
 export function Device_set_up() {
 
   // const dpr = window.devicePixelRatio || 1;
@@ -348,9 +337,7 @@ zoom-out
 myBall.cur
  */
 }
-
-
-
+/** */
 export function Detect_host_platform() {
 
   const wn = window.navigator;

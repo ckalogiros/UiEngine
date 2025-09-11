@@ -1,14 +1,13 @@
 "use strict";
-import { FloorArr2, FloorArr3, InterpolateToRange, Lerp, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
+import { Abs, Clamp, ClampMax, Floor, FloorArr2, FloorArr3, InterpolateToRange, Lerp, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
 import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
-import { View_activate_all_vbs_in_renderqueue, View_destroy_render_group_and_meshes, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
+import { View_activate_all_vbs_in_renderqueue, View_create_scissorbox, View_destroy_render_group_and_meshes, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated, ORANGEL } from '../Engine/Drawables/Material/Colors.js';
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from '../Engine/Events/EventFunctions.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
 import { Test_alignment } from './Demo/DemoAlignNestedSections.js';
-import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties, Style_text_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_slider_simple, Widget_ready_switch } from '../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_set_vb_root_wposx } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_set_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
@@ -30,7 +29,7 @@ import { Callback_animations_create } from '../Engine/Animations/CallbackAnimati
 import { App_reinitialize, App_reset } from './App.js';
 import { Controls_create_slider_controls_from_shader_uniform_buffer, Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from '../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js';
 import { Arkanoid_initialize, Arkanoid_test_game_options } from './Demo/Games/Arkanoid/Arkanoid.js';
-import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_rotate_z, Mesh_rotate_z_with_pivot, Mesh_set_color_rgba, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
+import { Mesh_add_and_copy_wpos_x, Mesh_add_and_copy_wpos_xy, Mesh_add_and_copy_wpos_y, Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_get_real_pos_x, Mesh_get_real_pos_y, Mesh_rotate_z, Mesh_rotate_z_with_pivot, Mesh_set_color_rgba, Mesh_set_wpos_x, Mesh_set_wpos_xy, Mesh_set_wpos_y } from '../Engine/Drawables/Operations/MeshAttributesFunctions.js';
 import { Mesh_event_callback_create, Mesh_get_name, Mesh_listener_create } from '../Engine/Drawables/Operations/MeshPropertiesFunctions.js';
 import { Layout_basic_pre_render, Layout_expand_x_axis, Layout_grow_containers_pre_render, Layout_grow_containers_pre_render_with_item_reposition } from '../Engine/Drawables/Operations/AlignNestedSections.js';
 import { Elastic_collisions, Sattelite_rotation } from './Demo/DemoPhysics.js';
@@ -45,10 +44,15 @@ import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext
 import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
 import { Widget_render } from '../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
 import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
-import { Test_queue_buffer } from '../Engine/Core/Buffers.js';
+import { New_int8_buffer, Test_queue_buffer } from '../Engine/Core/Buffers.js';
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 import { Vertex_buffer_render_group_get_render_group } from '../Graphics/Buffers/RenderGroups.js';
 import { Jump_physics } from './Demo/Games/PhysicsJump.js';
+import { Spring_physics } from './Demo/Games/PhysicsSpring.js';
+import { Physics2D_apply_force, Physics2D_Calculate_magnitude_local_space, Physics2D_calculate_position, Physics2D_create_object, Physics2D_test, Physics2D_update, Physics2D_update_pos_xy, Physics2D_update_pos_y, Physics_2D_get_velocity_xy_from_position } from '../Engine/Physics2D/Physics2D.js';
+import { Jump_physics_2 } from './Demo/Games/PhysicsJump2.js';
+import { Collision_detection_add_object, Collision_detection_create_group, Physics2D_collision_detection_all_with_all, Physics2D_collision_detection_all_with_all_with_obstructions, Physics2D_collision_detection_find_collider_from_group, Physics2D_collision_detection_one_with_all, PHYSICS2D_COLLISION_FLAGS } from '../Engine/Physics2D/CollissionDetection.js';
+import { Mouse_get_pos_dif } from '../Engine/Controls/Input/Mouse.js';
 
 
 
@@ -224,7 +228,6 @@ export function TestWidgetsGeneric() {
     
     // const a = .8
     // const menu = Test_colored_labels_with_hsv(0, 10, 20, .2, a);
-    // // const menu = Test_colored_labels_with_hsv(0, 10, 20, .1, .1);
     // const w = menu.geom.dim[0]*2;
     // Test_colored_labels_with_hsv((w*1), 10, 20, .3, a);
     // Test_colored_labels_with_hsv((w*2), 10, 20, .4, a);
@@ -266,7 +269,8 @@ export function TestWidgetsGeneric() {
     // Test_create_remove_render_groups();
 
 
-    Jump_physics();
+
+
 
     // Demo_page();
     // Demos_welcome_menu();
@@ -355,6 +359,17 @@ export function TestWidgetsGeneric() {
 
         // }
 
+    }
+
+    { // Physics2D Engine
+
+        // Test_physics2D_collision_detection_many_rects();
+        // Test_physics2D_collision_detection_obstract_collider();
+        // Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug();
+        
+        // Jump_physics();
+        // Spring_physics();
+        // Jump_physics_2();
     }
 
 
@@ -535,11 +550,16 @@ export function TestWidgetsGeneric() {
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 420, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY|CALLBACK_ANIMATION_TYPE_FLAGS.SCALE);
         }
 
+        { // Instanced Geometry
+
+            Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
+        }
+
         { // Mesh Animations
 
             // const label = Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '[ HELLO ] !!!', TEXTURES.MTSDF_COMIC_1024, 300, 50, 20, _, _, _, _, _);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, label, .03, 0., 1.,)
-
+            
             // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS3);
             // // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
@@ -850,6 +870,398 @@ export function TestWidgetsGeneric() {
     // Vertex_buffer_build_index_buffer_all();
 }
 
+/* Test collision detection: 2 rects with mouse move. Collision detection: sweptAABB */
+function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() { 
+
+    const panel_width = 500, panel_height = 400;
+    const panel_x = 50, panel_y = 60;
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1],  }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
+    
+    
+    const coll_group_idx = Collision_detection_create_group('test');
+
+    const debug_info = {
+        near_dx  : null, far_dx   : null, near_dy  : null, far_dy   : null,
+        near_xt  : null, far_xt   : null, near_yt  : null, far_yt   : null,
+        near_t  : null, far_t   : null,
+
+        penet_x: null, penet_y: null,
+
+        x1    : null,
+        x2    : null,
+        y1    : null,
+        y2    : null,
+        axis  : 'o',
+    };
+
+    let mesh1 = null, mesh2 = null;
+
+
+    const size = 40;
+    let hue = .12;
+
+    // Colliding Meshes
+    {
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [50,50], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:'mesh1'}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        mesh1 = mesh;
+    }
+    {
+        // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2-size, panel_y+panel_height/2+size], dim: [size, size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:'mesh2'}));
+        // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2, panel_y+panel_height/2], dim: [size, size], col: Color_hsv_to_rgb(.25,1,1,1,.7,0),  name:'mesh2'}));
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2, panel_y+panel_height/2], dim: [10, 100], col: Color_hsv_to_rgb(.25,1,1,1,.7,0),  name:'mesh2'}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        mesh2 = mesh;
+    }
+
+
+ 
+
+    { // Text Info Display
+        let w = 220, h = 30;
+        const tex_id = TEXTURES.MTSDF_COMIC_1024;
+        // Distance
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info;  }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
+    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
+    
+        // Time
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
+    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
+    
+    
+        // Rect Posiotions
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect1 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x1 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect2 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y1 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
+    }
+
+    panel.GenGfxCtx();
+    Widget_render(panel);
+
+    
+
+
+    const params = {
+        collision_group_idx:coll_group_idx,
+        debug_info_struct:debug_info,
+        mesh1:mesh1,
+        mesh2:mesh2,
+    };
+    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+        const collision_group_idx = params.params.collision_group_idx;
+
+        /** For the collision detection we assume all meshes have their velocity reseted on each frame
+         * So to find the mesh that is moved (by the user), we check which mesh has a none zero velocity(either x or y)
+         */
+
+        const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
+        if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
+        // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
+
+        if(debug_info) {
+            params.params.debug_info_struct.near_dx.RenderTextFromString(`neardx   ${debug_info.near_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dx.RenderTextFromString( `fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_dy.RenderTextFromString(`neardy   ${debug_info.near_dy.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dy.RenderTextFromString( `fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.penet_x.RenderTextFromString(`penet_x   ${debug_info.penetration_depth_y.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.penet_y.RenderTextFromString(`penet_y    ${debug_info.penetration_depth_x.toFixed(2)}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.near_xt.RenderTextFromString( `Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.axis.RenderTextFromString(   `Axis  ${debug_info.axis}`, true); // Change the text to the new info
+
+        }
+        
+        const x1 = params.params.mesh1.geom.pos[0];
+        const y1 = params.params.mesh1.geom.pos[1];
+        const x2 = params.params.mesh2.geom.pos[0];
+        const y2 = params.params.mesh2.geom.pos[1];
+        params.params.debug_info_struct.x1.RenderTextFromString( `rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x2.RenderTextFromString( `y: ${y1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y1.RenderTextFromString( `rect2 x: ${x2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y2.RenderTextFromString( `y: ${y2.toFixed(2)}`, true); // Change the text to the new info
+
+
+    }, params);
+
+}
+function Test_physics2D_collision_detection_many_rects() { 
+
+    const panel_width = 300, panel_height = 400;
+    const panel_x = 60, panel_y = 60;
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1],  }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
+    
+    
+    const coll_group_idx = Collision_detection_create_group('test');
+
+    const debug_info = {
+        near_dx  : null, far_dx   : null, near_dy  : null, far_dy   : null,
+        near_xt  : null, far_xt   : null, near_yt  : null, far_yt   : null,
+        near_t  : null, far_t   : null,
+
+        penet_x: null, penet_y: null,
+
+        x1    : null,
+        x2    : null,
+        y1    : null,
+        y2    : null,
+        axis  : '-0',
+    };
+
+    const debug_meshes = [];
+    
+    
+    // const num_meshes = 80; 
+    // const size = 20;
+    const num_meshes = 20; 
+    const size = 50;
+    let x = 200, y = 140;
+    let hue = .12;
+    let v_size = size;
+    for(let i = 0; i < num_meshes; i++) {
+
+        if(i===0) v_size = 0
+        else v_size = size
+
+        // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y], dim: [v_size, 20], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y+10], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+
+        debug_meshes.push(mesh);
+
+        hue += .2; // Change color
+        y += v_size*2+10
+        if(y>600){
+            x += v_size*2+20;
+            y = 20
+        }
+    }
+
+    {
+    //     const barier_width = 10;
+    //     /** */
+    //     const left_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'left_barier'}));
+    //     Widget_gfx_ready_enable({ mesh: left_barier, enable_sdf_rect: 5, });
+    //     panel.AddItem(left_barier);
+    //     left_barier.physics.idx = Physics2D_create_object(left_barier.geom.pos[0], left_barier.geom.pos[1]);
+    //     left_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, left_barier, left_barier.physics.idx);
+    //     /** */
+    //     const top_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [barier_width*2, 0], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'top_barier'}));
+    //     Widget_gfx_ready_enable({ mesh: top_barier, enable_sdf_rect: 5, });
+    //     panel.AddItem(top_barier);
+    //     top_barier.physics.idx = Physics2D_create_object(top_barier.geom.pos[0], top_barier.geom.pos[1]);
+    //     top_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, top_barier, top_barier.physics.idx);
+    //     /** */
+    //     const right_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_width*2-barier_width*2, barier_width*2], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'right_barier'}));
+    //     Widget_gfx_ready_enable({ mesh: right_barier, enable_sdf_rect: 5});
+    //     panel.AddItem(right_barier);
+    //     right_barier.physics.idx = Physics2D_create_object(right_barier.geom.pos[0], right_barier.geom.pos[1]);
+    //     right_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, right_barier, right_barier.physics.idx);
+    //     /** */
+    //     const bottom_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, panel_height*2-barier_width*2], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'bottom_barier'}));
+    //     Widget_gfx_ready_enable({ mesh: bottom_barier, enable_sdf_rect: 5});
+    //     panel.AddItem(bottom_barier);
+    //     bottom_barier.physics.idx = Physics2D_create_object(bottom_barier.geom.pos[0], bottom_barier.geom.pos[1]);
+    //     bottom_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, bottom_barier, bottom_barier.physics.idx);
+    }
+
+
+    { // Text Info Display
+        let w = 220, h = 30;
+        const tex_id = TEXTURES.MTSDF_COMIC_1024;
+        // Distance
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info;  }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
+    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
+    
+        // Time
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
+    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
+    
+    
+        // Rect Posiotions
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect1 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x1 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect2 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y1 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
+    }
+
+
+    panel.GenGfxCtx();
+    Widget_render(panel);
+
+    
+
+
+    const params = {
+        collision_group_idx:coll_group_idx,
+        debug_info_struct:debug_info,
+        debug_meshes:debug_meshes,
+    };
+    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+        const collision_group_idx = params.params.collision_group_idx;
+
+        /** For the collision detection we assume all meshes have their velocity reseted on each frame
+         * So to find the mesh that is moved (by the user), we check which mesh has a none zero velocity(either x or y)
+         */
+
+        const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
+        if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
+        // if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_one_with_all(collision_group_idx, grabbed_mesh_idx);
+        // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
+        if(debug_info) {
+            params.params.debug_info_struct.near_dx.RenderTextFromString(`neardx   ${debug_info.near_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dx.RenderTextFromString( `fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_dy.RenderTextFromString(`neardy   ${debug_info.near_dy.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dy.RenderTextFromString( `fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.penet_x.RenderTextFromString(`penet_x   ${debug_info.penetration_depth_y.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.penet_y.RenderTextFromString(`penet_y    ${debug_info.penetration_depth_x.toFixed(2)}`, true); // Change the text to the new info
+
+            // params.params.debug_info_struct.near_xt.RenderTextFromString( `Ntimex  ${Floor(debug_info.near_xt)}`, true); // Change the text to the new info
+            // params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${Floor(debug_info.far_xt)}`, true); // Change the text to the new info
+            // params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${Floor(debug_info.near_yt)}`, true); // Change the text to the new info
+            // params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${Floor(debug_info.far_yt)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_xt.RenderTextFromString( `Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
+            // params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${Floor(debug_info.near_t)}`, true); // Change the text to the new info
+            // params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${Floor(debug_info.far_t)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
+
+            params.params.debug_info_struct.axis.RenderTextFromString(   `Axis  ${debug_info.axis}`, true); // Change the text to the new info
+
+        }
+        
+        const x1 = params.params.debug_meshes[0].geom.pos[0];
+        const y1 = params.params.debug_meshes[0].geom.pos[1];
+        const x2 = params.params.debug_meshes[1].geom.pos[0];
+        const y2 = params.params.debug_meshes[1].geom.pos[1];
+        params.params.debug_info_struct.x1.RenderTextFromString( `rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x2.RenderTextFromString( `y: ${x2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y1.RenderTextFromString( `rect2 x: ${y1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y2.RenderTextFromString( `y: ${y2.toFixed(2)}`, true); // Change the text to the new info
+
+    }, params);
+
+}
+/* Test collision detection: many rects with mouse move. Resolve: obstarct collider object */
+function Test_physics2D_collision_detection_obstract_collider() { 
+
+    const size = 40;
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [60, 60, 0], dim: [300, 400], col: GREY[1],  }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
+    
+    
+    const coll_group_idx = Collision_detection_create_group('test');
+    
+    
+    const num_meshes = 10; 
+    let hue = .12;
+    let v_size = size;
+    let i = 0;
+
+    {
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [200, 100], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        i++;
+    }
+    {
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [10, 10], dim: [200, 30], col: Color_hsv_to_rgb(.78,1,1,1,.7,0),  name:`${i}`}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        i++; hue+=.2;
+    }
+    {
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [400, 100], dim: [30, 100], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        i++; hue+=.2;
+    }
+    {
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [20, 60], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        panel.AddItem(mesh);
+        mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
+        mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
+        i++; hue+=.2;
+    }
+
+
+    panel.GenGfxCtx();
+    Widget_render(panel);
+
+
+    const params = {
+        collision_group_idx:coll_group_idx,
+    };
+    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+        const collision_group_idx = params.params.collision_group_idx;
+
+        /** For the collision detection we assume all meshes have their velocity reseted on each frame
+         * So to find the mesh that is moved (by the user), we check which mesh has a none zero velocity(either x or y)
+         */
+
+        const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
+        // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_one_with_all(collision_group_idx, grabbed_mesh_idx);
+        if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
+
+
+    }, params);
+
+}
 
 /** */
 function Test_colored_labels_with_hsv(x=100, y=10, num_colors=20, contrast=.28, saturation=.8) { // Coloring Labels
@@ -4836,12 +5248,10 @@ function Pivotal_robot_rigging(x=300, y=300) {
     return section;
 }
 
-function SectionResizable(pos) {
+function SectionResizable(pos, dim= [200, 200]) {
 
     const tr = 1.;
     const marg = [10, 10];
-    const dim = [200, 200];
-    // const dim = [400, VIEWPORT.HEIGHT / 2];
 
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: pos, dim: dim, col: TRANSPARENCY(BLUEL[5], tr), name: `section${grey_cnt++}` }));
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
@@ -5095,14 +5505,40 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 
 
     const line = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: TRANSPARENCY(col, 1), name: 'sdf linem2', style: [0, 10, 1.8] }));
-    Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    // Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], enable_attr_angle: 2, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: dim[1], listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
     // Widget_gfx_ready_enable({ mesh: line, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
 
-    // line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     line.GenGfxCtx();
     Widget_render(line);
 
     return line;
+}
+/** */
+function Instanced_geometry(col, pos, dim) {
+
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0,0,1.,1.,.1,0), name: 'instanced geom panel', }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, })
+
+    const w=200, h=10;
+    {
+        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,10,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.3,1,1.,1.,.4,0), name: 'line-inst 1',  }));
+        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+        panel.AddItem(line);
+        line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    }
+    {
+        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [100,50,0], dim: [w,h+20], col: Color_hsv_to_rgb_calibrated(.1,1,1.,1.,.4,0), name: 'line-inst 2',  }));
+        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+        panel.AddItem(line);
+        line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    }
+
+    panel.GenGfxCtx();
+    Widget_render(panel);
+
+    return panel;
 }
 /** */
 function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT) {
@@ -7546,6 +7982,7 @@ function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, n
 let grey_cnt = 0;
 let green_cnt = 0;
 let orange_cnt = 0;
+/** */
 function Sections2(is_root, layout) {
 
     const tr = .7;
@@ -7567,6 +8004,7 @@ function Sections2(is_root, layout) {
 
     return grey;
 }
+/** */
 function Sections4(is_root, layout) {
 
     const tr = 1.;
@@ -7592,37 +8030,44 @@ function Sections4(is_root, layout) {
 
     return blu;
 }
-
-
+/** */
 function Help() {
 
     const font_size = 10;
     const section = Create_rect_mesh(Style_rect_default_properties({ 
         is_root:ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], 
-        pos: [0, 0, 0], dim: [20, 300], col: Color_hsv_to_rgb_calibrated(.8, .0, 1, .8, .1, 0), 
+        pos: [0, 0, 0], dim: [20, 300], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, .8, .05, 0), 
         layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'HelpSection' 
     }));
     Widget_gfx_ready_enable({ 
-        mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE},
+        mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.MOVE},
         scroller: { width: 10, max_height: 300, },
     }); 
 
 
     const s1 = Create_rect_mesh(Style_rect_default_properties({ 
-        pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .0, 1, .8, .14, 0), 
+        pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, 1., .15, 0), 
         layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:'subSection' 
     }));
-    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
+    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20,}); 
     s1.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
     section.AddItem(s1);
 
+    const msg = 'Press the characters in quotes in sequence.\nE.x. "a1": press and hold \'a\', then press \'1\' ';
+    const description = Create_widget_label(Style_label_default_properties({ 
+        theme: Color_theme_label_auto(.1, 1., .08, .0),
+        text: msg, pos: [0, 0, 1], font_size: font_size, 
+        text_pad: [8, 6], layout:LAYOUT.VERTICAL|LAYOUT.EXPAND, name:msg,
+    }));
+    Widget_gfx_ready_enable({ mesh: description, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    s1.AddItem(description);
+
     let msgs = [];
-    for (let i = 0; i < DEBUG_PRINT_KEYS.length; i++) {
+    for (let i = 1; i < DEBUG_PRINT_KEYS.length; i++) {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
-
         const label = Create_widget_label(Style_label_default_properties({ 
-            theme: Color_theme_label_auto(.58, 1., .18, .0),
+            theme: Color_theme_label_auto(.4, 1., .08, .0),
             text: msgs[i], pos: [0, 0, 1], font_size: font_size, 
             text_pad: [8, 6], layout:LAYOUT.VERTICAL|LAYOUT.EXPAND, name:`label${i++}` 
         }));
@@ -7644,16 +8089,15 @@ function Help() {
     Scroller_component_calculate_handle_pos_dim(scroller_comp);
 
     // Set scissor box
-    // const mx = section.mesh_bufferidx;
-    // const my = scroller_component.mesh_bufferidx;
-    // const mw = section.mesh_bufferidx;
-    // const mh = scroller_component.mesh_bufferidx;
-    // Vertex_buffer_group_create_scissorbox(section.gfx.vb.groupidx, mx, my, mw, mh);
-
+    const mx = section.mesh_bufferidx;
+    const my = scroller_comp.mesh_bufferidx;
+    const mw = section.mesh_bufferidx;
+    const mh = scroller_comp.mesh_bufferidx;
+    View_create_scissorbox(section.group_bufferidxs[0], mx, my, mw, mh);
 
 
     // Create label animations
-    for (let i = 0; i <= s1.children.boundary; i++) {
+    for (let i = 1; i <= s1.children.boundary; i++) {
 
         const label = s1.children.buffer[i];
         Callback_animations_create_specific(label, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 20 });
@@ -7664,6 +8108,196 @@ function Help() {
     return section;
 }
 
+
+let first_text_child_idx = INT_NULL; // If minimizer is anabled, have a ref to the fist text child for the text updates
+function MeshInfo() {
+
+    const fontsize = 9;
+    const pad = [4, 0];
+    const pos = [80, 230, 0];
+
+    /********************************************************************************************************************************************************/
+    // Info UI
+    const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
+    // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [100, 100], GREY[1], 'MeshInfoUiTip');
+    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
+    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
+    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+
+    /********************************************************************************************************************************************************/
+    // Menu bar and Minimizer
+    const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREEN[4], .7), WHITE, 'Info tip', [10, 6],);
+    // const menu = Create_widget_menubar(_, [80, 200, 1], [30,10], GREEN[9], WHITE, 'Info tip', [10, 6],);
+    menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
+    menu.AddMinimizeButton(_, section);
+    section.AddItem(menu);
+
+    // /********************************************************************************************************************************************************/
+    // // All the info text                            _, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1
+    // const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', TEXT_ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], pad, .4);
+    // first_text_child_idx = section.AddItem(infomesh);
+
+    // // For mesh-parent-rect 
+    // infomesh.CreateNewText('{meshidx:0000} {rootidx:00} {groupidx:[00] vb:[00]}', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.CreateNewText('pos: [0000,0000,0] dim:[0000,0000] defpos: [0000,0000,0] defdim:[0000,0000]', fontsize, ORANGE_240_160_10, pad, .9);
+    // infomesh.CreateNewText('alpha:0.00, max-size:0000', fontsize, ORANGE_240_160_10, pad, .9);
+    // infomesh.CreateNewText('gfx: prog:0, vb:00, start:00000 faces:0000', fontsize, BLUE_10_120_220, pad, .9);
+
+    // // For text_mesh
+    // infomesh.CreateNewText('Text: name of the text and id', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.CreateNewText('pos: 0000,0000,0, dim: 0000,0000, alpha: 0.00', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.CreateNewText('gfx: group:0, prog:0, vb:0, start:00000, faces:00000', fontsize, BLUE_10_120_220, pad, .9);
+    // infomesh.SetName('Info Mesh 2');
+
+    // // DEBUG COUNTERS 
+    // section.geom.pos[0] = VIEWPORT.RIGHT - infomesh.GetMaxWidth() * 2 - 30;
+    // section.geom.pos[1] = VIEWPORT.TOP;
+
+    // infomesh.Align_pre(infomesh, TEXT_ALIGN.VERTICAL)
+
+
+    section.GenGfxCtx();
+    section.Calc_no_gfx_update();
+    Widget_render(section);
+
+    return section;
+}
+function MeshInfoUpdate(params) {
+
+
+    const minimize_btn = params.params.mesh.children.buffer[first_text_child_idx - 1].children.buffer[0];
+    if (minimize_btn.toggle === true)
+        return;
+
+    // _pt_mesh_info_tip.timer.Start();
+
+    // TODO: IMPLEMENT - Skip if nothing changed(from previous hover). The question is how to implement an easy and efficient change
+
+    const textMesh = params.params.mesh.children.buffer[first_text_child_idx];
+    const infoMesh = STATE.mesh.hovered;
+
+    // if (infoMesh && infoMesh !== prev_infomesh) { // Avoid update if mesh is same with the mesh of previous update.
+    if (infoMesh) {
+
+        prev_infomesh = infoMesh;
+
+        textMesh.RenderTextFromString(Mesh_get_name(infoMesh));
+
+        const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start} faces:${infoMesh.geom.num_faces}` : 'null'
+
+        const max_size = infoMesh.max_size ? infoMesh.max_size : 'null';
+
+        let msgs = [
+            `{meshidx:${infoMesh.mesh_bufferidx}} {rootidx:${infoMesh.root_bufferidx}} {groupidx:[${infoMesh.group_bufferidxs[0]}] vb:[${infoMesh.group_bufferidxs[0]}]}`,
+            `pos:[${FloorArr3(infoMesh.geom.pos)}] dim:[${FloorArr2(infoMesh.geom.dim)}] defpos:[${FloorArr3(infoMesh.geom.defPos)}] defdim:[${FloorArr2(infoMesh.geom.defDim)}]`,
+            `alpha:${infoMesh.mat.col[3]} max-size:${max_size}`,
+            gfx,
+            // (STATE.mesh.hovered) ? `HOVERED: name:${STATE.mesh.hovered.GetName()}, id:${STATE.mesh.hoveredId}` : 'HOVERED: NULL',
+            // (STATE.mesh.focused) ? `FOCUSED: name:${STATE.mesh.focused.GetName()}, id:${STATE.mesh.focusedId}` : 'FOCUSED: NULL',
+
+        ];
+
+        // Create info for any text gfx, if exists
+        const child = (infoMesh.children.boundary && infoMesh.children.buffer[0]) ? infoMesh.children.buffer[0] : null;
+        if (child) {
+            if (child.type & MESH_TYPE.FONT_MATERIAL) { // Plain text
+
+                const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
+
+                msgs.push(`Plain Text:${Mesh_get_name(child)}, dim: ${child.mesh_bufferidx}`);
+                msgs.push(`{pos:[${FloorArr3(child.geom.pos)}]} {dim:[${child.geom.dim}]}, {alpha:${child.mat.col[3]}}`);
+                msgs.push(`1gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
+            }
+            else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
+                msgs.push(`Text_mesh: id:${child.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(child.text_mesh)},`);
+                msgs.push(`{pos:[${FloorArr3(child.text_mesh.geom.pos)}]}, {dim: [${child.text_mesh.geom.dim}]}, {alpha:${child.text_mesh.mat.col[3]}}`);
+                msgs.push(`2gfx: {prog:${child.text_mesh.gfx.prog.idx}}, {vb:${child.text_mesh.gfx.vb.idx}}, {start:${child.text_mesh.gfx.vb.start}}, {faces:${child.text_mesh.geom.num_faces}}`);
+            }
+        }
+        else if (infoMesh.text_mesh) {
+            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(infoMesh.text_mesh)},`);
+            msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
+            msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
+        }
+
+        const mouse_pos = Mouse_get_pos();
+
+        // Update info text
+        for (let i = 0; i <= textMesh.children.boundary; i++) {
+
+            const childText = textMesh.children.buffer[i];
+
+            if (msgs[i]) childText.RenderTextFromString(msgs[i]);
+            else childText.RenderTextFromString('NULL')
+        }
+    }
+
+    // _pt_mesh_info_tip.timer.Stop();
+}
+function Window_menu_2() {
+
+    const pad = [10, 10];
+    const menu_layout = LAYOUT.FIXED_WIDTH | LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_HORIZONTAL;
+    const window_menu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad, dim: [VIEWPORT.WIDTH / 2 - pad[1] - 1, 0], col: TRANSPARENCY(GREY[5], .94), layout: menu_layout, name: 'window_menu' }));
+    Widget_gfx_ready_enable({ mesh: window_menu, enable_sdf_rect: 4, });
+    Scene_store_window_resized_meshes(window_menu.mesh_bufferidx);
+
+
+    const Load_menu_btn = Create_widget_button(Style_button_default_properties({ text: 'Demos', pos: [0, 0, 1], col: GREEN[7], text_pad: [18, 8], }));
+    Widget_gfx_ready_enable({ mesh: Load_menu_btn, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+    window_menu.AddItem(Load_menu_btn);
+
+
+    const text_pad = [12, 6];
+    const font_size = 8;
+    const dp_rcorners = 7;
+    const dp_col = GREY[6];
+    const menu_col = GREY[3];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Menu`, pos: [0, 0, 0], col: dp_col, menu_col: menu_col, btn_col: GREY[3], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners })
+    window_menu.AddItem(dp);
+    Dropdown_roots_set_root(dp, dp);
+
+
+
+    const buttons_panel = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], col: TRANSPARENCY(GREY[1], .9), name: 'buttons_panel', }));
+    Widget_gfx_ready_enable({ mesh: buttons_panel, enable_sdf_rect: buttons_panel.geom.dim[0] / 10 });
+    dp.AddToMenu(buttons_panel);
+    {
+        const rcorners = 10;
+        const font = TEXTURES.MTSDF_COMIC_1024;
+        const text_pad = [15, 8];
+        let color_index = 3;
+        const color_max_count = 14 * 2, num_colors = 2, brightness = 1., alpha = 1.;
+
+
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Mathematics      ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); buttons_panel.AddItem(button); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Molecular Biology', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Chemistry        ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Neuroscience     ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Physics          ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Biochemistry     ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+        { const button = Create_widget_button(Style_button_default_properties({ text: 'Genetics         ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
+        color_index += 1;
+
+    }
+
+
+    window_menu.GenGfxCtx();
+    Layout_basic_pre_render(window_menu);
+
+    Widget_render(window_menu);
+
+
+}
 
 /*******************************************************************************************************************************************************/
 // Test Shader InnerShadow-RhomboidEffect wit smoothin
@@ -8195,7 +8829,6 @@ function Shader_color_functions_glow_sphere(x = 20, y = 300, w = 200, h = 200, c
     Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh, slider_dim, generic_parameters, 'u_generic_controls', ROOT_WIDGETS.CREATE_ROOT, x, 0);
 
 }
-
 // UN-REIMPLEMENTED
 function Shader_color_functions_blend_simple_noise_with_voronoi() { // Shaders Tests
 
@@ -8240,260 +8873,6 @@ function Shader_color_functions_noise_test() { // Shaders Tests
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];
     Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(rect, slider_dim, control_values, 'u_generic_controls', ROOT_WIDGETS.CREATE_ROOT, 10, 0);
-
-}
-
-let first_text_child_idx = INT_NULL; // If minimizer is anabled, have a ref to the fist text child for the text updates
-function MeshInfo() {
-
-    const fontsize = 9;
-    const pad = [4, 0];
-    const pos = [80, 230, 0];
-
-    /********************************************************************************************************************************************************/
-    // Info UI
-    const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [0, 0], TRANSPARENCY(GREY[1], .8), 'MeshInfoUiTip');
-    // const section = Create_rect_mesh(ROOT_WIDGETS.CREATE_ROOT, SECTION.VERTICAL, [15, 10], pos, [100, 100], GREY[1], 'MeshInfoUiTip');
-    section.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    // section.EnableGfx(MESH_ENABLE.GFX.ATTR_FEATHER, 2);
-    section.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-    section.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-
-    /********************************************************************************************************************************************************/
-    // Menu bar and Minimizer
-    const menu = Create_widget_menubar(_, pos, _, TRANSPARENCY(GREEN[4], .7), WHITE, 'Info tip', [10, 6],);
-    // const menu = Create_widget_menubar(_, [80, 200, 1], [30,10], GREEN[9], WHITE, 'Info tip', [10, 6],);
-    menu.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-    menu.AddMinimizeButton(_, section);
-    section.AddItem(menu);
-
-    // /********************************************************************************************************************************************************/
-    // // All the info text                            _, 'Meshes:', align, [0, 0, DEBUG_INFO.UI_STATS.POS[2] + 1], fontsize, GREY[7], .5, pad1
-    // const infomesh = Create_widget_multi_text(_, 'Mesh name 000000000000', TEXT_ALIGN.VERTICAL, [420, 15, 100], fontsize, GREEN[7], pad, .4);
-    // first_text_child_idx = section.AddItem(infomesh);
-
-    // // For mesh-parent-rect 
-    // infomesh.CreateNewText('{meshidx:0000} {rootidx:00} {groupidx:[00] vb:[00]}', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.CreateNewText('pos: [0000,0000,0] dim:[0000,0000] defpos: [0000,0000,0] defdim:[0000,0000]', fontsize, ORANGE_240_160_10, pad, .9);
-    // infomesh.CreateNewText('alpha:0.00, max-size:0000', fontsize, ORANGE_240_160_10, pad, .9);
-    // infomesh.CreateNewText('gfx: prog:0, vb:00, start:00000 faces:0000', fontsize, BLUE_10_120_220, pad, .9);
-
-    // // For text_mesh
-    // infomesh.CreateNewText('Text: name of the text and id', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.CreateNewText('pos: 0000,0000,0, dim: 0000,0000, alpha: 0.00', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.CreateNewText('gfx: group:0, prog:0, vb:0, start:00000, faces:00000', fontsize, BLUE_10_120_220, pad, .9);
-    // infomesh.SetName('Info Mesh 2');
-
-    // // DEBUG COUNTERS 
-    // section.geom.pos[0] = VIEWPORT.RIGHT - infomesh.GetMaxWidth() * 2 - 30;
-    // section.geom.pos[1] = VIEWPORT.TOP;
-
-    // infomesh.Align_pre(infomesh, TEXT_ALIGN.VERTICAL)
-
-
-    section.GenGfxCtx();
-    section.Calc_no_gfx_update();
-    Widget_render(section);
-
-    return section;
-}
-
-function MeshInfoUpdate(params) {
-
-
-    const minimize_btn = params.params.mesh.children.buffer[first_text_child_idx - 1].children.buffer[0];
-    if (minimize_btn.toggle === true)
-        return;
-
-    // _pt_mesh_info_tip.timer.Start();
-
-    // TODO: IMPLEMENT - Skip if nothing changed(from previous hover). The question is how to implement an easy and efficient change
-
-    const textMesh = params.params.mesh.children.buffer[first_text_child_idx];
-    const infoMesh = STATE.mesh.hovered;
-
-    // if (infoMesh && infoMesh !== prev_infomesh) { // Avoid update if mesh is same with the mesh of previous update.
-    if (infoMesh) {
-
-        prev_infomesh = infoMesh;
-
-        textMesh.RenderTextFromString(Mesh_get_name(infoMesh));
-
-        const gfx = (infoMesh.gfx !== null) ? `gfx: prog:${infoMesh.gfx.prog.idx}, vb:${infoMesh.gfx.vb.idx}, start:${infoMesh.gfx.vb.start} faces:${infoMesh.geom.num_faces}` : 'null'
-
-        const max_size = infoMesh.max_size ? infoMesh.max_size : 'null';
-
-        let msgs = [
-            `{meshidx:${infoMesh.mesh_bufferidx}} {rootidx:${infoMesh.root_bufferidx}} {groupidx:[${infoMesh.group_bufferidxs[0]}] vb:[${infoMesh.group_bufferidxs[0]}]}`,
-            `pos:[${FloorArr3(infoMesh.geom.pos)}] dim:[${FloorArr2(infoMesh.geom.dim)}] defpos:[${FloorArr3(infoMesh.geom.defPos)}] defdim:[${FloorArr2(infoMesh.geom.defDim)}]`,
-            `alpha:${infoMesh.mat.col[3]} max-size:${max_size}`,
-            gfx,
-            // (STATE.mesh.hovered) ? `HOVERED: name:${STATE.mesh.hovered.GetName()}, id:${STATE.mesh.hoveredId}` : 'HOVERED: NULL',
-            // (STATE.mesh.focused) ? `FOCUSED: name:${STATE.mesh.focused.GetName()}, id:${STATE.mesh.focusedId}` : 'FOCUSED: NULL',
-
-        ];
-
-        // Create info for any text gfx, if exists
-        const child = (infoMesh.children.boundary && infoMesh.children.buffer[0]) ? infoMesh.children.buffer[0] : null;
-        if (child) {
-            if (child.type & MESH_TYPE.FONT_MATERIAL) { // Plain text
-
-                const text_num_faces = (child.text_mesh) ? child.text_mesh.geom.num_faces : child.geom.num_faces; // If child is of type label and has 'text_mesh' else is plain text.
-
-                msgs.push(`Plain Text:${Mesh_get_name(child)}, dim: ${child.mesh_bufferidx}`);
-                msgs.push(`{pos:[${FloorArr3(child.geom.pos)}]} {dim:[${child.geom.dim}]}, {alpha:${child.mat.col[3]}}`);
-                msgs.push(`1gfx: prog:${child.gfx.prog.idx}, vb:${child.gfx.vb.idx}, start:${child.gfx.vb.start}, faces:${text_num_faces}`);
-            }
-            else if (child.text_mesh) { // Text in label or any other mesh that has text_mesh
-                msgs.push(`Text_mesh: id:${child.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(child.text_mesh)},`);
-                msgs.push(`{pos:[${FloorArr3(child.text_mesh.geom.pos)}]}, {dim: [${child.text_mesh.geom.dim}]}, {alpha:${child.text_mesh.mat.col[3]}}`);
-                msgs.push(`2gfx: {prog:${child.text_mesh.gfx.prog.idx}}, {vb:${child.text_mesh.gfx.vb.idx}}, {start:${child.text_mesh.gfx.vb.start}}, {faces:${child.text_mesh.geom.num_faces}}`);
-            }
-        }
-        else if (infoMesh.text_mesh) {
-            msgs.push(`Text_mesh: id:${infoMesh.text_mesh.mesh_bufferidx}, name:${Mesh_get_name(infoMesh.text_mesh)},`);
-            msgs.push(`pos:[${FloorArr3(infoMesh.text_mesh.geom.pos)}], dim: [${FloorArr2(infoMesh.text_mesh.geom.dim)}], alpha:${infoMesh.text_mesh.mat.col[3]}`);
-            msgs.push(`3gfx: prog:${infoMesh.text_mesh.gfx.prog.idx}, vb:${infoMesh.text_mesh.gfx.vb.idx}, start:${infoMesh.text_mesh.gfx.vb.start}, faces:${infoMesh.text_mesh.geom.num_faces}`);
-        }
-
-        const mouse_pos = Mouse_get_pos();
-
-        // Update info text
-        for (let i = 0; i <= textMesh.children.boundary; i++) {
-
-            const childText = textMesh.children.buffer[i];
-
-            if (msgs[i]) childText.RenderTextFromString(msgs[i]);
-            else childText.RenderTextFromString('NULL')
-        }
-    }
-
-    // _pt_mesh_info_tip.timer.Stop();
-}
-
-
-
-function Create3DCubes(scene) {
-
-    { // Create cube
-        {
-            const geom = new CubeGeometry([80, 450, -1], [100, 100, 100], [1, 1, 1]);
-            const mat = new Material_TEMP_fromBufferFor3D(WHITE)
-            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-            //     color: [
-            //         0.9, 0.0, 0.0, .4,
-            //         0.0, 0.9, 0.1, .4,
-            //         0.0, 0.0, 0.9, .4,
-            //         0.9, 0.0, 0.9, .4
-            //     ]
-            // });
-            const cube = new Mesh(geom, mat);
-            scene.AddMesh(cube);
-
-            console.log('cube', SID.GetTypeToString(cube.sid), cube.sid)
-            cube.type |= geom.type;
-            cube.type |= mat.type;
-        }
-        {
-            const geom = new CubeGeometry([240, 450, -1], [100, 100, 100], [1, 1, 1]);
-            const mat = new Material_TEMP_fromBufferFor3D(WHITE);
-            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-            //     color: [
-            //         1.0, 1.0, 0.0, .4,
-            //         0.0, 0.7, 0.4, .4,
-            //         0.0, 1.0, 0.0, .4,
-            //         1.0, 0.0, 1.0, .4,
-            //     ]
-            // });
-            const cube2 = new Mesh(geom, mat);
-            scene.AddMesh(cube2);
-            console.log('cube2:', SID.GetTypeToString(cube2.sid), cube2.sid)
-            cube2.type |= geom.type;
-            cube2.type |= mat.type;
-        }
-        {
-            const geom = new CubeGeometry([400, 450, -1], [100, 100, 100], [1, 1, 1]);
-            const mat = new Material_TEMP_fromBufferFor3D(WHITE);
-            // mat.EnableGfx(MAT_ENABLE.ATTR_VERTEX_COLOR, {
-            //     color: [
-            //         0.9, 0.0, 0.0, .4,
-            //         0.0, 0.9, 0.1, .4,
-            //         0.0, 0.0, 0.9, .4,
-            //         0.9, 0.0, 0.9, .4
-            //     ]
-            // });
-            const cube3 = new Mesh(geom, mat);
-            scene.AddMesh(cube3);
-            console.log('cube3:', SID.GetTypeToString(cube3.sid), cube3.sid)
-            cube3.type |= geom.type;
-            cube3.type |= mat.type;
-        }
-    }
-}
-
-
-
-function Window_menu_2() {
-
-    const pad = [10, 10];
-    const menu_layout = LAYOUT.FIXED_WIDTH | LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_HORIZONTAL;
-    const window_menu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad, dim: [VIEWPORT.WIDTH / 2 - pad[1] - 1, 0], col: TRANSPARENCY(GREY[5], .94), layout: menu_layout, name: 'window_menu' }));
-    Widget_gfx_ready_enable({ mesh: window_menu, enable_sdf_rect: 4, });
-    Scene_store_window_resized_meshes(window_menu.mesh_bufferidx);
-
-
-    const Load_menu_btn = Create_widget_button(Style_button_default_properties({ text: 'Demos', pos: [0, 0, 1], col: GREEN[7], text_pad: [18, 8], }));
-    Widget_gfx_ready_enable({ mesh: Load_menu_btn, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-    window_menu.AddItem(Load_menu_btn);
-
-
-    const text_pad = [12, 6];
-    const font_size = 8;
-    const dp_rcorners = 7;
-    const dp_col = GREY[6];
-    const menu_col = GREY[3];
-
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Menu`, pos: [0, 0, 0], col: dp_col, menu_col: menu_col, btn_col: GREY[3], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-    Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners })
-    window_menu.AddItem(dp);
-    Dropdown_roots_set_root(dp, dp);
-
-
-
-    const buttons_panel = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], col: TRANSPARENCY(GREY[1], .9), name: 'buttons_panel', }));
-    Widget_gfx_ready_enable({ mesh: buttons_panel, enable_sdf_rect: buttons_panel.geom.dim[0] / 10 });
-    dp.AddToMenu(buttons_panel);
-    {
-        const rcorners = 10;
-        const font = TEXTURES.MTSDF_COMIC_1024;
-        const text_pad = [15, 8];
-        let color_index = 3;
-        const color_max_count = 14 * 2, num_colors = 2, brightness = 1., alpha = 1.;
-
-
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Mathematics      ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); buttons_panel.AddItem(button); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Molecular Biology', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Chemistry        ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Neuroscience     ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Physics          ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Biochemistry     ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-        { const button = Create_widget_button(Style_button_default_properties({ text: 'Genetics         ', align: TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, pos: [0, 0, 0], col: Get_fasma_color(color_index, color_max_count, num_colors, brightness, alpha), text_pad: text_pad, font_size: font_size, texture_id: font, layout: LAYOUT.VERTICAL })); Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); Callback_animations_create_specific(button, CALLBACK_ANIMATION_TYPE_IDX.MOVE_X, { slope_constant: .3, time_step: 0.05, ammount: 40 }); buttons_panel.AddItem(button); }
-        color_index += 1;
-
-    }
-
-
-    window_menu.GenGfxCtx();
-    Layout_basic_pre_render(window_menu);
-
-    Widget_render(window_menu);
-
 
 }
 

@@ -17,6 +17,7 @@ import { Dbg_ui_init_buffer_entries, Dbg_ui_reset_buffer_entries, Dbg_ui_store_c
 
 _CNT = 0x1;
 let xxx = 0x1;
+/** */
 export const NOTIFICATION_TYPE = {
    
    MESH_BUFFER: _CNT,
@@ -76,7 +77,7 @@ export const NOTIFICATION_TYPE = {
    }
 
 }
-
+/** */
 function Notification_type_to_sting(idx) {
 
    if (idx === this.MESH_BUFFER) return 'MESH_BUFFER';
@@ -85,7 +86,7 @@ function Notification_type_to_sting(idx) {
    if (idx === this.VERTEX_BUFFER) return 'VERTEX_BUFFER';
    if (idx === this.RENDER_QUEUE_BUFFER) return 'RENDER_QUEUE_BUFFER';
 }
-
+/** */
 function Notification_process_to_sting(idx) {
 
    let res = '';
@@ -99,32 +100,22 @@ function Notification_process_to_sting(idx) {
 
 
 
-
 const _notifications_buffer = New_generic_buffer(_, '_notifications_buffer');
-
-
-
+/** */
 export function Notifications_reset() { _notifications_buffer.ResetFull(); Dbg_ui_reset_buffer_entries() }
-
-
+/** */
 export function Notifications_get_ui_widget(TYPE_IDX){
    return _notifications_buffer.buffer[TYPE_IDX].params.root;
 }
-
-
-
+/** */
 export function Notifications_set_ui_widget(TYPE_IDX, ui_widget_root){
    _notifications_buffer.buffer[TYPE_IDX].params.root = ui_widget_root;
 }
-
-
-
+/** */
 export function Notifications_get_by_idx(idx) {
    return _notifications_buffer.buffer[idx];
 }
-
-
-
+/** */
 function Create(){
 
    const ret = Dbg_ui_init_buffer_entries();
@@ -142,10 +133,7 @@ function Create(){
 
    return { type_idx:type_idx, entries_bufferidx:ret.entries_bufferidx };
 }
-
-
-
-
+/** */
 export function Notifications_initialize() {
 
    {
@@ -186,11 +174,7 @@ export function Notifications_initialize() {
    }
 
 }
-
-
-
-
-
+/** */
 export function Notifications_send(TYPE_IDX, FLAGS, bufferidx) {
 
    const notification = _notifications_buffer.buffer[TYPE_IDX];
@@ -204,9 +188,7 @@ export function Notifications_send(TYPE_IDX, FLAGS, bufferidx) {
       notification.is_active = true;
 
 }
-
-
-
+/** */
 export function Notifications_update() {
 
    
@@ -221,9 +203,7 @@ export function Notifications_update() {
       }
    }
 }
-
-
-
+/** */
 export function Notifications_destroy(TYPE_IDX) {
 
    _notifications_buffer.RemoveByIdx(TYPE_IDX);
@@ -234,18 +214,12 @@ export function Notifications_destroy(TYPE_IDX) {
    else if(TYPE_IDX === NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF = INT_NULL;
    else if(TYPE_IDX === NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF) NOTIFICATION_TYPE.RENDER_QUEUE_BUFFER_IDXS.NOTIF = INT_NULL;
 }
-
-
-
+/** */
 export function Notifications_deactivate(TYPE_IDX) {
 
    _notifications_buffer.buffer[TYPE_IDX].is_active = false;
    _notifications_buffer.buffer[TYPE_IDX].params.root = null; // Detach the refference to the ui widget
 }
-
-
-
-
 /**Debug-Print */
 export function Notifications_print() {
 

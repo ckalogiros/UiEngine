@@ -22,6 +22,7 @@ class Timer_Base_Fast {
       this.fnidx = fnidx;
    }
 }
+/** */
 class Timer_Base_Detailed {
 
    constructor(name=null, fnidx) {
@@ -32,11 +33,11 @@ class Timer_Base_Detailed {
       this.best = 512.001;
       this.called = 0;
       this.fnidx = fnidx;
-      // if(name)
       this.nameidx = Str_buffer_store(name);
 
    }
 }
+/** */
 class Performance_Timer {
 
    constructor() {
@@ -45,7 +46,7 @@ class Performance_Timer {
       this.group = New_generic_buffer(_, 'Group Performance_Timer');
    }
 }
-
+/** */
 function Performance_timer_construct(TYPE = INT_NULL, name) {
 
    if (TYPE & PERFORMANCE_TIMER.BASE) return new Timer_Base_Fast(PERFORMANCE_TIMER.BASE_FN_IDX);
@@ -55,6 +56,7 @@ function Performance_timer_construct(TYPE = INT_NULL, name) {
 }
 
 
+/** */
 const _performance_timers_buffer = New_generic_buffer(_, 'Performance_Timer');
 
 // TYPE: SEE->PERFORMANCE_TIMER
@@ -69,8 +71,7 @@ function Performance_timer_create(TYPE, name) {
 
    return pt_groupidx;
 }
-
-
+/**  */
 export function Performance_timer_create_secondary_timer(TYPE, timer_groupidx = INT_NULL) {
    /**DEBUG */ if (_performance_timers_buffer.buffer[timer_groupidx] === undefined) console.error('SEVERE_ERROR\nNULL timer is passed as param');
 
@@ -80,8 +81,7 @@ export function Performance_timer_create_secondary_timer(TYPE, timer_groupidx = 
 
    return timeridx;
 }
-
-
+/**  */
 export function Performance_timer_start(timer_groupidx) {
    /**DEBUG */ if (_performance_timers_buffer.buffer[timer_groupidx] === undefined) console.error('SEVERE_ERROR\nNULL timer is passed as param');
 
@@ -89,26 +89,23 @@ export function Performance_timer_start(timer_groupidx) {
    pt_group.t = window.performance.now(); // In miliseconds
 
 }
-
-
+/**  */
 function Performance_timer_base_stop_(timer, delta){
    timer.accum += delta;
-   // timer.cnt++;
 }
-
+/**  */
 function Performance_timer_detailed_stop_(timer, delta){
    timer.accum += delta;
    if (timer.worst < delta) timer.worst = delta;
    if (timer.best > delta && delta > 0.0) timer.best = delta;
    timer.called++;
-   // timer.cnt++;
 }
-
+/**  */
 const fn_table = [
    Performance_timer_base_stop_, 
    Performance_timer_detailed_stop_,
 ];
-
+/**  */
 export function Performance_timer_stop(timer_groupidx){
 
    const timer_group = _performance_timers_buffer.buffer[timer_groupidx];
@@ -126,8 +123,7 @@ export function Performance_timer_stop(timer_groupidx){
    
    /**DEBUG*/return delta
 }
-
-
+/** */
 export function Performance_timers_update_tick(){
    for (let i = 0; i <= _performance_timers_buffer.boundary; i++){
 
@@ -145,55 +141,75 @@ export function Performance_timers_update_tick(){
 
 
 
-export function PerformanceTimersGetFps(timer_idxs) {
+/**  */
+export function Performance_timers_get_fps_avg(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
    return ~~(1000 / (timer.accum / timer.cnt));
 }
-export function PerformanceTimersGetMilisec(timer_idxs) {
+/**  */
+export function Performance_timers_get_fps_per_sec_reset(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   const ret = (timer.accum / timer.cnt);
-   // timer.accum = 0.0;
-   // timer.cnt = 0;
-   return ret;
-   // return (timer.accum / timer.cnt).toFixed(4);
-}
-export function PerformanceTimersGetNanosec(timer_idxs) {
-   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   return (timer.accum / NANOSEC / timer.cnt).toFixed(1);
-}
-export function Performance_timers_get_avg_1sec_reset(timer_idxs) {
-   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   const avg = (1000 / (timer.accum / timer.cnt));
-   // { // Debug
-   //    const called = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].called;
-   //    const cnt = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]].cnt;
-   //    console.log(timer_idxs, 'called', called, 'cnt', cnt, 'name', Performance_timer_get_name_byid(timer_idxs[0]))
-   // }
+   const fps = (1000 / (timer.accum / timer.cnt));
    timer.cnt = 0;
    timer.accum = 0; // Get the accumulated time from the timer.
-   return ~~(avg);
+   return ~~(fps); // Floor the value
 }
-export function Performance_timers_get_ms_1sec_reset(timer_idxs) {
+/**  */
+export function Performance_timers_get_milisec_avg(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   const ms = (timer.accum / timer.cnt).toFixed(4);
+   return (timer.accum / timer.cnt);
+}
+/**  */
+export function Performance_timers_get_ms_per_sec_reset(timer_idxs) {
+   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
+   const ms = (timer.accum / timer.cnt);
    timer.cnt = 0;
-   timer.accum = 0; // Get the accumulated time from the timer.
+   timer.accum = 0;
    return ms;
 }
-export function PerformanceTimersGetWorstFps(timer_idxs) {
+/**  */
+export function Performance_timers_get_microsec_avg(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   const fps = ~~(1000 / timer.worst);
-   // timer.worst = 0.001;
-   return fps;
+   return ~~((timer.accum  / timer.cnt) * MILLISEC_TO_MICROSEC);
 }
-export function PerformanceTimersGetBestFps(timer_idxs) {
+/**  */
+export function Performance_timers_get_microsec_per_sec_reset(timer_idxs) {
+   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
+   const t =  ~~((timer.accum  / timer.cnt) * MILLISEC_TO_MICROSEC);
+   timer.cnt = 0;
+   timer.accum = 0;
+   return t;
+}
+
+/**  */
+export function Performance_timers_get_worst_frame_avg(timer_idxs) {
+   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
+   const fps = (1000 / timer.worst);
+   return ~~(fps);
+}
+/**  */
+export function Performance_timers_get_best_frame_avg(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
    const fps = ~~(1000 / timer.best);
    return fps;
 }
-export function PerformanceTimersGetCurTime(timer_idxs) {
+/**  */
+export function Performance_timers_get_timer(timer_idxs) {
    const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
-   return (timer.cur);
+   return (timer.accum * MILLISEC_TO_SEC);
+}
+/**  */
+export function Performance_timers_get_delta(timer_idxs) {
+   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
+   const delta = timer.accum * MILLISEC_TO_MICROSEC;
+   timer.cnt = 0;
+   timer.accum = 0;
+   return delta;
+}
+/**  */
+export function Performance_timers_get_tick(timer_idxs) {
+   const timer = _performance_timers_buffer.buffer[timer_idxs[0]].group.buffer[timer_idxs[1]];
+   return (timer.cnt);
 }
 
 
@@ -210,7 +226,6 @@ export function PerformanceTimersGetCurTime(timer_idxs) {
  * Also its better for callbacks to be functions rather than class methods,
  * which they dont have any object state through the callback.
  */
-
 export function Performance_timers_init_all() {
 
    // const idx = Performance_timers_create_timer('GameLoop');
@@ -291,8 +306,6 @@ export function Performance_timers_init_all() {
       PERFORMANCE_TIMERS_IDXS.MiscTest4 = idx;
    }
 }
-
-
 /**
  * @param {const} id of type: PERFORMANCE_TIMERS_IDXS
  */

@@ -2,13 +2,12 @@
 
 import { Create_rect_mesh, Create_widget_slider } from "./CreateWidgetInterface.js";
 import { GREY, ORANGE, PURPLE, YELLOW } from "../../Material/Colors.js";
-import { Mesh_get_uniform_ubidx_from_name } from "../../Operations/MeshHelperFunctions.js";
 import { Slider_connect } from "../WidgetSlider.js";
 import { Vertex_buffer_set_and_update_uniform } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { Program_get_uniform_from_name } from "../../../../Graphics/ShaderPrograms.js";
 import { Widget_gfx_ready_enable, Style_rect_default_properties, Style_slider_default_properties } from "./WidgetEnableProperties.js";
 import { Layout_basic_pre_render } from "../../Operations/AlignNestedSections.js";
-import { Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
+import { Mesh_get_uniform_ubidx_from_name, Mesh_listener_create } from "../../Operations/MeshPropertiesFunctions.js";
 import { Color_theme_slider_auto } from "../../Material/Themes.js";
 import { Gl_set_generic2, Gl_set_time } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Widget_render } from "./WidgetRender.js";
@@ -16,6 +15,7 @@ import { Widget_render } from "./WidgetRender.js";
 
 
 
+/** */
 export function Controls_create_slider_controls_from_shader_uniform_buffer(target_mesh, controls_size, parameters = null, uniform_name=null) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {
@@ -144,7 +144,7 @@ export function Controls_create_slider_controls_from_shader_uniform_buffer(targe
 
    return controls_buffer;
 }
-
+/** */
 export function Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(target_mesh, controls_size, parameters = null, uniform_name=null, is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0) {
 
    const Create_slider_control = (slider_dim, color, name, rcorners, texture_id) => {

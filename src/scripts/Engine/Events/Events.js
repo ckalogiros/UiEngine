@@ -13,7 +13,7 @@ const events = []; // Aplication's events array
 let evtsIdx = 0; // Index for events array
 
 
-
+/** */
 export function RegisterEvent(eventType, params) {
 
     events[evtsIdx++] = {
@@ -21,9 +21,7 @@ export function RegisterEvent(eventType, params) {
         params: params,
     };
 }
-
-
-
+/** */
 export function HandleEvents() {
 
     let i = 0;
@@ -79,7 +77,6 @@ export function HandleEvents() {
                      * intersection between the mouse and the button
                      */
 
-                    // Mesh_remove_time_interval(STATE.mesh.click_hold, INTERVALS.UPDATE);
                     const intervalIdx = STATE.mesh.click_hold.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
                     Time_intervals_destroy_byidx(intervalIdx);
                     STATE.mesh.click_hold.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
@@ -108,9 +105,7 @@ export function HandleEvents() {
 
     evtsIdx = 0; // Reset evemts buffer
 }
-
-
-
+/** */
 export function Events_handle_immidiate(e) {
 
     /**
@@ -197,9 +192,7 @@ export function Events_handle_immidiate(e) {
     }
 
 }
-
-
-
+/** */
 export function Events_buffer_print() {
     console.log(events);
 }

@@ -13,6 +13,7 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js
 
 
 
+/** */
 const ANIM_DATA = {
     T: 0,
     STEP: 1,
@@ -22,11 +23,11 @@ const ANIM_DATA = {
 
 
 
-
+/** */
 function MeshAnimations_get_type_to_string(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return 'COLOR';
 }
-
+/** */
 function MeshAnimations_get_value_size(anim_type_flag, anim_data_type){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
         if(anim_data_type & ANIMATIONS.DATA.COLOR.R) return 1;
@@ -56,7 +57,7 @@ function MeshAnimations_get_value_size(anim_type_flag, anim_data_type){
     }
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
-
+/** */
 function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
 
     let offsets = [];
@@ -76,13 +77,12 @@ function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
         return offsets;
     }
 }
-
-
-
+/** */
 function Choose_update_callback(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return Gl_batch_set_RGBA;
     if(anim_type_flag & ANIMATIONS.TYPE.WPOS) return Gl_batch_set_pos_xy;
 }
+/** */
 function Update_test(num_values){
     if(num_values === 2) return Update_values_color_balanced_vec2;
     alert('77777777777 MISSING CALLBACK');
@@ -92,6 +92,7 @@ function Update_test(num_values){
 
 
 
+/** */
 class VB_DATA {
 
     constructor(vbidx, attribsidx, values_len){
@@ -136,6 +137,7 @@ class VB_DATA {
         this.data.values_indices.push((this.data_count/this.values_len)-1); // RGBA:4 values -> values_indices = 4/4-1=0idx, next 8/4-1=1idx, next 12/4-1=2idx, ... 
     }
 }
+/** */
 class Animation_Data {
 
     constructor(){
@@ -147,11 +149,7 @@ class Animation_Data {
         this.data.push(t, step, min, max);
     }
 }
-
-
-
-
-
+/** */
 class Mesh_Animation{
 
     constructor(anim_type_flag=0x0, anim_data_type){
@@ -186,16 +184,15 @@ class Mesh_Animation{
 const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
 
 
+/** */
 export function Mesh_animations_reset() { 
 
     _mesh_animations_buffer.ResetFull(); 
     ANIMATIONS.Reset();
 }
-
-
+/** */
 export function Mesh_animations_get(){ return _mesh_animations_buffer; }
-
-
+/** */
 function Vb_data_exist(anim_type_idx, vbidx){
     
     if(_mesh_animations_buffer.buffer[anim_type_idx].vb_data === null) return INT_NULL;
@@ -204,7 +201,7 @@ function Vb_data_exist(anim_type_idx, vbidx){
 
     return INT_NULL;
 }
-
+/** */
 function Analyze_flag(anim_type_flag, flag){
 
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
@@ -239,8 +236,6 @@ function Analyze_flag(anim_type_flag, flag){
     }
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
-
-
 /**
  * 
  * @param {*} anim_type_flag    type of: "ANIMATIONS.TYPE."
@@ -344,9 +339,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     anim.is_active = true;
     anim.in_animation = true;
 }
-
-
-
+/** */
 function Min_max(values, anim_data, flags, values_len){
 
     const min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
@@ -409,8 +402,7 @@ function Update_values_color_balanced_vec2(values, anim_data, flags, values_len)
     // if(flags & ANIMATIONS.TYPE.CYCLICAL){
     
 }
-
-
+/** */
 export function Mesh_animations_run(){
 
     if(_mesh_animations_buffer.active_count===0) return;

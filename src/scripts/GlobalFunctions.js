@@ -132,6 +132,7 @@ export function Sid_check_match(sid1, sid2) {
          shad1 === shad2 &&
          attr1 === attr2 &&
          unif1 === unif2 && 
+         sid1.inst === sid2.inst && 
          shader_ops1 === shader_ops2 && 
          sid1.pass === sid2.pass
          // sid1.fx === sid2.fx

@@ -482,7 +482,7 @@ const attribs_info = { mesh_attribs: [], attribs_loc: [] };
 
 
 
-
+/** */
 function Create_new_attrib_location(loc, loc_idx) {
 
    if (loc_idx > 4)
@@ -498,9 +498,7 @@ function Create_new_attrib_location(loc, loc_idx) {
 
    return loc_idx;
 }
-
-
-
+/** */
 function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, attrib_flag=0x0) {
 
    const pass_to_fs = sid.pass & attrib_flag;
@@ -516,9 +514,7 @@ function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, a
 
    return o;
 }
-
-
-
+/** */
 export function Shader_builder_create_attribs_info(sid) {
 
    const assign_new_loc = (loc, loc_idx)=>   {
@@ -807,6 +803,7 @@ export function Shader_builder_create_attribs_info(sid) {
 
 
 }
+/** */
 function Vertex_shader_resolve_attributes_in(sid) {
 
    attributes_in_code += ''
@@ -1076,9 +1073,7 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
 
 }
-
-
-
+/** */
 function Vertex_shader_resolve_attributes_out() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -1095,9 +1090,7 @@ function Vertex_shader_resolve_attributes_out() {
    }
 
 }
-
-
-
+/** */
 function Vertex_shader_resolve_attributes_out_assignment() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -1121,9 +1114,6 @@ function Vertex_shader_resolve_attributes_out_assignment() {
 
    // console.log('-------------------------------------------------------\nResolver: Attributes Assign:\n', attributes_assign_code);
 }
-
-
-
 /**
  * Set 'DEFINES_xxxx' and then find and replace the 'DEFINES_xxxx' with code from a function
  */
@@ -1247,7 +1237,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       code:vs_chunks,
    };
 }
-
 /** // https://www.khronos.org/opengl/wiki/Fragment_Shader
  * Fragment Shaders have the following built-in input variables.
 
@@ -1256,10 +1245,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    in vec2 gl_PointCoord;
 
  */
-
-
-
-
 function Fragment_shader_resolve_attributes_in() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -1276,7 +1261,7 @@ function Fragment_shader_resolve_attributes_in() {
 
    // console.log('-------------------------------------------------------\nResolver: Fragment Shader Inputs:\n', fs_attribs_in_code);
 }
-
+/** */
 export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=null) {
 
    Fragment_shader_resolve_attributes_in();
@@ -1487,7 +1472,8 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
       // If no operations in shaer, then the final_color(0) should be additive otherwise is gonna be 0
       (shader_ops!==null) ? Resolve_function_operations_called_from_main(shader_ops) : 
-      `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, src_color );`,
+      // `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, src_color );`,
+      `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY)}( final_color, src_color );`,
 
 
 

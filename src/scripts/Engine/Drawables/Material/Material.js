@@ -1,6 +1,5 @@
 "use strict";
 
-import { Gl_set_rgb, Gl_set_rgba } from '../../../Graphics/Buffers/VertexBuffersOps.js';
 import { Texture_load_texture_byid } from '../../Loaders/Textures/Texture.js';
 import { New_generic_char_buffer } from '../../Core/Buffers.js';
 import { Texture_metrics_get_texture_pixel_size, Uv_get_uv_coords } from '../../Loaders/Textures/TextureUvMap.js';

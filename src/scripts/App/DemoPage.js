@@ -5,7 +5,6 @@ import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_
 import { Screen_wpos_get_y } from "../Engine/Core/MeshUniformsBuffer.js";
 import { Debug_info_ui_static } from "../Engine/Drawables/DebugInfo/DebugInfoUi.js";
 import { BLUEL, Color_hsv_to_rgb_calibrated, COLOR_THEME_BASIC, GREEN, GREENR, GREY, REDL, TRANSPARENT, WHITE } from "../Engine/Drawables/Material/Colors.js";
-import { Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Listeners_set_priority } from "../Engine/Events/EventListeners.js";
 import { Scene_camera_scroll_add, Scene_camera_scroll_set, Scene_store_window_resized_meshes } from "../Engine/Scenes.js";
 import { Abs } from "../Helpers/Math/MathOperations.js";
@@ -18,7 +17,7 @@ import { Board_rotations } from "./Demo/DemoBoardRotations.js";
 import { Tetris, Tetris_reset } from "./Demo/Games/Tetris/Tetris.js";
 import { Arkanoid_initialize, Arkanoid_reset } from "./Demo/Games/Arkanoid/Arkanoid.js";
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_rect_default_properties, Style_label_default_properties, Style_dropdown_default_properties } from "../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Mesh_listener_create } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Mesh_listener_create, Mesh_set_root_in_focus } from "../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Layout_expand_x_axis, Layout_basic_pre_render } from "../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Dropdown_roots_set_root } from "../Engine/Drawables/Widgets/Widget_Dropdown.js";
 import { Color_theme_dropdown_auto, Color_theme_label_auto } from "../Engine/Drawables/Material/Themes.js";
@@ -26,6 +25,7 @@ import { Demo_animations, Demo_animations_ready_button_with_panel, Demo_animatio
 import { Demo_chain_link } from "./Demo/DemoChainLink.js";
 import { Widget_render } from "../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_destroy_view_group_and_meshes } from "../Engine/Core/Views/MeshBufferViews.js";
+import { Renderqueue_set_priority_by_program, Renderqueue_set_priority_by_vb } from "../Engine/Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -224,7 +224,7 @@ const _demo_categories_buffer = [
       id: bit <<= 0x1,
       idx: demos_index_cnt++,
    },
-   { // [3]: Animations
+   { // [4]: Animations
       name: 'Animations',
       sub_cat: [
          {
@@ -277,7 +277,7 @@ const _demo_categories_buffer = [
       id: bit <<= 0x1,
       idx: demos_index_cnt++,
    },
-   { // [3]: In Practise
+   { // [5]: In Practise
       name: 'In Practise',
       sub_cat: [
          {
@@ -299,7 +299,8 @@ const _demo_categories_buffer = [
             self: null,
             Load: (total_height) => {
                Tetris_reset();
-               Tetris(ROOT_WIDGETS.CREATE_ROOT, 0, total_height, true, demos_index_cnt, 1);
+               // Tetris(ROOT_WIDGETS.CREATE_ROOT, 0, total_height, true, demos_index_cnt, 1);
+               Tetris(ROOT_WIDGETS.CREATE_ROOT, 0, total_height, true, 5, 1);
                return null;
             },
             LoadControls: null,
@@ -710,12 +711,20 @@ export function Demo_page(category_idx = demo_categories.in_practise.idx, sub_ca
    }
 
 
+
+   
+   
+   
+   Renderqueue_set_priority_by_vb(LAST, info_ui.gfx.vb.groupidx);
+   info_ui.children.buffer[0].SetRenderPriority(LAST);
+   
+   window_menu.SetRenderPriority(LAST);
+
+
    // Set focus
    Mesh_set_root_in_focus(info_ui.root_bufferidx);
    Mesh_set_root_in_focus(window_menu.root_bufferidx);
-
-   Listeners_set_priority(E.C, window_menu.listeners);
-
+   
 }
 
 

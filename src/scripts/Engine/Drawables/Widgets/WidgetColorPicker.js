@@ -534,7 +534,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
             State_mesh_set_focused(widget);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
             widget.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
-            // Mesh_set_root_in_focus(widget.root_bufferidx);
          }
 
       }
@@ -957,6 +956,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
 
 
+/** */
 function On_move_clbk(params) {
 
    const widget = params.params;

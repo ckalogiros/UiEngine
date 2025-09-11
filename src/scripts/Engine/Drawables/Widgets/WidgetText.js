@@ -11,6 +11,7 @@ import { Text_Mesh } from "../Meshes/Text_Mesh.js";
 import { Mesh_add_wpos_xy, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
 import { View_add_mesh, View_create_new_group } from "../../Core/Views/MeshBufferViews.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -255,69 +256,7 @@ export class Widget_Text extends Text_Mesh {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** */
 export class Widget_Multi_Text extends Widget_Text {
 
 	alignment = 0x0;
@@ -1105,6 +1044,13 @@ export class Widget_Multi_Text extends Widget_Text {
 		return false;
 	}
 
+	SetRenderPriority(flag) {
+		Renderqueue_set_priority_by_vb(flag, this.gfx.vb.groupidx);
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) Renderqueue_set_priority_by_vb(flag, child.gfx.vb.groupidx);
+		}
+	}
 
 }
 

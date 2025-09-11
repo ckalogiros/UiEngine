@@ -2,7 +2,6 @@
 
 import { Create_rect_mesh, Create_widget_slider, Create_widget_text } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { BLUEL, Color_hsv_to_rgb_calibrated, GREY, YELLOWL } from "../../Engine/Drawables/Material/Colors.js";
-import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Slider_connect, Slider_simple_set_value } from "../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Time_intervals_create } from "../../Engine/Timers/TimeIntervals.js";
 import { Gl_rotate_z_2d, Gl_set_angle, Gl_set_wpos_xy } from "../../Graphics/Buffers/VertexBuffersOps.js";
@@ -15,6 +14,7 @@ import { Layout_basic_pre_render } from "../../Engine/Drawables/Operations/Align
 import { Uniforms_buffer_get_uniform_byidx } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Color_theme_slider_auto } from "../../Engine/Drawables/Material/Themes.js";
+import { Mesh_get_uniform_ubidx_from_name } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 
 
 

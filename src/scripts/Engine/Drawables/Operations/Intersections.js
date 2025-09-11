@@ -14,9 +14,7 @@ export function Intersection_point_rect(px, py, l, r, t, b){
    
    return false;
 }
-
-
-
+/** */
 export function Collision_PointTriangle(p, t){
 
    // const base = t[0][1] - t[0][0];
@@ -30,9 +28,7 @@ export function Collision_PointTriangle(p, t){
    // }
    // return false;
 }
-
-
-
+/** */
 export function Check_intersection_point_rect(pos, dim, point, margin = [0,0]){
 
    const l = pos[0]-margin[0];
@@ -40,6 +36,5 @@ export function Check_intersection_point_rect(pos, dim, point, margin = [0,0]){
    const t = pos[1]-margin[1];
    const b = pos[1]+dim[1]*2+margin[1];
 
-      // return b;
    return Intersection_point_rect(point.x, point.y, l, r, t, b);
 }

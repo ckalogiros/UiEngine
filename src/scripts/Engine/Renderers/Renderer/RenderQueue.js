@@ -132,6 +132,8 @@ class RenderQueue {
 
       // DEBUG
       if (this.count > this.size) alert('ERROR - RenderQueue buffer is FULL')
+
+      return obj.queueIdx
    }
 
 
@@ -209,60 +211,45 @@ class RenderQueue {
 }
 
 
-
+/** */
 const _render_queue = new RenderQueue;
 
-
-
-export function Renderqueue_get() { return _render_queue; }
-
-
-
-export function Renderqueue_get_count() { return _render_queue.activeCount; }
-export function Renderqueue_get_size() { return _render_queue.size; }
-export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
-
-
-
+/** */
+export function Renderqueue_init() {
+   _render_queue.Init(); // One time initialization(creates an empty buffer...)
+}
+/** */
+export function Renderqueue_reset() {
+   _render_queue.Reset();
+   _render_queue.Init(); // One time initialization(creates an empty buffer...)
+}
+/** */
 export function Renderqueue_Add(progidx, vb_groupidx, ibidx, isActive) {
    _render_queue.Add(progidx, vb_groupidx, ibidx, isActive);
 }
-
-
-
+/** */
+export function Renderqueue_get() { return _render_queue; }
+/** */
+export function Renderqueue_get_count() { return _render_queue.activeCount; }
+/** */
+export function Renderqueue_get_size() { return _render_queue.size; }
+/** */
+export function Renderqueue_active_get_count() { return _render_queue.activeCount; }
+/** */
 export function Renderqueue_set_flags(vb_groupidx, flags) {
 
    const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
    _render_queue.buffer[idx].flags |= flags;
 }
-
-
-
-
-export function Renderqueue_init() {
-   _render_queue.Init(); // One time initialization(creates an empty buffer...)
-}
-
-
-
-
-export function Renderqueue_reset() {
-   _render_queue.Reset();
-   _render_queue.Init(); // One time initialization(creates an empty buffer...)
-}
-
-
+/** */
 export function Renderqueue_get_byidx(idx) { return _render_queue.buffer[idx]; }
-
-
-
+/** */
 export function Renderqueue_get_active() { 
 
    if(_render_queue.needs_update) _render_queue.RebuildActiveQueue(); // Create a new active buffer from the renderqueue
    return _render_queue.active; 
 }
-
-
+/** */
 export function Renderqueue_is_vb_active(vb_groupidx) { 
 
    const idx = Vertex_buffer_group_get_render_queueidx(vb_groupidx);
@@ -270,26 +257,17 @@ export function Renderqueue_is_vb_active(vb_groupidx) {
       return (_render_queue.buffer[idx].flags & RENDER_QUEUE_FLAGS.IS_ACTIVE);
    }
 }
-
-
-
+/** */
 export function Renderqueue_set_priority_by_program(flag, progidx) {
    _render_queue.SetPriorityProgram(flag, progidx);
 }
-
-
-
+/** */
 export function Renderqueue_set_priority_by_vb(flag, vb_groupidx) {
    _render_queue.SetPriority(flag, vb_groupidx);
 }
-
-
-
+/** */
 // Update the active queue, when new gfx buffers have been created
 export function Renderqueue_update_active_queue() { _render_queue.RebuildActiveQueue(); }
-
-
-
 /**
  * Enable and Disable programs and vertex buffers from the draw queue.
  * It is called from the GfxVbRender function. If a vertex buffer has 
@@ -326,15 +304,10 @@ export function Renderqueue_set_active(vb_groupidx, isActive) {
 
 
 
-
-
-
-
-
-
 /************************************************************************************************************/
 // DEBUG-PRINT
 
+/** */
 export function Renderqueue_print_all(){
 
    console.log('--- RenderQueue All');
@@ -344,10 +317,7 @@ export function Renderqueue_print_all(){
       if (queue.buffer[i]) console.log(queue.buffer[i]);
    }
 }
-
-
-
-
+/** */
 export function Renderqueue_print_active(){
    
    console.log('--- RenderQueue Active');

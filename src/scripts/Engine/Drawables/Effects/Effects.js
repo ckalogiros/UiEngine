@@ -32,6 +32,7 @@ const PRE_INITIALIZED_EXPLOSION_MESHES = 32;
 
 
 _CNT = 0;
+/** */
 export const EFFECTS_TYPES = {
    EXPLOSION_CIRCLE: {
       ID:_CNT++,
@@ -57,6 +58,7 @@ export const EFFECTS_TYPES = {
 /*************************************************************************************************************************************************************************/
 // Effects Meshes - Explosion Circle
 
+/** */
 class Effect_Mesh_Explosion_Circle {
 
    constructor(x=0, y=0, w=75, h=75, color=BLUEL[9], groupidx = INT_NULL, parent, ring_diameter, intensity) {
@@ -94,15 +96,16 @@ const _effect_explosion_circle_mesh_buffer = New_generic_buffer(_, '_effect_expl
 const _free_effect_explosion_circle_idx_buffer = New_int8_buffer(PRE_INITIALIZED_EXPLOSION_MESHES, '_free_effect_explosion_circle_idx_buffer');
 
 
+/** */
 export function Effect_explosion_circle_set_update_uniform(val, unif_idx) {
    _effect_explosion_circle_mesh_buffer.buffer[0].mesh.GfxUniformSetAndUpdate('u_generic_vec3', val, unif_idx);
 }
-
+/** */
 export function Effect_explosion_circle_get_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_circle_mesh_buffer.buffer[idx] === undefined) alert('090909091 Wrong index for _effect_explosion_circle_mesh_buffer')
    return _effect_explosion_circle_mesh_buffer.buffer[idx];
 }
-// Removes the effect mesh from the storage buffer and from rendering, but mesh still remains in the application
+/** Removes the effect mesh from the storage buffer and from rendering, but mesh still remains in the application */
 export function Effect_explosion_circle_remove_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_circle_mesh_buffer.buffer[idx] === undefined) alert('090909092 Wrong index for _effect_explosion_circle_mesh_buffer')
    
@@ -113,7 +116,7 @@ export function Effect_explosion_circle_remove_mesh_byidx(idx = INT_NULL) {
    _free_effect_explosion_circle_idx_buffer.Add(idx);
    
 }
-// Removes the effect mesh from the storage buffer and from rendering, plus destroys the mesh (complete mesh removal from the application)
+/* Removes the effect mesh from the storage buffer and from rendering, plus destroys the mesh (complete mesh removal from the application) */
 export function Effect_explosion_circle_destroy_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_circle_mesh_buffer.buffer[idx] === undefined) alert('090909093 Wrong index for _effect_explosion_circle_mesh_buffer')
       _effect_explosion_circle_mesh_buffer.RemoveByIdx(idx);
@@ -122,8 +125,7 @@ export function Effect_explosion_circle_destroy_mesh_byidx(idx = INT_NULL) {
 
 
 }
-
-
+/** */
 export function Effects_explosion_circle_init_buffer(groupidx, parent, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
 
    let vb_groupidx = INT_NULL;
@@ -146,8 +148,7 @@ export function Effects_explosion_circle_init_buffer(groupidx, parent, num_effec
    return effect;
 
 }
-
-
+/** */
 export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, color, ring_diameter=.1, intensity=.02, needs_auto_update=true) {
 
    let idx = INT_NULL;
@@ -202,8 +203,7 @@ export function Effects_create_explosion_circle(x, y, w, h, w_src=0, h_src=0, co
 
    return idx;
 }
-
-
+/** */
 export function Effects_explosion_circle_update() {
    
    for(let i=0; i <= _effect_explosion_circle_mesh_buffer.boundary; i++) {
@@ -228,26 +228,13 @@ export function Effects_explosion_circle_update() {
 
 
 
-
-
-
-
-
-
-
-
-
-// TODO: Widget_gfx_ready_enable( enable_pass_vpos:true, enable_pass_wpos:true ARE NOT NEEDED, REMOVE THEM
-
-
-
-
 /*************************************************************************************************************************************************************************/
 // Effects Meshes - Explosion Glow
 
 const _effect_explosion_glow_mesh_buffer = New_generic_buffer(_, '_effect_explosion_glow_mesh_buffer');
 const _free_effect_explosion_glow_idx_buffer = New_int8_buffer(PRE_INITIALIZED_EXPLOSION_MESHES, '_free_effect_explosion_glow_idx_buffer');
 let eee = true;
+/** */
 class Effect_Mesh_Explosion_Glow {
 
    constructor(x=0, y=0, w=35, h=35, color=GREY[7], groupidx = INT_NULL, parent=null) {
@@ -292,14 +279,12 @@ class Effect_Mesh_Explosion_Glow {
    }
 }
 
-
-
-
+/** */
 export function Effects_explosion_glow_get_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_glow_mesh_buffer.buffer[idx] === undefined) alert('090909091 Wrong index for _effect_explosion_glow_mesh_buffer')
    return _effect_explosion_glow_mesh_buffer.buffer[idx];
 }
-// Removes the effect mesh from the storage buffer and from rendering, but mesh still remains in the application
+/** Removes the effect mesh from the storage buffer and from rendering, but mesh still remains in the application */
 export function Effects_explosion_glow_remove_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_glow_mesh_buffer.buffer[idx] === undefined) alert('090909092 Wrong index for _effect_explosion_glow_mesh_buffer')
    
@@ -310,14 +295,14 @@ export function Effects_explosion_glow_remove_mesh_byidx(idx = INT_NULL) {
    _free_effect_explosion_glow_idx_buffer.Add(idx);
    
 }
-// Removes the effect mesh from the storage buffer and from rendering, plus destroys the mesh (complete mesh removal from the application)
+/** Removes the effect mesh from the storage buffer and from rendering, plus destroys the mesh (complete mesh removal from the application) */
 export function Effects_explosion_glow_destroy_mesh_byidx(idx = INT_NULL) {
    /**DEBUG */ if (idx === INT_NULL || _effect_explosion_glow_mesh_buffer.buffer[idx] === undefined) alert('090909093 Wrong index for _effect_explosion_glow_mesh_buffer')
       _effect_explosion_glow_mesh_buffer.RemoveByIdx(idx);
    const mesh = _effect_explosion_glow_mesh_buffer.buffer[idx].mesh;
    mesh.Destroy();
 }
-
+/** */
 export function Effects_explosion_glow_init_buffer(groupidx, parent, num_effect_meshes=PRE_INITIALIZED_EXPLOSION_MESHES, w, h) {
       
    let vb_groupidx = INT_NULL;
@@ -338,8 +323,7 @@ export function Effects_explosion_glow_init_buffer(groupidx, parent, num_effect_
    return effect;
 
 }
-
-
+/** */
 export function Effects_create_explosion_glow(x, y, w, h, w_src=0, h_src=0, color) {
 
    let idx = INT_NULL;
@@ -399,8 +383,7 @@ export function Effects_create_explosion_glow(x, y, w, h, w_src=0, h_src=0, colo
 
    return idx;
 }
-
-
+/** */
 export function Effects_explosion_glow_update() {
    
    for(let i=0; i <= _effect_explosion_glow_mesh_buffer.boundary; i++) {

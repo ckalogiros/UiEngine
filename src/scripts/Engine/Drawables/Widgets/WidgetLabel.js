@@ -621,6 +621,7 @@ export class Widget_Label extends Rect_Mesh {
 }
 
 
+/** */
 function Label_on_move_clbk(params) {
 
     /**

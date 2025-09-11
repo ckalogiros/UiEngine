@@ -455,9 +455,9 @@ class Vertex_Buffer_Group {
     
     SetScissorBox(x=null, y=null, w=null, h=null) {
         if(x !== null) this.scissorbox[0] = x;
-        if(x !== null) this.scissorbox[1] = y;
-        if(x !== null) this.scissorbox[2] = w;
-        if(x !== null) this.scissorbox[3] = h;
+        if(y !== null) this.scissorbox[1] = y;
+        if(w !== null) this.scissorbox[2] = w;
+        if(h !== null) this.scissorbox[3] = h;
         this.has_scissorbox = true;
     }
     
@@ -640,10 +640,8 @@ export function Vertex_buffer_group_update_scissorbox(vb_groupidx) {
     const mw = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[2]);
     const mh = Mesh_buffer_get_mesh_byidx(vb_group.scissorbox_meshidx[3]);
 
-    const pad_offset = 4;
+    const pad_offset = -4;
 
-    // const x = Mesh_get_real_pos_x(mx)-pad_offset;
-    // const y = Mesh_get_real_pos_y(my)-pad_offset;
     const x = Mesh_get_real_pos_x(mx);
     const y = Mesh_get_real_pos_y(my);
     const w = mw.geom.dim[0] * 2-pad_offset;

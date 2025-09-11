@@ -10,7 +10,9 @@ import { Floor } from "../../Helpers/Math/MathOperations.js";
 
 
 
-
+/** Mesh Buffer
+ * A global buffer to store all 'mesh' type objects.
+ */
 
 
 

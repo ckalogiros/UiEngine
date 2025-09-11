@@ -16,6 +16,7 @@ class Renderbuffer {
 
 
 
+/** */
 export function Gl_renderbuffer_create(gl, format, width, height, name) {
 
    const renderbuffer = new Renderbuffer(name);

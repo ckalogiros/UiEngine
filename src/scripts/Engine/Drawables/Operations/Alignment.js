@@ -53,9 +53,7 @@ export function Align_text_in_rect_parent(Align, parent, pos=[0,0]) {
     
 
 }
-/**
- * 
- */
+/** */
 export function Align_between(flags, first_mesh, second_mesh, first_pad = [0, 0], second_pad = [0, 0], advancex) {
 
     // Check if any of the acceptable TEXT_ALIGN flags are passed.

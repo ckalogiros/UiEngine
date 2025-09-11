@@ -8,18 +8,20 @@ import { Vertex_buffer_add_vertices_from_render_group } from "../../../Graphics/
 import { Performance_timer_start, Performance_timer_stop } from "../../Timers/PerformanceTimers.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { Mesh_set_root_in_focus } from "../Operations/MeshHelperFunctions.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Mouse_get_pos, Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { State_mesh_set_clicked, State_mesh_set_clickhold, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Components_create_scroller_component, Scroller_component_movexy, Scroller_component_resize_y } from "../Widgets/ScrollerComponent.js";
-import { Mesh_get_real_pos_xy_obj_t } from "../Operations/MeshAttributesFunctions.js";
-import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
-import { Layout_grow_containers_pre_render, Layout_grow_containers_pre_render_with_item_reposition } from "../Operations/AlignNestedSections.js";
-import { View_add_mesh, View_create_new_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Core/Views/MeshBufferViews.js";
+import { Mesh_add_and_copy_wpos_xy, Mesh_get_real_pos_xy_obj_t } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_get_name, Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_set_root_in_focus, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
+import { Layout_grow_containers_pre_render_with_item_reposition } from "../Operations/AlignNestedSections.js";
+import { View_add_mesh, View_create_new_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group, View_update_scissorbox } from "../../Core/Views/MeshBufferViews.js";
+import { Physics2D_update_pos_xy } from "../../Physics2D/Physics2D.js";
+import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 
 
+/** */
 export class Rect_Mesh extends Mesh {
 
    /**
@@ -218,7 +220,6 @@ export class Rect_Mesh extends Mesh {
       this.gfx = ret.gfx;
 
       // Add to view group
-      const view_groupidx = (specific_view_group !== INT_NULL) ? specific_view_group : this.group_bufferidxs[0];
       View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
 
 
@@ -227,11 +228,6 @@ export class Rect_Mesh extends Mesh {
          const child = this.children.buffer[i];
          child.GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
-
-      // if (this.scroller_comp) {
-
-      //    Scoller_component_gengfx(this.scroller_comp,);
-      // }
 
    }
    Render(run_for_children = true) {
@@ -378,7 +374,7 @@ export class Rect_Mesh extends Mesh {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params
-            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            const idx = Time_intervals_create(1, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
             State_mesh_set_clickhold(mesh);
@@ -404,7 +400,7 @@ export class Rect_Mesh extends Mesh {
                // console.log('X Y RESIZE');
 
                const OnResizeFn = mesh.OnResize;
-               const idx = Time_intervals_create(10, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+               const idx = Time_intervals_create(1, 'ResizeXY Section', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
             else if (point.x > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -428,7 +424,7 @@ export class Rect_Mesh extends Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = Time_intervals_create(10, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, mesh);
+         const idx = Time_intervals_create(1, 'Move Section', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, mesh);
          mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_GRABABLE)) {
@@ -552,33 +548,66 @@ export class Rect_Mesh extends Mesh {
       // If there is a click event already created
    }
 
+   SetRenderPriority(flag) {
+      Renderqueue_set_priority_by_vb(flag, this.gfx.vb.groupidx);
+      for (let i = 0; i <= this.children.boundary; i++) {
+         const child = this.children.buffer[i];
+         if (child) {
+            Renderqueue_set_priority_by_vb(flag, child.gfx.vb.groupidx);
+            if (child.text_mesh) 
+               Renderqueue_set_priority_by_vb(flag, child.text_mesh.gfx.vb.groupidx);
+         }
+      }
+   }
+
 }
-
-
+/** */
 export function Rect_mesh_on_move_clbk(params) {
 
-   const section = params.params;
+   const rect = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (Mesh_state_check(section, MESH_STATE_FLAGS.IN_GRAB) === 0 && section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (Mesh_state_check(rect, MESH_STATE_FLAGS.IN_GRAB) === 0 && rect.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
-      const intervalIdx = section.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
+      const intervalIdx = rect.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);
-      section.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
+      rect.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.MOVE);
 
       return;
    }
 
+
+   
    const mouse_dif = Mouse_get_pos_dif();
-   if ((mouse_dif.x === 0 && mouse_dif.y === 0) || section.root_posidx === INT_NULL) return;
+   // console.log('M HIT', mouse_dif.x, mouse_dif.y)
+   if ((mouse_dif.x === 0 && mouse_dif.y === 0)) return;
+   
+   // console.log('M HIT', mouse_dif.x, mouse_dif.y)
 
-   Mesh_unif_add_vb_root_wpos(section.root_posidx, mouse_dif.x, -mouse_dif.y);
+   // If mesh has physics - Update physics
+   if(rect.physics.idx !== INT_NULL) {
+      // // const collision_group_idx = rect.physics.collision.group_idx, collider_idx = rect.physics.collision.collision_idx;
+      // // Physics2D_collision_detection_all_with_all(collision_group_idx, collider_idx);
+      Mesh_add_and_copy_wpos_xy(rect, mouse_dif.x, -mouse_dif.y);
+      Physics2D_update_pos_xy(rect.physics.idx, rect.geom.pos[0], rect.geom.pos[1]);
+      return;
+   }
 
+   // Else - Move by uniform position if rect is root and has a root_posidx, else move local space
+   if(rect.root_posidx === INT_NULL) {
+      Mesh_add_and_copy_wpos_xy(rect, mouse_dif.x, -mouse_dif.y);
+   }
+   else {
+      Mesh_unif_add_vb_root_wpos(rect.root_posidx, mouse_dif.x, -mouse_dif.y);
+   }
 
+   
    /********************************************************************************************************************/
    // Set any scrollbar
-   // TODO: We need to make the scroller visible to the root parent 'section' mesh.
-   if (section.scroller_comp !== null || section.has_children_scrollers)
-      Scroller_component_movexy(section.children_scrollers_buffer, mouse_dif.x, -mouse_dif.y);
+   // TODO: We need to make the scroller visible to the root parent 'rect' mesh.
+   if (rect.scroller_comp !== null || rect.has_children_scrollers)
+      Scroller_component_movexy(rect.children_scrollers_buffer, mouse_dif.x, -mouse_dif.y);
 
+   if(rect.scroller_comp)
+      View_update_scissorbox(rect.group_bufferidxs[0]);
 }

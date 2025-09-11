@@ -47,50 +47,14 @@ const mouse = {
     */
 
    pos: {
+
       x: 0, y: 0,
       xprev: INT_NULL, yprev: INT_NULL, // Mouse previous pos
       xdiff: 0, ydiff: 0, // Mouse pos difference form previous pos (in pixels)
 
-      // GetPos(){
-      //    // return RoundArr2([
-      //    //    this.x,
-      //    //    this.y,
-      //    // ]);
-      //    return { x:Floor(this.x), y:Floor(this.y), };
-      // },
-      // GetPosX(){
-      //    return this.x;
-      // },
-      // GetPosY(){
-      //    return this.y;
-      // },
-      // GetDif(){
-      //    return {
-      //       x:Round(this.xdiff),
-      //       y:Round(this.ydiff),
-      //    };
-      // },
-      // GetPrevPos(){
-      //    return {
-      //       x:Round(this.xprev),
-      //       y:Round(this.yprev),
-      //    };
-      // },
-      SetPos(x, y){
-         this.x = x;
-         this.y = y;
-      },
-      SetDif(x, y){
-         this.xdiff = Round(x);
-         this.ydiff = Round(y);
-      },
       SetPrevPos(x, y){
          this.xprev = Round(x);
          this.yprev = Round(y);
-      },
-      ResetPos(){
-         this.x = 0;
-         this.y = 0;
       },
       ResetDif(){
          this.xdiff = 0;
@@ -100,10 +64,7 @@ const mouse = {
          this.xdiff *= factor;
          this.ydiff *= factor;
       },
-      ResetPrevPos(){
-         this.xprev = 0;
-         this.yprev = 0;
-      },
+
    },
    click: {
       down:{
@@ -162,76 +123,46 @@ const mouse = {
  * 
  * @returns {Obj:{x,y}} 
  */
+/** */
 export function Mouse_get_pos() {
-   // return mouse.pos.GetPos();
    return {
-      x:~~(mouse.pos.x), // floor value
+      x:~~(mouse.pos.x), // floor values
       y:~~(mouse.pos.y),
    };
 }
+/** */
 export function Mouse_get_posx() {
    return (~~(mouse.pos.x)); // floor value
-   // return mouse.pos.GetPosX();
 }
+/** */
 export function Mouse_get_posy() {
    return (~~(mouse.pos.y)); // floor value
-   // return mouse.pos.GetPosY();
 }
-
-
+/** */
 export function Mouse_get_pos_dif() {
    return {
       x:mouse.pos.xdiff,
       y:mouse.pos.ydiff,
    };
 }
-
-
+/** */
 export function Mouse_get_pos_difx() {
    return mouse.pos.xdiff;
 }
-
-
+/** */
 export function Mouse_get_pos_dify() {
    return mouse.pos.ydiff;
 }
-
-
-function MouseGetDir() {
-   return {
-      x:~~(mouse.pos.xdiff),
-      y:~~(mouse.pos.ydiff),
-   };
-   return mouse.pos.GetDif();
-}
-
-
-function MouseGetXdir() {
-   return mouse.pos.xdiff;
-}
-
-
-function MouseGetYdir() {
-   return mouse.pos.ydiff;
-}
-
-
-function MouseGetArea() {
-   return mouse.click.drag;
-}
-
-
+/** */
 export function Mouse_reset_dif(factor) {  // HOT-PATH
    mouse.pos.DampenDif(factor)
    // mouse.pos.ResetDif()
 }
-
-
+/** */
 export function Mouse_get_wheel(){
    return mouse.wheel;
 }
-
-
+/** */
 export function MouseResetWheel(){  // HOT-PATH
    mouse.wheel.Reset();
 }
@@ -244,6 +175,7 @@ export function MouseResetWheel(){  // HOT-PATH
  * Mouse Events
  */
 
+/** */
 export function Mouse_set_coordinates(coord){
     
    mouse.pos.xprev = mouse.pos.x;
@@ -253,20 +185,17 @@ export function Mouse_set_coordinates(coord){
    mouse.pos.y = coord[1] + VIEWPORT.MARGIN.TOP; 
 
 }
-
-
-
+/** */
 export function Mouse_on_move(e) {
 
    e.stopPropagation();
    e.preventDefault(); 
 
 
-   const newPosX = e.clientX - VIEWPORT.MARGIN.LEFT;
-   const newPosY = e.clientY + VIEWPORT.MARGIN.TOP;
+   const newPosX = Floor(e.clientX - VIEWPORT.MARGIN.LEFT);
+   const newPosY = Floor(e.clientY + VIEWPORT.MARGIN.TOP);
    const oldPosx = mouse.pos.x;
    const oldPosy = mouse.pos.y;
-   // console.log(newPosX, newPosY)
    
    mouse.pos.x = newPosX;
    mouse.pos.y = newPosY;
@@ -287,20 +216,15 @@ export function Mouse_on_move(e) {
 
    RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_MOVE, null);
 
-   // console.log(mouse.pos.x, mouse.pos.y)
-
    Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.MOUSE, {mouse:mouse})
 }
-
-
-
+/** */
 export function Mouse_on_out(e){
    
    e.stopPropagation();
    e.preventDefault();
 
-   mouse.pos.SetPrevPos(INT_NULL, INT_NULL);
-   // mouse.pos.ResetPos();
+   mouse.pos.SetPrevPos(0, 0);
 }
 
 
@@ -312,6 +236,7 @@ let temp_scroll_speed = 0;
 let temp_prev_dir = 1;
 let in_scolling = false;
 
+/** */
 export function Mouse_on_wheel(e){
 
    e.stopPropagation();
@@ -374,9 +299,7 @@ export function Mouse_on_wheel(e){
 
    // console.log(`MOUSE WHEEL: pos: ${e.x} ${e.y}, delta: ${e.wheelDelta}`)
 }
-
-
-
+/** */
 export function Mouse_on_down(e) {
    
    e.stopPropagation();
@@ -391,9 +314,7 @@ export function Mouse_on_down(e) {
    RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_DOWN, params);
    // console.log(`MOUSE pos: ${e.x} ${e.y}`)
 }
-
-
-
+/** */
 export function Mouse_on_up(e) {
    
    e.stopPropagation();
@@ -421,14 +342,12 @@ export function Mouse_on_up(e) {
  * as the Mouse_on_touch_start and Mouse_on_touch_end events. 
  */
 
+/** */
 export function Mouse_on_move_android(e) {
    Mouse_set_coordinates([e.clientX, e.clientY]);
    console.log('Mouse_on_move_android: ', mouse.pos.x, mouse.pos.y)
    console.log('000000')
 }
-
-
-
 /**
 * Touchscreen Events
 * 
@@ -467,9 +386,7 @@ export function Mouse_on_touch_start(e) {
    
 
 }
-
-
-
+/** */
 export function Mouse_on_touch_end(e) {
 
    e.stopPropagation();
@@ -489,92 +406,86 @@ export function Mouse_on_touch_end(e) {
    RegisterEvent(EVENT_HANDLER_TYPE.MOUSE_CLICK_UP, params);
    // console.log(e);
 }
-
-
-
+/** */
 export function Mouse_on_touch_cancel(e) {
    e.stopPropagation();
    e.preventDefault(); 
    console.log(`Mouse_on_touch_cancel`);
 }
-
-
-
+/** */
 export function Mouse_on_touch_move(e) {
    e.stopPropagation();
    e.preventDefault(); 
 
 
    
-   // Update mouse coordinates
-   const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
-   const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
+   // // Update mouse coordinates
+   // const x = e.changedTouches[0].clientX + DEVICE.info.canvas_left;
+   // const y = e.changedTouches[0].clientY + DEVICE.info.canvas_top ;
    
-   const prevy = y;
-   const delta = GetSign(mouse.pos.y - prevy);
+   // const prevy = y;
+   // const delta = GetSign(mouse.pos.y - prevy);
    
-   if(Abs(delta) < 1) return;
+   // if(Abs(delta) < 1) return;
    
-   Mouse_set_coordinates([x,y]);
+   // Mouse_set_coordinates([x,y]);
    
-   mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
-   mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
+   // mouse.pos.xdiff = (mouse.pos.x - mouse.pos.xprev);
+   // mouse.pos.ydiff = -((mouse.pos.y - mouse.pos.yprev)); // Reverse the direction(negative for down dir and positive for up dir) 
    
    
-   if(STATE.scene.scroll_enable === false) return;
-   // TODO: We need to account for clicked meshes too(I mean if an area below the mouse is clickable we shouldn't run the move event )
-   if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null && STATE.mesh.grabed === null){
+   // if(STATE.scene.scroll_enable === false) return;
+   // // TODO: We need to account for clicked meshes too(I mean if an area below the mouse is clickable we shouldn't run the move event )
+   // if(STATE.mouse.activeClickedButtonId !== INT_NULL && STATE.mesh.hovered === null && STATE.mesh.grabed === null){
       
-      const speed = 1.
-      let bool = true
-      if(temp_prev_dir !== delta) {
+   //    const speed = 1.
+   //    let bool = true
+   //    if(temp_prev_dir !== delta) {
          
-         temp_prev_dir = delta;
-         bool = false;
-         temp_deccel = .9; // Reduce deccel if the user switched scroll direction
-         temp_scroll_speed = 1; // Cancel the deccelarate scrolling
-      }
+   //       temp_prev_dir = delta;
+   //       bool = false;
+   //       temp_deccel = .9; // Reduce deccel if the user switched scroll direction
+   //       temp_scroll_speed = 1; // Cancel the deccelarate scrolling
+   //    }
    
-      const dist = (mouse.pos.ydiff < 50) ? (mouse.pos.ydiff > -50) ? mouse.pos.ydiff : -50 : mouse.pos.ydiff;
-      temp_scroll_speed += speed * dist * -.2;
-      // if(temp_deccel < .97 && bool !== delta) temp_deccel += .002; // Increase deccelarate scrolling on continuous scroll on the same direction
+   //    const dist = (mouse.pos.ydiff < 50) ? (mouse.pos.ydiff > -50) ? mouse.pos.ydiff : -50 : mouse.pos.ydiff;
+   //    temp_scroll_speed += speed * dist * -.2;
+   //    // if(temp_deccel < .97 && bool !== delta) temp_deccel += .002; // Increase deccelarate scrolling on continuous scroll on the same direction
 
    
-      if(!in_scolling){
+   //    if(!in_scolling){
    
-         Callback_animations_create(
-            (params)=>{
+   //       Callback_animations_create(
+   //          (params)=>{
                
-               if(temp_scroll_speed > .2 || temp_scroll_speed < -.2){
+   //             if(temp_scroll_speed > .2 || temp_scroll_speed < -.2){
    
-                  in_scolling = true;
-                  temp_scroll_speed *= temp_deccel; // deccelarate scrolling
+   //                in_scolling = true;
+   //                temp_scroll_speed *= temp_deccel; // deccelarate scrolling
                   
-                  Scene_camera_scroll_add(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
-                  // console.log(temp_scroll_speed, params.wheel_delta)
+   //                Scene_camera_scroll_add(STATE.scene.active_idx, temp_scroll_speed); // Update camera position
+   //                // console.log(temp_scroll_speed, params.wheel_delta)
    
-                  return true;
-               }
+   //                return true;
+   //             }
                
-               return false;
-            }, 
-            ()=>{
-               // console.log('END')
+   //             return false;
+   //          }, 
+   //          ()=>{
+   //             // console.log('END')
                
-               in_scolling = false;
-               temp_scroll_speed = 1;
-               temp_deccel = .9;
-            }, 
-            {wheel_delta:delta}, 'SceneScroll'
-         );
-      }
+   //             in_scolling = false;
+   //             temp_scroll_speed = 1;
+   //             temp_deccel = .9;
+   //          }, 
+   //          {wheel_delta:delta}, 'SceneScroll'
+   //       );
+   //    }
    
-   }
+   // }
    
 }
-
-
-
+/** */
 export function Mouse_android_deactivate_scrolling(){
 
    STATE.scene.scroll_enable = false;

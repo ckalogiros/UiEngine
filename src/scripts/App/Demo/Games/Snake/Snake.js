@@ -3,7 +3,6 @@ import { Mouse_android_deactivate_scrolling, Mouse_get_pos_difx } from "../../..
 import { New_generic_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh, Create_widget_button, Create_widget_label, Create_widget_slider, Create_widget_switch_simple } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { BLACK, BLUEL, Color_hsv_to_rgb_calibrated, CYAN, GREEN, GREY, PURPLEB, PURPLER, REDL, RGB, TRANSPARENT, WHITE, YELLOWR } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshHelperFunctions.js";
 import { Slider_connect, Slider_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
 import { Switch_set_listeners_priority } from "../../../../Engine/Drawables/Widgets/WidgetSwitch.js";
 import { Listeners_set_priority } from "../../../../Engine/Events/EventListeners.js";
@@ -15,7 +14,7 @@ import { Abs, Magnitude, Magnitude_2vectors } from "../../../../Helpers/Math/Mat
 import { Widget_gfx_ready_enable, Style_button_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_switch_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_create } from "../../DemoAnimations.js";
 import { Mesh_add_wpos_xy, Mesh_set_and_copy_wpos_xy, Mesh_set_color_rgb, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_calc_pos_dif, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Mesh_calc_pos_dif, Mesh_set_name, Mesh_set_root_in_focus } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { View_destroy_view_group_and_meshes } from "../../../../Engine/Core/Views/MeshBufferViews.js";
@@ -464,7 +463,7 @@ export function Game_snake(y = 0, controls_create = true, controls_render=true) 
          color_slider: {
             wideness: { val: 0, slider_val: 0.008, min: 0, max: 0.001 },
             offset: { val: 0, slider_val: 0.11, min: 0, max: 4 },
-            brightness: { val: 0, slider_val: 1, min: 0, max: 1 },
+            brightness: { val: 1, slider_val: 1, min: 0, max: 1 },
 
          },
       },
@@ -601,7 +600,7 @@ click mouse button.`;
          Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
 
-         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.2,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise, layout:LAYOUT.HORIZONTAL }));
+         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.2,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_left, layout:LAYOUT.HORIZONTAL }));
          Widget_gfx_ready_enable({ mesh: rotate_symbol, enable_sdf_rect: 10, })
          info.AddItem(rotate_symbol);
 
@@ -619,7 +618,7 @@ click mouse button.`;
          Widget_gfx_ready_enable({mesh:ctrl, enable_sdf_rect:ctrl.geom.dim[1]});
          info.AddItem(ctrl);
          
-         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.78,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise, layout:LAYOUT.HORIZONTAL }));
+         const rotate_symbol = Create_rect_mesh(Style_rect_default_properties({ pad: [20, 0], dim: [font_size*2, font_size*2], col: Color_hsv_to_rgb_calibrated(.78,1,1,.5,1,0), texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id:ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_right, layout:LAYOUT.HORIZONTAL }));
          Widget_gfx_ready_enable({ mesh: rotate_symbol, enable_sdf_rect: 10, })
          info.AddItem(rotate_symbol);
 
@@ -1667,6 +1666,7 @@ function Snake_options_callback(params) {
    // return controls_section.children.buffer;
 
 }
+/**This is a callback. It differentiates from the  'Snake_options_callback' which is used for a standalone snake game implementation*/
 export function Snake_options_controls(params) {
 
 
@@ -1984,7 +1984,7 @@ export function Snake_options_controls(params) {
 
          brightness.slider_val = slider_val;
 
-      }, { snake: snake, mnemonics: params.params.mnemonics.color_slider });
+      }, { snake: snake, mnemonics: params.params.mnemonics.color_slider },);
 
    }
 

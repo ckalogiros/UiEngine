@@ -12,7 +12,7 @@ import { Mesh_get_name, Mesh_listener_remove, Mesh_state_check } from "./MeshPro
 
 
 
-
+/** */
 export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
@@ -76,9 +76,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
@@ -120,9 +118,7 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
    let changes_hapened = false;
@@ -170,11 +166,7 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
 
    return changes_hapened;
 }
-
-
-
-
-
+/** */
 export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
    // if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
 
@@ -221,9 +213,7 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
 
@@ -270,9 +260,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 
    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
@@ -303,9 +291,7 @@ export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
       }
    }
 }
-
-
-
+/** */
 export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
    const DBG = false
@@ -474,13 +460,6 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
    return changes_hapened;
 }
-
-
-
-
-
-
-
 /**
  * This function runs through children of mesh type:Section,
  * and removes children that are located above (upper clamped chunk)
@@ -557,62 +536,3 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
    };
 }
 
-
-/**SAVE */
-// export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clampy) {
-
-//    // The first and last meshes of scrolled section after been clamped.
-//    let firstupper = INT_NULL, lastupper = INT_NULL, firstlower = INT_NULL, lastlower = INT_NULL;
-//    const clamped_buffer = []; // Store the removed children
-
-
-//    let cnt = 0;
-//    for (let i = 0; i <= section.children.boundary; i++) {
-
-//       const child = section.children.buffer[i];
-//       const top = child.geom.pos[1] - child.geom.dim[1];
-//       const bottom = child.geom.pos[1] + child.geom.dim[1];
-
-//       if (bottom <= clampy.clip_top) {
-
-//          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-//          // section.children.RemoveByIdx(i);
-//          child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-         
-//          if (firstupper === INT_NULL) firstupper = i;
-//       }
-//       else if (top >= clampy.clip_bottom) {
-         
-//          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-//          // section.children.RemoveByIdx(i);
-//          child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
-         
-//          if (firstlower === INT_NULL) {
-//             firstlower = i;
-//             // 1. This clamp is running on mesh initialization, so we need only one chunk, the upper one
-//             // 2. Store the lower border of the renderable area chunk. This is when the first mesh outside the renderable chunk has been reached
-//             clampy.upper_chunk.lower_border = bottom;
-//             clampy.upper_chunk.lower_meshidx = i;
-//          }
-//       }
-//       else { // The mesh is inside limits
-//          child.state.mask |= MESH_STATE_FLAGS.ACTIVE;
-//          if (lastupper === INT_NULL) {
-//             lastupper = i;
-//             // 1. Store the upper border of the renderable area chunk. This is when the first mesh inside the renderable chunk has been reached
-//             clampy.upper_chunk.upper_border = top;
-//             clampy.upper_chunk.upper_meshidx = i;
-//          }
-//       }
-//    }
-
-//    clampy.both_chunks_active = false;
-
-//    return {
-//       firstupper: firstupper,
-//       lastupper: lastupper,
-//       firstlower: firstlower,
-//       lastlower: lastlower,
-//       clamped_buffer: clamped_buffer
-//    };
-// }

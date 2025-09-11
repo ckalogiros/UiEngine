@@ -3,6 +3,7 @@
 const bin_a_32 = new Int8Array(32);
 
 
+/** */
 function binary_32_to_string(val, byte_len=8) {
 
     let bin_str = '';
@@ -17,21 +18,19 @@ function binary_32_to_string(val, byte_len=8) {
     return bin_str;
 
 }
-
 /**
  * This can be used to determine if an unsigned integer is a power of 2 or is 0: 
  * apply the formula followed by a 0-test on the result
  */
 function op_turn_off_right_most_bit(val)  { return val & (val-1); }
+/** */
 function op_isolate_right_most_bit(val)  { return val & (-val); }
 /**
  * These can be used to determine if a nonnegative integer is of the form {2^j 2^k} for some {j>=k>=0} 
  * apply the formula followed by a 0-test on the result
  */
 function op_turn_off_right_most_contiguous_bits(val)  { return ((val & (-val)) + val) & val; }
-
-
-
+/** */
 export function Test_bitwise_from_book_run_all_tests() {
 
     {

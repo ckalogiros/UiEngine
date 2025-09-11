@@ -27,7 +27,7 @@ export function Time_intervals_init_time(){
 }
 
 
-
+/** */
 class Interval {
    t;
    interval; // In miliseconds
@@ -168,7 +168,8 @@ class TimeIntervals {
 
    Update() {
 
-      for (let i = 0; i < this.count; i++) {
+      // for (let i = 0; i < this.count; i++) {
+      for (let i = this.count-1; i >= 0; i--) {
 
          if(this.ti[i].isActive)
             this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
@@ -243,55 +244,42 @@ class TimeIntervals {
 
 
 
+/** */
 const intervalTimers = new TimeIntervals;
 
+/** */
 export function Time_intervals_initialize(){
    // TODO: Make sure its initialized ONCE 
    intervalTimers.Init();
 }
-
+/** */
 export function Time_intervals_destroy_all() {
    for (let i = 0; i < intervalTimers.size; i++) {
       intervalTimers.DestroyByIdx(i);
    }
 }
-
-
-
-
+/** */
 export function Time_intervals_reset_byidx(idx) {
    intervalTimers.ti[idx].ResetTime();
 }
-
-
-
+/** */
 export function Time_intervals_update() {
    intervalTimers.Update();
 }
-
-
-
-//  Returns the timeInterval index
+/** Returns the timeInterval index */
 export function Time_intervals_create(interval, name, repeat, clbk, params) {
    // console.log('INTERVAL create', name)
    return intervalTimers.Create(interval, name, repeat, clbk, params);
 }
-
-
-
+/** */
 export function Time_intervals_get_byidx(idx) {
    return intervalTimers.ti[idx];
 }
-
-
-
+/** */
 export function Time_intervals_destroy_byidx(idx) {
    intervalTimers.DestroyByIdx(idx);
 }
-
-
-
-// DEBUG
+/** DEBUG */
 export function Time_intervals_print() {
    intervalTimers.Print();
 }
@@ -417,12 +405,11 @@ class StepTimers {
 
 const stepTimers = new StepTimers;
 
+/** */
 export function Step_timers_create(duration, step, clbk, stopClbk, params) {
    stepTimers.Create(duration, step, clbk, stopClbk, params);
 }
-
-
-
+/** */
 export function Step_timers_update() {
 
    for (let i = 0; i < stepTimers.size; i++) {

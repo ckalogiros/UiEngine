@@ -7,9 +7,8 @@
 
 "use strict";
 
-import { Vertex_buffer_group_get, Vertex_buffer_group_has_scissorbox, Vertex_buffer_group_update_scissorbox } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_group_get } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
-import { Mesh_set_and_update_wpos_uniform } from "../Drawables/Operations/MeshHelperFunctions.js";
 import { New_generic_buffer } from "./Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "./MeshBuffer.js";
 import { Str_buffer_mesh_names_get_by_idx } from "./StringBuffer.js";

@@ -11,6 +11,7 @@ import { Callback_animations_create, Callback_animations_replace_byidx } from ".
 
 
 let _cnt = 0;
+/** */
 export const CALLBACK_ANIMATION_TYPE_IDX = {
    MOVE_XY: _cnt++,
    MOVE_X: _cnt++,
@@ -19,6 +20,7 @@ export const CALLBACK_ANIMATION_TYPE_IDX = {
    COUNT: _cnt,
 };
 _cnt = 0x1;
+/** */
 export const CALLBACK_ANIMATION_TYPE_FLAGS = {
    MOVE_XY: _cnt,
    MOVE_X: _cnt <<= 0x1,
@@ -26,6 +28,7 @@ export const CALLBACK_ANIMATION_TYPE_FLAGS = {
    RCORNERS: _cnt <<= 0x1,
 };
 
+/** */
 const _ready_animations_buffer = [
    { run: Animation_move_xy_inflate_run, stop: Animation_move_xy_inflate_stop },
    { run: Animation_move_x_inflate_run, stop: Animation_move_x_inflate_stop },

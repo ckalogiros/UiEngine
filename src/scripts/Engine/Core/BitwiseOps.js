@@ -20,43 +20,32 @@ const BIT_MASKS = {
 };
 
 
+/** */
 export function Bitwise_opps_store_low_7bits(val){
    if(val > BIT_MASKS.X7) alert('914443121 \n VALUE EXCEEDS BIT MASK LIMIT')
    const ret_val = val;
    return ret_val;
 }
+/** */
 export function Bitwise_opps_store_high_9bits(val){
    if(val > BIT_MASKS.X9) alert('914443122 \n VALUE EXCEEDS BIT MASK LIMIT')
    const ret_val = (val << 0x7) ;
    return ret_val;
 }
+/** */
 export function Bitwise_opps_retrieve_low_7bits(val){
    // const ret_val = ((val >> 0x7) & BIT_MASKS.X7);
    const ret_val = val & BIT_MASKS.X7;
    return ret_val;
 }
+/** */
 export function Bitwise_opps_retrieve_high_9bits(val){
    // const ret_val = ((val >> BIT_MASKS.X7) & BIT_MASKS.r9);
    const ret_val = ((val >> 0x7) & BIT_MASKS.X9);
    // const ret_val = ((val >> 0x7) & 0x1ff);
    return ret_val;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** */
 export function Bitwise_operations_run_test() {
 
    let lowval = 127; 
@@ -82,24 +71,7 @@ export function Bitwise_operations_run_test() {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Calculate index from flag
+/** Calculate index from flag */
 export function Bitwise_calc_bit_length_from_flag(flag) {
 
    if (flag === 0) return 0; // Edge case: 0 has no bits set
@@ -108,8 +80,7 @@ export function Bitwise_calc_bit_length_from_flag(flag) {
    // return (32 - Math.clz32(flag));
    return (32 - Math.clz32(flag));
 }
-
-// Calculate index from flag starting from a base(subtracting all previous indexes and start from 0-th index at base)
+/** Calculate index from flag starting from a base(subtracting all previous indexes and start from 0-th index at base) */
 export function Bitwise_calc_bit_length_from_flag_base(flag, base) {
 
    if (flag === 0) return 0; // Edge case: 0 has no bits set

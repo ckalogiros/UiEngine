@@ -54,6 +54,44 @@ export class Geometry2D {
     }
 }
 /** */
+export class Geometry_Line {
+
+    constructor(pos = [0, 0, 0], dim = [0, 0], scale = [1, 1], num_faces=1) {
+
+        this.pos = [0, 0, 0];
+        this.dim = [0, 0];
+        this.scale = [0, 0];
+        this.defPos = [0, 0, 0];
+        this.defDim = [0, 0];
+        this.defScale = [0, 0];
+        this.time = 1;
+        this.generic = {a:0,b:0};
+        this.num_faces = num_faces;
+        this.type = MESH_TYPE.GEOMETRY_LINE;
+        
+        this.sid = {
+            shad: SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
+            attr: (SID.ATTR.VPOS2 | SID.ATTR.WPOS3),
+            inst: 0x0,
+            unif: 0,
+            pass: 0,
+        };
+
+        const dim1 = dim;
+        
+        math.CopyArr3(this.pos, math.FloorArr3(pos));
+        math.CopyArr2(this.dim, dim1);
+        math.CopyArr2(this.scale, scale);
+
+        // Keep a copy of the starting dimention and position
+        math.CopyArr2(this.defDim, dim1);
+        math.CopyArr2(this.defScale, scale);
+        math.CopyArr3(this.defPos, this.pos);
+
+
+    }
+}
+/** */
 export class Geometry2D_Text extends Geometry2D {
 
     constructor(pos=[0,0,0], text='', size) {

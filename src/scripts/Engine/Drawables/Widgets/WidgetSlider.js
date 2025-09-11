@@ -31,6 +31,7 @@ import { View_add_mesh, View_create_new_group, View_remove_mesh } from '../../Co
 
 
 
+/** */
 export class Widget_Slider_Simple extends Rect_Mesh {
 
    /**
@@ -528,9 +529,6 @@ export class Widget_Slider_Simple extends Rect_Mesh {
    }
 }
 
-
-
-
 /*******************************************************************************************************************************************************/
 // Slider Functionality 
 
@@ -726,7 +724,7 @@ export function Slider_simple_connect(slider_bar, Clbk, clbk_params) {
 
    const bar = slider_bar;
 
-   Mesh_event_callback_create(bar, Clbk, clbk_params);
+   const params = Mesh_event_callback_create(bar, Clbk, clbk_params);
 
    // Run the callback to set the sliders initial value.
    Clbk(params, bar.slider_val);
@@ -737,7 +735,7 @@ export function Slider_connect(slider, Clbk, clbk_params, call_immediately = fal
 
    const bar = slider.children.buffer[slider.bar_idx];
 
-   Mesh_event_callback_create(bar, Clbk, clbk_params);
+   const params = Mesh_event_callback_create(bar, Clbk, clbk_params);
 
    // Run the callback to set the sliders initial value.
    if (call_immediately) Clbk(params, bar.slider_val);
@@ -1410,7 +1408,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
             mesh.state.mask |= MESH_STATE_FLAGS.IN_FOCUS;
             bar.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
 
-            // Mesh_set_root_in_focus(mesh.root_bufferidx);
          }
 
          return true;
@@ -1428,7 +1425,6 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
             State_mesh_set_focused(mesh);
             mesh.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
 
-            // Mesh_set_root_in_focus(mesh.root_bufferidx);
          }
 
          return true;

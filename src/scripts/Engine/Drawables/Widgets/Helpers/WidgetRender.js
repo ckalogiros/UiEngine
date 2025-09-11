@@ -1,7 +1,7 @@
 "use strict";
 
 import { View_render_whole_view_group_NEW } from "../../../Core/Views/MeshBufferViews.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventFunctions.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../../Events/EventListeners.js";
 
 /**
  * If group has already been rendered, then the mesh must be added to the vertex buffer without:

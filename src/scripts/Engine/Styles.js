@@ -9,24 +9,19 @@ import { New_generic_buffer, New_int16_buffer } from "./Core/Buffers.js";
 
 
 const _margin_buffer = New_generic_buffer(_, 'Margins');
+/** */
 export function Styles_margin_reset(){ _margin_buffer.ResetFull(); } 
 const _pad_buffer = New_generic_buffer(_, 'Paddings');
+/** */
 export function Styles_pad_reset(){ _pad_buffer.ResetFull(); } 
 const _hover_margin_buffer = New_generic_buffer(_, 'Hover Margins');
+/** */
 export function Styles_hover_margin_reset(){ _hover_margin_buffer.ResetFull(); } 
-
-
-
-
-
-
-
-
 
 
 /*******************************************************************************************************************************************/
 // CREATE
-
+/** */
 export function Styles_create(margin=[0,0], pad=[0,0], hover_margin=[0,0]){ 
 
    const idx = Styles_margin_create(margin);
@@ -36,59 +31,53 @@ export function Styles_create(margin=[0,0], pad=[0,0], hover_margin=[0,0]){
    return idx; 
 }
 
-
-
-
+/** */
 function Styles_margin_create(margin=[0,0]){ return _margin_buffer.Add(margin); }
-
-
-
-
+/** */
 function Styles_hover_margin_create(margin=[0,0]){ return _hover_margin_buffer.Add(margin); }
-
-
-
-
+/** */
 function Styles_pad_create(pad=[0,0]){ return _pad_buffer.Add(pad); }
-
-
-
 
 
 
 
 /*******************************************************************************************************************************************/
 // GET
-
+/** */
 function Margin_get(idx){ return _margin_buffer.buffer[idx]; }
+/** */
 function Margin_get_x(idx){ return _margin_buffer.buffer[idx][0]; }
+/** */
 function Margin_get_y(idx){ return _margin_buffer.buffer[idx][1]; }
 const margin_fn_table = [ Margin_get, Margin_get_x, Margin_get_y, ];
+/** */
 export function Styles_margin_get(axis=0, idx){ return margin_fn_table[axis](idx); }
 
 
 
 
+/** */
 function Hover_margin_get(idx){ return _hover_margin_buffer.buffer[idx]; }
+/** */
 function Hover_margin_get_x(idx){ return _hover_margin_buffer.buffer[idx][0]; }
+/** */
 function Hover_margin_get_y(idx){ return _hover_margin_buffer.buffer[idx][1]; }
 const hover_margin_fn_table = [ Hover_margin_get, Hover_margin_get_x, Hover_margin_get_y, ];
+/** */
 export function Styles_hover_margin_get(axis=0, idx){ return hover_margin_fn_table[axis](idx); }
 
 
 
 
+/** */
 function Pad_get(idx){ return _pad_buffer.buffer[idx]; }
+/** */
 function Pad_get_x(idx){ return _pad_buffer.buffer[idx][0]; }
+/** */
 function Pad_get_y(idx){ return _pad_buffer.buffer[idx][1]; }
 const pad_fn_table = [ Pad_get, Pad_get_x, Pad_get_y, ];
+/** */
 export function Styles_pad_get(axis=0, idx){ return pad_fn_table[axis](idx); }
-
-
-
-
-
-
 
 
 
@@ -97,25 +86,18 @@ export function Styles_pad_get(axis=0, idx){ return pad_fn_table[axis](idx); }
 
 /*******************************************************************************************************************************************/
 // SET
-
+/** */
 export function Styles_margin_set(idx, margin){
    // TODOD: DEBUG the idx if exists and in boundaries
    _margin_buffer.buffer[idx][0] = margin[0];
    _margin_buffer.buffer[idx][1] = margin[1];
 }
-
-
-
-
+/** */
 export function Styles_hover_margin_set(idx, margin){
    // TODOD: DEBUG the idx if exists and in boundaries
    _hover_margin_buffer.buffer[idx][0] = margin[0];
    _hover_margin_buffer.buffer[idx][1] = margin[1];
 }
-
-
-
-
 /** */
 export function Styles_pad_set(idx, pad){
    // TODOD: DEBUG the idx if exists and in boundaries
@@ -146,7 +128,7 @@ export function Styles_pad_y_set(idx, pad){
 
 /*******************************************************************************************************************************************/
 // DESTROY
-
+/** */
 export function Styles_remove_byidx(idx){
    // TODOD: DEBUG the idx if exists and in boundaries
 
@@ -167,18 +149,12 @@ export function Styles_remove_byidx(idx){
 // Batch Destroy
 
 const _batch_destroy_storage = New_int16_buffer(_, 'Styles-BatchDestroy');
-
-
-
-
+/** */
 export function Styles_batch_destroy_store(idx){
    // TODOD: DEBUG the idx if exists and in boundaries
    _batch_destroy_storage.Add(idx);
 }
-
-
-
-
+/** */
 export function Styles_batch_destroy_run(){
    // TODOD: DEBUG the idx if exists and in boundaries
 
@@ -202,19 +178,6 @@ export function Styles_batch_destroy_run(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*******************************************************************************************************************************************************************************/
 // DEBUG-PRINT
 /*******************************************************************************************************************************************************************************/
@@ -222,10 +185,13 @@ export function Styles_batch_destroy_run(){
 _margin_buffer
 _pad_buffer
 _hover_margin_buffer
+/** */
 export function Styles_margin_print() { console.log('_margin_buffer:', _margin_buffer); }
+/** */
 export function Styles_hover_margin_print() { console.log('_margin_buffer:', _hover_margin_buffer); }
+/** */
 export function Styles_pad_buffer_print() { console.log('_pad_buffer:', _pad_buffer); }
-
+/** */
 export function Styles_margin_print_loop() { 
 
    for (let i = 0; i <= _margin_buffer.boundary; i++) {
@@ -234,7 +200,7 @@ export function Styles_margin_print_loop() {
       if(marg) console.log(' ', i, `marg:${marg}`);
    }
 }
-
+/** */
 export function Styles_hover_margin_print_loop() { 
 
    for (let i = 0; i <= _hover_margin_buffer.boundary; i++) {
@@ -243,7 +209,7 @@ export function Styles_hover_margin_print_loop() {
       if(hover_marg) console.log(' ', i, `hover marg:${hover_marg}`);
    }
 }
-
+/** */
 export function Styles_pad_buffer_print_loop() { 
 
    for (let i = 0; i <= _pad_buffer.boundary; i++) {

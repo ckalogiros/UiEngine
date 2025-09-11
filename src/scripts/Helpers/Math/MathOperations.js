@@ -234,6 +234,7 @@ export function SubArr3(arr1, arr2){
 /** */
 export function Floor(val){
     return ~~val;
+    // return Math.floor(val);
 }
 /** */
 export function FloorArr2(arr){
@@ -245,6 +246,7 @@ export function FloorArr3(arr){
 }
 /** */
 export function Round(val){
+    // return ~~val;
     return Math.round(val);
 }
 /** */
@@ -304,6 +306,11 @@ export function Clamp(val, min, max) {
 
     const v = val < min ? min : val;
     return v > max ? max : v;
+}
+/** */
+export function ClampMax(val, max) {
+
+    return val > max ? max : val;
 }
 /* Linear mapping from range <a1, a2> to range <b1, b2> */
 /**

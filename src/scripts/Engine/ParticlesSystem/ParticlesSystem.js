@@ -750,10 +750,8 @@ class Emitter {
 
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
+/** */
 export function Particles_system_reset() { return _emitters.ResetFull(); }
-
-
-
 /** */
 export function Particles_get_particle_system(idx) { return _emitters.buffer[idx]; }
 /**
@@ -1345,22 +1343,6 @@ export function Particle_system_emitter_enable_intermidiate_emission(emitter_idx
 
 
 
-/****************************************************************************************************************************************************************/
-// Function Pointers
-/** */
-function Emitter_particles_set_direction_emission(emitter) {
-
-}
-/** */
-function Emitter_particles_set_direction_explosio(emitter) {
-
-}
-
-
-
-
-
-
 
 
 export function Particle_system_set_uwpos_x(emitter, pos_x) {
@@ -1371,13 +1353,6 @@ export function Particle_system_set_uwpos_y(emitter, pos_y) {
 
    Mesh_unif_set_vb_root_wposy(emitter.root_posidx, pos_y);
 }
-
-
-
-
-
-
-
 
 
 
@@ -1455,201 +1430,4 @@ export function Particle_system_print_free_particles_buffer() {
       );
    }
 }
-
-
-
-
-
-
-/**SAVE */
-// export function Particle_system_emitt(params) {
-
-//    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles);
-
-//    const len = params.params.target_params.length;
-//    for (let i = 0; i < len; i++) {
-
-//       const emitter_idx = params.params.target_params[i]
-//       const emitter = _emitters.buffer[emitter_idx];
-//       let next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary;
-
-//       const has_intermidiate_emission = emitter.has_intermidiate_emission;
-
-//       // Case emitter has been deactivated (if all of its particles animations have been stoped)
-//       if (!emitter.is_active) {
-
-//          emitter.is_active = true;
-//          Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
-//       }
-
-
-//       /**
-//        * 'has_intermidiate_emission'
-//        * Fill big position gaps (created by great movement speed) with particles
-//        * 
-//        * Calculate the magnitude of the prev and curent pos
-//        * if the difference is greater than a preffered distance:
-//        *    reduce the magnitude by a threshold distance
-//        *    the angle is calculated from atan2(x,y)
-//        *    calculate the particle position with pos = [magnitude*sin(angle), magnitude*cos(angle)]
-//        *    create new particle at that position
-//        *    repeat until the magnitude-distance is 0
-//        * 
-//       */
-
-//       let mag = 0, // The vector magnitude of the difference of the previous and current emitter position
-//          angle = 0,
-//          intermediate_num_particles = 0, // Store the number of total particles to be created in a frame
-//          dist = 0, // A minimum distance in which a particle must be created
-//          mag_partition = 0; // This will cary the next reduced magnitude distance
-
-//       if (has_intermidiate_emission) {
-
-//          const y = emitter.geom.pos[1]
-//          const x = emitter.geom.pos[0]
-//          const pos_dif = [emitter.geom.prev_pos[0] - x, emitter.geom.prev_pos[1] - y];
-//          angle = Math.atan2(pos_dif[0], pos_dif[1])
-//          mag = Magnitude(pos_dif[0], pos_dif[1]);
-
-//          mag += emitter.left_over;
-
-//          // const dist = 2;
-//          dist = emitter.geom.dim[0] / 6;
-//          const ratio = mag / dist;
-//          intermediate_num_particles = Floor(ratio);
-//          emitter.left_over = ratio - intermediate_num_particles; // Save any fraction value of the distance magnitude for later use
-
-//          if (intermediate_num_particles === 0) intermediate_num_particles = 1; // Emitt a particle at least once per frame
-
-//          // emitter.mat.col = GetSequencedColor();
-
-//       }
-
-
-
-
-//       const stored_pos = [emitter.geom.pos[0], emitter.geom.pos[1]]; // Store the emitters's pos to re-set it
-
-//       // Choise: If has intermidiate_emission, calculate the num particles from the prev_pos-pos magnitude. Else use the 'num_particles_per_frame' variable
-//       const num_particles = has_intermidiate_emission ? intermediate_num_particles : emitter.num_particles_per_frame;
-
-
-//       for (let j = 0; j < num_particles; j++) {
-
-
-//          if (has_intermidiate_emission) {
-
-//             const new_pos = [(mag_partition * Math.sin(angle)), (mag_partition * Math.cos(angle))];
-//             emitter.geom.pos[0] = stored_pos[0] + new_pos[0];
-//             emitter.geom.pos[1] = stored_pos[1] + new_pos[1];
-//             emitter.geom.time = emitter.t_step * j;
-//          }
-
-//          if (next_free_particle_idx === INT_NULL) {
-
-//             const particle = new Particle(emitter);
-//             const particle_idx = emitter.particles_buffer.Add(particle);
-//             particle.is_alive = true;
-
-//             emitter.ParticleAddToGfx(particle_idx);
-
-//          }
-//          else {
-
-//             const particle_idx = emitter.free_particles_idxs_buffer.buffer[next_free_particle_idx];
-//             const particle = emitter.particles_buffer.buffer[particle_idx];
-
-//             if (particle !== undefined) {
-
-//                particle.is_alive = true;
-
-//                // particle.accel = emitter.accel;
-//                particle.deccel = emitter.deccel;
-//                particle.grav = emitter.gravity;
-
-//                // particle.scale = initial_scale;
-//                particle.scale = emitter.max_scale;
-
-//                if (has_intermidiate_emission) particle.time = emitter.t_step * j;
-//                // else particle.time = 0;
-//                else particle.time = emitter.geom.time;
-//                // particle.col[3] -= .2*j;
-
-//                particle.pos[0] = emitter.geom.pos[0];
-//                particle.pos[1] = emitter.geom.pos[1];
-
-//                particle.dim[0] = emitter.geom.dim[0];
-//                particle.dim[1] = emitter.geom.dim[1];
-
-//                particle.col[0] = emitter.mat.col[0];
-//                particle.col[1] = emitter.mat.col[1];
-//                particle.col[2] = emitter.mat.col[2];
-//                particle.col[3] = emitter.mat.col[3];
-
-//                particle.generic.a = emitter.geom.generic.a;
-//                particle.generic.b = emitter.geom.generic.b;
-
-//                if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
-
-//                   const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
-//                   particle.dirx = dir.x;
-//                   particle.diry = dir.y;
-//                   particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
-
-//                }
-//                if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
-
-//                   const dir = Polar_coordinates()
-//                   particle.dirx = dir.x;
-//                   particle.diry = dir.y;
-
-//                   particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
-//                   // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
-
-//                }
-
-//                // emitter.free_particles_idxs_buffer.RemoveByIdx(next_free_particle_idx);
-//                emitter.free_particles_idxs_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
-//                next_free_particle_idx = emitter.free_particles_idxs_buffer.boundary
-//             }
-//             else {
-//                console.error('0099890099889 UNDEFINED')
-//             }
-//          }
-
-//          // increment to the next position
-//          mag_partition += dist;
-//       }
-
-
-//       // emitter.left_over += mag;
-//       // emitter.left_over += mag-mag_partition;
-
-
-//       emitter.geom.pos[0] = stored_pos[0];
-//       emitter.geom.pos[1] = stored_pos[1];
-//       emitter.geom.prev_pos[0] = emitter.geom.pos[0];
-//       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-//       // if (is_particle_created) {
-
-//       //    emitter.geom.pos[0] = stored_pos[0];
-//       //    emitter.geom.pos[1] = stored_pos[1];
-
-//       //    emitter.geom.prev_pos[0] = emitter.geom.pos[0];
-//       //    emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-//       // }
-
-//    }
-
-//    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles);
-
-// }
-
-
-
-
-
-
-
-
 
