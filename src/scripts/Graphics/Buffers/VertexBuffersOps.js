@@ -2082,6 +2082,90 @@ export function Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time(vbidx, start, 
 
 }
 
+/****************************************************************************************************************************************************************************/
+// Particles: Instanced Geometry
+/** */
+export function Gl_particles_batch_set_instanced_col4_wpos3_dim2(vbidx, start, r,g,b,a, x,y, w,h, t) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   // V1
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = t;
+   
+   // V2
+   vb_data[index++] = r;
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = t;
+   
+   // V3
+   vb_data[index++] = r;
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = t;
+   
+   // V4
+   vb_data[index++] = r;
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = t;
+}
+
+/** */
+export function Gl_particles_batch_set_vpos2_rcorner(vbidx, start, w,h, rc, ) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   // V1
+   vb_data[index++] = -w;
+   vb_data[index++] = -h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V2
+   vb_data[index++] = -w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V3
+   vb_data[index++] = w;
+   vb_data[index++] = -h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V4
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+}
 
 
 

@@ -300,8 +300,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          // Here we store any scroller created vb for all scrollers in the program
          if (flags & GFX_CTX_FLAGS.SCROLLER_VB) GFX_VBIDX_RENAME_ME.SCROLLER_VB_IDX = vb_groupidx;
 
-         // Vertex_buffer_group_set_texidx(vb_groupidx, mesh.mat.texidx); // Update the vertex buffer to store the texture index
-
          if (DEBUG.GFX.CONTEXT_CREATE) console.log('NO BUFFER FOUND. CREATE NEW VB ############', progidx, vbidxs);
 
 
@@ -367,19 +365,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
       // Add the new vertexBuffer to the render queue
       Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
       Vertex_buffer_group_set_ibidx(vb_groupidx, ibidx); // Create a refference of ib to vb
-
-
-      ///// msdjhdhjhsdjkhsjhd
-
-      // const eee = Renderqueue_Add(progidx, vb_groupidx, ibidx, true);
-      // Vertex_buffer_group_set_render_queueidx(vb_groupidx, eee);
-      
-      // const vb_idxs = Vertex_buffer_group_get_vbidxs(vb_groupidx);
-      // for(let i = 1; i <= vb_idxs.boundary; i++) {
-         
-      //    const vb_idx = vb_idxs.buffer[i];
-      //    Renderqueue_Add(progidx, vb_idx, ibidx, true);
-      // }
    }
 
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count);

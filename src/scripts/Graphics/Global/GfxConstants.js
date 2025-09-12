@@ -201,6 +201,7 @@ const V_SCALE_COUNT = 2;
 const V_TEX_COUNT = 2;
 const V_WPOS_COUNT = 3;
 const V_WPOS_TIME_COUNT = 4; // Use the 4th element for the time attribute 
+const V_DIM2_COUNT = 2;
 const V_STYLE_COUNT = 3;
 const V_BORDER_WIDTH = 1, V_BORDER_FEATHER = 1, V_ROUND_CORNERS = 1;
 const V_TIME_COUNT = 1;

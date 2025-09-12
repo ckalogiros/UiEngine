@@ -8,8 +8,7 @@ import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../En
 import { Widget_ready_label, Widget_ready_slider } from "../../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js";
 import { Mesh_get_name, Mesh_listener_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
 import { Layout_expand_x_axis, Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
-import { View_render_from_view_NEW, View_render_whole_view_group_NEW, View_reset_rendergroup_draw_count, View_reset_rendering_buffer_whole_view_group } from "../../Engine/Core/Views/MeshBufferViews.js";
-import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from "../../Engine/Core/Views/MeshBufferViews.js";
 import { Widget_render } from "../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Color_theme_label_auto, Color_theme_label_auto2 } from "../../Engine/Drawables/Material/Themes.js";
 

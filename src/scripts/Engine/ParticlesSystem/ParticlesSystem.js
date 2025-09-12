@@ -1,10 +1,10 @@
 "use strict";
 
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
-import { Vertex_buffer_render_group_set_count_from_num_faces, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
+import { Vertex_buffer_render_group_add_instance, Vertex_buffer_render_group_remove_instance, Vertex_buffer_render_group_set_count_from_num_faces, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2, Gl_particles_batch_set_vpos2_rcorner } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -285,10 +285,12 @@ class Emitter {
 
       this.vertex_buffer_start = 0;  // The start position in the vertex buffer(start may vary according to the first particle) 
 
+      const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME);
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3, // TODO: some attribs are activated in the 'Fn Enables'
          unif: 0x0,
+         inst: inst_attribs,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
          blend_options: 0x0,
@@ -325,6 +327,8 @@ class Emitter {
 
       this.num_particles_per_frame = properties.num_particles_per_frame;
       this.has_intermidiate_emission = properties.has_intermidiate_emission;
+
+
 
 
       // Initialize Function Pointers
@@ -867,7 +871,7 @@ export function Particle_system_emitt(params) {
 
       const has_intermidiate_emission = emitter.has_intermidiate_emission;
       
-      // Case emitter has been deactivated (if all of its particles animations have been stoped)
+      // Case emitter has been deactivated (if all of its particle animations have been stoped)
       if ((emitter.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0) {
 
          emitter.state.mask |= MESH_STATE_FLAGS.ACTIVE;
@@ -963,6 +967,8 @@ export function Particle_system_emitt(params) {
             
             particle.generic.a = emitter.geom.generic.a;
             particle.generic.b = emitter.geom.generic.b;
+
+            console.log(particle.pos[0],particle.pos[1])
             
             if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
                
@@ -1001,6 +1007,9 @@ export function Particle_system_emitt(params) {
       emitter.geom.pos[1] = stored_pos[1];
       emitter.geom.prev_pos[0] = emitter.geom.pos[0];
       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
+      
+      // Instanced Geometry
+      Vertex_buffer_render_group_add_instance(emitter.gfx.vb.render_groupidx);
       
       
       // Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, emitter.total_alive);
@@ -1146,17 +1155,27 @@ export function Particle_system_update() {
             // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
             // Render Particles
             // emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv, particle.generic);
-            emitter.UpdateGfxBuffersFn(
-               emitter.gfx.vb.groupidx, particle.start, 
+            // emitter.UpdateGfxBuffersFn(
+            //    emitter.gfx.vb.groupidx, particle.start, 
+            //    particle.col[0], particle.col[1], particle.col[2], particle.col[3],
+            //    particle.pos[0], particle.pos[1], 
+            //    particle.dim[0], particle.dim[1],
+            //    emitter.mat.style.rcorners, 
+            //    particle.time, 
+            //    particle.rot[0], particle.rot[1], particle.rot[2], particle.rot[3],
+            //    particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
+            //    particle.generic.a, particle.generic.b,
+            // );
+
+            Gl_particles_batch_set_instanced_col4_wpos3_dim2(
+               // emitter.gfx.vb.groupidx, particle.start, 
+               2, particle.start, 
                particle.col[0], particle.col[1], particle.col[2], particle.col[3],
                particle.pos[0], particle.pos[1], 
                particle.dim[0], particle.dim[1],
-               emitter.mat.style.rcorners, 
                particle.time, 
-               particle.rot[0], particle.rot[1], particle.rot[2], particle.rot[3],
-               particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
-               particle.generic.a, particle.generic.b,
             );
+
             // vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot, uv
             // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
 
@@ -1176,11 +1195,21 @@ export function Particle_system_update() {
                //    Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
                // }
 
+               // Remove instanced count
+               Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
+
             }
 
             needs_update = true;
          }
       }
+
+      Gl_particles_batch_set_vpos2_rcorner(
+         // emitter.gfx.vb.groupidx, 0, 
+         3, 0, 
+         emitter.geom.dim[0], emitter.geom.dim[1],
+         emitter.mat.style.rcorners, 
+      );
 
       // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
       if (needs_update) Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);

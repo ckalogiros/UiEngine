@@ -107,7 +107,6 @@ class RenderQueue {
    }
 
 
-
    Add(progidx, vb_groupidx, ibidx, isActive) {
 
       if(this.count >= MAX_DRAWQUEUE_COUNT) alert('5412231432 \nRenderqueue buffer overflow')
@@ -133,7 +132,7 @@ class RenderQueue {
       // DEBUG
       if (this.count > this.size) alert('ERROR - RenderQueue buffer is FULL')
 
-      return obj.queueIdx
+      // return obj.queueIdx
    }
 
 

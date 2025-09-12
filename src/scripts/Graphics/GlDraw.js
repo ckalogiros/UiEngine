@@ -91,7 +91,6 @@ export function Gl_draw(gl) {
             
             for (let k = 0; k <= vb_group.vb_idxs.boundary; k++) {
 
-                // const vb_info = VBI_get_byidx(render_group.vb_data_idx);
                 const vb_data_idx = vb_group.vb_idxs.buffer[k];
                 const vb_info = VBI_get_byidx(vb_data_idx);
 
@@ -103,6 +102,7 @@ export function Gl_draw(gl) {
                 vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
                 render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
     
+                gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
             }
             
             
@@ -113,7 +113,7 @@ export function Gl_draw(gl) {
              *      2, num instances
              *  );
              */
-            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 1)
+            // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 1)
             // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 3)
             // gl.drawElementsInstanced(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 2)
 

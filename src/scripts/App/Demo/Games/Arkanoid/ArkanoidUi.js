@@ -6,7 +6,6 @@ import { Create_rect_mesh, Create_widget_label } from "../../../../Engine/Drawab
 import { Style_label_default_properties, Style_rect_default_properties, Widget_gfx_ready_enable } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../../../Graphics/Buffers/VertexBuffers.js";
 import { _arkanoid_struct } from "./Arkanoid.js";
 import { COIN_SIZE, COIN_TEXTURE } from "./Coin.js";
 

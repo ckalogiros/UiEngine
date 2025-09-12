@@ -454,9 +454,7 @@ export function View_add_mesh(groupidx, mesh, is_root_widget_on_reused_vb=false)
    const vb_groupidx = mesh.gfx.vb.groupidx;
    const view = _view_buffer.buffer[groupidx];
 
-   // const vb = Vertex_buffer_group_get_byidx(vb_groupidx);
-if(view===_)
-   console.log()
+
    // Enable copying the mesh's wpos if it is the view group root or if it is a root by it's self(added afterwards to the group)
    const is_root_group = (view.rootidx === mesh.mesh_bufferidx) ? true : (Root_group_view_is_widget_root(mesh.root_bufferidx, mesh_bufferidx)) ? true : false ;  // Set u_wpos on the root mesh, from which all root's meshes position will draw from
 

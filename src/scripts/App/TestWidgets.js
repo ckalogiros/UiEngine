@@ -252,7 +252,7 @@ export function TestWidgetsGeneric() {
 
     let yy = 0, pp = 23;
     { // Statistics
-        // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
+        const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
@@ -524,6 +524,11 @@ export function TestWidgetsGeneric() {
     { // Window menu
         // Window_menu_2();
     }
+    
+    { // Instanced Geometry
+
+        // Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
+    }
 
     { // Annimations
 
@@ -548,11 +553,6 @@ export function TestWidgetsGeneric() {
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 220, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY);
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 420, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_X);
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 420, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY|CALLBACK_ANIMATION_TYPE_FLAGS.SCALE);
-        }
-
-        { // Instanced Geometry
-
-            Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
         }
 
         { // Mesh Animations
@@ -581,7 +581,7 @@ export function TestWidgetsGeneric() {
 
         { // Demo Particles 
 
-            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
+            Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
 
             // Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
 
@@ -5521,19 +5521,43 @@ function Instanced_geometry(col, pos, dim) {
     const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0,0,1.,1.,.1,0), name: 'instanced geom panel', }));
     Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, })
 
-    const w=200, h=10;
-    {
-        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,10,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.3,1,1.,1.,.4,0), name: 'line-inst 1',  }));
-        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    const w=200, h=2., d=1, r_corners = 1;
+    let hue = .1;
+    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+
+    for(let i = 0; i < 100; i++) {
+
+        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,.6,0), name: `line-inst ${i}`,  }));
+        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
         panel.AddItem(line);
-        line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+        line.sid.inst = inst_attribs;
+
     }
-    {
-        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [100,50,0], dim: [w,h+20], col: Color_hsv_to_rgb_calibrated(.1,1,1.,1.,.4,0), name: 'line-inst 2',  }));
-        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
-        panel.AddItem(line);
-        line.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
-    }
+    // {
+    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*2,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.3,1,1.,1.,.4,0), name: 'line-inst 1',  }));
+    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    //     panel.AddItem(line);
+    //     line.sid.inst = inst_attribs;
+    // }
+    // {
+    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*4,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.13,1,1.,1.,.4,0), name: 'line-inst 2',  }));
+    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    //     panel.AddItem(line);
+    //     line.sid.inst = inst_attribs;
+    // }
+    // {
+    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*6,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.78,1,1.,1.,.5,0), name: 'line-inst 3',  }));
+    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    //     panel.AddItem(line);
+    //     line.sid.inst = inst_attribs;
+    // }
+    // {
+    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*8,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.6,1,1.,1.,.5,0), name: 'line-inst 4',  }));
+    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+    //     panel.AddItem(line);
+    //     line.sid.inst = inst_attribs;
+    // }
 
     panel.GenGfxCtx();
     Widget_render(panel);
