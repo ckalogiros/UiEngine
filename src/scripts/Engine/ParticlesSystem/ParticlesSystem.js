@@ -359,9 +359,9 @@ class Emitter {
          unif: 0x0,
          // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
-         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
-         inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         // inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
          // inst: 0x0,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
@@ -899,7 +899,7 @@ function Set_update_function_pointers(emitter) {
       // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
 
       // Per vertex geometry (for 1 mesh only, gets updated once on particles initialization and keeps constant/unchanged values)
-      const clean_attr = sid.attr & ~sid.inst; // Get the attributes without any instance geometry attributes flags
+      const clean_attr = sid.attr & ~sid.inst; // Get the attributes flags without any instance geometry attributes flags
       if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS)) {
          emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_rcorner;
       }
@@ -919,7 +919,6 @@ function Set_update_function_pointers(emitter) {
    else { // TODO: OLD, implement clearly what attributes the particle emitter has(like in VertexBufferFillOps.js)
 
       if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
-      // else if (emitter.sid.shad & SID.SHAD.FN_GLOW) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
       else if (emitter.sid.shad & SID.SHAD.FN_GLOW_SPHERE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
       else if (emitter.sid.shad & SID.SHAD.FN_NOISE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time;
       else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2;
