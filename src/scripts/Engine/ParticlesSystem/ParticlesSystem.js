@@ -3,8 +3,8 @@
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Vertex_buffer_render_group_add_instance, Vertex_buffer_render_group_remove_instance, Vertex_buffer_render_group_set_count_from_num_faces, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2, Gl_particles_batch_set_vpos2_rcorner } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name, VBI_get_byidx, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time, Gl_particles_batch_set_vpos2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2, Gl_particles_batch_set_vpos2, Gl_particles_batch_set_instanced_wpos3_time, Gl_particles_batch_set_col4_vpos2_dim2_rcorner, Gl_particles_batch_set_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_time } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -20,6 +20,11 @@ import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
+/**
+ * // TODO: Create all attributes of particles in separate buffers, so that we can copy all positions/time/color attribs in the vertex buffer at once
+ * 2. Remove class's Int32_Buffer_Reversed methods
+ * 3. Implement an interleaved buffer for all particles attributes
+ */
 
 /**
  * // TODO: Implement correctly the fillOp functions
@@ -59,6 +64,45 @@ const rand_max = 210;
 const interpolate = 1 / rand_max;
 
 
+// class Int32_Buffer_Reversed {
+
+//    constructor(size) {
+//       this.buffer = new Int32Array(size);
+//       this.size = size;
+//       this.count = 0;
+//       this.pos = 0;
+
+//       for(let i=0; i<=this.size-1; i++) {
+//          this.buffer[i] = INT_NULL;
+//       }
+//    }
+//    Add(idx) {  // populate free particles buffer from start to size
+//       this.buffer[this.count] = idx;
+//       this.count++;
+//    }
+//    AddFree(idx) { // Add free particle to free position
+      
+//       this.pos--;
+//       this.buffer[this.pos] = idx;
+//       this.count++;
+//    }
+//    GetNextFree() { // Get most left free particle 
+
+//       if(this.pos < 0 || this.pos >= this.size) {
+//          console.error('Particle index out of bounds: this.pos', this.pos)
+//          // alert()
+//          return undefined;
+//       }
+
+//       // console.log('Add', this.pos, this.buffer[this.pos]);
+//       // console.log('Add', this.buffer[this.pos]);
+//       const freeidx = this.buffer[this.pos];
+//       this.buffer[this.pos] = -1;
+//       this.pos++;
+//       this.count--;
+//       return freeidx;
+//    }
+// }
 class Int32_Buffer_Reversed {
 
    constructor(size) {
@@ -78,8 +122,6 @@ class Int32_Buffer_Reversed {
    AddFree(idx) { // Add free particle to free position
       
       this.pos--;
-      // console.log('Free', this.pos, idx);
-      // console.log('Free', idx);
       this.buffer[this.pos] = idx;
       this.count++;
    }
@@ -99,6 +141,31 @@ class Int32_Buffer_Reversed {
       this.count--;
       return freeidx;
    }
+}
+
+function Get_free_particle(free) {
+   const free_elem = free.buffer[free.pos];
+   // console.log('Get at:', free.pos, 'elem:', free.buffer[free.pos])
+   free.buffer[free.pos] = INT_NULL;
+   free.count--;
+   free.pos++;
+
+   if(free_elem !== INT_NULL)
+      return free_elem;
+   else if(free.pos >= free.size)
+      alert('Particles: No free elem avaliable');
+
+   return INT_NULL;
+}
+function Store_free_particle(free, idx) {
+
+   if(free.buffer[free.pos-1] !== INT_NULL || free.pos >= free.size || free.pos < 0) {
+      alert('Particles: Free buffer is full for storage');
+      return INT_NULL;
+   }
+   free.buffer[free.pos-1] = idx;
+   free.pos--;
+   // console.log('Store at:', free.pos, 'elem:', free.buffer[free.pos])
 }
 
 
@@ -256,7 +323,8 @@ class Emitter {
       this.left_over = 0;
       this.total_alive = 0;
 
-      this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
+      this.Update_gfx_buffers_fn_inst = null; // Function pointer to update the vertex buffer of the particle system
+      this.Update_gfx_buffers_fn = null; // Function pointer to update the vertex buffer of the particle system
 
       // Set the cone of variation vector direction. Diagonals are -.5 and +.5 
       this.variation_emission = {
@@ -277,20 +345,24 @@ class Emitter {
       }
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      // this.free_particles_idxs_buffer = New_int32_buffer(vb_aprox_size, 'ParticlesSystem-free_particles_idxs_buffer');
+      // this.free_particles = New_int32_buffer(vb_aprox_size, 'ParticlesSystem-free_particles');
       
       this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
       
-      this.free_particles_idxs_buffer = new Int32_Buffer_Reversed(this.vb_aprox_size);
+      this.free_particles = new Int32_Buffer_Reversed(this.vb_aprox_size);
 
       this.vertex_buffer_start = 0;  // The start position in the vertex buffer(start may vary according to the first particle) 
 
-      const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME);
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3, // TODO: some attribs are activated in the 'Fn Enables'
          unif: 0x0,
-         inst: inst_attribs,
+         // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
+         inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         // inst: 0x0,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
          blend_options: 0x0,
@@ -341,24 +413,6 @@ class Emitter {
 
       console.log('#### Perticles-Size aproximation', this.vb_aprox_size );
 
-   }
-   ParticleAddToGfx(particle_idx) {
-
-      // Must create geom struct to pass to the GlAdd...() fuunction
-      const geom = {
-         pos: this.particles_buffer.buffer[particle_idx].pos,
-         dim: this.particles_buffer.buffer[particle_idx].dim,
-         time: this.particles_buffer.buffer[particle_idx].time,
-         generic: this.particles_buffer.buffer[particle_idx].generic,
-      }
-      // alert('99923836562545243523\n Vertex_buffer_add_vertices is DEPRECRATED')
-      // const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
-      // const start = Vertex_buffer_add_vertices(this.gfx, geom, this.mat, _, _, true);
-      const start = Vertex_buffer_add_vertices_from_render_group(this.gfx, geom, this.mat, _, Mesh_get_name(this));
-      this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
-
-
-      return start;
    }
    SetDir(xdir = 0, ydir = 0) {
 
@@ -816,20 +870,63 @@ export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupi
    emitter.geom.pos[0] = pos_x;
    emitter.geom.pos[1] = pos_y;
 
-   // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   // TODO: Implement an Abstract function to not use function pointer 
-   if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
-   else if (emitter.sid.shad & SID.SHAD.FN_GLOW_SPHERE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
-   else if (emitter.sid.shad & SID.SHAD.FN_NOISE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time;
-   else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2;
-   else if (emitter.sid.attr & (SID.ATTR.GENERIC2)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
-   else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation;
-   else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time;
-   else alert('Particles-System: No VertexBufferFillOperation function selected.');
+
+   Set_update_function_pointers(emitter);
 
    Vertex_buffer_group_set_mesh_debug_name(emitter.gfx.vb.groupidx, emitter.name);
-   
+
    return emitter.gfx.vb.groupidx;
+}
+/** */
+function Set_update_function_pointers(emitter) {
+
+   const sid = emitter.sid;
+   if(sid.inst !== 0x0) {
+
+      // Instanced geometry
+      if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_dim2_time;
+      }
+      else if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2;
+      }
+      else if(sid.inst === (SID.ATTR.WPOS3  | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_wpos3_time;
+      }
+      else if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_time;
+      }
+      // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
+
+      // Per vertex geometry (for 1 mesh only, gets updated once on particles initialization and keeps constant/unchanged values)
+      const clean_attr = sid.attr & ~sid.inst; // Get the attributes without any instance geometry attributes flags
+      if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2;
+      }
+      else if(clean_attr === (SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_col4_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_col4_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_dim2_rcorner;
+      }
+   }
+   else { // TODO: OLD, implement clearly what attributes the particle emitter has(like in VertexBufferFillOps.js)
+
+      if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
+      // else if (emitter.sid.shad & SID.SHAD.FN_GLOW) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
+      else if (emitter.sid.shad & SID.SHAD.FN_GLOW_SPHERE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
+      else if (emitter.sid.shad & SID.SHAD.FN_NOISE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time;
+      else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2;
+      else if (emitter.sid.attr & (SID.ATTR.GENERIC2)) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
+      else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation;
+      else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time;
+   }
 }
 /** */
 export function Particle_system_init_particles(emitter) {
@@ -839,23 +936,49 @@ export function Particle_system_init_particles(emitter) {
 
       const particle = new Particle(emitter);
       const particle_idx = emitter.particles_buffer.Add(particle);
-
-      const start = Vertex_buffer_init_vertices_for_particles(emitter.gfx, emitter.mat.texidx)
+      
+      const start = Vertex_buffer_init_vertices_for_particles(emitter.gfx, emitter.mat.texidx);
+      // const start = Vertex_buffer_add_vertices_from_render_group(emitter.gfx, emitter.geom, emitter.mat, );
       emitter.particles_buffer.buffer[particle_idx].SetGfxStart(start);
-
+      
       // Add to free particles
-      emitter.free_particles_idxs_buffer.Add(particle_idx);
+      // emitter.free_particles.Add(particle_idx);
+      // Store_free_particle(emitter.free_particles, particle_idx)
+      emitter.free_particles.buffer[i] = particle_idx;
    }
 
    Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
-   Vertex_buffer_render_group_set_draw_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
-   Vertex_buffer_render_group_set_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
+   // Vertex_buffer_render_group_set_draw_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
+   // Vertex_buffer_render_group_set_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
    // emitter.SetVbStartIndex(0);
    // Vertex_buffer_render_group_set_start(emitter.gfx.vb.render_groupidx, emitter.vertex_buffer_start)
       
-   View_render_specific_render_group(emitter.group_bufferidxs[0], emitter.group_bufferidxs[1], emitter.group_bufferidxs[2])
+   View_render_specific_render_group(emitter.group_bufferidxs[0], emitter.group_bufferidxs[1], emitter.group_bufferidxs[2]);
 
-   console.log('+++++++++++++++++++++++++++++\nParticles Free Buffer:',emitter.free_particles_idxs_buffer)
+          
+   if(emitter.sid.inst !== 0x0) {
+
+      // emitter.Update_gfx_buffers_fn_inst(
+      //    emitter.gfx.vb.groupidx+1, 0, 
+      //    emitter.geom.dim[0], emitter.geom.dim[1],
+      //    emitter.mat.style.rcorners, 
+      // );
+      emitter.Update_gfx_buffers_fn_inst(
+            emitter.gfx.vb.groupidx+1, 0, 
+            emitter.mat.col[0], emitter.mat.col[1], emitter.mat.col[2], emitter.mat.col[3],
+            0, 0, 
+            emitter.geom.dim[0], emitter.geom.dim[1],
+            emitter.mat.style.rcorners, 
+            0, 
+            0,0,0,0,
+            0,0,0,0,
+            // particle.generic.a, particle.generic.b,
+            0,0,
+      );
+
+   }
+
+   console.log('+++++++++++++++++++++++++++++\nParticles Free Buffer:',emitter.free_particles)
 
 }
 /** */
@@ -935,7 +1058,8 @@ export function Particle_system_emitt(params) {
             emitter.geom.time = emitter.t_step * j;
          }
          
-         let next_free_particle_idx = emitter.free_particles_idxs_buffer.GetNextFree();
+         // let next_free_particle_idx = emitter.free_particles.GetNextFree();
+         let next_free_particle_idx = Get_free_particle(emitter.free_particles);
          const particle = emitter.particles_buffer.buffer[next_free_particle_idx];
          emitter.total_alive++;
          
@@ -968,7 +1092,7 @@ export function Particle_system_emitt(params) {
             particle.generic.a = emitter.geom.generic.a;
             particle.generic.b = emitter.geom.generic.b;
 
-            console.log(particle.pos[0],particle.pos[1])
+            // console.log(particle.pos[0],particle.pos[1])
             
             if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
                
@@ -991,11 +1115,11 @@ export function Particle_system_emitt(params) {
             
          }
          else {
-            // console.error('0099890099889 UNDEFINED', 
-            //    'num_particles', num_particles, 
-            //    'total_alive', emitter.total_alive,
-            //    'next_free_particle_idx', next_free_particle_idx,
-            // )
+            console.error('0099890099889 UNDEFINED', 
+               'num_particles', num_particles, 
+               'total_alive', emitter.total_alive,
+               'next_free_particle_idx', next_free_particle_idx,
+            )
             return;
          }
          
@@ -1009,7 +1133,7 @@ export function Particle_system_emitt(params) {
       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
       
       // Instanced Geometry
-      Vertex_buffer_render_group_add_instance(emitter.gfx.vb.render_groupidx);
+      // Vertex_buffer_render_group_add_instance(emitter.gfx.vb.render_groupidx);
       
       
       // Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, emitter.total_alive);
@@ -1154,8 +1278,7 @@ export function Particle_system_update() {
 
             // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
             // Render Particles
-            // emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv, particle.generic);
-            // emitter.UpdateGfxBuffersFn(
+            // emitter.Update_gfx_buffers_fn_inst(
             //    emitter.gfx.vb.groupidx, particle.start, 
             //    particle.col[0], particle.col[1], particle.col[2], particle.col[3],
             //    particle.pos[0], particle.pos[1], 
@@ -1167,13 +1290,17 @@ export function Particle_system_update() {
             //    particle.generic.a, particle.generic.b,
             // );
 
-            Gl_particles_batch_set_instanced_col4_wpos3_dim2(
-               // emitter.gfx.vb.groupidx, particle.start, 
-               2, particle.start, 
+
+            emitter.Update_gfx_buffers_fn(
+               emitter.gfx.vb.groupidx, particle.start, 
                particle.col[0], particle.col[1], particle.col[2], particle.col[3],
                particle.pos[0], particle.pos[1], 
                particle.dim[0], particle.dim[1],
+               emitter.mat.style.rcorners, 
                particle.time, 
+               particle.rot[0], particle.rot[1], particle.rot[2], particle.rot[3],
+               particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
+               particle.generic.a, particle.generic.b,
             );
 
             // vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot, uv
@@ -1187,16 +1314,17 @@ export function Particle_system_update() {
                // Reset particle for reuse
                particle.is_alive = false;
                particle.time = emitter.geom.time;
-               emitter.free_particles_idxs_buffer.Add(j);
-               emitter.free_particles_idxs_buffer.AddFree(j);
+               emitter.free_particles.Add(j);
+               // emitter.free_particles.AddFree(j);
+               Store_free_particle(emitter.free_particles, j)
                emitter.total_alive--;
-               // if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
-               //    emitter.is_active = false;
-               //    Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-               // }
+               if (emitter.free_particles.boundary === emitter.particles_buffer.boundary) {
+                  emitter.is_active = false;
+                  Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
+               }
 
                // Remove instanced count
-               Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
+               // Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
 
             }
 
@@ -1204,12 +1332,6 @@ export function Particle_system_update() {
          }
       }
 
-      Gl_particles_batch_set_vpos2_rcorner(
-         // emitter.gfx.vb.groupidx, 0, 
-         3, 0, 
-         emitter.geom.dim[0], emitter.geom.dim[1],
-         emitter.mat.style.rcorners, 
-      );
 
       // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
       if (needs_update) Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
@@ -1425,7 +1547,7 @@ export function Particle_system_print_info() {
          '\nvariation_emission:', emitter.variation_emission,
          '\nuniforms:', emitter.uniforms,
          '\nParticlesBuffer:', emitter.particles_buffer,
-         '\nParticlesFreeBuffer:', emitter.free_particles_idxs_buffer.buffer,
+         '\nParticlesFreeBuffer:', emitter.free_particles.buffer,
       );
    }
 }
@@ -1455,7 +1577,7 @@ export function Particle_system_print_free_particles_buffer() {
 
       const emitter = _emitters.buffer[i];
       console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),
-         'free_buffer:', emitter.free_particles_idxs_buffer.buffer,
+         'free_buffer:', emitter.free_particles.buffer,
       );
    }
 }

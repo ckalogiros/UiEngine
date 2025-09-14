@@ -198,17 +198,13 @@ class Index_Buffer_Info {
    }
 
 
-   Realloc(extra_size = 0) {
+   Realloc(new_size = 0) {
 
-      this.size = this.#CalculateMemoryPaddedSize(this.count, extra_size)
+      this.size = this.#CalculateMemoryPaddedSize(this.size, new_size)
       const new_data = Typed_array_create_from_type(this.type, this.size);
 
       const old_data = _index_buffers.buffer[this.ibidx];
-      const size = old_data.length;
       new_data.set(old_data, 0);
-      // for (let i = 0; i < size; i++) {
-      //    new_data[i] = old_data[i];
-      // }
       _index_buffers.buffer[this.ibidx] = new_data;
 
       if (DEBUG.GFX.BUFFERS) console.warn('Resizing index buffer!')
@@ -216,29 +212,27 @@ class Index_Buffer_Info {
    }
 
 
-   #CalculateMemoryPaddedSize(cur_size, extra_size) {
+   #CalculateMemoryPaddedSize(cur_size, new_size) {
 
-      let stride = 64;
-
-      if (cur_size + extra_size < 64) { return 64; }
-      if (cur_size + extra_size < 128) { return 128; }
-      if (cur_size + extra_size < 256) { return 256; }
-      if (cur_size + extra_size < 512) { return 512; }
-      else if (cur_size > 32768) { stride = 2048; }
-      else if (cur_size > 16384) { stride = 1024; }
-      else if (cur_size > 4096) { stride = 128; }
-
-
-      let new_size = cur_size;
-      const target_size = cur_size + extra_size;
-      while (new_size < target_size) {
-         new_size += stride;
-      }
-      // console.warn('stride:', stride, ' cursize:', cur_size, ' newsize:', new_size, ' extra_size:', extra_size)
-      // if (new_size % 64) console.error('NOT DIVISIBLE BY 64:', new_size, new_size % 64, stride)
-
-      new_size += stride; // Make it greater than the target_size
       return new_size;
+
+      if (new_size <= 6) { return 6; }
+
+      console.log(new_size)
+      
+      let stride = 6;
+      const dif = new_size - cur_size;
+      if(dif < 60) stride = 6;
+      if(dif < 60*10) stride = 24;
+      else stride = 48;
+
+      let size = cur_size;
+      const target_size = new_size;
+      while (size < target_size) {
+         size += stride;
+      }
+
+      return size;
    }
 
 };

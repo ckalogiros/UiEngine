@@ -48,15 +48,16 @@ export function Vertex_buffer_render_group_create(vb_data_idx=INT_NULL, num_face
          start:0, 
          count:0, 
          size:0, 
-         num_faces:num_faces,  // !!! We cannot trust the 'num_faces' of  the render groups yet. PLEASE instead use 'num_faces' from View_group structure
+         num_faces:num_faces, 
 
          draw_count:0, 
          num_instances:0,
-         draw_hint:gfxCtx.gl.STATIC_DRAW,
+         // draw_hint:gfxCtx.gl.STATIC_DRAW,
+         draw_hint:gfxCtx.gl.DYNAMIC_DRAW,
          index_offset:0,
          state:0x0,
 
-         vb_data_idx:vb_data_idx, // TODO: For now it gets the vertex buffer group index. On "buffer instances" implementation should take the vb_info or vb_data index.
+         vb_data_idx:vb_data_idx,
       }
    );
 
@@ -113,7 +114,7 @@ export function Vertex_buffer_render_group_reset(render_groupidx) {
 }
 /** */
 export function Vertex_buffer_render_group_set_draw_count_from_num_faces(render_groupidx, num_faces) { 
-   _render_groups.buffer[render_groupidx].draw_count = num_faces * INDICES_PER_RECT;
+   // _render_groups.buffer[render_groupidx].draw_count = num_faces * INDICES_PER_RECT;
 }
 /** */
 export function Vertex_buffer_render_group_add_instance(render_groupidx) { 

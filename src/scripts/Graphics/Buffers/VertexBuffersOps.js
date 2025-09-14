@@ -2085,12 +2085,61 @@ export function Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time(vbidx, start, 
 /****************************************************************************************************************************************************************************/
 // Particles: Instanced Geometry
 /** */
-export function Gl_particles_batch_set_instanced_col4_wpos3_dim2(vbidx, start, r,g,b,a, x,y, w,h, t) {
+export function Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
    let index = start;
 
-   // V1
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = t;
+   vb_data[index++] = gena;
+   vb_data[index++] = genb;
+
+}
+/** */
+export function Gl_particles_batch_set_instanced_wpos3_time(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = t;
+   // console.log('SUCCESS',x,y,t)
+
+}
+/** */
+export function Gl_particles_batch_set_instanced_col4_wpos3_time(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = x;
+   vb_data[index++] = y;
+   index++; // z;
+   vb_data[index++] = t;
+   // console.log('SUCCESS',x,y,t)
+
+}
+/** */
+export function Gl_particles_batch_set_instanced_col4_wpos3_dim2_time(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
    vb_data[index++] = r; 
    vb_data[index++] = g;
    vb_data[index++] = b;
@@ -2102,45 +2151,97 @@ export function Gl_particles_batch_set_instanced_col4_wpos3_dim2(vbidx, start, r
    vb_data[index++] = h;
    vb_data[index++] = t;
    
-   // V2
-   vb_data[index++] = r;
-   vb_data[index++] = g;
-   vb_data[index++] = b;
-   vb_data[index++] = a;
-   vb_data[index++] = x;
-   vb_data[index++] = y;
-   index++; // z;
-   vb_data[index++] = w;
-   vb_data[index++] = h;
-   vb_data[index++] = t;
-   
-   // V3
-   vb_data[index++] = r;
-   vb_data[index++] = g;
-   vb_data[index++] = b;
-   vb_data[index++] = a;
-   vb_data[index++] = x;
-   vb_data[index++] = y;
-   index++; // z;
-   vb_data[index++] = w;
-   vb_data[index++] = h;
-   vb_data[index++] = t;
-   
-   // V4
-   vb_data[index++] = r;
-   vb_data[index++] = g;
-   vb_data[index++] = b;
-   vb_data[index++] = a;
-   vb_data[index++] = x;
-   vb_data[index++] = y;
-   index++; // z;
-   vb_data[index++] = w;
-   vb_data[index++] = h;
-   vb_data[index++] = t;
+
 }
 
 /** */
-export function Gl_particles_batch_set_vpos2_rcorner(vbidx, start, w,h, rc, ) {
+export function Gl_particles_batch_set_col4_vpos2_dim2_rcorner(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   // V1
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = -w;
+   vb_data[index++] = -h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V2
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = -w;
+   vb_data[index++] = h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V3
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = w;
+   vb_data[index++] = -h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V4
+   vb_data[index++] = r; 
+   vb_data[index++] = g;
+   vb_data[index++] = b;
+   vb_data[index++] = a;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+}
+/** */
+export function Gl_particles_batch_set_vpos2_dim2_rcorner(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   // V1
+   vb_data[index++] = -w;
+   vb_data[index++] = -h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V2
+   vb_data[index++] = -w;
+   vb_data[index++] = h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V3
+   vb_data[index++] = w;
+   vb_data[index++] = -h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+   // V4
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = w;
+   vb_data[index++] = h;
+   vb_data[index++] = rc; // FOR RCORNERS
+   
+}
+/** */
+export function Gl_particles_batch_set_vpos2_rcorner(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
 
    const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
    let index = start;
@@ -2164,6 +2265,29 @@ export function Gl_particles_batch_set_vpos2_rcorner(vbidx, start, w,h, rc, ) {
    vb_data[index++] = w;
    vb_data[index++] = h;
    vb_data[index++] = rc; // FOR RCORNERS
+   
+}
+/** */
+export function Gl_particles_batch_set_vpos2(vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot0,rot1,rot2,rot3, u1,u2,v1,v2, gena,genb) {
+
+   const vb_data = Vertex_buffer_get_by_vbidx(vbidx);
+   let index = start;
+
+   // V1
+   vb_data[index++] = -w;
+   vb_data[index++] = -h;
+   
+   // V2
+   vb_data[index++] = -w;
+   vb_data[index++] = h;
+   
+   // V3
+   vb_data[index++] = w;
+   vb_data[index++] = -h;
+   
+   // V4
+   vb_data[index++] = w;
+   vb_data[index++] = h;
    
 }
 

@@ -581,13 +581,13 @@ export function TestWidgetsGeneric() {
 
         { // Demo Particles 
 
-            Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
+            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
 
-            // Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
+            Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 80,);
 
             // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
 
-            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 32)
+            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
 
             // Create_smoke_particles();
 
@@ -5524,11 +5524,14 @@ function Instanced_geometry(col, pos, dim) {
     const w=200, h=2., d=1, r_corners = 1;
     let hue = .1;
     // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
-    const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+    // const inst_attribs = (SID.ATTR.WPOS3 | SID.ATTR.DIM2);
+    const inst_attribs = (SID.ATTR.WPOS3);
+    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
 
-    for(let i = 0; i < 100; i++) {
+    for(let i = 0; i < 10; i++) {
 
-        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,.6,0), name: `line-inst ${i}`,  }));
+        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,1.,0), name: `line-inst ${i}`,  }));
         Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
         panel.AddItem(line);
         line.sid.inst = inst_attribs;

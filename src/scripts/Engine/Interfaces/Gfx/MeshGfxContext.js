@@ -189,9 +189,6 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
 
 
-
-
-
    /*******************************************************************************************************************/
    // Program
 

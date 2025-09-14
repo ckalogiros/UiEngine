@@ -57,6 +57,7 @@ export function Gl_draw(gl) {
         if (GL_STATE.BOUND_VAO !== vb_group.vao) {
             gl.bindVertexArray(vb_group.vao);
             GL_STATE.BOUND_VAO = vb_group.vao;
+            // console.log(vb_group.vaoidx)
         }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
@@ -73,15 +74,15 @@ export function Gl_draw(gl) {
             
             const rgidx = vb_group.render_groupidxs.buffer[j];
             const render_group = Vertex_buffer_render_group_get_render_group(rgidx);
-
+            
             // TODO: Distinguish uniforms that will update with uniforms with constant value
             Vertex_buffer_set_and_update_uniforms_no_vao_binding(vb_groupidx, progidx, rgidx);
-
-            if (vb_group.has_scissorbox) {
-                gl.enable(gl.SCISSOR_TEST);
-                gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);
-            }
-
+            
+            // if (vb_group.has_scissorbox) {
+            //     gl.enable(gl.SCISSOR_TEST);
+            //     gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);
+            // }
+                
             // if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
             if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && vb_group.texidx !== INT_NULL) {
                 const texture = Texture_get_texture_unit_byidx(vb_group.texidx);
@@ -90,19 +91,40 @@ export function Gl_draw(gl) {
             }
             
             for (let k = 0; k <= vb_group.vb_idxs.boundary; k++) {
+                
 
                 const vb_data_idx = vb_group.vb_idxs.buffer[k];
                 const vb_info = VBI_get_byidx(vb_data_idx);
+                // if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_VBO !== vb_info.vbo) {
+                    
+                    // console.log(vb_data_idx)
+                    
+                    const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
+                    gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
+                    // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
+                    // gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
+                    
+                    vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
+                    vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+                    render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
+                // }
 
-                const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
-                gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                gl.bufferData(gl.ARRAY_BUFFER, vb_data, render_group.draw_hint);
+                // HACK: Force instanced drawing to 
+                // If instanced vertex buffers, the vb with the 1 instance (per vertex buffer) has only 6 indices, but the rendergroup registers the instanced buffer's draw_count which is more (num_instances*6 indices)
+                // const a = 1-k;
+                // // // const draw_count = 6 + (6 * (render_group.num_instances-1) * a)
+                // const draw_count = 6 + ((render_group.draw_count-6) * a)
+                // gl.drawElementsInstanced(gl.TRIANGLES, draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
 
-                vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
-                vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
-                render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
-    
-                gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+                // if(k==1)
+                //     gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+                // else
+                //     gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+                // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+                // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 140);
+
+                // console.log(draw_count)
             }
             
             
@@ -113,12 +135,15 @@ export function Gl_draw(gl) {
              *      2, num instances
              *  );
              */
+            gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+
             // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 1)
             // gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 3)
             // gl.drawElementsInstanced(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, 2)
 
 
-            if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
+            // if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
 
         }
 

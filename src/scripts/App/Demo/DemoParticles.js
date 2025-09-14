@@ -242,13 +242,14 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
 /*********************************************************************************************************************************************************************************************/
 /** Glow-Particles. Testing with different shaders */
 // TODO: For attributes we need to implement the controls to control vb attribs
-export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame, transform_parameters=null, generic_controls_parameters=null) { // 3 control Sliders 
+export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame, transform_parameters=[.5, 1., .65, .5, .4], generic_controls_parameters = [0, .6, .45], ) { // 3 control Sliders 
 
    const scale_down = .2;
    const rcorners = 10;
 
-
-
+   particles_size=10;
+   
+   
    /****************************************************************************************************************/
    // Create Particles Particles Emitter
 
@@ -258,16 +259,27 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
       num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
+      // num_particles_per_frame:1, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
    }));
-   // Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true, });
-   Widget_gfx_ready_enable({ mesh: emitter, enable_unif_scale: true, });
+   
+   { // Explosion with FN_EXPLOSION_CIRCLE shader
+      // Widget_gfx_ready_enable({ mesh: emitter, enable_unif_scale: true, });
+      // emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
+      // emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 3.5, jiggley: 6 });
+      // emitter.EnableProperties(PARTICLES.HAS_FADE);
+      // emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .0, generic: { a: .0, b: .23 }, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY });
+      // emitter.SetConeOfDirection(-.1, .1, .05, -.05);
+   }
+   
+   { // regular explosion
+      Widget_gfx_ready_enable({mesh:emitter, enable_sdf_rect:particles_size, enable_unif_scale:true, });
+      emitter.EnableProperties(PARTICLES.HAS_RANDOM_POLAR_COORD);
+      emitter.EnableProperties(PARTICLES.HAS_FADE);
+      emitter.GfxEnableFn(SID.SHAD.FN_GLOW, { time: 0, });
+      emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
+      emitter.SetConeOfDirection(-.1, .1, .1, -.1);
+   }
 
-   emitter.EnableProperties(PARTICLES.HAS_START_POS_VARIATION);
-   emitter.EnableProperties(PARTICLES.HAS_JIGGLE, { jigglex: 3.5, jiggley: 6 });
-   emitter.EnableProperties(PARTICLES.HAS_FADE);
-
-
-   emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .0, generic: { a: .0, b: .23 }, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY });
 
    // emitter.GfxEnableFn(SID.SHAD.FN_INNER_SHADOW, {blend_mode:flag++});
    // emitter.EnableGfxUniforms({ unif:SID.UNIF.BLEND_MODE } , 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
@@ -309,7 +321,6 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
 
 
    // For default glow particles change:SetConeOfDirection(), gravity, diry -+ and dirx in controls
-   emitter.SetConeOfDirection(-.1, .1, .05, -.05);
 
    if(transform_parameters) {
       // The values are interpolated based on 'Create_particles_controls()' 
@@ -357,7 +368,7 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
    
    // Set callback for uniform update
    emitter.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1,]);
-   // emitter.GfxUniformSetAndUpdate('u_generic_controls', [1, 0, 0]);
+   emitter.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
    emitter.GfxUniformsSetClbk('u_blend_mode', () => {
       return emitter.sid.blend_options;
    }, emitter.gfx.vb.groupidx);
