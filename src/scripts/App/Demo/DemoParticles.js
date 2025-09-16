@@ -64,7 +64,8 @@ const physics_init_values = {
 /*********************************************************************************************************************************************************************************************/
 
 
-export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=null) { // 3 control Sliders 
+export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=[.48, .5, .19, .2, .4]) { // 3 control Sliders 
+// export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=null) { // 3 control Sliders 
 
    const particles_size = 20;
    const rcorners = 10;
@@ -81,7 +82,13 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
       name:'GlowParticles', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
+      // t_step:.001, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
+      num_particles_per_frame:num_particles_per_frame, 
+      is_continuous_emmit:true, 
+      // has_intermidiate_emission:true, 
+      num_particles:1, 
+      scale_down:scale_down,
+
    }));
    // let emitter = Particles_get_particle_system(emitter1_idx);
    Widget_gfx_ready_enable({ mesh: emitter, enable_sdf_rect: particles_size, enable_unif_scale: true });
@@ -258,8 +265,12 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
       name:'GlowParticlesTest', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
-      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
-      // num_particles_per_frame:1, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
+      // t_step:.03, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
+      num_particles_per_frame:num_particles_per_frame, 
+      is_continuous_emmit:true, 
+      // has_intermidiate_emission:true,
+      num_particles:1, 
+      scale_down:scale_down,
    }));
    
    { // Explosion with FN_EXPLOSION_CIRCLE shader
@@ -435,9 +446,9 @@ export function Demo_glow_particles_explosion_shaders(x = 0, y = 0, root_widget 
 
 /*********************************************************************************************************************************************************************************************/
 /** Using FN_EXPLOSION_CIRCLE to create sparks effect. The difference is there is no sdf_rect enabled for the mesh and the blend mode is multiply */
-export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame, transform_parameters=null, generic_controls_parameters=null) { // 3 control Sliders 
+export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 0x0, particles_size = 100, controls_create = true, num_particles_per_frame, transform_parameters=[.5, 1., .5, .1, .4], generic_controls_parameters=null) { // 3 control Sliders 
 
-   const scale_down = .25;
+   const scale_down = .15;
    const rcorners = 10;
 
 
@@ -447,7 +458,6 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
    /****************************************************************************************************************/
    // Create Particles Particles Emitter
 
-   // let emitter1_idx = Particle_system_create_emitter('Emitter:Sparkles', PURPLEB[9], [x, y, 10], [particles_size, particles_size], .006, 1, 4, .98, .1, 4, _, num_particles_per_frame, scale_down);
    const emitter = Create_particle_emitter(Style_particles_system_default_properties({
       name:'SparkleParticles', 
       col:PURPLEB[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
@@ -462,11 +472,14 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
 
 
    // New attrib Enable implementation
-   emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .8, generic: { a: .02, b: .6 }, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY });
+   emitter.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .6, generic: { a: .0, b: .07 }, blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY });
 
 
 
-   emitter.SetConeOfDirection(.1, .1, -.05, .05);
+   // emitter.SetConeOfDirection(.1, .1, -.05, .05);
+   emitter.SetConeOfDirection(.1, .1, -.015, .015);
+
+   
 
    if(transform_parameters) {
       // The values are interpolated based on 'Create_particles_controls()' 
@@ -553,8 +566,8 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
 
 
       const parameters = [.48, .6, .35, .08, .4, .04, .04, .55];
-      // const generic_controls_parameters = [.7, 1., .12];
-      const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], parameters, _,);
+      const generic_controls_parameters = [.7, 1., .12];
+      const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], parameters, generic_controls_parameters,);
 
 
       const len = controls_buffer.length;
@@ -605,10 +618,10 @@ export function Demo_glow_particles_sparkles_effect(x = 0, y = 0, root_widget = 
  */
 /*********************************************************************************************************************************************************************************************/
 
-export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame = 10, generic_controls_parameters = [0, .6, .3], transform_parameters=null) { // 3 control Sliders 
+export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame = 10, transform_parameters=[.5, 1., .65, .5, .4], generic_controls_parameters = [0, .6, .45]) { // 3 control Sliders 
 
    const scale_down = .14;
-   const particles_size = 20;
+   const particles_size = 10;
    const rcorners = 10;
 
 
@@ -620,9 +633,10 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    const emitter = Create_particle_emitter(Style_particles_system_default_properties({
       name:'ExplosionParticles', 
       col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
-      t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
+      t_step:.1, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
+      // t_step:.012, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
       // num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:true, num_particles:1, scale_down:scale_down,
-      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:false, num_particles:20, scale_down:scale_down,
+      num_particles_per_frame:num_particles_per_frame, is_continuous_emmit:false, num_particles:1, scale_down:scale_down,
    }));
    Widget_gfx_ready_enable({ mesh: emitter, enable_sdf_rect: particles_size, enable_unif_scale: true, });
 
@@ -637,6 +651,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
    emitter.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, generic_controls_parameters.length);
 
    emitter.SetConeOfDirection(-.1, .1, .1, -.1);
+
 
    if(transform_parameters) {
       // The values are interpolated based on 'Create_particles_controls()' 
@@ -688,7 +703,6 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
 
 
-
    const zpos = -1
 
    const switch_panel = Create_emitt_switch_panel({ z: zpos, emitter: emitter, emitt_options: { continuous_emitt: false, button_pres_emitt: true } });
@@ -704,8 +718,7 @@ export function Create_explosion_particles(x = 0, y = 0, root_widget = 0x0, cont
 
    if (controls_create) { // Create slider controls only if this is to be rendered from this function
 
-      const parameters = [.5, 1., .5, .5, .5, .05, .05, .5];
-      const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], parameters, generic_controls_parameters, 'u_generic_controls');
+      const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], transform_parameters, generic_controls_parameters, 'u_generic_controls');
 
       const len = controls_buffer.length;
       for (let i = 0; i < len; i++) {

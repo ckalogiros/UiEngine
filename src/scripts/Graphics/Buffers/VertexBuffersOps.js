@@ -917,6 +917,85 @@ export function Gl_add_vpos_x_left(gfx, x, num_faces = 1) {
       Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
    // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
 }
+/** */
+export function Gl_set_vpos_y_top(gfx, y, num_faces = 1) {
+
+   const vbidx = gfx.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfx.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfx.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx];
+
+   const start = gfx.vb.starts.buffer[vbidx];
+
+   let index = start + a_offset;
+   let loop_count = num_faces;
+   let stride = vb_info.attribs_info.count - a_size;
+
+   while (loop_count) {
+
+      index++;
+      vb_data[index++] = y;
+      index += stride;
+      
+      index++;
+      index++;
+      index += stride;
+
+      index++;
+      vb_data[index++] = y;
+      index += stride;
+      
+      index++;
+      index++;
+      index += stride;
+
+
+      loop_count--;
+   }
+
+      Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+}
+/** */
+export function Gl_set_vpos_y_bottom(gfx, y, num_faces = 1) {
+
+   const vbidx = gfx.vb.which_vb.dim_buf;
+   const vb_info = VBI_get_byidx(gfx.vb.idxs.buffer[vbidx]);
+   const vb_data = Vertex_buffer_get_by_vbidx(gfx.vb.idxs.buffer[vbidx]);
+
+   const attr_idx = vb_info.attribs_indexing.VPOS2;
+   const a_offset = vb_info.attribs_info.offsets[attr_idx];
+   const a_size = vb_info.attribs_info.sizes[attr_idx] - 1;
+
+   const start = gfx.vb.starts.buffer[vbidx];
+
+   let index = start + a_offset;
+   let loop_count = num_faces;
+   let stride = vb_info.attribs_info.count - a_size;
+
+   while (loop_count) {
+
+      index += stride;
+      vb_data[index++] = y;
+
+      index += stride;
+      vb_data[index++] = y;
+
+      index++;
+      index += stride;
+
+      index++;
+      index += stride;
+
+      index += stride;
+      loop_count--;
+   }
+
+      Vertex_buffer_render_group_set_state(gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+   // Vertex_buffer_state_enable(gfx.vb.groupidx, gfx.vb.idxs.buffer[vbidx], BUFFER_STATE.NEEDS_UPDATE);
+}
 
 
 

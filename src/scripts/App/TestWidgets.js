@@ -12,9 +12,9 @@ import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_read
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_set_vb_root_wposx } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_set_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
 import { Listeners_set_priority } from '../Engine/Events/EventListeners.js';
-import { VBI_state_enable, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get_render_groupidxs, Vertex_buffer_group_state_enable, } from '../Graphics/Buffers/VertexBuffers.js';
+import { VBI_get_byidx, VBI_state_enable, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_data_get_byidx, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_render_groupidxs, Vertex_buffer_group_state_enable, } from '../Graphics/Buffers/VertexBuffers.js';
 import { Slider_connect } from '../Engine/Drawables/Widgets/WidgetSlider.js';
-import { Gl_set_angle, Gl_set_generic2, Gl_set_rgba, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from '../Graphics/Buffers/VertexBuffersOps.js';
+import { Gl_set_angle, Gl_set_dim_y, Gl_set_generic2, Gl_set_rgba, Gl_set_time, Gl_set_vpos_y_top, Gl_set_wpos_x, Gl_set_wpos_xy, Gl_set_wpos_y } from '../Graphics/Buffers/VertexBuffersOps.js';
 import { Time_intervals_create } from '../Engine/Timers/TimeIntervals.js';
 import { Timer_get_global_timer, Timer_get_global_timer_cosine } from '../Engine/Timers/Timers.js';
 import { Create_menu_items_buttons, Demo_animations, Demo_animations_ready_button_anim, Demo_animations_ready_button_with_panel, Demo_animations_text, Demo_animations_with_slider_slope, Demo_clbk_animations_create_transition_slope, Demo_clbk_animations_text_counter, Demo_clbk_animations_text_create } from './Demo/DemoAnimations.js';
@@ -52,7 +52,10 @@ import { Spring_physics } from './Demo/Games/PhysicsSpring.js';
 import { Physics2D_apply_force, Physics2D_Calculate_magnitude_local_space, Physics2D_calculate_position, Physics2D_create_object, Physics2D_test, Physics2D_update, Physics2D_update_pos_xy, Physics2D_update_pos_y, Physics_2D_get_velocity_xy_from_position } from '../Engine/Physics2D/Physics2D.js';
 import { Jump_physics_2 } from './Demo/Games/PhysicsJump2.js';
 import { Collision_detection_add_object, Collision_detection_create_group, Physics2D_collision_detection_all_with_all, Physics2D_collision_detection_all_with_all_with_obstructions, Physics2D_collision_detection_find_collider_from_group, Physics2D_collision_detection_one_with_all, PHYSICS2D_COLLISION_FLAGS } from '../Engine/Physics2D/CollissionDetection.js';
-import { Mouse_get_pos_dif } from '../Engine/Controls/Input/Mouse.js';
+import { Mouse_get_pos_dif, Mouse_get_posy } from '../Engine/Controls/Input/Mouse.js';
+import { Visual_debug_create, Visual_debug_create_properties } from '../Engine/VisualDebug/VisualDebug.js';
+import { Program_get_programs } from '../Graphics/ShaderPrograms.js';
+import { TEMP_Update_all_vertex_buffers } from '../Graphics/GlDraw.js';
 
 
 
@@ -525,6 +528,23 @@ export function TestWidgetsGeneric() {
         // Window_menu_2();
     }
     
+    { // Visual Debug
+
+        // Visual_debug_mouse(true);  
+        // Visual_debug_memory_cells(true);
+
+        // Visual_debug_create(Visual_debug_create_properties({
+        //     is_root:ROOT_WIDGETS.CREATE_ROOT,
+        //     pos:{x:100, y:100},
+        //     dim:{x:30, y:200},
+
+        //     Target_get_cur_val:Mouse_get_posy,
+        //     Target_get_max_val:()=>{return VIEWPORT.HEIGHT},
+
+        //     name:'Visual Debug Test',
+        // }));  
+    }
+
     { // Instanced Geometry
 
         // Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
@@ -581,13 +601,13 @@ export function TestWidgetsGeneric() {
 
         { // Demo Particles 
 
-            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
+            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 6);
 
-            Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 80,);
+            // Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 64,);
 
-            // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 1);
+            // Demo_glow_particles_sparkles_effect(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 6);
 
-            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 64)
+            // Create_explosion_particles(0, 0, ROOT_WIDGETS.CREATE_ROOT, true, 256)
 
             // Create_smoke_particles();
 
@@ -600,7 +620,7 @@ export function TestWidgetsGeneric() {
 
         { // Demos Physics
 
-            // const total_height = Elastic_collisions(100, 200, ROOT_WIDGETS.CREATE_ROOT, true, true);
+            const total_height = Elastic_collisions(100, 200, ROOT_WIDGETS.CREATE_ROOT, true, true);
 
             // Sattelite_rotation([0, 100]);
 
@@ -638,33 +658,30 @@ export function TestWidgetsGeneric() {
 
         { // Demo Animations
 
-            {
-                // Demo_animations();
-                // Demo_animations_with_slider_slope();
-                // Demo_animations_text(_, _, _, 40 );
-                // Demo_animations_ready_button_with_panel(ROOT_WIDGETS.CREATE_ROOT);
+            // Demo_animations();
+            // Demo_animations_with_slider_slope();
+            // Demo_animations_text(_, _, _, 40 );
+            // Demo_animations_ready_button_with_panel(ROOT_WIDGETS.CREATE_ROOT);
+
+            // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
+            // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, .05, 12, 14, 35, true, );
 
 
-                { // Text Animations Testing
-                    { // All
-                        // Test_text_clbk_animations_with_counter(100, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, 40, .1);
-                        // Test_text_clbk_animations_with_counter(220, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, 40, .1);
-                        // Test_text_clbk_animations_with_counter(100, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, 40, .1);
-                        // Test_text_clbk_animations_with_counter(220, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, 40, .1);
-                    }
-                    { // Counter with 2 text labels
-                        // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
-                        // Test_text_clbk_animations_counter_2_text_meshes(100, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X);
-                        // Test_text_clbk_animations_counter_2_text_meshes(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y);
-                        // Test_text_clbk_animations_counter_2_text_meshes(300, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y);
-                    }
+            { // Text Animations Testing
+                { // All
+                    // Test_text_clbk_animations_with_counter(100, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, 40, .1);
+                    // Test_text_clbk_animations_with_counter(220, 100, 20, 6, 65, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y, 40, .1);
+                    // Test_text_clbk_animations_with_counter(100, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_X, 40, .1);
+                    // Test_text_clbk_animations_with_counter(220, 270, 20, 6, 65, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y, 40, .1);
+                }
+                { // Counter with 2 text labels
+                    // Test_text_clbk_animations_counter_2_text_meshes(100, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_X, );
+                    // Test_text_clbk_animations_counter_2_text_meshes(100, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_X);
+                    // Test_text_clbk_animations_counter_2_text_meshes(300, 100, 10, 10, CLBK_ANIMATIONS.TEXT_SQUEEZE_Y);
+                    // Test_text_clbk_animations_counter_2_text_meshes(300, 260, 10, 10, CLBK_ANIMATIONS.TEXT_TRANSLATE_Y);
                 }
             }
 
-            { // Demo Rotating Rectangles on mouse hover
-                // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, true);
-                // Board_rotations(0, 0, ROOT_WIDGETS.CREATE_ROOT, .05, 12, 14, 35, true, );
-            }
         }
     }
 
@@ -684,14 +701,15 @@ export function TestWidgetsGeneric() {
         {
 
             {
-                // const HUE_COLOR = [ RED[9], RED[9], YELLOW[9], YELLOW[9],GREEN[9], GREEN[9],CYAN[9], CYAN[9],BLUE[9], BLUE[9],MAGENTA, MAGENTA,BLACK, BLACK,WHITE, WHITE,BLACK, BLACK,];
-                // // const HUE_COLOR = [ BLUE[9], BLUE[9], CYAN[9], CYAN[9], ];
+                // const HUE_COLOR = [ RED[9], RED[9], YELLOW[9], YELLOW[9],GREEN[9], GREEN[9],CYAN[9], CYAN[9],BLUE[9], BLUE[9],MAGENTA, MAGENTA,BLACK, BLACK,WHITE, WHITE];
+                // // const HUE_COLOR = [ BLUE[9], BLUE[9], CYAN[9], CYAN[9]];
+                // // const HUE_COLOR = [ BLUE[9], BLUE[9], CYAN[9], CYAN[9], GREEN[9], GREEN[9], GREEN[9], GREEN[9], ];
                 // Multi_color_multi_vertex_mesh(HUE_COLOR)
             }
             { // Contrast (GOOD)
 
-                // const contrast = .8;
-                // const hue_preservation = .3;
+                // const contrast = .8, hue_preservation = .3;
+                // // const contrast = .3, hue_preservation = .0;
                 // const red       = Contrast_calibrated_rgba(RED[9],   contrast, hue_preservation);
                 // const yel       = Contrast_calibrated_rgba(YELLOW[9],contrast, hue_preservation);
                 // const green     = Contrast_calibrated_rgba(GREEN[9], contrast, hue_preservation);
@@ -700,68 +718,10 @@ export function TestWidgetsGeneric() {
                 // const magenta   = Contrast_calibrated_rgba(MAGENTA,  contrast, hue_preservation);
                 // const black     = Contrast_calibrated_rgba(BLACK,    contrast, hue_preservation);
                 // const white     = Contrast_calibrated_rgba(WHITE,    contrast, hue_preservation);
-                // // const HUE_COLOR = [ red, red, yel, yel, green, green, cyan, cyan, blue, blue, magenta, magenta, black, black, white, white, black, black, white, white, ];
-                // const HUE_COLOR = [ blue, blue, cyan, cyan];
-                // // const HUE_COLOR = [ magenta, magenta, cyan, cyan];
+                // const HUE_COLOR = [ red, red, yel, yel, green, green, cyan, cyan, blue, blue, magenta, magenta, black, black, white, white, ];
+                // // const HUE_COLOR = [ blue, blue, cyan, cyan];
+                // // // const HUE_COLOR = [ magenta, magenta, cyan, cyan];
                 // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 190)
-            }
-            {
-                // const contrast = .9;
-                // const red = Contrast_rgba(RED[9], contrast);
-                // const yel = Contrast_rgba(YELLOW[9], contrast);
-                // const green = Contrast_rgba(GREEN[9], contrast);
-                // const cyan = Contrast_rgba(CYAN[9], contrast);
-                // const blue = Contrast_rgba(BLUE[9], contrast);
-                // const magenta = Contrast_rgba(MAGENTA, contrast);
-                // const black = Contrast_rgba(BLACK, contrast);
-                // const white = Contrast_rgba(WHITE, contrast);
-                // const HUE_COLOR = [
-                //     red, red, 
-                //     yel, yel,
-                //     green, green, 
-                //     cyan, cyan,
-                //     blue, blue,
-                //     magenta, magenta,
-
-                //     black, black, 
-                //     white, white, 
-                //     black, black, 
-                //     white, white, 
-
-                //     // BLUE[9], BLUE[9],   // v5-v6
-                //     // GREEN[9], GREEN[9],   // v3-v4
-                //     // RED[9], RED[9],
-                //     // BLACK, BLACK,
-                //     // WHITE, WHITE,
-                //     // BLACK, BLACK,
-                //     // WHITE, WHITE,
-                // ];
-                // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 200)
-            }
-            {
-                // const contrast = .8;
-                // const red = Contrast_rgba(RED[9], contrast);
-                // const yel = Contrast_rgba(YELLOW[9], contrast);
-                // const green = Contrast_rgba(GREEN[9], contrast);
-                // const cyan = Contrast_rgba(CYAN[9], contrast);
-                // const blue = Contrast_rgba(BLUE[9], contrast);
-                // const magenta = Contrast_rgba(MAGENTA, contrast);
-                // const black = Contrast_rgba(BLACK, contrast);
-                // const white = Contrast_rgba(WHITE, contrast);
-                // const HUE_COLOR = [
-                //     red, red, 
-                //     yel, yel,
-                //     green, green, 
-                //     cyan, cyan,
-                //     blue, blue,
-                //     magenta, magenta,
-
-                //     black, black, 
-                //     white, white, 
-                //     black, black, 
-                //     white, white, 
-                // ];
-                // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 400)
             }
             { // Luminance
 
@@ -862,14 +822,202 @@ export function TestWidgetsGeneric() {
     }
 
 
-
     // Bitwise_operations_run_test();
     // Test_bitwise_from_book_run_all_tests();
 
 
     // Vertex_buffer_build_index_buffer_all();
+
+    TEMP_Update_all_vertex_buffers(gfxCtx.gl);
+
 }
 
+/** Visual Debug Test */
+function Visual_debug_mouse(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=250, ) {
+
+    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: IS_WIDGET_ROOT, 
+        pos: [x, y, 0], dim: [dbg_w, dbg_h], 
+        col: Color_hsv_to_rgb_calibrated(0,0,1,1,.4,0),  
+    }));
+    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+
+    const pad = 4;
+    const dbg_rect = Create_rect_mesh(Style_rect_default_properties({ 
+        pos: [pad, pad, 0], dim: [dbg_w-pad, dbg_h-pad], 
+        col: Color_hsv_to_rgb_calibrated(.12,1,1,1,.7,.7),  
+    }));
+    Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10,});
+    dbg_surface.AddItem(dbg_rect);
+
+    const debug_info_text = {
+        cur_value    : null,
+    };
+
+    { // Text Info Display
+        const w = dbg_surface.geom.dim[0]*2 + 6, h = dbg_surface.geom.pos[1];
+        const tex_id = TEXTURES.MTSDF_CONSOLAS_1024;
+        { 
+            const text_info = Create_widget_text(Style_text_default_properties({ 
+                pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14,1,1,1,.8,.8), 
+                texture_id: tex_id, font_size: 8, 
+                text: 'value: 0.000', 
+            })); 
+            Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            dbg_surface.AddItem(text_info); 
+            debug_info_text.cur_value = text_info;  
+        }
+    }
+
+
+    dbg_surface.GenGfxCtx();
+    Widget_render(dbg_surface);
+
+
+    
+    const params = {
+        dbg_rect:dbg_rect, // The mesh to visualize the ratio
+        initial_height:(dbg_rect.geom.dim[1]),
+        debug_info_text:debug_info_text, // A text mesh to draw information on the screen
+        target_getter_callback:()=>{
+            // Callback returning params necessary for calculating the ratio
+            // So the calee must sutisfy the 2 variables returned as structure retaining the name of the variables
+            const curr_target_val = Mouse_get_posy();
+            return {
+                target_curr_val:curr_target_val,
+                target_max_val:VIEWPORT.HEIGHT,
+            };
+        },
+        info_text_pos_y_offset:y,
+    };
+
+    Time_intervals_create(16, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+        const dbg_rect = params.params.dbg_rect;
+
+        const target_params = params.params.target_getter_callback();
+        const target_curr_val=target_params.target_curr_val;
+        const target_max_val=target_params.target_max_val;
+        const ratio = target_curr_val / target_max_val;
+
+        
+        const initial_height = params.params.initial_height;
+        const h = (ratio * initial_height * 2) - initial_height;
+
+        Gl_set_vpos_y_top(dbg_rect.gfx, h);
+        // Gl_set_dim_y(dbg_rect.gfx, initial_height+ratio-20);
+
+
+        const info_text = params.params.debug_info_text.cur_value;
+
+
+        if(info_text) {
+            const text = Floor(initial_height-(ratio * initial_height));
+            info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
+            Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
+        }
+        
+
+
+    }, params);
+}
+function Visual_debug_memory_cells(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=250, ) {
+
+    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: IS_WIDGET_ROOT, 
+        // pos: [x, y, 0], dim: [dbg_w, dbg_h], 
+        pos: [x, y, 0],  
+        pad:[10,10],
+        col: Color_hsv_to_rgb_calibrated(0,0,1,1,.4,0),  
+        layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
+    }));
+    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+
+    const pad = 4, s=5;
+    for(let i=0; i < 100; i++) {
+
+        const dbg_rect = Create_rect_mesh(Style_rect_default_properties({ 
+            pos: [pad, pad, 0], dim: [s, s], 
+            // pad:[10,10],
+            col: Color_hsv_to_rgb_calibrated(.12,1,1,1,.7,.7),  
+            layout:LAYOUT.HORIZONTAL ,
+        }));
+        Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10,});
+        dbg_surface.AddItem(dbg_rect);
+    }
+
+    // const debug_info_text = {
+    //     cur_value    : null,
+    // };
+
+    // { // Text Info Display
+    //     const w = 10, h = 10;
+    //     const tex_id = TEXTURES.MTSDF_CONSOLAS_1024;
+    //     { 
+    //         const text_info = Create_widget_text(Style_text_default_properties({ 
+    //             pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14,1,1,1,.8,.8), 
+    //             texture_id: tex_id, font_size: 8, 
+    //             text: 'value: 0.000', 
+    //         })); 
+    //         Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    //         dbg_surface.AddItem(text_info); 
+    //         debug_info_text.cur_value = text_info;  
+    //     }
+    // }
+
+
+    dbg_surface.GenGfxCtx();
+    Layout_basic_pre_render(dbg_surface);
+    Widget_render(dbg_surface);
+
+
+    
+    // const params = {
+    //     dbg_rect:dbg_rect, // The mesh to visualize the ratio
+    //     initial_height:(dbg_rect.geom.dim[1]),
+    //     debug_info_text:debug_info_text, // A text mesh to draw information on the screen
+    //     target_getter_callback:()=>{
+    //         // Callback returning params necessary for calculating the ratio
+    //         // So the calee must sutisfy the 2 variables returned as structure retaining the name of the variables
+    //         const curr_target_val = Mouse_get_posy();
+    //         return {
+    //             target_curr_val:curr_target_val,
+    //             target_max_val:VIEWPORT.HEIGHT,
+    //         };
+    //     },
+    //     info_text_pos_y_offset:y,
+    // };
+
+    // Time_intervals_create(16, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+    //     const dbg_rect = params.params.dbg_rect;
+
+    //     const target_params = params.params.target_getter_callback();
+    //     const target_curr_val=target_params.target_curr_val;
+    //     const target_max_val=target_params.target_max_val;
+    //     const ratio = target_curr_val / target_max_val;
+
+        
+    //     const initial_height = params.params.initial_height;
+    //     const h = (ratio * initial_height * 2) - initial_height;
+
+    //     Gl_set_vpos_y_top(dbg_rect.gfx, h);
+    //     // Gl_set_dim_y(dbg_rect.gfx, initial_height+ratio-20);
+
+
+    //     const info_text = params.params.debug_info_text.cur_value;
+
+
+    //     if(info_text) {
+    //         const text = Floor(initial_height-(ratio * initial_height));
+    //         info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
+    //         Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
+    //     }
+        
+
+
+    // }, params);
+}
 /* Test collision detection: 2 rects with mouse move. Collision detection: sweptAABB */
 function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() { 
 
@@ -2870,7 +3018,12 @@ function Multi_color_multi_vertex_mesh(color_buffer, x = 0, y = 0,) { // TEST MU
 
     const dim = [VIEWPORT.WIDTH / 2 - 4, VIEWPORT.HEIGHT / 9]
     const vertices_count = (color_buffer.length / 2) - 1;
-    const slider_hue = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: [x, y, 2], dim: dim, col: color_buffer, num_faces: vertices_count, name: 'Slider Hue' }));
+    const slider_hue = Create_rect_mesh(Style_rect_default_properties({ 
+        is_root: ROOT_WIDGETS.CREATE_ROOT, 
+        pad: [0, 0], pos: [x, y, 2], dim: dim, 
+        col: color_buffer, num_faces: vertices_count, 
+        name: 'Slider Hue' 
+    }));
     Widget_gfx_ready_enable({ mesh: slider_hue, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
     // Widget_gfx_ready_enable({mesh:slider_hue, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
@@ -5518,50 +5671,39 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 /** */
 function Instanced_geometry(col, pos, dim) {
 
-    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0,0,1.,1.,.1,0), name: 'instanced geom panel', }));
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0,0,1.,.1,.5,0), name: 'instanced geom panel', }));
     Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, })
 
-    const w=200, h=2., d=1, r_corners = 1;
+    const w=200, h=5., d=1, r_corners = 1;
     let hue = .1;
-    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
     // const inst_attribs = (SID.ATTR.WPOS3 | SID.ATTR.DIM2);
-    const inst_attribs = (SID.ATTR.WPOS3);
-    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    // const inst_attribs = (SID.ATTR.WPOS3);
+    // const inst_attribs = (SID.ATTR.COL4);
+
 
     for(let i = 0; i < 10; i++) {
 
-        const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,1.,0), name: `line-inst ${i}`,  }));
-        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+        const line = Create_rect_mesh(Style_rect_default_properties({ 
+            pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], 
+            col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,1.,0), 
+            name: `line-inst ${i}`,  
+        }));
+        // Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
+        Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
         panel.AddItem(line);
         line.sid.inst = inst_attribs;
 
-    }
-    // {
-    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*2,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.3,1,1.,1.,.4,0), name: 'line-inst 1',  }));
-    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
-    //     panel.AddItem(line);
-    //     line.sid.inst = inst_attribs;
-    // }
-    // {
-    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*4,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.13,1,1.,1.,.4,0), name: 'line-inst 2',  }));
-    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
-    //     panel.AddItem(line);
-    //     line.sid.inst = inst_attribs;
-    // }
-    // {
-    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*6,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.78,1,1.,1.,.5,0), name: 'line-inst 3',  }));
-    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
-    //     panel.AddItem(line);
-    //     line.sid.inst = inst_attribs;
-    // }
-    // {
-    //     const line = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [10,(d+h)*8,0], dim: [w,h], col: Color_hsv_to_rgb_calibrated(.6,1,1.,1.,.5,0), name: 'line-inst 4',  }));
-    //     Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
-    //     panel.AddItem(line);
-    //     line.sid.inst = inst_attribs;
-    // }
 
+    }
+
+    {
+
+    }
+
+
+    
     panel.GenGfxCtx();
     Widget_render(panel);
 

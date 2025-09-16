@@ -65,20 +65,6 @@ function SetValueV4ui(gl, loc, val) { gl.uniform4uiv(loc, val); }
 
 
 
-// gl.getActiveUniform(this.shader_program, idx)
-// gl.getActiveUniforms(this.shader_program, indices, TYPE_TO_RETRACT);
-// TYPE_TO_RETRACT TYPES
-// gl.UNIFORM_TYPE            Returns an Array of GLenum indicating the types of the uniforms.
-// gl.UNIFORM_SIZE            Returns an Array of GLuint indicating the sizes of the uniforms.
-// gl.UNIFORM_BLOCK_INDEX     Returns an Array of GLint indicating the block indices of the uniforms.
-// gl.UNIFORM_OFFSET          Returns an Array of GLint indicating the uniform buffer offsets.
-// gl.UNIFORM_ARRAY_STRIDE    Returns an Array of GLint indicating the strides between the elements.
-// gl.UNIFORM_MATRIX_STRIDE   Returns an Array of GLint indicating the strides between columns of a column-major matrix or a row-major matrix.
-// gl.UNIFORM_IS_ROW_MAJOR    Returns an Array of GLboolean indicating whether each of the uniforms is a row-major matrix or not.
-
-
-
-
 /**
  * // TODO:
  * // IMPORTANT: The folowing fields are unecessary-> {UpdateUniform(), clbk_params}
@@ -173,17 +159,15 @@ class Uniform {
 
 
 const _uniforms_buffer = New_generic_buffer(_, 'GFX Uniforms');
-
+/** */
 export function Uniforms_buffer_reset() { _uniforms_buffer.ResetFull(); }
-
-
+/** */
 export function Uniforms_buffer_destroy_uniform(ubidx) {
 
    _uniforms_buffer.RemoveByIdx(ubidx); // Add new unifor to local buffer
 
 }
-
-
+/** */
 export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, progidx, vb_groupidx) {
 
    const uniform = new Uniform(gl, shader_program, type, name, progidx, vb_groupidx);
@@ -191,40 +175,27 @@ export function Uniforms_buffer_create_uniform(gl, shader_program, type, name, p
 
    return ubidx;
 }
-
-
-
+/** */
 export function Uniforms_buffer_get_uniform_byidx(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
    return _uniforms_buffer.buffer[ubidx].val;
 }
-
-
-
+/** */
 export function Uniforms_buffer_set_uniform(ubidx, val) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
    _uniforms_buffer.buffer[ubidx].Set(val);
 }
-
-
-
 /** Set one value form a uniform vector/array */
 export function Uniforms_buffer_set_uniform_val_from_index(ubidx, val, idx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
    _uniforms_buffer.buffer[ubidx].SetFromIndex(val, idx);
 }
-
-
-
-
+/** */
 export function Uniforms_buffer_update_uniform(ubidx) {
    if (!DISABLE_DEBUG) DEBUG_PRINT(_uniforms_buffer, ubidx, new Error().lineNumber);
    _uniforms_buffer.buffer[ubidx].Update();
 }
-
-
-
-
+/** */
 export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', vb_groupidx) {
 
    // Find uniform by name
@@ -243,39 +214,6 @@ export function Uniforms_buffer_find_ubidx_from_name(unif_name = '', vb_groupidx
    return INT_NULL;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -350,14 +288,10 @@ const ERROR_UBS = `
 3. Check the ShaderBuilder.
 4. Check all parameters an offsets passed to .AddLayout().`
 
-
-
-
 const _uniform_blocks = New_generic_buffer(_, 'GFX Uniforms Block');
+/** */
 export function Uniform_blocks_buffer_reset() { _uniform_blocks.ResetFull(); }
-
-
-// const CreatedUniforms = [];
+/** */
 function Uniform_block_exists(sid) {
 
    for (let i = 0; i <= _uniform_blocks.boundary; i++) {
@@ -369,9 +303,7 @@ function Uniform_block_exists(sid) {
 
    return false;
 }
-
-
-
+/** */
 let ubs_counter = 0;
 class UniformsBlock {
 
@@ -453,8 +385,6 @@ class UniformsBlock {
    }
 
 }
-
-
 /** 
  * Searches uniform names from @uniforms and puts it to the uniform block if it is a shared type uniform (shared across all programs) 
  * 
@@ -503,9 +433,6 @@ export function Uniforms_block_create_shared_uniform(sid, program, uniforms) {
    // Combine 2 Uniform Blocks in to one buffer
    // gl.bindBufferRange( BINDING_INDEX, glbuffer, offset, size, )
 }
-
-
-
 /** The binding happens with an index to the uniform's layout of the '_uniform_blocks' buffer */
 export function Uniforms_block_get_uniform_by_name(unif_name = '') {
 
@@ -524,16 +451,12 @@ export function Uniforms_block_get_uniform_by_name(unif_name = '') {
    console.error('No Block uniform with name:', unif_name, 'found to be bound. Blocks:', _uniform_blocks);
    alert('No Block uniform found to be bound.\n SEE console error');
 }
-
-
-
+/** */
 export function Uniforms_block_set_uniform(uniform_locidx, val) {
    _uniform_blocks.buffer[0].SetVal(uniform_locidx, val);
    _uniform_blocks.buffer[0].needs_update = true;
 }
-
-
-
+/** */
 export function Uniforms_block_update_uniform() { // HOT-PATH
 
    if (!_uniform_blocks.buffer[0] || !_uniform_blocks.buffer[0].needs_update) return;
@@ -560,6 +483,7 @@ export function Uniforms_block_update_uniform() { // HOT-PATH
 // DEBUG
 /****************************************************************************************************************************************************/
 
+/** */
 function DEBUG_PRINT(buffer, index, line) {
    if (index < 0 || index > buffer.boundary) {
       console.error('Index is out of bounds. @GlProgram.js.\nLine:', line, 'index:', index, buffer);

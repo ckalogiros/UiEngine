@@ -19,6 +19,7 @@ import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
+import { Visual_debug_create, Visual_debug_create_properties } from "../VisualDebug/VisualDebug.js";
 
 /**
  * // TODO: Create all attributes of particles in separate buffers, so that we can copy all positions/time/color attribs in the vertex buffer at once
@@ -273,13 +274,36 @@ class Particle {
    }
 }
 
-function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles, has_intermidiate_emission) {
+function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles, has_intermidiate_emission, has_continueus_emitt=true) {
+
+   const fps = 60; // Assuming standard 60 fps
+   const t = (life_time / t_step) / fps;
+   const click_rate = has_continueus_emitt ? 60 : 8; // 8 clicks per 1 second estimation
+   // let cpplt = 1 / (t*click_rate); // 1 / clicks per particle life time
+   let cpplt = (t*click_rate); // 1 / clicks per particle life time
 
    
-   const total_particles_num = (life_time / t_step) * num_particles;
+   // let total_particles_per_second = num_particles / cpplt;
+   let total_particles_per_second = num_particles * cpplt;
+   if(has_continueus_emitt) {
+      total_particles_per_second = t*num_particles*fps
+   }
+   
+   console.warn('PARTICLES APROXIMATION:', 
+      '\num_particles', Floor(num_particles), 
+      '\ntotal_particles_per_second', Floor(total_particles_per_second), 
+      '\nt', t.toFixed(2), 
+      '\nt*num_particles*fps', (t*num_particles*fps).toFixed(2), 
+      '\nclicks per particle life time', (t*click_rate).toFixed(2), 
+      '\ncpplt', cpplt.toFixed(2),
+      '\nnum_particles / cpplt', (num_particles / cpplt).toFixed(2)
+   )
+
+   // const total_particles_num = (life_time / t_step) * num_particles * emitt_per_second;
+   const total_particles_num = total_particles_per_second;
    // TODO: The ammount of extra particles can be aproximated only if we take into consideration the max speed(deriving the max number of particles being put in between the spaces)
-   const extra_particles = has_intermidiate_emission ? total_particles_num*2 : 0;
-   return Floor(total_particles_num)+100+extra_particles;
+   const extra_particles = has_intermidiate_emission ? total_particles_num*2 : 10;
+   return Floor(total_particles_num)+num_particles+extra_particles;
 }
 
 class Emitter {
@@ -334,18 +358,11 @@ class Emitter {
          ydir_neg: 0, // Upper quadrant
       }
       
-      if(properties.is_continuous_emmit) {
-         
-         // this.vb_aprox_size = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles, properties.has_intermidiate_emission);
-         this.vb_aprox_size = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles_per_frame, properties.has_intermidiate_emission);
-      }
-      else {
-         
-         this.vb_aprox_size = properties.num_particles_per_frame * properties.num_particles;
-      }
+      const num_particles_aproximation = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles_per_frame, properties.has_intermidiate_emission, properties.is_continuous_emmit);
+      this.vb_aprox_size = num_particles_aproximation;
+
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      // this.free_particles = New_int32_buffer(vb_aprox_size, 'ParticlesSystem-free_particles');
       
       this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
       
@@ -359,8 +376,8 @@ class Emitter {
          unif: 0x0,
          // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
-         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
-         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
          // inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
          // inst: 0x0,
          shad_ops: 0x0,
@@ -846,6 +863,17 @@ export function Particle_system_create_emitter(mesh_bufferidx, properties) {
    const emitter = new Emitter(mesh_bufferidx, properties);
    const idx = _emitters.Add(emitter);
    _emitters.buffer[idx].idx = idx;
+
+   Visual_debug_create(Visual_debug_create_properties({
+      is_root:ROOT_WIDGETS.CREATE_ROOT,
+      pos:{x:10, y:200},
+      dim:{x:30, y:200},
+
+      Target_get_cur_val:Get_emitter_free_particle_count,
+      Target_get_max_val:Get_emitter_free_particle_size,
+      target_get_cur_val_params:idx,
+      target_get_max_val_params:idx,
+   })); 
 
    return emitter;
 }
@@ -1581,3 +1609,25 @@ export function Particle_system_print_free_particles_buffer() {
    }
 }
 
+
+
+
+
+
+
+/*********************************************************************************************************/
+// VISUAL-DEBUG
+function Get_emitter_free_particle_size(emitter_idx) {
+
+   const emitter = _emitters.buffer[emitter_idx];
+   const size = emitter.free_particles.size;
+   return size;
+}
+function Get_emitter_free_particle_count(emitter_idx) {
+
+   const emitter = _emitters.buffer[emitter_idx];
+   const count = emitter.free_particles.pos;
+   // if(count!==0)
+   //    console.log()
+   return count;
+}

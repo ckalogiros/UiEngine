@@ -7,7 +7,7 @@ import { Progarm_get_program, Program_get_shader_attributes_index, Program_use_p
 import { Typed_array_create_from_type } from "./TypedArrayBuffersInterface.js";
 import { Gl_vertex_array_object_create, Gl_vertex_array_object_get_by_vaoidx } from "./VertexArrays.js";
 import { Floor } from "../../Helpers/Math/MathOperations.js";
-import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_by_ibidx, Index_buffer_info_get_indices_per_face } from "./IndexBuffers.js";
+import { Index_buffer_info_check_has_enough_indices, Index_buffer_info_get_by_ibidx, Index_buffer_info_get_indices_per_face, Index_buffer_reset } from "./IndexBuffers.js";
 import { NOTIFICATION_TYPE, Notifications_send } from "../../Engine/Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Uniforms_buffer_set_uniform_val_from_index, Uniforms_buffer_update_uniform } from "./UniformBuffers.js";
 import { Gl_operation_add, Select_fnidx_to_fill_vertex_buffer } from "./VertexBufferFillOps.js";
@@ -240,6 +240,8 @@ export function Vertex_buffer_reset_full() {
 export function Vertex_buffer_get_Active_count() { return _vertex_buffers_data.active_count; }
 /** */
 export function Vertex_buffer_get() { return _vertex_buffers_data; }
+/** */
+export function Vertex_buffer_data_get_byidx(vb_data_idx) { return _vertex_buffers_data.buffer[vb_data_idx]; }
 /** */
 export function Vertex_buffer_get_by_vbidx(vbidx) {
     if (!DISABLE_DEBUG) DEBUG_PRINT(_vertex_buffers_data, vbidx, new Error().lineNumber);
@@ -858,7 +860,7 @@ export function Vertex_buffer_calculate_vertexbuffer_render_group_starts() {
         if(total_size >  vb_info.size) {
             
             vb_info.Realloc(total_size);
-            console.error('REALLOC 1', vb_info.size, 'vbidx', vb_info.vbidx,  'count', vb_info.count);
+            console.error('1REALLOC', 'vbidx', vb_info.vbidx,  'count', vb_info.count, 'vb_info.size', vb_info.size, 'new_size', total_size);
             vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
         }
 
@@ -901,8 +903,8 @@ export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, ren
     // Reallocate vb according to render groups total size
     if(total_size >  vb_info.size) {
         
+        console.error('2REALLOC', 'vbidx', vb_info.vbidx,  'count', vb_info.count, 'vb_info.size', vb_info.size, 'new_size', total_size);
         vb_info.Realloc(total_size);
-        console.error('REALLOC 1', vb_info.size, 'vbidx', vb_info.vbidx,  'count', vb_info.count);
         vb_info.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
     }
 
@@ -1014,8 +1016,11 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         if(vb_info.sid & gfx.sid.inst) {
             total_attribs = attribs_per_vertex * num_faces;
             render_group.count += total_attribs;
-            const index_buffer_count = ib_info.vCount + (vb_info.vertices_per_face * num_faces);
-            Index_buffer_info_check_has_enough_indices(vb_group.ibidx, index_buffer_count, num_faces);
+            if(ib_info.count === 0) {
+                const index_buffer_count = ib_info.vCount + (vb_info.vertices_per_face * num_faces);
+                Index_buffer_info_check_has_enough_indices(vb_group.ibidx, index_buffer_count, num_faces);
+            }
+
             vb_info.count += total_attribs;
             vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
         }
@@ -1030,7 +1035,6 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         else {
             vb_info.count = total_attribs;
             vb_info.vCount = vb_info.count / vb_info.attribs_info.count;
-
         }
 
         
@@ -1266,6 +1270,8 @@ export function Vertex_buffer_reset_to_index_NEW(vb_groupidx, render_groupidx) {
     render_group.debug_is_reseted = true;
     
     _vertex_buffer_groups.buffer[vb_groupidx].needs_any_update = true;
+
+    // Index_buffer_reset(ibidx)
 
 }
 

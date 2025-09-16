@@ -33,7 +33,7 @@ export class Material {
 
       this.hsv = [0, 1, 1];
 
-      if (col[0].constructor === Float32Array) {
+      if (col[0].constructor === Float32Array) { // Per Vertex RGBA
 
          const len = col.length;
          this.col = new Array(len);
