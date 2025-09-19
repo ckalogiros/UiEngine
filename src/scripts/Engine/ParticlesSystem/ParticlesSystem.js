@@ -1,9 +1,9 @@
 "use strict";
 
 import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
-import { Vertex_buffer_render_group_add_instance, Vertex_buffer_render_group_remove_instance, Vertex_buffer_render_group_set_count_from_num_faces, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
+import { Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_add_vertices_from_render_group, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name, VBI_get_byidx, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name } from "../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time, Gl_particles_batch_set_vpos2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2, Gl_particles_batch_set_vpos2, Gl_particles_batch_set_instanced_wpos3_time, Gl_particles_batch_set_col4_vpos2_dim2_rcorner, Gl_particles_batch_set_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_time } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
@@ -19,8 +19,6 @@ import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
-import { Visual_debug_create, Visual_debug_create_properties } from "../VisualDebug/VisualDebug.js";
-import { Static_particles_set_need_update } from "./ParticlesSystemStatic.js";
 
 /**
  * // TODO: Create all attributes of particles in separate buffers, so that we can copy all positions/time/color attribs in the vertex buffer at once
@@ -1141,8 +1139,8 @@ export function Particle_system_emitt(params) {
                
             }
 
-            GLOB_TEMP.visual_debug.AddAtIndex(next_free_particle_idx);
-            Static_particles_set_need_update(0, true);
+            // GLOB_TEMP.visual_debug.AddAtIndex(next_free_particle_idx);
+            // Static_particles_set_need_update(0, true);
             
          }
          else {
@@ -1352,13 +1350,13 @@ export function Particle_system_update() {
                if (emitter.free_particles.boundary === emitter.particles_buffer.boundary) {
                   emitter.is_active = false;
                   Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-                  Static_particles_set_need_update(0, false);
+                  // Static_particles_set_need_update(0, false);
                }
 
                // Remove instanced count
                // Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
 
-               GLOB_TEMP.visual_debug.Remove(j);
+               // GLOB_TEMP.visual_debug.Remove(j);
 
             }
 
@@ -1370,7 +1368,7 @@ export function Particle_system_update() {
       // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
       if (needs_update) {
          Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
-         Static_particles_set_need_update(0, true);
+         // Static_particles_set_need_update(0, true);
       }
 
 

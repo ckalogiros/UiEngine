@@ -162,9 +162,9 @@ class Emitter extends Rect_Mesh {
       this.Update_gfx_buffers_fn = null; // Function pointer to update the vertex buffer of the particle system
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      this.vis_buffer = New_uint64_buffer(this.num_particles, 'VisualDebug');
-      GLOB_TEMP.visual_debug = this.vis_buffer;
-      console.warn('this.vis_buffer', this.vis_buffer)
+      // this.vis_buffer = New_uint64_buffer(this.num_particles, 'VisualDebug');
+      // GLOB_TEMP.visual_debug = this.vis_buffer;
+      // console.warn('this.vis_buffer', this.vis_buffer)
       this.target = properties.target;
       // this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
 

@@ -281,7 +281,7 @@ export function TestWidgetsGeneric() {
 
 
 
-    Test_time_intervals_performance();
+    // Test_time_intervals_performance();
 
 
 
@@ -541,54 +541,12 @@ export function TestWidgetsGeneric() {
 
     { // Visual Debug
 
-        // Visual_debug_mouse(true);  
+        // Visual_debug_mouse(ROOT_WIDGETS.CREATE_ROOT, 100, 100, 30, 250);  
 
-        {
-            // {
-            //     const transform_parameters=[.48, .5, .19, .2, .4]
-            //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters);
-            //     Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
-            // }
-            // {
-            //     const transform_parameters=[.48, .5, .19, .2, .6]
-            //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 300, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters);
-            //     Visual_debug_buffer_cells(200, 500, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
-            // }
-            // const params = {
-            //     // emitter_idx: emitter.idx,
-            //     // timer: timer,
-            // };
-            // Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
-                
-            //     // const emitter_idx = params.params.emitter_idx;
-            //     Static_particle_system_update(); 
+        Demo_visual_debug_glow_particles();
 
-            // }, params);
-        }
+        // Demo_visual_debug_explosion_particles();
 
-
-        // {
-        //     const ret = Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 16,);
-        //     Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
-        // }
-
-
-        // const generic_buffer = Debug_Generic_buffers_container_get_buffer();
-        // Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, generic_buffer);
-        
-        // Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _,);
-        // Visual_debug_memory_cells_with_meshes(true);
-
-        // Visual_debug_create(Visual_debug_create_properties({
-        //     is_root:ROOT_WIDGETS.CREATE_ROOT,
-        //     pos:{x:100, y:100},
-        //     dim:{x:30, y:200},
-
-        //     Target_get_cur_val:Mouse_get_posy,
-        //     Target_get_max_val:()=>{return VIEWPORT.HEIGHT},
-
-        //     name:'Visual Debug Test',
-        // }));  
     }
 
     { // Instanced Geometry
@@ -916,94 +874,51 @@ export function TestWidgetsGeneric() {
 
 }
 
-/** Visual Debug Test */
-function Visual_debug_mouse(IS_WIDGET_ROOT = false, x = 100, y = 100, dbg_w = 20, dbg_h = 250,) {
+function Demo_visual_debug_glow_particles() {
 
-    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({
-        is_root: IS_WIDGET_ROOT,
-        pos: [x, y, 0], dim: [dbg_w, dbg_h],
-        col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .4, 0),
-    }));
-    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
-
-    const pad = 4;
-    const dbg_rect = Create_rect_mesh(Style_rect_default_properties({
-        pos: [pad, pad, 0], dim: [dbg_w - pad, dbg_h - pad],
-        col: Color_hsv_to_rgb_calibrated(.12, 1, 1, 1, .7, .7),
-    }));
-    Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10, });
-    dbg_surface.AddItem(dbg_rect);
-
-    const debug_info_text = {
-        cur_value: null,
-    };
-
-    { // Text Info Display
-        const w = dbg_surface.geom.dim[0] * 2 + 6, h = dbg_surface.geom.pos[1];
-        const tex_id = TEXTURES.MTSDF_CONSOLAS_1024;
-        {
-            const text_info = Create_widget_text(Style_text_default_properties({
-                pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14, 1, 1, 1, .8, .8),
-                texture_id: tex_id, font_size: 8,
-                text: 'value: 0.000',
-            }));
-            Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-            dbg_surface.AddItem(text_info);
-            debug_info_text.cur_value = text_info;
-        }
+    {
+        const transform_parameters=[.48, .5, .19, .01, .2]
+        const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.12,1,1,1,.6,0));
+        Visual_debug_buffer_cells(160, 130, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
     }
-
-
-    dbg_surface.GenGfxCtx();
-    Widget_render(dbg_surface);
-
-
-
-    const params = {
-        dbg_rect: dbg_rect, // The mesh to visualize the ratio
-        initial_height: (dbg_rect.geom.dim[1]),
-        debug_info_text: debug_info_text, // A text mesh to draw information on the screen
-        target_getter_callback: () => {
-            // Callback returning params necessary for calculating the ratio
-            // So the calee must sutisfy the 2 variables returned as structure retaining the name of the variables
-            const curr_target_val = Mouse_get_posy();
-            return {
-                target_curr_val: curr_target_val,
-                target_max_val: VIEWPORT.HEIGHT,
-            };
-        },
-        info_text_pos_y_offset: y,
-    };
-
+    {
+        const transform_parameters=[.48, .5, .19, .04, .45]
+        const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 240, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.58,1,1,1,.7,0));
+        Visual_debug_buffer_cells(160, 370, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+    }
+    {
+        const transform_parameters=[.48, .5, .19, .07, .7]
+        const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 480, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.3,1,1,1,.5,0));
+        Visual_debug_buffer_cells(160, 610, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+    }
+    const params = {};
     Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
-
-        const dbg_rect = params.params.dbg_rect;
-
-        const target_params = params.params.target_getter_callback();
-        const target_curr_val = target_params.target_curr_val;
-        const target_max_val = target_params.target_max_val;
-        const ratio = target_curr_val / target_max_val;
-
-
-        const initial_height = params.params.initial_height;
-        const h = (ratio * initial_height * 2) - initial_height;
-
-        Gl_set_vpos_y_top(dbg_rect.gfx, h);
-        // Gl_set_dim_y(dbg_rect.gfx, initial_height+ratio-20);
-
-
-        const info_text = params.params.debug_info_text.cur_value;
-
-
-        if (info_text) {
-            const text = Floor(initial_height - (ratio * initial_height));
-            info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
-            Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
-        }
-
-
+        
+        Static_particle_system_update(); 
 
     }, params);
+}
+function Demo_visual_debug_explosion_particles() {
+
+    const ret = Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 16,);
+    Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+    const params = {};
+    Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+        Static_particle_system_update(); 
+    }, params);
+}
+
+/** Visual Debug Test */
+function Visual_debug_mouse(is_root = true, x = 100, y = 100, w = 30, h = 250,) {
+    Visual_debug_create(Visual_debug_create_properties({
+        is_root:is_root,
+        pos:{x:x, y:y},
+        dim:{x:w, y:h},
+
+        Target_get_cur_val:Mouse_get_posy,
+        Target_get_max_val:()=>{return VIEWPORT.HEIGHT},
+        name:'Visual Debug Test',
+    })); 
 }
 function Visual_debug_buffer_cells(x = 0, y = 0, root_widget = 0x0, particles_size = 10, target=null) { // 3 control Sliders 
 
@@ -1107,115 +1022,6 @@ function Visual_debug_buffer_cells(x = 0, y = 0, root_widget = 0x0, particles_si
 
     return emitter;
 
-}
-function Visual_debug_memory_cells_with_meshes(IS_WIDGET_ROOT = false, x = 100, y = 100, dbg_w = 250, dbg_h = 50,) {
-
-    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({
-        is_root: IS_WIDGET_ROOT,
-        // pos: [x, y, 0], dim: [dbg_w, dbg_h], 
-        pos: [x, y, 0], dim: [dbg_w, 10],
-        // pos: [x, y, 0],  
-        // pad:[10,10],
-        col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .4, 0),
-        // layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
-    }));
-    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
-
-
-
-    const emitter_idx = 0;
-    const free_buffer = Get_emitter_particle_buffer(emitter_idx);
-    console.warn(free_buffer)
-    const pad = 4, w = 6, h = w * .7;
-    let xp = 0, yp = 0;
-    const max_width = dbg_w * 2 - w * 2;
-    for (let i = 0; i < free_buffer.size; i++) {
-
-
-        if (xp > max_width) {
-            xp = 0;
-            yp += h * 2;
-            dbg_surface.geom.dim[1] += h
-        }
-
-        const dbg_rect = Create_rect_mesh(Style_rect_default_properties({
-            pos: [xp + pad, yp + pad, 0], dim: [w, h],
-            // pad:[10,10],
-            col: Color_hsv_to_rgb_calibrated(.12, 1, 1, 1, .7, .7),
-            // layout:LAYOUT.HORIZONTAL ,
-        }));
-        Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 2, });
-        dbg_surface.AddItem(dbg_rect);
-
-        xp += w * 2;
-
-    }
-
-
-    // const debug_info_text = {
-    //     cur_value    : null,
-    // };
-
-    // { // Text Info Display
-    //     const w = 10, h = 10;
-    //     const tex_id = TEXTURES.MTSDF_CONSOLAS_1024;
-    //     { 
-    //         const text_info = Create_widget_text(Style_text_default_properties({ 
-    //             pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14,1,1,1,.8,.8), 
-    //             texture_id: tex_id, font_size: 8, 
-    //             text: 'value: 0.000', 
-    //         })); 
-    //         Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-    //         dbg_surface.AddItem(text_info); 
-    //         debug_info_text.cur_value = text_info;  
-    //     }
-    // }
-
-
-    dbg_surface.GenGfxCtx();
-    // Layout_basic_pre_render(dbg_surface);
-    Widget_render(dbg_surface);
-
-
-
-    const params = {
-        dbg_surface: dbg_surface, // The mesh to visualize the ratio
-        emitter_idx: emitter_idx,
-        // debug_info_text:debug_info_text, // A text mesh to draw information on the screen
-        // info_text_pos_y_offset:y,
-    };
-
-    Time_intervals_create(32, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
-
-        const dbg_surface = params.params.dbg_surface;
-        const buffer = Get_emitter_particle_buffer(params.params.emitter_idx);
-        const meshes = dbg_surface.children;
-
-
-        for (let i = 0; i < buffer.size; i++) {
-
-            const f = free_buffer.buffer[i];
-            const mesh = meshes.buffer[i];
-            if (f) {
-                if (f.is_alive)
-                    Gl_set_rgba(mesh.gfx, mesh.mat.col);
-                else
-                    Gl_set_rgba(mesh.gfx, GREY[3]);
-            }
-            else Gl_set_rgba(mesh.gfx, BLACK);
-        }
-
-
-        // const info_text = params.params.debug_info_text.cur_value;
-
-
-        // if(info_text) {
-        //     const text = Floor(initial_height-(ratio * initial_height));
-        //     info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
-        //     Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
-        // }
-
-    }, params);
 }
 /* Test collision detection: 2 rects with mouse move. Collision detection: sweptAABB */
 function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
@@ -8965,6 +8771,7 @@ function Test_time_intervals_performance() {
     const num_intervals = 10;
     const internal_loop_repetition = 1000;
 
+    timer.prev = window.performance.now();
 
     const o1 = {x:0, y:0};
     const o2 = {x:0, y:0};
@@ -8975,9 +8782,8 @@ function Test_time_intervals_performance() {
             o2:o2,
             timer:timer,
         };
-        Time_intervals_create(1, 'TestIntervals', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+        Time_intervals_create(1, 'TestIntervals', 10, (params)=>{
 
-            timer.prev = window.performance.now();
 
             const o1 = params.params.o1;
             const o2 = params.params.o2;

@@ -64,8 +64,7 @@ const physics_init_values = {
 /*********************************************************************************************************************************************************************************************/
 
 
-export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=[.48, .5, .19, .2, .4]) { // 3 control Sliders 
-// export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=null) { // 3 control Sliders 
+export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_create = true, num_particles_per_frame, scale_down=.2, transform_parameters=[.48, .5, .19, .2, .4], color=BLUEL[9]) { // 3 control Sliders 
 
    const particles_size = 20;
    const rcorners = 10;
@@ -80,7 +79,7 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    // name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down
    const emitter = Create_particle_emitter(Style_particles_system_default_properties({
       name:'GlowParticles', 
-      col:BLUEL[9], pos:[x, y, 10], dim:[particles_size, particles_size], 
+      col:color, pos:[x, y, 10], dim:[particles_size, particles_size], 
       t_step:.006, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
       // t_step:.001, life_time:1, accel:4, deccel:.98, gravity:.1, max_speed:4, 
       num_particles_per_frame:num_particles_per_frame, 
@@ -200,18 +199,16 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    const switch_panel = Create_emitt_switch_panel({ z: zpos, emitter: emitter, emitt_options: { continuous_emitt: true, button_pres_emitt: true } });
    controls_section.AddItem(switch_panel);
 
-   const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
-   controls_section.AddItem(colorpicker_panel);
-
-
-
+      
+      
    /****************************************************************************************************************/
    // Create slider controls
-
    if (controls_create) { // Create slider controls only if this is to be rendered from this function
 
+      const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
+      controls_section.AddItem(colorpicker_panel);
+
       const parameters = [.48, .5, .19, .08, .4, .04, .04, .55];
-      // const parameters = [0.2, .48, .5, .19, .08, .4, .04, .55];
       const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], parameters, generic_controls_parameters, 'u_generic_controls');
 
       const len = controls_buffer.length;

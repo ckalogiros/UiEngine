@@ -58,7 +58,7 @@ let dubg = 0;
 /** */
 class Array_Buffer_Integer_Interface {
 
-
+   /** */
    constructor() {
 
       this.buffer = null;
@@ -72,7 +72,7 @@ class Array_Buffer_Integer_Interface {
       this.debug_name = null;
 
    }
-   
+   /** */
    Reset() {
 
       for (let i = 0; i <= this.boundary; i++) {
@@ -88,7 +88,7 @@ class Array_Buffer_Integer_Interface {
       this.freeidx = 0;
       this.reserveidx = INT_NULL;
    }
-
+   /** */
    Add(elem) {
 
       if (this.freeidx !== INT_NULL) {
@@ -107,8 +107,7 @@ class Array_Buffer_Integer_Interface {
       this.active_count++;
       return idx;
    }
-
-
+   /** */
    AddAtIndex(idx, elem) {
 
       if (idx < 0) console.error('SEVERE_ERROR.\nWRONG Index. Adding item at: ', idx);
@@ -131,8 +130,7 @@ class Array_Buffer_Integer_Interface {
 
       return idx;
    }
-
-
+   /** */
    GetNextFree() {
 
       if (this.active_count >= this.size) {
@@ -154,8 +152,7 @@ class Array_Buffer_Integer_Interface {
          }
       }
    }
-   
-   
+   /** */
    ShiftLeft(){
 
       if(this.boundary >= 0) {
@@ -198,8 +195,7 @@ class Array_Buffer_Integer_Interface {
          if(this.boundary > this.count) console.error('009988176651 \n Boundary > active_count', this.boundary, this.count)
       }
    }
-
-
+   /** */
    RemoveByIdx(idx) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -224,9 +220,7 @@ class Array_Buffer_Integer_Interface {
       }
       console.warn('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
    }
-
-
-
+   /** */
    RemoveByIdxNoGapsVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -284,8 +278,7 @@ class Array_Buffer_Integer_Interface {
       this.active_count--;
       /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
    }
-
-   
+   /** */
    Consolidate() {
 
       alert(' 00909987813245 IMPLEMENT CORRECTLY')
@@ -314,8 +307,7 @@ class Array_Buffer_Integer_Interface {
       this.boundary = leftidx;
       // this.count has been calculated in a remove_idx function;
    }
-
-
+   /** */
    CopyFromBufferToStart(oldData) {
 
       const size = oldData.length;

@@ -545,7 +545,6 @@ export function Switch_simple_time_interval_callback(params) {
 
    if (this_switch.isOn === 0x0 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
-      Time_intervals_print()
       const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
       // this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
@@ -553,9 +552,6 @@ export function Switch_simple_time_interval_callback(params) {
       // this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersionLastElemGuarantee(INTERVALS.UPDATE);
       this_switch.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.UPDATE);
       
-      Time_intervals_print()
-
-
       return;
    }
 

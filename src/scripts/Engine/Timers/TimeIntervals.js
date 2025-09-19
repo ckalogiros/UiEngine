@@ -1,13 +1,12 @@
 "use strict";
 
-import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy, Str_buffer_change } from "../Core/StringBuffer.js";
-import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
 import { Time_get } from "./Time.js";
 
 
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/*
  * Interval Timers.
 
  * Runs every 'interval' time.
@@ -112,6 +111,7 @@ class TimeIntervals {
 
       this.ti = [];
       this.count = 0;
+      this.boundary = INT_NULL;
       this.size = 0;
 
    }
@@ -137,10 +137,22 @@ class TimeIntervals {
       return freeIdx;
    }
    /** */
+   GetNextFree() {
+
+      for (let i = 0; i < this.size; i++) {
+         if (!this.ti[i].isActive) {
+            // Increment boundary only if the free element is after the last stored element in the buffer.
+            if (i > this.boundary) this.boundary = i;
+            return i;
+         }
+      }
+      alert('Not enough space in buffer:TimeIntervals\nAt TimeIntervals.js\nGetNextFree()')
+      return null;
+   }
+   /** */
    Update() {
 
-      // for (let i = 0; i < this.count; i++) {
-      for (let i = this.count-1; i >= 0; i--) {
+      for (let i = this.boundary; i >= 0; i--) {
 
          if(this.ti[i].isActive)
             this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
@@ -149,7 +161,7 @@ class TimeIntervals {
    /** */
    DestroyByIdx(idx) {
 
-      /**
+      /** // TODO
        * Because of the dynamic text widget, 
        * we share intervals between different dynamic text 
        * but also between different widgets.
@@ -162,6 +174,10 @@ class TimeIntervals {
 
          this.#Destroy(idx);
          this.count--;
+         // Check if previous elements are empty, and reduce boundary to the last active.
+         while(this.boundary > INT_NULL && this.ti[this.boundary].isActive === false) {
+            this.boundary--;
+         }
          if(this.count < 0) {
             console.error('Time intervals: count out of bounds\nidx:', this.count, this);
             alert('554413099897765413.\nTime intervals: count out of bounds');
@@ -187,26 +203,15 @@ class TimeIntervals {
          return true;
       return false;
    }
-   /** */
-   GetNextFree() {
-
-      for (let i = 0; i < this.size; i++) {
-         if (!this.ti[i].isActive) {
-            return i;
-         }
-      }
-      alert('Not enough space in buffer:TimeIntervals\nAt TimeIntervals.js\nGetNextFree()')
-      return null;
-   }
-
-
-   // DEBUG
+   /* DEBUG-PRINT */
    Print() {
 
       console.log('Num Interval timers: ', this.count);
-      for (let i = 0; i < this.count; i++) {
-         console.log(`${this.ti[i].idx}: name:${Str_buffer_get_by_idx(this.ti[i].nameidx)} | interval:${this.ti[i].interval/1000}s  | t:${this.ti[i].t}`);
+      for (let i = 0; i < this.size; i++) {
+         if(this.ti[i].isActive)
+            console.log(`${this.ti[i].idx}: name:${Str_buffer_get_by_idx(this.ti[i].nameidx)} | interval:${this.ti[i].interval/1000}s  | t:${this.ti[i].t}`);
       }
+      
    }
 
 };
@@ -237,7 +242,6 @@ export function Time_intervals_update() {
 }
 /** Returns the timeInterval index */
 export function Time_intervals_create(interval, name, repeat, clbk, params) {
-   // console.log('INTERVAL create', name)
    return intervalTimers.Create(interval, name, repeat, clbk, params);
 }
 /** */
@@ -251,147 +255,7 @@ export function Time_intervals_destroy_byidx(idx) {
 /** DEBUG */
 export function Time_intervals_print() {
    intervalTimers.Print();
+   console.log('Interval timer struct: ', intervalTimers);
 }
 
-
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Step Timers.
- */
-
-const MAX_STEP_TIMERS_LEN = 10;
-class StepTimer {
-
-   t; // The running step timer
-   duration; // In miliseconds
-   step; // If = 0, executes indefinitely. Set a maximum number of times the callback will execute before the timer has finished  
-   clbk; // Callback to call upon time interval  
-   stopClbk; // Callback to call upon timer completion  
-   clbkParams; // The parameters for the Stop mestod callback
-   idx;
-   isActive;
-
-   constructor() {
-
-      this.t = 0;
-      this.duration = 0;
-      this.step = 0;
-      this.clbk = null;
-      this.stopClbk = null;
-      this.clbkParams = null;
-      this.idx = INT_NULL;
-      this.isActive = false;
-   }
-
-
-   Set(duration, step, idx, clbk, stopClbk, params) {
-
-      this.duration = duration;
-      this.clbk = clbk;
-      this.stopClbk = stopClbk;
-      this.clbkParams = params;
-      this.step = step;
-      this.idx = idx;
-      this.isActive = true;
-   }
-
-
-   Clear() {
-
-      this.t = 0;
-      this.duration = 0;
-      this.step = 0;
-      this.clbk = null;
-      this.stopClbk = null;
-      this.clbkParams = null;
-      this.idx = INT_NULL;
-      this.isActive = false;
-   }
-
-};
-
-
-
-
-// TODO: Implement like the PerformanceTimer class, that is by extending from M_Buffer class
-/** Create a class that manages all applications intervals(in an array) */
-class StepTimers {
-
-   buffer = [];
-   size;
-   count = 0;
-
-   constructor() {
-
-      this.size = MAX_STEP_TIMERS_LEN;
-      this.count = 0;
-      this.buffer = new Array(this.size);
-
-      for (let i = 0; i < this.size; i++) {
-         this.buffer[i] = new StepTimer;
-      }
-   }
-
-
-   Create(duration, step, clbk, stopClbk, params) {
-
-      const idx = this.GetNextFreeIdx(); // Get the first not active timer 
-      this.buffer[idx].Set(duration, step, idx, clbk, stopClbk, params);
-      this.count++;
-
-      // Catch buffer overflow
-      if (this.count >= this.size) {
-         console.log(`Max Size:${this.size}  current count:${this.count}`);
-         alert('ERROR. Buffer overflow in StepTimers');
-      }
-
-      return this.buffer[idx];
-   }
-
-
-   Clear(idx) {
-
-      this.buffer[idx].Clear();
-      this.count--;
-   }
-
-
-   GetNextFreeIdx() {
-
-      for (let i = 0; i < this.size; i++) {
-         if (this.buffer[i].isActive === false) {
-            return i;
-         }
-      }
-      alert('No Space for new Timer. Timer.js');
-   }
-
-};
-
-
-
-
-const stepTimers = new StepTimers;
-
-/** */
-export function Step_timers_create(duration, step, clbk, stopClbk, params) {
-   stepTimers.Create(duration, step, clbk, stopClbk, params);
-}
-/** */
-export function Step_timers_update() {
-
-   for (let i = 0; i < stepTimers.size; i++) {
-      const t = stepTimers.buffer[i]; // Cash
-      if (t.isActive) {
-         if (t.t >= t.duration) {
-            t.stopClbk(t.clbkParams);
-            stepTimers.Clear(i);
-            return;
-         }
-         t.t += t.step;
-         t.clbk();
-      }
-   }
-}
 
