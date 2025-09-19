@@ -128,16 +128,19 @@ export function Gl_draw(gl) {
         }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib_info.ibo);
-        if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_IBO !== ib_info.ibo) {
+        // if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_IBO !== ib_info.ibo) {
+        if (ib_info.state.mask & BUFFER_STATE.NEEDS_UPDATE) {
             const ib_data = Index_buffer_get_by_ibidx(ib_info.ibidx);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ib_data, gl.STATIC_DRAW, 0);
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
             GL_STATE.BOUND_IBO = ib_info.ibo;
             GL_STATE.BOUND_IBIDX = ib_info.ibidx;
+            // if(vb_groupidx===2) console.log('INDEX bufferData', ib_info.ibidx)
+            console.log('INDEX bufferData', ib_info.ibidx)
         }
 
         for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
-
+            
             
             const rgidx = vb_group.render_groupidxs.buffer[j];
             const render_group = Vertex_buffer_render_group_get_render_group(rgidx);
@@ -163,10 +166,7 @@ export function Gl_draw(gl) {
                 const vb_data_idx = vb_group.vb_idxs.buffer[k];
                 const vb_info = VBI_get_byidx(vb_data_idx);
 
-                // if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC) {
                 if (render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE_FROM_REALLOC) {
-                    
-                    // console.log(vb_data_idx)
                     
                     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo);
@@ -174,20 +174,21 @@ export function Gl_draw(gl) {
                     
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
                     render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE_FROM_REALLOC;
+                    // if(vb_groupidx===2) console.log('bufferData', vb_groupidx)
+                    console.log('bufferData', vb_groupidx)
                 }
-                // else if (vb_info.state.mask & BUFFER_STATE.NEEDS_UPDATE || GL_STATE.BOUND_VBO !== vb_info.vbo) {
                 else if (render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
-                    
-                    // console.log(vb_data_idx)
                     
                     const vb_data = Vertex_buffer_get_by_vbidx(vb_info.vbidx);
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
-                    // bufferSubData(gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS);
+                    /*              (gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS */
                     gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
-                    // gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start);
+                    // if(vb_groupidx===2) console.log('bufferSubData', vb_groupidx)
+                    // console.log('bufferSubData', vb_groupidx)
                     
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
                     render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE;
+
                 }
 
             }
@@ -200,6 +201,7 @@ export function Gl_draw(gl) {
              *      num instances
              */
             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
+            // console.log(vb_groupidx, render_group.draw_count)
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
 

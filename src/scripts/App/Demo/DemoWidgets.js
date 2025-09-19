@@ -1146,19 +1146,19 @@ Adjust the font size using the slider.
 
    const font = TEXTURES.MTSDF_CONSOLAS_1024;
    const font_size = 10;
-   const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND}));
+   const info1 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer1, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: 0x0n, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND}));
    Widget_gfx_ready_enable({ mesh: info1, enable_sdf_rect: 4, });
    s.AddItem(info1);
 
-   const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
+   const info2 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer2, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: 0x0n, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info2, enable_sdf_rect: 4, });
    s.AddItem(info2);
 
-   const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
+   const info3 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer3, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: 0x0n, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info3, enable_sdf_rect: 4, });
    s.AddItem(info3);
 
-   const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: false, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
+   const info4 = Create_widget_label(Style_label_default_properties({ is_root: _, col: GREY[4], text_pad: [10, 10], text: text_sample_explainer4, texture_id: font, font_size: font_size, text_col: WHITE, is_debug_mesh: 0x0n, layout:LAYOUT.VERTICAL | LAYOUT.EXPAND, }));
    Widget_gfx_ready_enable({ mesh: info4, enable_sdf_rect: 4, });
    s.AddItem(info4);
 

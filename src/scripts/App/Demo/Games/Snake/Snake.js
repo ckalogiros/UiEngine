@@ -657,7 +657,7 @@ click mouse button.`;
          const root = params.params.params.root_mesh;
          View_destroy_view_group_and_meshes(root.group_bufferidxs[0]); 
          // Start the game loop
-         Time_intervals_create(16, 'Snake', TIME_INTERVAL_REPEAT_ALWAYS, Animate_snake, params.params.params.animation_params);
+         Time_intervals_create(1, 'Snake', TIME_INTERVAL_REPEAT_ALWAYS, Animate_snake, params.params.params.animation_params);
       },
       _,
       {params:{animation_params:params, root_mesh:menu_panel}},

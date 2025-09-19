@@ -14,6 +14,7 @@ import { Mesh_animations_run } from "../Animations/MeshAnimations.js";
 import { Particle_system_update } from "../ParticlesSystem/ParticlesSystem.js";
 import { Callback_animations_run } from "../Animations/CallbackAnimations.js";
 import { Physics2D_update } from "../Physics2D/Physics2D.js";
+import { Static_particle_system_update } from "../ParticlesSystem/ParticlesSystemStatic.js";
 
 
 
@@ -101,7 +102,8 @@ export class Renderer {
          
          Uniforms_block_update_uniform();
          
-         Particle_system_update()
+         Particle_system_update();
+         // Static_particle_system_update();
          
          Performance_timer_start(PERFORMANCE_TIMERS_IDXS.GlDraw)
          Gl_draw(this.gfxctx); // REIMPLEMENT: Draw should be independed of graphics platform

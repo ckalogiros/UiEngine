@@ -20,6 +20,7 @@ import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 import { Visual_debug_create, Visual_debug_create_properties } from "../VisualDebug/VisualDebug.js";
+import { Static_particles_set_need_update } from "./ParticlesSystemStatic.js";
 
 /**
  * // TODO: Create all attributes of particles in separate buffers, so that we can copy all positions/time/color attribs in the vertex buffer at once
@@ -337,7 +338,7 @@ class Emitter {
       this.max_speed = properties.max_speed;
       this.deccel = properties.deccel;
       this.gravity = properties.gravity;
-      this.max_scale = properties.max_speed;
+      this.max_scale = properties.max_scale;
 
       this.properties_flags = 0x0; // Set from user by method: EnableProperties()
       this.jigglex = 4;
@@ -377,9 +378,9 @@ class Emitter {
          // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
-         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
          // inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
-         // inst: 0x0,
+         inst: 0x0,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
          blend_options: 0x0,
@@ -864,16 +865,16 @@ export function Particle_system_create_emitter(mesh_bufferidx, properties) {
    const idx = _emitters.Add(emitter);
    _emitters.buffer[idx].idx = idx;
 
-   Visual_debug_create(Visual_debug_create_properties({
-      is_root:ROOT_WIDGETS.CREATE_ROOT,
-      pos:{x:10, y:200},
-      dim:{x:30, y:200},
+   // Visual_debug_create(Visual_debug_create_properties({
+   //    is_root:ROOT_WIDGETS.CREATE_ROOT,
+   //    pos:{x:10, y:200},
+   //    dim:{x:30, y:200},
 
-      Target_get_cur_val:Get_emitter_free_particle_count,
-      Target_get_max_val:Get_emitter_free_particle_size,
-      target_get_cur_val_params:idx,
-      target_get_max_val_params:idx,
-   })); 
+   //    Target_get_cur_val:Get_emitter_free_particle_count,
+   //    Target_get_max_val:Get_emitter_free_particle_size,
+   //    target_get_cur_val_params:idx,
+   //    target_get_max_val_params:idx,
+   // })); 
 
    return emitter;
 }
@@ -1139,6 +1140,9 @@ export function Particle_system_emitt(params) {
                // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
                
             }
+
+            GLOB_TEMP.visual_debug.AddAtIndex(next_free_particle_idx);
+            Static_particles_set_need_update(0, true);
             
          }
          else {
@@ -1348,10 +1352,13 @@ export function Particle_system_update() {
                if (emitter.free_particles.boundary === emitter.particles_buffer.boundary) {
                   emitter.is_active = false;
                   Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
+                  Static_particles_set_need_update(0, false);
                }
 
                // Remove instanced count
                // Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
+
+               GLOB_TEMP.visual_debug.Remove(j);
 
             }
 
@@ -1361,7 +1368,10 @@ export function Particle_system_update() {
 
 
       // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
-      if (needs_update) Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+      if (needs_update) {
+         Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+         Static_particles_set_need_update(0, true);
+      }
 
 
       Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
@@ -1617,17 +1627,28 @@ export function Particle_system_print_free_particles_buffer() {
 
 /*********************************************************************************************************/
 // VISUAL-DEBUG
+/** */
 function Get_emitter_free_particle_size(emitter_idx) {
 
    const emitter = _emitters.buffer[emitter_idx];
    const size = emitter.free_particles.size;
    return size;
 }
+/** */
 function Get_emitter_free_particle_count(emitter_idx) {
 
    const emitter = _emitters.buffer[emitter_idx];
    const count = emitter.free_particles.pos;
-   // if(count!==0)
-   //    console.log()
    return count;
+}
+/** */
+export function Get_emitter_free_particle_buffer(emitter_idx) {
+
+   const emitter = _emitters.buffer[emitter_idx];
+   return emitter.free_particles;
+}
+export function Get_emitter_particle_buffer(emitter_idx) {
+
+   const emitter = _emitters.buffer[emitter_idx];
+   return emitter.particles_buffer;
 }

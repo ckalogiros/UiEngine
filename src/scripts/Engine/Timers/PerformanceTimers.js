@@ -286,6 +286,10 @@ export function Performance_timers_init_all() {
       PERFORMANCE_TIMERS_IDXS.Particles = idx;
    }
    {
+      const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'StaticParticles');
+      PERFORMANCE_TIMERS_IDXS.StaticParticles = idx;
+   }
+   {
       const idx = Performance_timer_create(PERFORMANCE_TIMER.DETAILED, 'Particles2');
       PERFORMANCE_TIMERS_IDXS.Particles2 = idx;
    }

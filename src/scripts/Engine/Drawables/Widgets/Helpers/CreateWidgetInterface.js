@@ -12,6 +12,7 @@ import { NOTIFICATION_TYPE, Notifications_send } from "../../DebugInfo/DebugInfo
 import { Widget_Color_Picker } from "../WidgetColorPicker.js";
 import { Mesh_set_name } from "../../Operations/MeshPropertiesFunctions.js";
 import { Particle_system_create_emitter } from "../../../ParticlesSystem/ParticlesSystem.js";
+import { Static_particle_system_create_emitter } from "../../../ParticlesSystem/ParticlesSystemStatic.js";
 
 /**
  * All Functions to create widgets.
@@ -111,7 +112,7 @@ export function Create_widget_label(properties) {
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, new Widget_Label(mesh_bufferidx, properties));
    Mesh_set_name(_mesh_buffer.buffer[mesh_bufferidx], `L[${mesh_bufferidx}]{${properties.text}}`); // Set name after mesh_bufferidx is created
 
-   if (NOTIFICATIONS_ON && properties.is_debug_mesh === 0x0)
+   if (NOTIFICATIONS_ON && properties.is_debug_mesh === 0x0n)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
    return _mesh_buffer.buffer[mesh_bufferidx];
@@ -180,7 +181,7 @@ export function Create_widget_slider(properties) {
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 /** */
-export function Create_widget_scroller(is_root = 0x0, scrolled_section, dim, col, scroller_margin, is_debug_mesh = 0x0) {
+export function Create_widget_scroller(is_root = 0x0, scrolled_section, dim, col, scroller_margin, is_debug_mesh = 0x0n) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
@@ -204,7 +205,7 @@ export function Create_widget_dropdown(properties) {
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 /** */
-export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, text, pad, bold, style, is_debug_mesh = 0x0) {
+export function Create_widget_menubar(is_root = 0x0, pos, dim, col, text_col, text, pad, bold, style, is_debug_mesh = 0x0n) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
@@ -228,7 +229,7 @@ export function Create_widget_close_btn(properties) {
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 /** */
-export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0) {
+export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh = 0x0n) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
@@ -240,7 +241,7 @@ export function Create_widget_minimize_btn(is_root = 0x0, root, pos, font_size, 
    return _mesh_buffer.buffer[mesh_bufferidx];
 }
 /** */
-export function Create_widget_color_picker(is_root = 0x0, margin, pos, dim, col, name, style, is_debug_mesh = 0x0) {
+export function Create_widget_color_picker(is_root = 0x0, margin, pos, dim, col, name, style, is_debug_mesh = 0x0n) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
@@ -259,8 +260,22 @@ export function Create_particle_emitter(properties) {
 
    const _mesh_buffer = Mesh_buffer_get();
    const mesh_bufferidx = _mesh_buffer.Reserve();
-   // _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, Particle_system_create_emitter(mesh_bufferidx, name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down));
    _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, Particle_system_create_emitter(mesh_bufferidx, properties));
+
+   if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
+      Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
+
+   return _mesh_buffer.buffer[mesh_bufferidx];
+}
+/**
+ * @param {*} properties 
+ * @returns 
+ */
+export function Create_static_particle_emitter(properties) {
+
+   const _mesh_buffer = Mesh_buffer_get();
+   const mesh_bufferidx = _mesh_buffer.Reserve();
+   _mesh_buffer.AddAtReservedIndex(mesh_bufferidx, Static_particle_system_create_emitter(mesh_bufferidx, properties));
 
    if (NOTIFICATIONS_ON && !properties.is_debug_mesh)
       Notifications_send(NOTIFICATION_TYPE.MESH_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);

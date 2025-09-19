@@ -1754,6 +1754,7 @@ export function Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner(vbidx, star
 
    // V1
    vb_data[index++] = r; 
+   // console.log(vb_data[index], r, start, vbidx)
    vb_data[index++] = g;
    vb_data[index++] = b;
    vb_data[index++] = a;

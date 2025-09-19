@@ -39,21 +39,10 @@ export class Widget_Slider_Simple extends Rect_Mesh {
     */
    constructor(mesh_bufferidx, properties) {
 
-      // super(mesh_bufferidx, Style_rect_default_properties({
-      //    is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
-      //    pos: properties.pos,
-      //    dim: properties.dim,
-      //    col: properties.col,
-      //    pad: properties.pad,
-      //    name: properties.text!==undefined ? properties.text : 'SliderBar',
-      //    num_faces: properties.num_faces,
-      //    layout:properties.layout,
-      //    is_debug_mesh: properties.is_debug_mesh,
-      // }));
       super(mesh_bufferidx, properties);
 
       this.mesh_bufferidx = mesh_bufferidx;
-      this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom | this.mat;
+      this.type |= MESH_TYPE.WIDGET_SLIDER | MESH_TYPE.WIDGET_SLIDER_BAR | this.geom.type | this.mat.type;
 
       this.EnableGfxUniforms(SID.UNIF.SCREEN_RESOLUTION, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
 
@@ -69,7 +58,7 @@ export class Widget_Slider_Simple extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({mesh:handle, enable_sdf_rect:handle.geom.dim[0], listener:{type:LISTEN_EVENT_TYPES.HOVER},});
 
-      handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom | handle.mat;
+      handle.type |= MESH_TYPE.WIDGET_SLIDER_HANDLE | handle.geom.type | handle.mat.type;
       if (properties.col[0] instanceof Float32Array) handle.GfxEnableAttr(SID.ATTR.COL4_PER_VERTEX, );
 
 
@@ -371,12 +360,12 @@ export class Widget_Slider_Simple extends Rect_Mesh {
          // Assign apropriate callback based on the sliders axis Vertical/Horizontal
          if (bar.geom.dim[0] > bar.geom.dim[1]) {
 
-            const idx = Time_intervals_create(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
+            const idx = Time_intervals_create(1, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
             bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
          }
          else {
 
-            const idx = Time_intervals_create(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_vertical_on_update_handle, bar);
+            const idx = Time_intervals_create(1, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_vertical_on_update_handle, bar);
             bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
          }
 
@@ -1400,7 +1389,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          if ((bar.type & MESH_TYPE.WIDGET_SLIDER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
-            const idx = Time_intervals_create(10, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
+            const idx = Time_intervals_create(1, 'Move Slider Handle', TIME_INTERVAL_REPEAT_ALWAYS, Slider_horizontal_on_update_handle, bar);
             bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
             State_mesh_set_grabed(bar);
@@ -1418,7 +1407,7 @@ export class Widget_Slider_XX1 extends Rect_Mesh {
 
          if ((mesh.type & MESH_TYPE.WIDGET_SLIDER) && Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_GRABABLE) && mesh.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
-            const idx = Time_intervals_create(10, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
+            const idx = Time_intervals_create(1, 'Move Slider', TIME_INTERVAL_REPEAT_ALWAYS, mesh.OnMove, mesh);
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
             State_mesh_set_grabed(mesh);

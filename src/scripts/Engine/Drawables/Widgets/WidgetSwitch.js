@@ -8,7 +8,7 @@ import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
-import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_print } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
 import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
@@ -545,9 +545,16 @@ export function Switch_simple_time_interval_callback(params) {
 
    if (this_switch.isOn === 0x0 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] !== INT_NULL) {
 
+      Time_intervals_print()
       const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersionLastElemGuarantee(INTERVALS.UPDATE);
+      this_switch.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.UPDATE);
+      
+      Time_intervals_print()
+
 
       return;
    }
@@ -555,8 +562,7 @@ export function Switch_simple_time_interval_callback(params) {
    if (this_switch.isOn === 0x1 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
       const Clbk = params.targetBindingFunctions;
-      // const idx = Time_intervals_create(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, this.evt_params.EventClbk, this.evt_params.evt_params);
-      const idx = Time_intervals_create(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
+      const idx = Time_intervals_create(1, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
       this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
    }
 }

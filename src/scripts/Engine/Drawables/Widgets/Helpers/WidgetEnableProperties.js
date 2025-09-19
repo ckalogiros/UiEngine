@@ -189,7 +189,7 @@ export function Style_rect_default_properties(user_properties) {
 
       layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
    return properties;
@@ -210,7 +210,7 @@ export function Style_text_default_properties(user_properties) {
       texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 
       variant_idx:user_properties.variant_idx,
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
 
@@ -232,7 +232,7 @@ export function Style_multi_text_default_properties(user_properties) {
       texture_id:user_properties.texture_id !== undefined ? user_properties.texture_id : TEXTURES.MTSDF_CONSOLAS_1024, 
       variant_idx:user_properties.variant_idx,
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
 
@@ -261,7 +261,7 @@ export function Style_slider_simple_default_properties(user_properties) {
          dim:user_properties.handle_dim !== undefined ? user_properties.handle_dim : [10, 10],
       },
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
 
@@ -311,7 +311,7 @@ export function Style_slider_default_properties(user_properties) {
          variant_idx: user_properties.value_text_variant_idx !== undefined ? user_properties.value_text_variant_idx : _,
       },
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
 
    };
 
@@ -376,7 +376,7 @@ export function Style_label_default_properties(user_properties) {
       
       layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
       
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
    if(user_properties.theme!==undefined) {
@@ -417,7 +417,7 @@ export function Style_button_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id !== undefined ? user_properties.sub_texture_id : _,
       variant_idx: user_properties.variant_idx !== undefined ? user_properties.variant_idx : _,
       
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
    if(user_properties.theme!==undefined) {
@@ -456,7 +456,7 @@ export function Style_switch_button_default_properties(user_properties) {
       sub_texture_id: user_properties.sub_texture_id !== undefined ? user_properties.sub_texture_id : _,
       variant_idx: user_properties.variant_idx !== undefined ? user_properties.variant_idx : _,
       
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
    return properties;
@@ -486,7 +486,7 @@ export function Style_switch_default_properties(user_properties) {
          name: 'Switch handle',
       },
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
    if(user_properties.theme!==undefined) {
       properties.col = user_properties.theme.col;
@@ -537,7 +537,7 @@ export function Style_dropdown_default_properties(user_properties) {
                
          layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL,
 
-         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
       },
       menu: { // Section class
          is_root:0x0,
@@ -558,7 +558,7 @@ export function Style_dropdown_default_properties(user_properties) {
 
          layout:(user_properties.layout !== undefined && user_properties.layout & LAYOUT.EXPAND) ? LAYOUT.EXPAND|LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL : LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL,
          
-         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
       },
       btn: { // Button->Label class
          // is_root, text, Align, pos, font_size, col, text_col, pad, bold, style, font, is_debug_mesh
@@ -586,7 +586,7 @@ export function Style_dropdown_default_properties(user_properties) {
          sub_texture_id:_,
          variant_idx:_,
          
-         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+         is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
 
          
       },
@@ -633,7 +633,7 @@ export function Style_color_picker_default_properties(user_properties) {
          labels:        user_properties.rcorners!==undefined && user_properties.rcorners.labels !== undefined ? user_properties.rcorners.labels : 5,
       },
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
    return properties;
@@ -660,8 +660,36 @@ export function Style_particles_system_default_properties(user_properties) {
       is_continuous_emmit: user_properties.is_continuous_emmit !== undefined ? user_properties.is_continuous_emmit : true, // Continuous emmiting particles versus 1 time emmit particles
       scale_down: user_properties.scale_down !== undefined ? user_properties.scale_down : 1,
       has_intermidiate_emission: user_properties.has_intermidiate_emission !== undefined ? user_properties.has_intermidiate_emission : false,
+      
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
+   };
 
-      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : false,
+
+  return properties;
+
+}
+/** */
+export function Style_static_particles_system_default_properties(user_properties) {
+   const properties = {
+      is_root: user_properties.is_root,
+      
+      name: user_properties.name !== undefined ? user_properties.name : 'ParticlesSystem',
+      pos:user_properties.pos !== undefined ? user_properties.pos : [0,0,0], 
+      dim: user_properties.dim !== undefined ? user_properties.dim : [10,10],
+      col: user_properties.col,
+      pad: user_properties.pad !== undefined ? user_properties.pad : [0,0],
+      texture_id: user_properties.texture_id !== undefined ? user_properties.texture_id : INT_NULL,
+      scale_down: user_properties.scale_down !== undefined ? user_properties.scale_down : 1,
+      num_faces: user_properties.num_faces !== undefined ? user_properties.num_faces : 1,
+
+      target: user_properties.target !== undefined ? user_properties.target : null,
+      num_particles: user_properties.num_particles !== undefined ? user_properties.num_particles : 1, // Used to set the total number of particles in case there is no continuous emission
+      particle_width: user_properties.particle_width !== undefined ? user_properties.particle_width : 4,
+      particle_height: user_properties.particle_height !== undefined ? user_properties.particle_height : 4,
+
+      layout:user_properties.layout !== undefined ? user_properties.layout : LAYOUT.HORIZONTAL,
+
+      is_debug_mesh:user_properties.is_debug_mesh !== undefined ? user_properties.is_debug_mesh : 0x0n,
    };
 
 

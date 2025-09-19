@@ -28,6 +28,7 @@ import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 import { Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { State_reset } from '../GlobalFunctions.js';
 import { Vertex_buffer_render_group_reset_g_buffer } from '../Graphics/Buffers/RenderGroups.js';
+import { TEMP_Update_all_vertex_buffers } from '../Graphics/GlDraw.js';
 
 
 
@@ -181,9 +182,11 @@ export function App_reset(){
 
     Scene_reset_window_resized_meshes();
 
+
 }
 
 
 export function App_reinitialize(){
     Texture_init_texture_storage_buffer();
+    TEMP_Update_all_vertex_buffers(gfxCtx.gl);
 }

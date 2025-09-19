@@ -867,7 +867,7 @@ export function Vertex_buffer_calculate_vertexbuffer_render_group_starts() {
     }
 }
 /** Calculate all attribute start indexes per render group */
-export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, render_groupidx, start_attribute_index) {
+export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, render_groupidx) {
 
 
     let num_faces = 0;
@@ -899,6 +899,8 @@ export function Vertex_buffer_calculate_starts_per_render_group(vb_groupidx, ren
         start_attrib = num_faces * vertices_per_face * attribs_per_vertex;
 
         total_size += rg.size;
+
+        // console.warn(total_size, vb_info.size)
 
     // Reallocate vb according to render groups total size
     if(total_size >  vb_info.size) {
@@ -1071,6 +1073,7 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
     }
 
     return start_attribute_index;
+    // return render_group.count;
 
 }
 /** */

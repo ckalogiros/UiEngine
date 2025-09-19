@@ -21,7 +21,7 @@ const MIN_INT32 = -2147483648;
 const MAX_UINT8 = 0xff; // 255
 const MAX_UINT16 = 65535;
 const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
-// const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
+const MAX_UINT64 = 0xFFFFFFFFFFFFFFFFn; // 18446744073709551615 ;
 
 const MAX_BIT_MASK = 0xFFFFFFFFFFFFF;
 const MAX_BIT_MASK_COMBINATIONS = 52;
@@ -86,6 +86,140 @@ const VEC4_BYTE_SIZE = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
 const MAT2X2_BYTE_SIZE = 2 * VEC2_BYTE_SIZE; // 16 Bytes
 const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
+
+
+const BITWISE = {
+   x1:  0x1n  ,
+   x2:  0x3n  ,
+   x3:  0x7n  ,
+   x4:  0xfn  ,
+   x5:  0x1fn ,
+   x6:  0x3fn ,
+   x7:  0x7fn ,
+   x8:  0xffn ,
+   x9:  0x1ffn  ,
+   x10: 0x3ffn  ,
+   x11: 0x7ffn  ,
+   x12: 0xfffn  ,
+   x13: 0x1fffn ,
+   x14: 0x3fffn ,
+   x15: 0x7fffn ,
+   x16: 0xffffn,
+   x17: 0x1ffffn  ,
+   x18: 0x3ffffn  ,
+   x19: 0x7ffffn  ,
+   x20: 0xfffffn  ,
+   x21: 0x1fffffn ,
+   x22: 0x3fffffn ,
+   x23: 0x7fffffn ,
+   x24: 0xffffffn,
+   x25: 0x1ffffffn  ,
+   x26: 0x3ffffffn  ,
+   x27: 0x7ffffffn  ,
+   x28: 0xfffffffn  ,
+   x29: 0x1fffffffn ,
+   x30: 0x3fffffffn ,
+   x31: 0x7fffffffn ,
+   x32: 0xffffffffn,
+   x33: 0x1ffffffffn  ,
+   x34: 0x3ffffffffn  ,
+   x35: 0x7ffffffffn  ,
+   x36: 0xfffffffffn  ,
+   x37: 0x1fffffffffn ,
+   x38: 0x3fffffffffn ,
+   x39: 0x7fffffffffn ,
+   x40: 0xffffffffffn,
+   x41: 0x1ffffffffffn  ,
+   x42: 0x3ffffffffffn  ,
+   x43: 0x7ffffffffffn  ,
+   x44: 0xfffffffffffn  ,
+   x45: 0x1fffffffffffn ,
+   x46: 0x3fffffffffffn ,
+   x47: 0x7fffffffffffn ,
+   x48: 0xfffffffffffffn,
+   x49: 0x1ffffffffffffn  ,
+   x50: 0x3ffffffffffffn  ,
+   x51: 0x7ffffffffffffn  ,
+   x52: 0xfffffffffffffn  ,
+   x53: 0x1fffffffffffffn ,
+   x54: 0x3fffffffffffffn ,
+   x55: 0x7fffffffffffffn ,
+   x56: 0xffffffffffffffn,
+   x57: 0x1ffffffffffffffn  ,
+   x58: 0x3ffffffffffffffn  ,
+   x59: 0x7ffffffffffffffn  ,
+   x60: 0xfffffffffffffffn  ,
+   x61: 0x1fffffffffffffffn ,
+   x62: 0x3fffffffffffffffn ,
+   x63: 0x7fffffffffffffffn ,
+   x64: 0xffffffffffffffffn,
+};
+// const BITWISE = {
+//    x1:  { mask:0x1n, 					pos: 0, },
+//    x2:  { mask:0x3n, 					pos: 1, },
+//    x3:  { mask:0x7n, 					pos: 2, },
+//    x4:  { mask:0xfn, 					pos: 3, },
+//    x5:  { mask:0x1fn, 					pos: 4, },
+//    x6:  { mask:0x3fn, 					pos: 5, },
+//    x7:  { mask:0x7fn, 					pos: 6, },
+//    x8:  { mask:0xffn, 					pos: 7, },
+//    x9:  { mask:0x1ffn, 					pos: 8, },
+//    x10: { mask:0x3ffn, 					pos: 9, },
+//    x11: { mask:0x7ffn, 					pos: 10, },
+//    x12: { mask:0xfffn, 					pos: 11, },
+//    x13: { mask:0x1fffn, 				pos: 12, },
+//    x14: { mask:0x3fffn, 				pos: 13, },
+//    x15: { mask:0x7fffn, 				pos: 14, },
+//    x16: { mask:0xffffn, 				pos: 15, },
+//    x17: { mask:0x1ffffn, 				pos: 16, },
+//    x18: { mask:0x3ffffn, 				pos: 17, },
+//    x19: { mask:0x7ffffn, 				pos: 18, },
+//    x20: { mask:0xfffffn, 				pos: 19, },
+//    x21: { mask:0x1fffffn, 				pos: 20, },
+//    x22: { mask:0x3fffffn, 				pos: 21, },
+//    x23: { mask:0x7fffffn, 				pos: 22, },
+//    x24: { mask:0xffffffn, 				pos: 23, },
+//    x25: { mask:0x1ffffffn, 			pos: 24, },
+//    x26: { mask:0x3ffffffn, 			pos: 25, },
+//    x27: { mask:0x7ffffffn, 			pos: 26, },
+//    x28: { mask:0xfffffffn, 			pos: 27, },
+//    x29: { mask:0x1fffffffn, 			pos: 28, },
+//    x30: { mask:0x3fffffffn, 			pos: 29, },
+//    x31: { mask:0x7fffffffn, 			pos: 30, },
+//    x32: { mask:0xffffffffn, 			pos: 31, },
+//    x33: { mask:0x1ffffffffn, 			pos: 32, },
+//    x34: { mask:0x3ffffffffn, 			pos: 33, },
+//    x35: { mask:0x7ffffffffn, 			pos: 34, },
+//    x36: { mask:0xfffffffffn, 			pos: 35, },
+//    x37: { mask:0x1fffffffffn, 		pos: 36, },
+//    x38: { mask:0x3fffffffffn, 		pos: 37, },
+//    x39: { mask:0x7fffffffffn, 		pos: 38, },
+//    x40: { mask:0xffffffffffn, 		pos: 39, },
+//    x41: { mask:0x1ffffffffffn, 		pos: 40, },
+//    x42: { mask:0x3ffffffffffn, 		pos: 41, },
+//    x43: { mask:0x7ffffffffffn, 		pos: 42, },
+//    x44: { mask:0xfffffffffffn, 		pos: 43, },
+//    x45: { mask:0x1fffffffffffn, 		pos: 44, },
+//    x46: { mask:0x3fffffffffffn, 		pos: 45, },
+//    x47: { mask:0x7fffffffffffn, 		pos: 46, },
+//    x48: { mask:0xfffffffffffffn,		pos: 47, },
+//    x49: { mask:0x1ffffffffffffn, 	pos: 48, },
+//    x50: { mask:0x3ffffffffffffn, 	pos: 49, },
+//    x51: { mask:0x7ffffffffffffn, 	pos: 50, },
+//    x52: { mask:0xfffffffffffffn, 	pos: 51, },
+//    x53: { mask:0x1fffffffffffffn, 	pos: 52, },
+//    x54: { mask:0x3fffffffffffffn, 	pos: 53, },
+//    x55: { mask:0x7fffffffffffffn, 	pos: 54, },
+//    x56: { mask:0xffffffffffffffn, 	pos: 55, },
+//    x57: { mask:0x1ffffffffffffffn, 	pos: 56, },
+//    x58: { mask:0x3ffffffffffffffn, 	pos: 57, },
+//    x59: { mask:0x7ffffffffffffffn, 	pos: 58, },
+//    x60: { mask:0xfffffffffffffffn, 	pos: 59, },
+//    x61: { mask:0x1fffffffffffffffn, pos: 60, },
+//    x62: { mask:0x3fffffffffffffffn, pos: 61, },
+//    x63: { mask:0x7fffffffffffffffn, pos: 62, },
+//    x64: { mask:0xffffffffffffffffn, pos: 63, },
+// };
 
 
 
@@ -462,6 +596,7 @@ const PERFORMANCE_TIMERS_IDXS = {
 	AddToGfxText: INT_NULL,
 	Animations: INT_NULL,
 	Particles: INT_NULL,
+	StaticParticles: INT_NULL,
 	Particles2: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
@@ -800,7 +935,7 @@ const CLBK_ANIMATIONS = {
 // Meshes  
 
 // MESH_TYPE: A bitmask to check if a mesh is of a specific type
-_CNT = 0x1;
+_CNT = 0x1n;
 // MAX cnt is 31 times shifted and the 32nd is valid but a negative number
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
 // TODO: Not enough space for all types. Re-organize and re-implement
@@ -808,61 +943,63 @@ const MESH_TYPE = {
 
 	DEBUG_MESH: _CNT,
 
-	GEOMETRY2D: _CNT <<= 1,
-	GEOMETRY_LINE: _CNT <<= 1,
-	TEXT_GEOMETRY2D: _CNT <<= 1,
-	GEOMETRY3D: _CNT <<= 1,
-	CUBE_GEOMETRY: _CNT <<= 1,
+	GEOMETRY2D: _CNT <<= 1n,
+	GEOMETRY_LINE: _CNT <<= 1n,
+	TEXT_GEOMETRY2D: _CNT <<= 1n,
+	GEOMETRY3D: _CNT <<= 1n,
+	CUBE_GEOMETRY: _CNT <<= 1n,
 
-	MATERIAL: _CNT <<= 1,
-	FONT_MATERIAL: _CNT <<= 1,
-	ATLAS_TEXTURE_MATERIAL: _CNT <<= 1,
-	TEXTURE_MATERIAL: _CNT <<= 1,
+	MATERIAL: _CNT <<= 1n,
+	FONT_MATERIAL: _CNT <<= 1n,
+	ATLAS_TEXTURE_MATERIAL: _CNT <<= 1n,
+	TEXTURE_MATERIAL: _CNT <<= 1n,
 
-	MESH: _CNT <<= 1,
-	TEXT_MESH: _CNT <<= 1,
-	RECT_MESH: _CNT <<= 1,
-	SECTION_MESH: _CNT <<= 1,
-	SECTION_MESH_ONLY: _CNT <<= 1,
+	MESH: _CNT <<= 1n,
+	TEXT_MESH: _CNT <<= 1n,
+	RECT_MESH: _CNT <<= 1n,
+	SECTION_MESH: _CNT <<= 1n,
+	SECTION_MESH_ONLY: _CNT <<= 1n,
 
-	WIDGET_LABEL: _CNT <<= 1,
-	WIDGET_BUTTON: _CNT <<= 1,
-	WIDGET_TEXT: _CNT <<= 1,
-	WIDGET_TEXT_DYNAMIC: _CNT <<= 1,
+	WIDGET_LABEL: _CNT <<= 1n,
+	WIDGET_BUTTON: _CNT <<= 1n,
+	WIDGET_TEXT: _CNT <<= 1n,
+	WIDGET_TEXT_DYNAMIC: _CNT <<= 1n,
 
-	WIDGET_SWITCH: _CNT <<= 1,
-	WIDGET_SWITCH_HANDLE: _CNT <<= 1,
+	WIDGET_SWITCH: _CNT <<= 1n,
+	WIDGET_SWITCH_HANDLE: _CNT <<= 1n,
 
-	WIDGET_SLIDER: _CNT <<= 1,
-	WIDGET_SLIDER_BAR: _CNT <<= 1,
-	WIDGET_SLIDER_HANDLE: _CNT <<= 1,
+	WIDGET_SLIDER: _CNT <<= 1n,
+	WIDGET_SLIDER_BAR: _CNT <<= 1n,
+	WIDGET_SLIDER_HANDLE: _CNT <<= 1n,
 
-	WIDGET_SCROLLER: _CNT <<= 1,
-	WIDGET_SCROLLER_BAR: _CNT <<= 1,
-	WIDGET_SCROLLER_HANDLE: _CNT <<= 1,
+	WIDGET_SCROLLER: _CNT <<= 1n,
+	WIDGET_SCROLLER_BAR: _CNT <<= 1n,
+	WIDGET_SCROLLER_HANDLE: _CNT <<= 1n,
 
-	SCROLLED_SECTION: _CNT <<= 1,
+	SCROLLED_SECTION: _CNT <<= 1n,
 	
-	WIDGET_DROP_DOWN: _CNT <<= 1,
-	DROP_DOWN_MENU: _CNT <<= 1,
+	WIDGET_DROP_DOWN: _CNT <<= 1n,
+	DROP_DOWN_MENU: _CNT <<= 1n,
 	
-	PARTICLES: _CNT <<= 1,
+	PARTICLES: _CNT <<= 1n,
+
+	RENAME_ME: _CNT <<= 1n,
 	
 	
-		// WIDGET_POP_UP: _CNT <<= 1,
-		// WIDGET_MENU_BAR: _CNT <<= 1,
-	// WIDGET_WINDOW: _CNT <<= 1,
+		// WIDGET_POP_UP: _CNT <<= 1n,
+		// WIDGET_MENU_BAR: _CNT <<= 1n,
+	// WIDGET_WINDOW: _CNT <<= 1n,
 
 
-	// SCENE: _CNT <<= 1,
-	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
-	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
+	// SCENE: _CNT <<= 1n,
+	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1n,
+	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1n,
 
 	MAX_BIT:_CNT,
 };
 
 console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{ MESH_TYPE }}}}}}}}}}}}}}}}}}}}}}}}}}}', MESH_TYPE);
-if(MESH_TYPE.MAX_BIT===0) console.error('MESH_TYPE BIT FLAGS OVERFLOW\nValue exceeded int 32');
+if(MESH_TYPE.MAX_BIT===0n) console.error('MESH_TYPE BIT FLAGS OVERFLOW\nValue exceeded int 64');
 
 
 
@@ -1125,6 +1262,20 @@ const INPUT_KEYCODE_D = 68;
 const INPUT_KEYCODE_PAUSE = 80;
 
 
+
+
+
+
+
+
+
+
+/***********************************************************************************************************************************************/
+// GLOBAL-TEMP
+
+const GLOB_TEMP = {
+	visual_debug: null,
+};
 
 
 

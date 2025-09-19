@@ -854,17 +854,6 @@ export function View_render_specific_render_group(groupidx, view_vbidx, view_rgi
    const view = _view_buffer.buffer[groupidx];
    const rg = view.vb.buffer[view_vbidx].rg.buffer[view_rgidx];
 
-   // if(view.vb.buffer[view_vbidx].vb_groupidx === 10)
-   //    console.log
-
-   // // Avoid continuing to accum vb.count for re-rendering an already rendered rg.(reset drawCount and count)
-   // if(add_in_already_rendered_group) {
-   //    Vertex_buffer_render_group_reset_draw_count(rg.render_groupidx, 0);
-   //    // Vertex_buffer_reset_to_index_NEW(view.vb.buffer[view_vbidx].vb_groupidx, rg.render_groupidx);
-   // }
-   // if(add_in_already_rendered_group)
-   //    Vertex_buffer_reset_to_index_NEW(view.vb.buffer[view_vbidx].vb_groupidx, rg.render_groupidx);
-
    const is_rendergroup_alredy_rendered = View_is_render_group_rendered(groupidx, view_vbidx, view_rgidx);
    if(!is_rendergroup_alredy_rendered || add_in_already_rendered_group) {
 
@@ -875,19 +864,6 @@ export function View_render_specific_render_group(groupidx, view_vbidx, view_rgi
    
    for (let k = 0; k <= rg.meshidxs.boundary; k++) { // Vertex Attribute Buffering.
       
-      // if(add_in_already_rendered_group)
-      //    Vertex_buffer_reset_to_index_NEW(view.vb.buffer[view_vbidx].vb_groupidx, rg.render_groupidx);
-
-      // const is_rendergroup_alredy_rendered = View_is_render_group_rendered(groupidx, view_vbidx, view_rgidx);
-      // if(!is_rendergroup_alredy_rendered || add_in_already_rendered_group) {
-
-      //    // TODO: Run calc if this is not the only rg for this group using this vertex buffer
-      //    // Also: if we just need to update an existing rg (after rg reset), then we need NOT to recalc starts
-      //    // calculate render group starts
-      //    View_calculate_render_group_starts(groupidx, view_vbidx, view_rgidx);
-
-      // }
-    
       const meshidx = rg.meshidxs.buffer[k];
       if (meshidx !== INT_NULL) {
 

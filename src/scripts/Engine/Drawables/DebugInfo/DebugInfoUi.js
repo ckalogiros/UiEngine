@@ -20,7 +20,7 @@ import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relatio
 import { Info_listener_create_event, Info_listener_remove_event } from "./InfoListeners.js";
 import { Components_create_scroller_component, Scoller_component_gengfx_and_render, Scroller_component_calculate_handle_pos_dim } from "../Widgets/ScrollerComponent.js";
 import { Root_group_view_buffer_get, Root_group_view_buffer_get_byidx, Root_group_view_buffer_get_count, } from "../../Core/Views/RootView.js";
-import { Widget_gfx_ready_enable, Style_dropdown_default_properties, Style_rect_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
+import { Widget_gfx_ready_enable, Style_dropdown_default_properties, Style_rect_default_properties, Style_multi_text_default_properties } from "../Widgets/Helpers/WidgetEnableProperties.js";
 import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
 import { Mesh_get_name, Mesh_set_name } from "../Operations/MeshPropertiesFunctions.js";
 import { Layout_basic_pre_render } from "../Operations/AlignNestedSections.js";
@@ -163,7 +163,7 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
    { // FPS average 1 second
 
       ms = (g_ms) ? g_ms : 1000;
-      const timer = Create_widget_multi_text({
+      const timer = Create_widget_multi_text(Style_multi_text_default_properties({
          is_root:0x0,
          text:'FPS:', 
          align:TEXT_ALIGN.HORIZONTAL, 
@@ -174,8 +174,8 @@ export function Debug_info_ui_static(root_widget = ROOT_WIDGETS.CREATE_ROOT, x =
          pad:pad1, 
          texture_id:TEXTURES.CONSOLA_VARIANT_FONT, 
          variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
-         is_debug_mesh:false,
-      });
+         is_debug_mesh: 0x0n,
+      }));
       Widget_gfx_ready_enable({mesh:timer, enable_attr_dim:false,});
       section.AddItem(timer);
 
@@ -309,7 +309,7 @@ export function Debug_info_ui_fps_detailed(root_widget = ROOT_WIDGETS.CREATE_ROO
          pad:pad1, 
          texture_id:TEXTURES.CONSOLA_VARIANT_FONT, 
          variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       Widget_gfx_ready_enable({mesh:timer, enable_attr_dim:false,});
       section.AddItem(timer);
@@ -379,7 +379,7 @@ export function Debug_info_ui_static_more_performance_timers(root_widget = ROOT_
          pad:pad1, 
          texture_id:TEXTURES.CONSOLA_VARIANT_FONT, 
          variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -440,7 +440,7 @@ export function Debug_info_ui_static_app_generic_buffers_container(root_widget =
          pad:pad1, 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          // variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -508,7 +508,7 @@ export function Debug_info_ui_static_app_generic_buffers(root_widget = ROOT_WIDG
          col:TRANSPARENCY(WHITE, transp), 
          pad:pad1, 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -574,7 +574,7 @@ export function Debug_info_ui_static_app_int16_buffers(root_widget = ROOT_WIDGET
          col:TRANSPARENCY(WHITE, transp), 
          pad:pad1, 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -639,7 +639,7 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
          col:TRANSPARENCY(WHITE, transp), 
          pad:pad1, 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -674,7 +674,67 @@ export function Debug_info_ui_static_app_int8_buffers(root_widget = ROOT_WIDGETS
    return section;
 
 }
+/** */
+export function Debug_info_ui_static_misc_performance_timers(root_widget = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0) {
 
+   const transp = .9;
+   const zpos = 0;
+   const section = Create_rect_mesh(Style_rect_default_properties({is_root:root_widget, name:'misc performance timers panel', pad:[10, 10], pos:[x, y, zpos], dim:[0,0], col:TRANSPARENCY(GREY[2], transp), layout:LAYOUT.RESIZE_SELF|LAYOUT.VERTICAL}));
+   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+
+
+   const fontsizedynamic = 18.5;
+   let pad1 = [4, 0];
+   let pad2 = [4, 0];
+   const g_ms = 0;
+   let ms = 500;
+   const align = TEXT_ALIGN.HORIZONTAL;
+
+   // Use custom interval for all debug ui for efficiency
+   let generic_time_interval = INT_NULL;
+
+   { // FPS average 1 second
+      ms = (g_ms) ? g_ms : 1000;
+      const timer = Create_widget_multi_text({
+         is_root:0x0,
+         text:'Misc1Perf:', 
+         align:align, 
+         pos:[0, 0, zpos + 1], 
+         font_size:fontsizedynamic, 
+         col:TRANSPARENCY(WHITE, transp), 
+         pad:pad1, 
+         texture_id:TEXTURES.CONSOLA_VARIANT_FONT, 
+         variant_idx:ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_5,
+         is_debug_mesh: 0x0n,
+      });
+      section.AddItem(timer);
+
+      timer.CreateNewText('000000000', fontsizedynamic, YELLOW[9], pad2, .9,);
+      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_fps_per_sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest1, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_fps_avg, [PERFORMANCE_TIMERS_IDXS.MiscTest1, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+      timer.CreateNewText('Misc2Perf:', fontsizedynamic, TRANSPARENCY(WHITE, transp), pad2, .9,);
+      timer.CreateNewText('000000000', fontsizedynamic, YELLOW[9], pad2, .9);
+      // timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_fps_per_sec_reset, [PERFORMANCE_TIMERS_IDXS.MiscTest2, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      timer.SetDynamicText(`ms${ms} Renderloop avg`, ms, Performance_timers_get_fps_avg, [PERFORMANCE_TIMERS_IDXS.MiscTest2, 0], _, generic_time_interval, ); // idx param is for use in creating separate timer for each widget dynamic text.
+      generic_time_interval = timer.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
+
+   }
+
+
+   if (root_widget & ROOT_WIDGETS.CREATE_ROOT) {
+
+      
+      section.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.ABSOLUTE_POSITION, section.mesh_bufferidx, true);
+      section.GenGfxCtx();
+      Layout_basic_pre_render(section);
+      Widget_render(section);
+   }
+
+   return section;
+
+}
 
 
 
@@ -719,7 +779,7 @@ export function Debug_info_ui(is_root_widget = undefined, x, y) {
    const rcorners = 6;
    
    // const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:TRANSPARENCY(GREY[0], .1), pad:dp_margin, text_pad:[10, 3], is_debug_mesh:true}));
-   const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:_, pad:dp_margin, text_pad:[10, 3], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF, is_debug_mesh:true}));
+   const dp = Create_widget_dropdown(Style_dropdown_default_properties({is_root:is_root_widget, text:'Debug Info', pos:[x, y, 0], col:_, pad:dp_margin, text_pad:[10, 3], layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF, is_debug_mesh:MESH_TYPE.DEBUG_MESH}));
    Widget_gfx_ready_enable({mesh:dp, enable_sdf_rect:rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE|LISTEN_EVENT_TYPES.HOVER}})
    Dropdown_roots_set_root(dp, dp);
 
@@ -902,7 +962,7 @@ function Debug_info_create_ui_stats() {
       texture_id:texture_id, 
       variant_idx:_,
       layout:LAYOUT.VERTICAL,
-      is_debug_mesh:false,
+      is_debug_mesh: 0x0n,
    };
 
 
@@ -1197,7 +1257,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.HORIZONTAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1233,7 +1293,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1264,7 +1324,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1295,7 +1355,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1326,7 +1386,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1357,7 +1417,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1393,7 +1453,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1429,7 +1489,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1465,7 +1525,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1501,7 +1561,7 @@ function Debug_info_create_ui_performance_timers() {
          col:GREY[7], 
          texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
          layout:LAYOUT.VERTICAL,
-         is_debug_mesh:false,
+         is_debug_mesh: 0x0n,
       });
       section.AddItem(timer);
 
@@ -1594,7 +1654,7 @@ export function Debug_info_create_ui_mouse(root_widget = ROOT_WIDGETS.CREATE_ROO
       col:WHITE, 
       pad:[0,0], 
       texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-      is_debug_mesh:false,
+      is_debug_mesh: 0x0n,
    });
    infomesh.align.flags = LAYOUT.HORIZONTAL;
    section.AddItem(infomesh);

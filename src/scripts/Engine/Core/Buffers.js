@@ -37,6 +37,11 @@ export const DEBUG_INFO_STRUCTS = {
 			TOTAL_BUFFER_SIZE: 0,
 			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
 		},
+		INT64: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
 
 	},
 };
@@ -217,20 +222,11 @@ class Array_Buffer_Integer_Interface {
 
          return;
       }
-      // alert('877877877877 BUFFERS')
-      // console.error('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
       console.warn('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
    }
 
 
-   /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
-   RemoveByIdxSortedVersionLastElemGuarantee() {
 
-      this.buffer[this.boundary] = INT_NULL;
-      this.boundary--;
-      this.active_count--;
-      /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
-   }
    RemoveByIdxNoGapsVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -336,20 +332,6 @@ class Array_Buffer_Integer_Interface {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************************************************************************************/
 // Int8
 /**********************************************************************************************************************************************/
@@ -416,20 +398,6 @@ export function Free_int8_buffer(buffer){
     // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -578,14 +546,6 @@ export function Free_int32_buffer(buffer){
    // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -981,6 +941,8 @@ export class M_Buffer {
    }
 }
 const _generic_buffers_container = new M_Buffer();
+/** */
+export function Debug_Generic_buffers_container_get_buffer(){ return _generic_buffers_container }
 /** */
 export function Generic_buffers_container_get_size(){ return _generic_buffers_container.size }
 /** */

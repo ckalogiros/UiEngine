@@ -525,7 +525,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = Time_intervals_create(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
+         const idx = Time_intervals_create(1, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
          if (Mesh_state_check(widget, MESH_STATE_FLAGS.IS_GRABABLE)) {

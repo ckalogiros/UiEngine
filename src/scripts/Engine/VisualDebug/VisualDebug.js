@@ -127,7 +127,7 @@ export function Visual_debug_create(properties_struct) {
 
    };
 
-   Time_intervals_create(16, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+   Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
       const dbg_rect = params.params.dbg_rect;
 

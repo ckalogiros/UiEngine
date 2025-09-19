@@ -1,6 +1,6 @@
 "use strict";
 
-import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy } from "../Core/StringBuffer.js";
+import { Str_buffer_store, Str_buffer_get_by_idx, Str_buffer_destroy, Str_buffer_change } from "../Core/StringBuffer.js";
 import { Mesh_get_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Time_get } from "./Time.js";
 
@@ -29,30 +29,21 @@ export function Time_intervals_init_time(){
 
 /** */
 class Interval {
-   t;
-   interval; // In miliseconds
-   clbk; // Callback to call upon time interval  
-   clbkParams; // Parameters for the callback funtion(if needed).
-   repeat; // If = 0, executes indefinitely. Set a maximum number of times the callback will execute before the timer has finished  
-   isActive;
-   idx; // A way of removing a specific Interval object from the buffer of class TimeIntervals.
-   // Debug
-   nameidx;
 
+   /** */
    constructor(interval, clbk, idx, name='Time intervalsUNAMED', repeat) {
 
-      this.t = 0;
+      this.t = 0; // In miliseconds
       this.interval = interval;
-      this.clbk = clbk;
-      this.clbkParams = null;
-      this.repeat = repeat;
+      this.clbk = clbk; // Callback to call upon time interval 
+      this.clbkParams = null; // Parameters for the callback funtion(if needed).
+      this.repeat = repeat; // If = 0, executes indefinitely. Set a maximum number of times the callback will execute before the timer has finished
       this.isActive = false;
-      this.idx = idx;
+      this.idx = idx; // Self refference index
       this.nameidx = Str_buffer_store(name);
 
    }
-
-
+   /** */
    Create(interval, idx, name, repeat, clbk, params) { // Params may be null
 
       this.t = 0;
@@ -64,8 +55,7 @@ class Interval {
       this.idx = idx;
       this.nameidx = Str_buffer_store(name);
    }
-
-
+   /** */
    Update() {  // HOT-PATH
 
       this.t += _time.delta;
@@ -87,9 +77,7 @@ class Interval {
       }
 
    }
-
-
-   // Case we only want to check (if time interval has passed) and not update
+   /** Case we only want to check (if time interval has passed) and not update */
    Check() {
 
       if (this.t >= this.interval) {
@@ -98,24 +86,9 @@ class Interval {
       }
       return false;
    }
-
-
-   #Destroy() {
-
-      this.t = 0;
-      this.interval = INT_NULL;
-      this.clbk = null;
-      this.clbkParams = null;
-      this.repeat = INT_NULL;
-      this.isActive = false;
-      this.idx = INT_NULL;
-      this.nameidx = INT_NULL;
-   }
-
-
+   /** */
    ResetTime(){ this.t = 0; }
-
-   
+   /** */
    GetName(){
       return Str_buffer_get_by_idx(this.nameidx)
    }
@@ -134,6 +107,7 @@ class TimeIntervals {
    count;
    size;
 
+   /** */
    constructor() {
 
       this.ti = [];
@@ -141,8 +115,7 @@ class TimeIntervals {
       this.size = 0;
 
    }
-
-
+   /** */
    Init() {
 
       this.size = MAX_TIME_INTERVALS_COUNT;
@@ -150,8 +123,7 @@ class TimeIntervals {
          this.ti[i] = new Interval(INT_NULL, null, i, `TimeInterval:${i}`, 0);
       }
    }
-
-
+   /** */
    Create(interval, name, repeat, clbk, params) {
 
       const freeIdx = this.GetNextFree();
@@ -164,8 +136,7 @@ class TimeIntervals {
 
       return freeIdx;
    }
-
-
+   /** */
    Update() {
 
       // for (let i = 0; i < this.count; i++) {
@@ -175,8 +146,7 @@ class TimeIntervals {
             this.ti[i].Update(); // Update and calls a callback if the time interval has completed a cycle
       }
    }
-
-
+   /** */
    DestroyByIdx(idx) {
 
       /**
@@ -192,12 +162,13 @@ class TimeIntervals {
 
          this.#Destroy(idx);
          this.count--;
-         if(this.count < 0) 
-            console.error('Time interval index is:', this.count, this);
+         if(this.count < 0) {
+            console.error('Time intervals: count out of bounds\nidx:', this.count, this);
+            alert('554413099897765413.\nTime intervals: count out of bounds');
+         }
       }
    }
-
-
+   /** */
    #Destroy(idx){
 
       this.ti[idx].t = 0;
@@ -209,16 +180,14 @@ class TimeIntervals {
       this.ti[idx].idx = INT_NULL;
       Str_buffer_destroy(this.ti[idx].nameidx);
    }
-
-
+   /** */
    Exists(idx){
 
       if(this.ti[idx].isActive)
          return true;
       return false;
    }
-
-
+   /** */
    GetNextFree() {
 
       for (let i = 0; i < this.size; i++) {
@@ -236,7 +205,7 @@ class TimeIntervals {
 
       console.log('Num Interval timers: ', this.count);
       for (let i = 0; i < this.count; i++) {
-         console.log(`${this.ti[i].idx}: name:${Mesh_get_name(this.ti[i])} | interval:${this.ti[i].interval}  | t:${this.ti[i].t}`);
+         console.log(`${this.ti[i].idx}: name:${Str_buffer_get_by_idx(this.ti[i].nameidx)} | interval:${this.ti[i].interval/1000}s  | t:${this.ti[i].t}`);
       }
    }
 

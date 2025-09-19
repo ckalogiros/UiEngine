@@ -1,13 +1,13 @@
 "use strict";
 import { Abs, Clamp, ClampMax, Floor, FloorArr2, FloorArr3, InterpolateToRange, Lerp, Max, Max3, Min, Min3, Mult_arr3_scalar } from '../Helpers/Math/MathOperations.js';
-import { Create_rect_mesh, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
+import { Create_particle_emitter, Create_rect_mesh, Create_static_particle_emitter, Create_widget_button, Create_widget_dropdown, Create_widget_label, Create_widget_menubar, Create_widget_slider, Create_widget_slider_simple, Create_widget_switch_simple, Create_widget_text } from '../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js';
 import { View_activate_all_vbs_in_renderqueue, View_create_scissorbox, View_destroy_render_group_and_meshes, View_render_from_view_NEW, View_render_specific_render_group, View_render_whole_view_group_NEW, View_reset_rendering_buffer_whole_view_group } from '../Engine/Core/Views/MeshBufferViews.js';
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_get } from '../Engine/Core/Views/RootView.js';
 import { GREY, BLUEL, YELLOW, YELLOWL, YELLOWR, GREEN, PURPLE, PURPLER, PURPLEB, REDL, BLACK, WHITE, ORANGE, Interpolate_rgb_to_01, COLOR_GRADIENT_VERTICAL, COLOR_GRADIENT_HORIZONTAL, RGB, RED, CYAN, BLUE, MAGENTA, ORANGER, Get_fasma_color, COLOR_THEME_BASIC, Color_hsv_to_rgb, Contrast_rgba, Luminance_rgb, Contrast_calibrated, Contrast_calibrated_rgba, Color_hsv_to_rgb_calibrated, ORANGEL } from '../Engine/Drawables/Material/Colors.js';
 import { Dropdown_roots_set_root } from '../Engine/Drawables/Widgets/Widget_Dropdown.js';
 import { GetSequencedColor } from '../Helpers/Helpers.js';
 import { Test_alignment } from './Demo/DemoAlignNestedSections.js';
-import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties, Style_text_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
+import { Widget_gfx_ready_enable, Style_button_default_properties, Style_dropdown_default_properties, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties, Style_slider_simple_default_properties, Style_switch_default_properties, Style_text_default_properties, Style_particles_system_default_properties, Style_static_particles_system_default_properties } from '../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js';
 import { Widget_ready_label, Widget_ready_rect, Widget_ready_slider, Widget_ready_slider_simple, Widget_ready_switch } from '../Engine/Drawables/Widgets/Helpers/WidgetReadyWidgets.js';
 import { Mesh_unif_connect_vb_root_wpos_with_scrollbar_root_wpos, Mesh_unif_set_vb_root_wposx } from '../Engine/Core/MeshUniformsBuffer.js';
 import { Components_create_scroller_component, Components_get_scroller_component, Scoller_component_set_scrolled_section, Scoller_component_gengfx_and_render, Scoller_component_render, Scroller_component_calculate_handle_pos_dim } from '../Engine/Drawables/Widgets/ScrollerComponent.js';
@@ -21,7 +21,7 @@ import { Create_menu_items_buttons, Demo_animations, Demo_animations_ready_butto
 import { CALLBACK_ANIMATION_TYPE_FLAGS, CALLBACK_ANIMATION_TYPE_IDX, Callback_animations_create_specific } from '../Engine/Animations/CallbackAnimationsReadyAnimations.js';
 import { Mesh_animations_create } from '../Engine/Animations/MeshAnimations.js';
 import { Create_comet_particles, Create_explosion_particles, Create_glow_particles, Create_smoke_particles, Demo_glow_particles_sparkles_effect, Demo_glow_particles_explosion_shaders, Test_noise_shader } from './Demo/DemoParticles.js';
-import { Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_fps_detailed, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
+import { Debug_info_create_ui_mouse, Debug_info_ui, Debug_info_ui_fps_detailed, Debug_info_ui_static, Debug_info_ui_static_app_generic_buffers, Debug_info_ui_static_app_generic_buffers_container, Debug_info_ui_static_app_int16_buffers, Debug_info_ui_static_app_int8_buffers, Debug_info_ui_static_misc_performance_timers, Debug_info_ui_static_more_performance_timers } from '../Engine/Drawables/DebugInfo/DebugInfoUi.js';
 import { Demo_complicated_widget_layout, Demo_widgets, Demo_widgets_colorpicker, Demo_widgets_colorpicker_demo_with_info, Demo_widgets_dropdown, Demo_widgets_explainer_info, Demo_widgets_msdf_text_rendering, Demo_widgets_scrolled_labels, Demo_widgets_sections } from './Demo/DemoWidgets.js';
 import { Texture_metrics_get_line_height, Texture_metrics_get_sub_tex_height, Texture_metrics_get_sub_tex_width, Texture_metrics_get_texture_height } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { Board_rotations } from './Demo/DemoBoardRotations.js';
@@ -41,10 +41,10 @@ import { Scene_camera_scroll_set, Scene_store_window_resized_meshes } from '../E
 import { Color_theme_dropdown_auto, Color_theme_label_auto, Color_theme_label_auto2, Color_theme_slider_auto, Color_theme_switch_auto } from '../Engine/Drawables/Material/Themes.js';
 import { Renderqueue_set_active } from '../Engine/Renderers/Renderer/RenderQueue.js';
 import { Test_find_match_from_parent_descending } from '../tests/TestsGfxContext.js';
-import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps_fromBookTests.js';
+import { Test_bitwise_from_book_run_all_tests } from '../Engine/Core/BitwiseOps/BitwiseOps_fromBookTests.js';
 import { Widget_render } from '../Engine/Drawables/Widgets/Helpers/WidgetRender.js';
 import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from '../Engine/Core/MeshBuffer.js';
-import { New_int8_buffer, Test_queue_buffer } from '../Engine/Core/Buffers.js';
+import { Debug_Generic_buffers_container_get_buffer, New_int8_buffer, Test_queue_buffer } from '../Engine/Core/Buffers.js';
 import { DEBUG_PRINT_KEYS } from '../Engine/Controls/Input/Keyboard.js';
 import { Vertex_buffer_render_group_get_render_group } from '../Graphics/Buffers/RenderGroups.js';
 import { Jump_physics } from './Demo/Games/PhysicsJump.js';
@@ -56,12 +56,18 @@ import { Mouse_get_pos_dif, Mouse_get_posy } from '../Engine/Controls/Input/Mous
 import { Visual_debug_create, Visual_debug_create_properties } from '../Engine/VisualDebug/VisualDebug.js';
 import { Program_get_programs } from '../Graphics/ShaderPrograms.js';
 import { TEMP_Update_all_vertex_buffers } from '../Graphics/GlDraw.js';
+import { Get_emitter_free_particle_buffer, Get_emitter_particle_buffer } from '../Engine/ParticlesSystem/ParticlesSystem.js';
+import { Static_particle_system_init_particles, Static_particle_system_update, Static_particles_gen_gfx_ctx, Static_particles_set_need_update } from '../Engine/ParticlesSystem/ParticlesSystemStatic.js';
+import { Bitwise32_operations_run_tests } from '../Engine/Core/BitwiseOps/Bitwise32Ops.js';
+import { Bitwise64_operations_run_tests, Bitwise_opps_get_bitpos_from_bitmask, Bitwise_opps_get_bitpos_from_bitmask_looped, Test_js_bigUint64 } from '../Engine/Core/BitwiseOps/Bitwise64Ops.js';
+import { Performance_timer_start, Performance_timer_stop } from '../Engine/Timers/PerformanceTimers.js';
+import { Time_get_delta_time_in_ms, Time_get_time } from '../Engine/Timers/Time.js';
 
 
 
 
-const big_text = 
-`Swelling, or edema, is a common reaction that follows an injury. 
+const big_text =
+    `Swelling, or edema, is a common reaction that follows an injury. 
 It's our body's way of signaling that something's gone awry. 
 When tissues get damaged, they release chemicals that trigger inflammation. 
 This inflammation leads to an increase in blood flow and fluid accumulation in the affected area. 
@@ -228,7 +234,7 @@ export function TestWidgetsGeneric() {
     // const section = Test_adding_mesh_to_a_view_group_after_has_been_rendered();
 
     // Test_on_hover_show_info(200, 300);
-    
+
     // const a = .8
     // const menu = Test_colored_labels_with_hsv(0, 10, 20, .2, a);
     // const w = menu.geom.dim[0]*2;
@@ -264,6 +270,7 @@ export function TestWidgetsGeneric() {
         // const d7 = Debug_info_ui_static_app_int16_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d7.geom.dim[1]*2
         // const d8 = Debug_info_ui_static_app_int8_buffers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d8.geom.dim[1]*2
         // const d3 = Debug_info_ui(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d3.geom.dim[1]*2
+        // Debug_info_ui_static_misc_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy)
     }
 
 
@@ -271,6 +278,10 @@ export function TestWidgetsGeneric() {
     // Test_create_render_groups_resize_and_rerender();
     // Test_create_remove_render_groups();
 
+
+
+
+    Test_time_intervals_performance();
 
 
 
@@ -302,7 +313,7 @@ export function TestWidgetsGeneric() {
         // CreateScrollerClampAlphaTest(_, 100, 400, 1000, 12)
         // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
         // const line = Test_rotate_section_with_round_corners();
- 
+
     }
 
     { // Test many render groups
@@ -311,7 +322,7 @@ export function TestWidgetsGeneric() {
 
         // const label = CreateLabel(0x0, '|',  TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
         // section.AddItem(label);
-        
+
         // const dp = CreateDropdownTree([100, 200, 0], 0x0);
         // section.AddItem(dp);
 
@@ -336,7 +347,7 @@ export function TestWidgetsGeneric() {
         // const clbk_params = {
         //         info_panel: info_panel,
         //     };
-        
+
         // let k = 0, y=50;
         // { 
         //     const section = Create_rect_mesh(Style_rect_default_properties({ 
@@ -369,7 +380,7 @@ export function TestWidgetsGeneric() {
         // Test_physics2D_collision_detection_many_rects();
         // Test_physics2D_collision_detection_obstract_collider();
         // Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug();
-        
+
         // Jump_physics();
         // Spring_physics();
         // Jump_physics_2();
@@ -496,9 +507,9 @@ export function TestWidgetsGeneric() {
 
         // CreateDropdownTree([30, 50, 0])
         // Create_dropdown_hsv_coloring([30, 50, 0]);
-        
+
         // CreateDropdownTreeHorizontalLayout();
-        
+
         // Demo_complicated_widget_layout(0, 200)
     }
 
@@ -509,7 +520,7 @@ export function TestWidgetsGeneric() {
         // CreateScrollerDeepNested(_, 30, 100, 10, 16);
         // CreateDropdownWithScroller(_, 30, 100, 10, 16);
         // const widget = CreateDropdownWithScrollerManyDps(_, 30, 100, 10, 10);
-        
+
         // Create_mesh_info_ui(_, 230, 100, 10, 10, widget.group_bufferidxs[0]);
 
     }
@@ -527,11 +538,46 @@ export function TestWidgetsGeneric() {
     { // Window menu
         // Window_menu_2();
     }
-    
+
     { // Visual Debug
 
         // Visual_debug_mouse(true);  
-        // Visual_debug_memory_cells(true);
+
+        {
+            // {
+            //     const transform_parameters=[.48, .5, .19, .2, .4]
+            //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters);
+            //     Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+            // }
+            // {
+            //     const transform_parameters=[.48, .5, .19, .2, .6]
+            //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 300, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters);
+            //     Visual_debug_buffer_cells(200, 500, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+            // }
+            // const params = {
+            //     // emitter_idx: emitter.idx,
+            //     // timer: timer,
+            // };
+            // Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+                
+            //     // const emitter_idx = params.params.emitter_idx;
+            //     Static_particle_system_update(); 
+
+            // }, params);
+        }
+
+
+        // {
+        //     const ret = Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 16,);
+        //     Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+        // }
+
+
+        // const generic_buffer = Debug_Generic_buffers_container_get_buffer();
+        // Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _, generic_buffer);
+        
+        // Visual_debug_buffer_cells(200, 200, ROOT_WIDGETS.CREATE_ROOT, _,);
+        // Visual_debug_memory_cells_with_meshes(true);
 
         // Visual_debug_create(Visual_debug_create_properties({
         //     is_root:ROOT_WIDGETS.CREATE_ROOT,
@@ -554,7 +600,7 @@ export function TestWidgetsGeneric() {
 
         { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribute
             // Test_rotate_section_with_round_corners();
-            
+
             // Rotatable_section_with_rcorners_via_attribute_rotation();
             // Rotatable_section_adjustable_pivotal_rotation();
             // Rotatable_section_with_rcorners_via_uniform_rotation();
@@ -579,7 +625,7 @@ export function TestWidgetsGeneric() {
 
             // const label = Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '[ HELLO ] !!!', TEXTURES.MTSDF_COMIC_1024, 300, 50, 20, _, _, _, _, _);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, label, .03, 0., 1.,)
-            
+
             // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS3);
             // // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
@@ -601,7 +647,7 @@ export function TestWidgetsGeneric() {
 
         { // Demo Particles 
 
-            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 6);
+            // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
 
             // Demo_glow_particles_explosion_shaders(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, _, true, 64,);
 
@@ -620,7 +666,7 @@ export function TestWidgetsGeneric() {
 
         { // Demos Physics
 
-            const total_height = Elastic_collisions(100, 200, ROOT_WIDGETS.CREATE_ROOT, true, true);
+            // const total_height = Elastic_collisions(100, 200, ROOT_WIDGETS.CREATE_ROOT, true, true);
 
             // Sattelite_rotation([0, 100]);
 
@@ -822,8 +868,46 @@ export function TestWidgetsGeneric() {
     }
 
 
-    // Bitwise_operations_run_test();
-    // Test_bitwise_from_book_run_all_tests();
+    { // Bitwise Operations
+        
+        // Bitwise32_operations_run_tests();
+        // Bitwise64_operations_run_tests();
+        // Test_bitwise_from_book_run_all_tests();
+
+
+        { // Performance Measurment: 1. Get bit_pos from bit_mask through a while loop, 2. Get bit_pos from bit_mask through if statements
+            // let bit_mask = 0x0n;
+            // const n = 1000;
+            // Time_intervals_create(1, 'Test:BITWISE operations performance', TIME_INTERVAL_REPEAT_ALWAYS, ()=>{
+
+            //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+            //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask_looped(bit_mask); // 3x faster than iff statements from Bitwise_opps_get_bitpos_from_bitmask()
+            //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+
+            //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2);
+            //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask(bit_mask);
+            //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2);
+
+            //     bit_mask <<= 0x1n;
+            //     if(bit_mask > MAX_UINT64) bit_mask = 0x0n;
+            // }, )
+        }
+
+    
+        // const xx = 0xaaaaaaaa;
+        // // const xx = 0x0b1010;
+        // // const xx = 0xa0;
+        // console.log(xx.toString(2))
+        // const aa = (xx >> 0x1) & 0x1;
+        // // console.log(aa.toString(2))
+        // for(let i = 0; i < 32; i++) {
+            
+        //     console.log(i, ((xx >> i) & 0x1).toString(2));
+        // }
+        
+        // Test_js_bigUint64();
+    }
+
 
 
     // Vertex_buffer_build_index_buffer_all();
@@ -833,39 +917,39 @@ export function TestWidgetsGeneric() {
 }
 
 /** Visual Debug Test */
-function Visual_debug_mouse(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=250, ) {
+function Visual_debug_mouse(IS_WIDGET_ROOT = false, x = 100, y = 100, dbg_w = 20, dbg_h = 250,) {
 
-    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: IS_WIDGET_ROOT, 
-        pos: [x, y, 0], dim: [dbg_w, dbg_h], 
-        col: Color_hsv_to_rgb_calibrated(0,0,1,1,.4,0),  
+    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({
+        is_root: IS_WIDGET_ROOT,
+        pos: [x, y, 0], dim: [dbg_w, dbg_h],
+        col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .4, 0),
     }));
-    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
     const pad = 4;
-    const dbg_rect = Create_rect_mesh(Style_rect_default_properties({ 
-        pos: [pad, pad, 0], dim: [dbg_w-pad, dbg_h-pad], 
-        col: Color_hsv_to_rgb_calibrated(.12,1,1,1,.7,.7),  
+    const dbg_rect = Create_rect_mesh(Style_rect_default_properties({
+        pos: [pad, pad, 0], dim: [dbg_w - pad, dbg_h - pad],
+        col: Color_hsv_to_rgb_calibrated(.12, 1, 1, 1, .7, .7),
     }));
-    Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10,});
+    Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10, });
     dbg_surface.AddItem(dbg_rect);
 
     const debug_info_text = {
-        cur_value    : null,
+        cur_value: null,
     };
 
     { // Text Info Display
-        const w = dbg_surface.geom.dim[0]*2 + 6, h = dbg_surface.geom.pos[1];
+        const w = dbg_surface.geom.dim[0] * 2 + 6, h = dbg_surface.geom.pos[1];
         const tex_id = TEXTURES.MTSDF_CONSOLAS_1024;
-        { 
-            const text_info = Create_widget_text(Style_text_default_properties({ 
-                pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14,1,1,1,.8,.8), 
-                texture_id: tex_id, font_size: 8, 
-                text: 'value: 0.000', 
-            })); 
-            Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
-            dbg_surface.AddItem(text_info); 
-            debug_info_text.cur_value = text_info;  
+        {
+            const text_info = Create_widget_text(Style_text_default_properties({
+                pos: [w, h, 0], col: Color_hsv_to_rgb_calibrated(.14, 1, 1, 1, .8, .8),
+                texture_id: tex_id, font_size: 8,
+                text: 'value: 0.000',
+            }));
+            Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            dbg_surface.AddItem(text_info);
+            debug_info_text.cur_value = text_info;
         }
     }
 
@@ -874,33 +958,33 @@ function Visual_debug_mouse(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=
     Widget_render(dbg_surface);
 
 
-    
+
     const params = {
-        dbg_rect:dbg_rect, // The mesh to visualize the ratio
-        initial_height:(dbg_rect.geom.dim[1]),
-        debug_info_text:debug_info_text, // A text mesh to draw information on the screen
-        target_getter_callback:()=>{
+        dbg_rect: dbg_rect, // The mesh to visualize the ratio
+        initial_height: (dbg_rect.geom.dim[1]),
+        debug_info_text: debug_info_text, // A text mesh to draw information on the screen
+        target_getter_callback: () => {
             // Callback returning params necessary for calculating the ratio
             // So the calee must sutisfy the 2 variables returned as structure retaining the name of the variables
             const curr_target_val = Mouse_get_posy();
             return {
-                target_curr_val:curr_target_val,
-                target_max_val:VIEWPORT.HEIGHT,
+                target_curr_val: curr_target_val,
+                target_max_val: VIEWPORT.HEIGHT,
             };
         },
-        info_text_pos_y_offset:y,
+        info_text_pos_y_offset: y,
     };
 
-    Time_intervals_create(16, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+    Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
         const dbg_rect = params.params.dbg_rect;
 
         const target_params = params.params.target_getter_callback();
-        const target_curr_val=target_params.target_curr_val;
-        const target_max_val=target_params.target_max_val;
+        const target_curr_val = target_params.target_curr_val;
+        const target_max_val = target_params.target_max_val;
         const ratio = target_curr_val / target_max_val;
 
-        
+
         const initial_height = params.params.initial_height;
         const h = (ratio * initial_height * 2) - initial_height;
 
@@ -911,40 +995,162 @@ function Visual_debug_mouse(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=
         const info_text = params.params.debug_info_text.cur_value;
 
 
-        if(info_text) {
-            const text = Floor(initial_height-(ratio * initial_height));
+        if (info_text) {
+            const text = Floor(initial_height - (ratio * initial_height));
             info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
             Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
         }
-        
+
 
 
     }, params);
 }
-function Visual_debug_memory_cells(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20, dbg_h=250, ) {
+function Visual_debug_buffer_cells(x = 0, y = 0, root_widget = 0x0, particles_size = 10, target=null) { // 3 control Sliders 
 
-    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: IS_WIDGET_ROOT, 
-        // pos: [x, y, 0], dim: [dbg_w, dbg_h], 
-        pos: [x, y, 0],  
-        pad:[10,10],
-        col: Color_hsv_to_rgb_calibrated(0,0,1,1,.4,0),  
-        layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
+    
+    
+    particles_size = 6;
+    
+    /****************************************************************************************************************/
+    // Create Particles Particles Emitter
+    const num_particles = target.particles_buffer.size;
+    // const num_particles = target.size;
+    const row_num_particles = 60;
+    const pad = 10;
+
+    const emitter = Create_static_particle_emitter(Style_static_particles_system_default_properties({
+        is_root:root_widget,
+        name: 'GlowParticlesTest',
+        col:Color_hsv_to_rgb_calibrated(.12,0,1,.5,.18,.0), pos: [x, y, 10], 
+        dim: [particles_size*(row_num_particles)+pad, ((num_particles/(row_num_particles)) * particles_size)+pad],
+        pad:[pad,pad],
+        target:target,
+        particle_width:particles_size, particle_height:particles_size,
+        num_particles: num_particles,
     }));
-    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
 
-    const pad = 4, s=5;
-    for(let i=0; i < 100; i++) {
+    Widget_gfx_ready_enable({ mesh: emitter, enable_sdf_rect: 8, listener: { type: LISTEN_EVENT_TYPES.MOVE }});
 
-        const dbg_rect = Create_rect_mesh(Style_rect_default_properties({ 
-            pos: [pad, pad, 0], dim: [s, s], 
+
+
+
+    /****************************************************************************************************************/
+    // Add the emitter here, because it needs a parent mesh to pass as param
+    Static_particles_gen_gfx_ctx(emitter, _);
+    Static_particle_system_init_particles(emitter);
+
+
+    
+    
+    // const timer = {
+        
+    //     sum: 0, 
+    //     avg: 0,
+    //     cnt:1,
+    //     prev: 0,
+    //     cur: 0,
+    // };
+    // Time_intervals_create(1000, 'Timer', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+        
+    //     console.log(
+    //         'Avg', params.params.timer.avg.toFixed(3),
+    //         'cnt', params.params.timer.cnt,
+    //     )
+        
+    // }, {timer:timer})
+    
+    // const params = {
+    //     emitter_idx: emitter.idx,
+    //     // timer: timer,
+    // };
+    // Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+        
+    //     const timer = params.params.timer;
+    //     const emitter_idx = params.params.emitter_idx;
+        
+    //     // timer.prev = window.performance.now();
+
+
+    //     { // Render every next particle based on time interval timer
+
+    //         // if(cur === 0) {
+    //         //     prev = target.size-1;
+    //         // }
+    //         // else prev = cur-1;
+    //         // if(cur >= target.size) cur = 0;
+    //         // if(cur === 0) {
+    //         //     const nt = Time_get_time();
+    //         //     const r = nt-t
+    //         //     console.log(r/1000)
+    //         //     t = nt
+    //         // }
+    
+    //         // GLOB_TEMP.visual_debug.AddAtIndex(cur);
+    //         // GLOB_TEMP.visual_debug.Remove(prev);
+    //         // cur++;
+    //     }
+
+    //     Static_particles_set_need_update(emitter_idx, true);
+    //     console.log(emitter_idx)
+    //     Static_particle_system_update(); 
+
+    //     // timer.cur = window.performance.now();
+    //     // const t = timer.cur - timer.prev;
+    //     // timer.sum += t;
+    //     // timer.avg = timer.sum / timer.cnt;
+    //     // timer.prev = timer.cur;
+    //     // timer.cnt++;
+
+        
+    // }, params);
+    
+
+    return emitter;
+
+}
+function Visual_debug_memory_cells_with_meshes(IS_WIDGET_ROOT = false, x = 100, y = 100, dbg_w = 250, dbg_h = 50,) {
+
+    const dbg_surface = Create_rect_mesh(Style_rect_default_properties({
+        is_root: IS_WIDGET_ROOT,
+        // pos: [x, y, 0], dim: [dbg_w, dbg_h], 
+        pos: [x, y, 0], dim: [dbg_w, 10],
+        // pos: [x, y, 0],  
+        // pad:[10,10],
+        col: Color_hsv_to_rgb_calibrated(0, 0, 1, 1, .4, 0),
+        // layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
+    }));
+    Widget_gfx_ready_enable({ mesh: dbg_surface, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
+
+
+
+    const emitter_idx = 0;
+    const free_buffer = Get_emitter_particle_buffer(emitter_idx);
+    console.warn(free_buffer)
+    const pad = 4, w = 6, h = w * .7;
+    let xp = 0, yp = 0;
+    const max_width = dbg_w * 2 - w * 2;
+    for (let i = 0; i < free_buffer.size; i++) {
+
+
+        if (xp > max_width) {
+            xp = 0;
+            yp += h * 2;
+            dbg_surface.geom.dim[1] += h
+        }
+
+        const dbg_rect = Create_rect_mesh(Style_rect_default_properties({
+            pos: [xp + pad, yp + pad, 0], dim: [w, h],
             // pad:[10,10],
-            col: Color_hsv_to_rgb_calibrated(.12,1,1,1,.7,.7),  
-            layout:LAYOUT.HORIZONTAL ,
+            col: Color_hsv_to_rgb_calibrated(.12, 1, 1, 1, .7, .7),
+            // layout:LAYOUT.HORIZONTAL ,
         }));
-        Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 10,});
+        Widget_gfx_ready_enable({ mesh: dbg_rect, enable_sdf_rect: 2, });
         dbg_surface.AddItem(dbg_rect);
+
+        xp += w * 2;
+
     }
+
 
     // const debug_info_text = {
     //     cur_value    : null,
@@ -967,80 +1173,73 @@ function Visual_debug_memory_cells(IS_WIDGET_ROOT=false, x=100, y=100, dbg_w=20,
 
 
     dbg_surface.GenGfxCtx();
-    Layout_basic_pre_render(dbg_surface);
+    // Layout_basic_pre_render(dbg_surface);
     Widget_render(dbg_surface);
 
 
-    
-    // const params = {
-    //     dbg_rect:dbg_rect, // The mesh to visualize the ratio
-    //     initial_height:(dbg_rect.geom.dim[1]),
-    //     debug_info_text:debug_info_text, // A text mesh to draw information on the screen
-    //     target_getter_callback:()=>{
-    //         // Callback returning params necessary for calculating the ratio
-    //         // So the calee must sutisfy the 2 variables returned as structure retaining the name of the variables
-    //         const curr_target_val = Mouse_get_posy();
-    //         return {
-    //             target_curr_val:curr_target_val,
-    //             target_max_val:VIEWPORT.HEIGHT,
-    //         };
-    //     },
-    //     info_text_pos_y_offset:y,
-    // };
 
-    // Time_intervals_create(16, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+    const params = {
+        dbg_surface: dbg_surface, // The mesh to visualize the ratio
+        emitter_idx: emitter_idx,
+        // debug_info_text:debug_info_text, // A text mesh to draw information on the screen
+        // info_text_pos_y_offset:y,
+    };
 
-    //     const dbg_rect = params.params.dbg_rect;
+    Time_intervals_create(32, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
-    //     const target_params = params.params.target_getter_callback();
-    //     const target_curr_val=target_params.target_curr_val;
-    //     const target_max_val=target_params.target_max_val;
-    //     const ratio = target_curr_val / target_max_val;
-
-        
-    //     const initial_height = params.params.initial_height;
-    //     const h = (ratio * initial_height * 2) - initial_height;
-
-    //     Gl_set_vpos_y_top(dbg_rect.gfx, h);
-    //     // Gl_set_dim_y(dbg_rect.gfx, initial_height+ratio-20);
+        const dbg_surface = params.params.dbg_surface;
+        const buffer = Get_emitter_particle_buffer(params.params.emitter_idx);
+        const meshes = dbg_surface.children;
 
 
-    //     const info_text = params.params.debug_info_text.cur_value;
+        for (let i = 0; i < buffer.size; i++) {
+
+            const f = free_buffer.buffer[i];
+            const mesh = meshes.buffer[i];
+            if (f) {
+                if (f.is_alive)
+                    Gl_set_rgba(mesh.gfx, mesh.mat.col);
+                else
+                    Gl_set_rgba(mesh.gfx, GREY[3]);
+            }
+            else Gl_set_rgba(mesh.gfx, BLACK);
+        }
 
 
-    //     if(info_text) {
-    //         const text = Floor(initial_height-(ratio * initial_height));
-    //         info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
-    //         Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
-    //     }
-        
+        // const info_text = params.params.debug_info_text.cur_value;
 
 
-    // }, params);
+        // if(info_text) {
+        //     const text = Floor(initial_height-(ratio * initial_height));
+        //     info_text.RenderTextFromString(`${text}`, true); // Change the text to the new info
+        //     Mesh_set_wpos_y(info_text, (ratio * initial_height * 2) + params.params.info_text_pos_y_offset);
+        // }
+
+    }, params);
 }
 /* Test collision detection: 2 rects with mouse move. Collision detection: sweptAABB */
-function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() { 
+function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
 
     const panel_width = 500, panel_height = 400;
     const panel_x = 50, panel_y = 60;
-    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1],  }));
-    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-    
-    
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1], }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } });
+
+
     const coll_group_idx = Collision_detection_create_group('test');
 
     const debug_info = {
-        near_dx  : null, far_dx   : null, near_dy  : null, far_dy   : null,
-        near_xt  : null, far_xt   : null, near_yt  : null, far_yt   : null,
-        near_t  : null, far_t   : null,
+        near_dx: null, far_dx: null, near_dy: null, far_dy: null,
+        near_xt: null, far_xt: null, near_yt: null, far_yt: null,
+        near_t: null, far_t: null,
 
         penet_x: null, penet_y: null,
 
-        x1    : null,
-        x2    : null,
-        y1    : null,
-        y2    : null,
-        axis  : 'o',
+        x1: null,
+        x2: null,
+        y1: null,
+        y2: null,
+        axis: 'o',
     };
 
     let mesh1 = null, mesh2 = null;
@@ -1051,8 +1250,8 @@ function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
 
     // Colliding Meshes
     {
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [50,50], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:'mesh1'}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [50, 50], col: Color_hsv_to_rgb(hue, 1, 1, 1, .7, 0), name: 'mesh1' }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
@@ -1061,8 +1260,8 @@ function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
     {
         // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2-size, panel_y+panel_height/2+size], dim: [size, size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:'mesh2'}));
         // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2, panel_y+panel_height/2], dim: [size, size], col: Color_hsv_to_rgb(.25,1,1,1,.7,0),  name:'mesh2'}));
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x+panel_width/2, panel_y+panel_height/2], dim: [10, 100], col: Color_hsv_to_rgb(.25,1,1,1,.7,0),  name:'mesh2'}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_x + panel_width / 2, panel_y + panel_height / 2], dim: [10, 100], col: Color_hsv_to_rgb(.25, 1, 1, 1, .7, 0), name: 'mesh2' }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
@@ -1070,51 +1269,51 @@ function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
     }
 
 
- 
+
 
     { // Text Info Display
         let w = 220, h = 30;
         const tex_id = TEXTURES.MTSDF_COMIC_1024;
         // Distance
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info;  }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
-    
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
-    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
+
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 2, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 2, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
+
         // Time
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
-    
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
-    
-    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
+
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
+
+
         // Rect Posiotions
         { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect1 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x1 = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
         { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect2 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y1 = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
     }
 
     panel.GenGfxCtx();
     Widget_render(panel);
 
-    
+
 
 
     const params = {
-        collision_group_idx:coll_group_idx,
-        debug_info_struct:debug_info,
-        mesh1:mesh1,
-        mesh2:mesh2,
+        collision_group_idx: coll_group_idx,
+        debug_info_struct: debug_info,
+        mesh1: mesh1,
+        mesh2: mesh2,
     };
-    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+    Time_intervals_create(1, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
         const collision_group_idx = params.params.collision_group_idx;
 
@@ -1123,85 +1322,85 @@ function Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug() {
          */
 
         const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
-        if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
+        if (grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
         // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
 
-        if(debug_info) {
+        if (debug_info) {
             params.params.debug_info_struct.near_dx.RenderTextFromString(`neardx   ${debug_info.near_dx.toFixed(2)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_dx.RenderTextFromString( `fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dx.RenderTextFromString(`fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
             params.params.debug_info_struct.near_dy.RenderTextFromString(`neardy   ${debug_info.near_dy.toFixed(2)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_dy.RenderTextFromString( `fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dy.RenderTextFromString(`fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
 
             params.params.debug_info_struct.penet_x.RenderTextFromString(`penet_x   ${debug_info.penetration_depth_y.toFixed(2)}`, true); // Change the text to the new info
             params.params.debug_info_struct.penet_y.RenderTextFromString(`penet_y    ${debug_info.penetration_depth_x.toFixed(2)}`, true); // Change the text to the new info
 
-            params.params.debug_info_struct.near_xt.RenderTextFromString( `Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_xt.RenderTextFromString(`Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_xt.RenderTextFromString(`Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_yt.RenderTextFromString(`Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_yt.RenderTextFromString(`Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
 
-            params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_t.RenderTextFromString(`NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_t.RenderTextFromString(`FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
 
-            params.params.debug_info_struct.axis.RenderTextFromString(   `Axis  ${debug_info.axis}`, true); // Change the text to the new info
+            params.params.debug_info_struct.axis.RenderTextFromString(`Axis  ${debug_info.axis}`, true); // Change the text to the new info
 
         }
-        
+
         const x1 = params.params.mesh1.geom.pos[0];
         const y1 = params.params.mesh1.geom.pos[1];
         const x2 = params.params.mesh2.geom.pos[0];
         const y2 = params.params.mesh2.geom.pos[1];
-        params.params.debug_info_struct.x1.RenderTextFromString( `rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.x2.RenderTextFromString( `y: ${y1.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.y1.RenderTextFromString( `rect2 x: ${x2.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.y2.RenderTextFromString( `y: ${y2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x1.RenderTextFromString(`rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x2.RenderTextFromString(`y: ${y1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y1.RenderTextFromString(`rect2 x: ${x2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y2.RenderTextFromString(`y: ${y2.toFixed(2)}`, true); // Change the text to the new info
 
 
     }, params);
 
 }
-function Test_physics2D_collision_detection_many_rects() { 
+function Test_physics2D_collision_detection_many_rects() {
 
     const panel_width = 300, panel_height = 400;
     const panel_x = 60, panel_y = 60;
-    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1],  }));
-    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-    
-    
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [panel_x, panel_y, 0], dim: [panel_width, panel_height], col: GREY[1], }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } });
+
+
     const coll_group_idx = Collision_detection_create_group('test');
 
     const debug_info = {
-        near_dx  : null, far_dx   : null, near_dy  : null, far_dy   : null,
-        near_xt  : null, far_xt   : null, near_yt  : null, far_yt   : null,
-        near_t  : null, far_t   : null,
+        near_dx: null, far_dx: null, near_dy: null, far_dy: null,
+        near_xt: null, far_xt: null, near_yt: null, far_yt: null,
+        near_t: null, far_t: null,
 
         penet_x: null, penet_y: null,
 
-        x1    : null,
-        x2    : null,
-        y1    : null,
-        y2    : null,
-        axis  : '-0',
+        x1: null,
+        x2: null,
+        y1: null,
+        y2: null,
+        axis: '-0',
     };
 
     const debug_meshes = [];
-    
-    
+
+
     // const num_meshes = 80; 
     // const size = 20;
-    const num_meshes = 20; 
+    const num_meshes = 20;
     const size = 50;
     let x = 200, y = 140;
     let hue = .12;
     let v_size = size;
-    for(let i = 0; i < num_meshes; i++) {
+    for (let i = 0; i < num_meshes; i++) {
 
-        if(i===0) v_size = 0
+        if (i === 0) v_size = 0
         else v_size = size
 
         // const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y], dim: [v_size, 20], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y+10], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [x, y + 10], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue, 1, 1, 1, .7, 0), name: `${i}` }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
@@ -1209,39 +1408,39 @@ function Test_physics2D_collision_detection_many_rects() {
         debug_meshes.push(mesh);
 
         hue += .2; // Change color
-        y += v_size*2+10
-        if(y>600){
-            x += v_size*2+20;
+        y += v_size * 2 + 10
+        if (y > 600) {
+            x += v_size * 2 + 20;
             y = 20
         }
     }
 
     {
-    //     const barier_width = 10;
-    //     /** */
-    //     const left_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'left_barier'}));
-    //     Widget_gfx_ready_enable({ mesh: left_barier, enable_sdf_rect: 5, });
-    //     panel.AddItem(left_barier);
-    //     left_barier.physics.idx = Physics2D_create_object(left_barier.geom.pos[0], left_barier.geom.pos[1]);
-    //     left_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, left_barier, left_barier.physics.idx);
-    //     /** */
-    //     const top_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [barier_width*2, 0], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'top_barier'}));
-    //     Widget_gfx_ready_enable({ mesh: top_barier, enable_sdf_rect: 5, });
-    //     panel.AddItem(top_barier);
-    //     top_barier.physics.idx = Physics2D_create_object(top_barier.geom.pos[0], top_barier.geom.pos[1]);
-    //     top_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, top_barier, top_barier.physics.idx);
-    //     /** */
-    //     const right_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_width*2-barier_width*2, barier_width*2], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'right_barier'}));
-    //     Widget_gfx_ready_enable({ mesh: right_barier, enable_sdf_rect: 5});
-    //     panel.AddItem(right_barier);
-    //     right_barier.physics.idx = Physics2D_create_object(right_barier.geom.pos[0], right_barier.geom.pos[1]);
-    //     right_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, right_barier, right_barier.physics.idx);
-    //     /** */
-    //     const bottom_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, panel_height*2-barier_width*2], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'bottom_barier'}));
-    //     Widget_gfx_ready_enable({ mesh: bottom_barier, enable_sdf_rect: 5});
-    //     panel.AddItem(bottom_barier);
-    //     bottom_barier.physics.idx = Physics2D_create_object(bottom_barier.geom.pos[0], bottom_barier.geom.pos[1]);
-    //     bottom_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, bottom_barier, bottom_barier.physics.idx);
+        //     const barier_width = 10;
+        //     /** */
+        //     const left_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'left_barier'}));
+        //     Widget_gfx_ready_enable({ mesh: left_barier, enable_sdf_rect: 5, });
+        //     panel.AddItem(left_barier);
+        //     left_barier.physics.idx = Physics2D_create_object(left_barier.geom.pos[0], left_barier.geom.pos[1]);
+        //     left_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, left_barier, left_barier.physics.idx);
+        //     /** */
+        //     const top_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [barier_width*2, 0], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'top_barier'}));
+        //     Widget_gfx_ready_enable({ mesh: top_barier, enable_sdf_rect: 5, });
+        //     panel.AddItem(top_barier);
+        //     top_barier.physics.idx = Physics2D_create_object(top_barier.geom.pos[0], top_barier.geom.pos[1]);
+        //     top_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, top_barier, top_barier.physics.idx);
+        //     /** */
+        //     const right_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [panel_width*2-barier_width*2, barier_width*2], dim: [barier_width, panel_height-barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'right_barier'}));
+        //     Widget_gfx_ready_enable({ mesh: right_barier, enable_sdf_rect: 5});
+        //     panel.AddItem(right_barier);
+        //     right_barier.physics.idx = Physics2D_create_object(right_barier.geom.pos[0], right_barier.geom.pos[1]);
+        //     right_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, right_barier, right_barier.physics.idx);
+        //     /** */
+        //     const bottom_barier = Create_rect_mesh(Style_rect_default_properties({ pos: [0, panel_height*2-barier_width*2], dim: [panel_width-barier_width, barier_width], col: Color_hsv_to_rgb(0,0,1,.18,0,0),  name:'bottom_barier'}));
+        //     Widget_gfx_ready_enable({ mesh: bottom_barier, enable_sdf_rect: 5});
+        //     panel.AddItem(bottom_barier);
+        //     bottom_barier.physics.idx = Physics2D_create_object(bottom_barier.geom.pos[0], bottom_barier.geom.pos[1]);
+        //     bottom_barier.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, bottom_barier, bottom_barier.physics.idx);
     }
 
 
@@ -1249,45 +1448,45 @@ function Test_physics2D_collision_detection_many_rects() {
         let w = 220, h = 30;
         const tex_id = TEXTURES.MTSDF_COMIC_1024;
         // Distance
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info;  }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
-    
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*2, h*1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
-    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardx    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardx     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dx = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'neardy    0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_dy = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'fardy     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_dy = text_info; }
+
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 2, h * 0, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_x  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_x = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 2, h * 1, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'penet_y  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.penet_y = text_info; }
+
         // Time
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000',})); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*1, h*4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
-    
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w*0, h*5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
-    
-    
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'near_xt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 2, 0], col: YELLOW[9], texture_id: tex_id, font_size: 8, text: 'far_xt   0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_xt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'near_yt 0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 3, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'far_yt  0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_yt = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'NT:     0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.near_t = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 1, h * 4, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'FT      0.000000000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.far_t = text_info; }
+
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [w * 0, h * 5, 0], col: ORANGER[9], texture_id: tex_id, font_size: 8, text: 'Axis -0000', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.axis = text_info; }
+
+
         // Rect Posiotions
         { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect1 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x1 = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 750, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y: 0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.x2 = text_info; }
         { const text_info = Create_widget_text(Style_text_default_properties({ pos: [0, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'rect2 x  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y1 = text_info; }
-        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00',     })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
+        { const text_info = Create_widget_text(Style_text_default_properties({ pos: [180, 780, 0], col: GREEN[9], texture_id: tex_id, font_size: 8, text: 'y  0000.00', })); Widget_gfx_ready_enable({ mesh: text_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); panel.AddItem(text_info); debug_info.y2 = text_info; }
     }
 
 
     panel.GenGfxCtx();
     Widget_render(panel);
 
-    
+
 
 
     const params = {
-        collision_group_idx:coll_group_idx,
-        debug_info_struct:debug_info,
-        debug_meshes:debug_meshes,
+        collision_group_idx: coll_group_idx,
+        debug_info_struct: debug_info,
+        debug_meshes: debug_meshes,
     };
-    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+    Time_intervals_create(11, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
         const collision_group_idx = params.params.collision_group_idx;
 
@@ -1296,14 +1495,14 @@ function Test_physics2D_collision_detection_many_rects() {
          */
 
         const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
-        if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
+        if (grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_all_with_all(collision_group_idx, grabbed_mesh_idx);
         // if(grabbed_mesh_idx !== INT_NULL) var debug_info = Physics2D_collision_detection_one_with_all(collision_group_idx, grabbed_mesh_idx);
         // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
-        if(debug_info) {
+        if (debug_info) {
             params.params.debug_info_struct.near_dx.RenderTextFromString(`neardx   ${debug_info.near_dx.toFixed(2)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_dx.RenderTextFromString( `fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dx.RenderTextFromString(`fardx    ${debug_info.far_dx.toFixed(2)}`, true); // Change the text to the new info
             params.params.debug_info_struct.near_dy.RenderTextFromString(`neardy   ${debug_info.near_dy.toFixed(2)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_dy.RenderTextFromString( `fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_dy.RenderTextFromString(`fardy    ${debug_info.far_dy.toFixed(2)}`, true); // Change the text to the new info
 
             params.params.debug_info_struct.penet_x.RenderTextFromString(`penet_x   ${debug_info.penetration_depth_y.toFixed(2)}`, true); // Change the text to the new info
             params.params.debug_info_struct.penet_y.RenderTextFromString(`penet_y    ${debug_info.penetration_depth_x.toFixed(2)}`, true); // Change the text to the new info
@@ -1312,78 +1511,78 @@ function Test_physics2D_collision_detection_many_rects() {
             // params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${Floor(debug_info.far_xt)}`, true); // Change the text to the new info
             // params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${Floor(debug_info.near_yt)}`, true); // Change the text to the new info
             // params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${Floor(debug_info.far_yt)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.near_xt.RenderTextFromString( `Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_xt.RenderTextFromString(  `Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.near_yt.RenderTextFromString( `Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_yt.RenderTextFromString(  `Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_xt.RenderTextFromString(`Ntimex  ${(debug_info.near_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_xt.RenderTextFromString(`Ftimex  ${(debug_info.far_xt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_yt.RenderTextFromString(`Ntimey  ${(debug_info.near_yt.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_yt.RenderTextFromString(`Ftimey  ${(debug_info.far_yt.toFixed(2))}`, true); // Change the text to the new info
             // params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${Floor(debug_info.near_t)}`, true); // Change the text to the new info
             // params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${Floor(debug_info.far_t)}`, true); // Change the text to the new info
-            params.params.debug_info_struct.near_t.RenderTextFromString(  `NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
-            params.params.debug_info_struct.far_t.RenderTextFromString(   `FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.near_t.RenderTextFromString(`NT  ${(debug_info.near_t.toFixed(2))}`, true); // Change the text to the new info
+            params.params.debug_info_struct.far_t.RenderTextFromString(`FT  ${(debug_info.far_t.toFixed(2))}`, true); // Change the text to the new info
 
-            params.params.debug_info_struct.axis.RenderTextFromString(   `Axis  ${debug_info.axis}`, true); // Change the text to the new info
+            params.params.debug_info_struct.axis.RenderTextFromString(`Axis  ${debug_info.axis}`, true); // Change the text to the new info
 
         }
-        
+
         const x1 = params.params.debug_meshes[0].geom.pos[0];
         const y1 = params.params.debug_meshes[0].geom.pos[1];
         const x2 = params.params.debug_meshes[1].geom.pos[0];
         const y2 = params.params.debug_meshes[1].geom.pos[1];
-        params.params.debug_info_struct.x1.RenderTextFromString( `rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.x2.RenderTextFromString( `y: ${x2.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.y1.RenderTextFromString( `rect2 x: ${y1.toFixed(2)}`, true); // Change the text to the new info
-        params.params.debug_info_struct.y2.RenderTextFromString( `y: ${y2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x1.RenderTextFromString(`rect1 x: ${x1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.x2.RenderTextFromString(`y: ${x2.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y1.RenderTextFromString(`rect2 x: ${y1.toFixed(2)}`, true); // Change the text to the new info
+        params.params.debug_info_struct.y2.RenderTextFromString(`y: ${y2.toFixed(2)}`, true); // Change the text to the new info
 
     }, params);
 
 }
 /* Test collision detection: many rects with mouse move. Resolve: obstarct collider object */
-function Test_physics2D_collision_detection_obstract_collider() { 
+function Test_physics2D_collision_detection_obstract_collider() {
 
     const size = 40;
-    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [60, 60, 0], dim: [300, 400], col: GREY[1],  }));
-    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-    
-    
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [60, 60, 0], dim: [300, 400], col: GREY[1], }));
+    Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP } });
+
+
     const coll_group_idx = Collision_detection_create_group('test');
-    
-    
-    const num_meshes = 10; 
+
+
+    const num_meshes = 10;
     let hue = .12;
     let v_size = size;
     let i = 0;
 
     {
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [200, 100], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [200, 100], dim: [v_size, v_size], col: Color_hsv_to_rgb(hue, 1, 1, 1, .7, 0), name: `${i}` }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
         i++;
     }
     {
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [10, 10], dim: [200, 30], col: Color_hsv_to_rgb(.78,1,1,1,.7,0),  name:`${i}`}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [10, 10], dim: [200, 30], col: Color_hsv_to_rgb(.78, 1, 1, 1, .7, 0), name: `${i}` }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
-        i++; hue+=.2;
+        i++; hue += .2;
     }
     {
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [400, 100], dim: [30, 100], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [400, 100], dim: [30, 100], col: Color_hsv_to_rgb(hue, 1, 1, 1, .7, 0), name: `${i}` }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
-        i++; hue+=.2;
+        i++; hue += .2;
     }
     {
-        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [20, 60], col: Color_hsv_to_rgb(hue,1,1,1,.7,0),  name:`${i}`}));
-        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener:{type:LISTEN_EVENT_TYPES.HOVER|LISTEN_EVENT_TYPES.MOVE}});
+        const mesh = Create_rect_mesh(Style_rect_default_properties({ pos: [100, 100], dim: [20, 60], col: Color_hsv_to_rgb(hue, 1, 1, 1, .7, 0), name: `${i}` }));
+        Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
         panel.AddItem(mesh);
         mesh.physics.idx = Physics2D_create_object(mesh.geom.pos[0], mesh.geom.pos[1]);
         mesh.physics.collision.collision_idx = Collision_detection_add_object(coll_group_idx, mesh, mesh.physics.idx, PHYSICS2D_COLLISION_FLAGS.IS_MOVABLE);
-        i++; hue+=.2;
+        i++; hue += .2;
     }
 
 
@@ -1392,9 +1591,9 @@ function Test_physics2D_collision_detection_obstract_collider() {
 
 
     const params = {
-        collision_group_idx:coll_group_idx,
+        collision_group_idx: coll_group_idx,
     };
-    Time_intervals_create(16, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+    Time_intervals_create(1, 'Test physics2D', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
 
         const collision_group_idx = params.params.collision_group_idx;
 
@@ -1404,7 +1603,7 @@ function Test_physics2D_collision_detection_obstract_collider() {
 
         const grabbed_mesh_idx = Physics2D_collision_detection_find_collider_from_group(collision_group_idx);
         // if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_one_with_all(collision_group_idx, grabbed_mesh_idx);
-        if(grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
+        if (grabbed_mesh_idx !== INT_NULL) Physics2D_collision_detection_all_with_all_with_obstructions(collision_group_idx, grabbed_mesh_idx);
 
 
     }, params);
@@ -1412,30 +1611,30 @@ function Test_physics2D_collision_detection_obstract_collider() {
 }
 
 /** */
-function Test_colored_labels_with_hsv(x=100, y=10, num_colors=20, contrast=.28, saturation=.8) { // Coloring Labels
+function Test_colored_labels_with_hsv(x = 100, y = 10, num_colors = 20, contrast = .28, saturation = .8) { // Coloring Labels
 
     const menu_panel = Create_rect_mesh(Style_rect_default_properties({
-        is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[5, 10], 
-        pos:[x, y, 0],
-        col:Color_hsv_to_rgb_calibrated(.0, .0, 1., 1., .08, .0), 
-        name:'MenuLoadPanel', 
-        layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF,
+        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [5, 10],
+        pos: [x, y, 0],
+        col: Color_hsv_to_rgb_calibrated(.0, .0, 1., 1., .08, .0),
+        name: 'MenuLoadPanel',
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF,
     }));
-    Widget_gfx_ready_enable({mesh:menu_panel, enable_sdf_rect: 10, listener:{type:LISTEN_EVENT_TYPES.MOVE}}); 
-    
-    let col = 0;
-    const grad = 1/num_colors;
+    Widget_gfx_ready_enable({ mesh: menu_panel, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
-    for (let i = 0; i < num_colors; i++) { 
-        const button = Create_widget_button(Style_button_default_properties({ 
-            theme: Color_theme_label_auto(col, saturation, contrast, .0), 
+    let col = 0;
+    const grad = 1 / num_colors;
+
+    for (let i = 0; i < num_colors; i++) {
+        const button = Create_widget_button(Style_button_default_properties({
+            theme: Color_theme_label_auto(col, saturation, contrast, .0),
             // text:'Neuro',pos:[0, 0, 0], text_pad:[15, 8], font_size:11, 
-            text:'Neuro',pos:[0, 0, 0], text_pad:[8, 6], font_size:11, 
-            texture_id:TEXTURES.MTSDF_CONSOLAS_1024, 
-            layout:LAYOUT.VERTICAL
+            text: 'Neuro', pos: [0, 0, 0], text_pad: [8, 6], font_size: 11,
+            texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
+            layout: LAYOUT.VERTICAL
         }));
-        Widget_gfx_ready_enable({mesh:button, enable_sdf_rect: 12, listener:{type:LISTEN_EVENT_TYPES.HOVER}}); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
-        menu_panel.AddItem(button); 
+        Widget_gfx_ready_enable({ mesh: button, enable_sdf_rect: 12, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); // , enable_col_per_vertex:COLOR_GRADIENT_HORIZONTAL(BLUEL[8], BLUEL[3])});
+        menu_panel.AddItem(button);
         col += grad
     }
     menu_panel.GenGfxCtx();
@@ -1450,7 +1649,7 @@ function Test_colored_labels_with_hsv(x=100, y=10, num_colors=20, contrast=.28, 
 /** Test: New implementation -> VB render groups PLUS reset (by whole group or by render group) and rerender (by whole group or by render group) */
 function Test_create_render_groups_resize_and_rerender() {
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ROOT' }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
@@ -1470,27 +1669,27 @@ function Test_create_render_groups_resize_and_rerender() {
     // let test_info = null;
 
     {
-        const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
-        Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 }); 
+        const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `red 1` }));
+        Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 });
         // red.RenderToNewRenderGroup();
         section.AddItem(red);
 
         {
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            red.AddItem(s1); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            red.AddItem(s1);
             // s1.RenderToNewRenderGroup();
             {
-                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: `l${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.VERTICAL, }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
-                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
 
                 // Any text will do..
@@ -1498,52 +1697,52 @@ function Test_create_render_groups_resize_and_rerender() {
             }
         }
         {
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            red.AddItem(s1); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            red.AddItem(s1);
             s1.RenderToNewRenderGroup();
             new_render_group_mesh_1 = s1;
             {
-                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: `l${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s2.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.VERTICAL, }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
-                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
 
                 new_render_group_text_1 = l.text_mesh;
             }
         }
         {
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            red.AddItem(s1); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            red.AddItem(s1);
             s1.RenderToNewRenderGroup();
             new_render_group_mesh_2 = s1;
             {
-                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: `l${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s2.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.VERTICAL, }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
-                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
-                
+
                 new_render_group_text_2 = l.text_mesh;
             }
         }
@@ -1599,7 +1798,7 @@ function Test_create_render_groups_resize_and_rerender() {
      */
 
 
-    const info_section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 10, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:'InfoPanel' }));
+    const info_section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 10, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'InfoPanel' }));
     Widget_gfx_ready_enable({
         mesh: info_section, enable_sdf_rect: 15,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
@@ -1609,13 +1808,13 @@ function Test_create_render_groups_resize_and_rerender() {
     // let test_info_text = '878172672676273615652651625615265162;\n878172672676273615652651625615265162;\n878172672676273615652651625615265162;\n878172672676273615652651625615265162;\n878172672676273615652651625615265162;\n878172672676273615652651625615265162;\n878172672676273615652651625615265162;';
     // let test_info_text = '878172672676273615652651625615265162;\n878172672676273615652651625615265162;';
     // let test_info_text = '1\n2\n3\n4';
-    const test_info = Create_widget_text({ 
-        pos: [0, 0, 0], col: GREEN[9], 
-        texture_id: TEXTURES.MTSDF_COMIC_1024, 
-        font_size: 8, text: test_info_text, 
-        pad: [10, 6], layout:LAYOUT.VERTICAL
+    const test_info = Create_widget_text({
+        pos: [0, 0, 0], col: GREEN[9],
+        texture_id: TEXTURES.MTSDF_COMIC_1024,
+        font_size: 8, text: test_info_text,
+        pad: [10, 6], layout: LAYOUT.VERTICAL
     });
-    Widget_gfx_ready_enable({ mesh: test_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    Widget_gfx_ready_enable({ mesh: test_info, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
     info_section.AddItem(test_info);
 
     info_section.GenGfxCtx();
@@ -1627,19 +1826,19 @@ function Test_create_render_groups_resize_and_rerender() {
 
 
     const rg_idxs = Vertex_buffer_group_get_render_groupidxs(new_render_group_mesh_0.gfx.vb.groupidx);
-    const Update_info = (rg_idxs, test_name, test_info_text)=>{
-        
+    const Update_info = (rg_idxs, test_name, test_info_text) => {
+
         test_info_text += `${test_name}`;
-        
-        for(let i=0; i<=rg_idxs.boundary; i++) {
+
+        for (let i = 0; i <= rg_idxs.boundary; i++) {
             const rg = Vertex_buffer_render_group_get_render_group(rg_idxs.buffer[i]);
             test_info_text += `\n  Render group: ${rg_idxs.buffer[i]} , vb: ${rg.vb_data_idx} , attributes count: ${rg.count} , draw count: ${rg.draw_count}`;
         }
-        
+
         return test_info_text;
     }
 
-    
+
     // Test 1: reset and rerender the whole view group
     {
         test_info_text += 'Test 1: Reset and rerender the whole view group';
@@ -1650,12 +1849,12 @@ function Test_create_render_groups_resize_and_rerender() {
         test_info_text = Update_info(rg_idxs, '\n* Reset', test_info_text); // Store test's info after reseting test mesh
 
         View_render_whole_view_group_NEW(new_render_group_mesh_0.group_bufferidxs[0]); // rerender test mesh
-        
+
         test_info_text = Update_info(rg_idxs, '\n* Rerender', test_info_text); // Store test's info after rerendering test mesh
         test_info.SetText(test_info_text, true); // Change the text to the new info 
         Layout_basic_pre_render(info_section); // Set layout after text ingo update
         View_render_whole_view_group_NEW(info_section.group_bufferidxs[0]); // Rerender info panel and info text
-        
+
     }
 
     // // Test 2: reset and rerender specific rendergroups
@@ -1682,62 +1881,62 @@ function Test_create_remove_render_groups() {
     // Store parent meshes that are gonna be rendered in their own render group(for testing)
     let new_render_group_mesh_0 = null;
     let new_render_group_text_0 = null;
-    
+
     {
-        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ROOT' }));
         Widget_gfx_ready_enable({
             mesh: section, enable_sdf_rect: 15,
             listener: { type: LISTEN_EVENT_TYPES.MOVE },
         });
-        
+
         let cnt = 1;
         const font_size = 20;
-        
+
         new_render_group_mesh_0 = section;
-    
+
         {
-            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
-            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 }); 
+            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `red 1` }));
+            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 });
             // red.RenderToNewRenderGroup();
             section.AddItem(red);
-    
+
             {
-                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-                red.AddItem(s1); 
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+                red.AddItem(s1);
                 // s1.RenderToNewRenderGroup();
                 {
-                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: `l${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     s1.AddItem(l);
-    
-                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
-                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+
+                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.VERTICAL, }));
+                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     s1.AddItem(sw);
-    
-                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+
+                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                     s1.AddItem(sl);
-    
+
                     // Any text will do..
                     new_render_group_text_0 = l.text_mesh;
                 }
             }
         }
-    
-    
+
+
         // Render
         section.GenGfxCtx();
         Layout_basic_pre_render(section);
         Widget_render(section);
-        
-    }    
+
+    }
 
     // /*************************************************************************************************************************************************************************/
     // // Remove all meshes and view render groups
     // View_destroy_render_group_and_meshes(new_render_group_text_0.group_bufferidxs[0], new_render_group_text_0.group_bufferidxs[1], new_render_group_text_0.group_bufferidxs[2],);
     // View_destroy_render_group_and_meshes(new_render_group_mesh_0.group_bufferidxs[0], new_render_group_mesh_0.group_bufferidxs[1], new_render_group_mesh_0.group_bufferidxs[2],);
-    
+
     // // Remove from App reset all
     // App_reset(); // Reset all 
     // Scene_camera_scroll_set(_, 0);
@@ -1745,51 +1944,51 @@ function Test_create_remove_render_groups() {
 
     {
 
-        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout:LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ROOT' }));
+        const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [100, 300, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ROOT' }));
         Widget_gfx_ready_enable({
             mesh: section, enable_sdf_rect: 15,
             listener: { type: LISTEN_EVENT_TYPES.MOVE },
         });
-    
+
         let cnt = 1;
         const font_size = 20;
 
         {
-            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`red 1` }));
-            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 }); 
+            const red = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 20], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(1., .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `red 1` }));
+            Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: 15 });
             // red.RenderToNewRenderGroup();
             section.AddItem(red);
-    
+
             {
-                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-                red.AddItem(s1); 
+                const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+                red.AddItem(s1);
                 // s1.RenderToNewRenderGroup();
                 {
-                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.VERTICAL, name:`l${cnt++}` }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.VERTICAL, name: `l${cnt++}` }));
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     s1.AddItem(l);
-    
-                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.VERTICAL, }));
-                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+
+                    const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.VERTICAL, }));
+                    Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     s1.AddItem(sw);
-    
-                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+
+                    const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                    Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                     s1.AddItem(sl);
-    
+
                     // Any text will do..
                     new_render_group_text_0 = l.text_mesh;
                 }
             }
         }
-        
+
         // Render
         section.GenGfxCtx();
         Layout_basic_pre_render(section);
         Widget_render(section);
-        
-    } 
+
+    }
 
 }
 
@@ -1804,7 +2003,7 @@ function Resolve_mesh_info_tool_tip(hovered_mesh, clbk_params, tool_tip_params) 
     const info_text_mesh_debug = info_panel.children.buffer[0];
     const char_buffer_size = (info_text_mesh_debug) ? `${info_text_mesh_debug.mat.char_buffer.size}` : 'null';
     const text_len = (info_text_mesh_debug) ? `${info_text_mesh_debug.mat.text.length}` : 'null';
-    
+
     const msg = [
         Mesh_get_name(hovered_mesh),
         `x:${hovered_mesh.geom.pos[0]}, y:${hovered_mesh.geom.pos[1]}`,
@@ -1813,24 +2012,24 @@ function Resolve_mesh_info_tool_tip(hovered_mesh, clbk_params, tool_tip_params) 
         `groupidx:${hovered_mesh.group_bufferidxs[0]}, vbidx:${hovered_mesh.group_bufferidxs[1]}, rgidx:${hovered_mesh.group_bufferidxs[2]}, meshidx:${hovered_mesh.group_bufferidxs[3]}}`,
         `TextName{charBufferSize${char_buffer_size}, textLen:${text_len}}`,
     ];
-    
+
     let widget_text = null;
-    for(let i = 0; i < msg.length; i++) {
-        
+    for (let i = 0; i < msg.length; i++) {
+
         View_reset_rendering_buffer_whole_view_group(info_panel.group_bufferidxs[0]);
         widget_text = info_panel.children.buffer[i];
-        
+
         // Use existing info text meshes
-        if(widget_text !== null && widget_text !== undefined) {
+        if (widget_text !== null && widget_text !== undefined) {
             widget_text.SetText(msg[i]);
         }
         else { // Create new text
 
             widget_text = Create_widget_text({
                 pad: [6, 2], pos: [0, 0, 0], col: ORANGER[9],
-                font_size: 10, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
+                font_size: 10, texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
                 text: msg[i],
-                layout:LAYOUT.VERTICAL,
+                layout: LAYOUT.VERTICAL,
             });
             Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false });
             widget_text.SetViewGroupIndex(info_panel.group_bufferidxs[0]);
@@ -1839,9 +2038,9 @@ function Resolve_mesh_info_tool_tip(hovered_mesh, clbk_params, tool_tip_params) 
             // Widget_render(widget_text);
             View_activate_all_vbs_in_renderqueue(widget_text.group_bufferidxs);
         }
-        
+
     }
-    
+
     Layout_basic_pre_render(info_panel);
     View_render_specific_render_group(widget_text.group_bufferidxs[0], widget_text.group_bufferidxs[1], widget_text.group_bufferidxs[2]);
     View_render_specific_render_group(info_panel.group_bufferidxs[0], info_panel.group_bufferidxs[1], info_panel.group_bufferidxs[2]);
@@ -1852,16 +2051,16 @@ function Resolve_mesh_info_tool_tip(hovered_mesh, clbk_params, tool_tip_params) 
 
 
 }
-function Create_info_panel_tool_tip(x=0, y=0) {
+function Create_info_panel_tool_tip(x = 0, y = 0) {
 
     const tr = 1.;
     const pad = [10, 10];
     const dim = [200, 200];
 
-    const info_panel = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad, 
-        pos: [x,y,0], dim: dim, col: TRANSPARENCY(BLUEL[5], tr), 
-        name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+    const info_panel = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad,
+        pos: [x, y, 0], dim: dim, col: TRANSPARENCY(BLUEL[5], tr),
+        name: 'InfoPanel', layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
     }));
     Widget_gfx_ready_enable({ mesh: info_panel, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
     // info_panel.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
@@ -1873,9 +2072,9 @@ function Create_info_panel_tool_tip(x=0, y=0) {
     return info_panel;
 }
 
-function Test_on_hover_show_info(x=0, y=0) {
+function Test_on_hover_show_info(x = 0, y = 0) {
 
-    const Info_tool_create = (hovered_mesh, clbk_params)=>{
+    const Info_tool_create = (hovered_mesh, clbk_params) => {
         console.log('CREATE!!!', hovered_mesh, clbk_params);
 
         const info_panel = clbk_params.info_panel;
@@ -1887,12 +2086,12 @@ function Test_on_hover_show_info(x=0, y=0) {
         ];
 
         // for(let i = 0; i <= info_panel.children.boundary; i++) {
-        for(let i = 0; i < msg.length; i++) {
+        for (let i = 0; i < msg.length; i++) {
 
             let widget_text = info_panel.children.buffer[i];
 
             // Use existing info text meshes
-            if(widget_text !== null && widget_text !== undefined) {
+            if (widget_text !== null && widget_text !== undefined) {
 
                 // widget_text.RenderTextFromString(Mesh_get_name(hovered_mesh));
                 widget_text.SetText(Mesh_get_name(hovered_mesh));
@@ -1902,9 +2101,9 @@ function Test_on_hover_show_info(x=0, y=0) {
                 widget_text = Create_widget_text({
                     // is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 6], pos: [0, 0, 0], col: ORANGER[9],
                     pad: [10, 6], pos: [0, 0, 0], col: ORANGER[9],
-                    font_size: 5.8, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, 
+                    font_size: 5.8, texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
                     text: Mesh_get_name(hovered_mesh),
-                    layout:LAYOUT.VERTICAL,
+                    layout: LAYOUT.VERTICAL,
                 });
                 Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false });
                 widget_text.SetViewGroupIndex(info_panel.group_bufferidxs[0]);
@@ -1913,24 +2112,24 @@ function Test_on_hover_show_info(x=0, y=0) {
                 widget_text.GenGfxCtx();
                 Widget_render(widget_text);
             }
-            
+
         }
 
         Layout_basic_pre_render(info_panel);
         View_render_from_view_NEW(info_panel.group_bufferidxs[0]);
 
-    } 
-    const Info_tool_destroy = (hovered_mesh, clbk_params)=>{
+    }
+    const Info_tool_destroy = (hovered_mesh, clbk_params) => {
         console.log('DESTROY!!!', hovered_mesh, clbk_params)
-    } 
-    const resolve_clbks = (hovered_mesh, mouse_event_type, clbk_params)=>{ // Called from Events.js, OnHover
+    }
+    const resolve_clbks = (hovered_mesh, mouse_event_type, clbk_params) => { // Called from Events.js, OnHover
         console.log('--------------------------------------------------------------------------------------');
         // console.log('RESOLVE', hovered_mesh, 'mouse_event_type', mouse_event_type, clbk_params);
 
-        if(mouse_event_type & EVENT_HANDLER_TYPE.MOUSE_HOVER) {
+        if (mouse_event_type & EVENT_HANDLER_TYPE.MOUSE_HOVER) {
             Info_tool_create(hovered_mesh, clbk_params);
         }
-        else if(mouse_event_type & EVENT_HANDLER_TYPE.MOUSE_UNHOVER) {
+        else if (mouse_event_type & EVENT_HANDLER_TYPE.MOUSE_UNHOVER) {
             Info_tool_destroy(hovered_mesh, clbk_params);
         }
     }
@@ -1940,10 +2139,10 @@ function Test_on_hover_show_info(x=0, y=0) {
     const pad = [10, 10];
     const dim = [200, 200];
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad, 
-        pos: [x,y,0], dim: dim, col: TRANSPARENCY(BLUEL[5], tr), 
-        name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: pad,
+        pos: [x, y, 0], dim: dim, col: TRANSPARENCY(BLUEL[5], tr),
+        name: 'InfoPanel', layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF,
     }));
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
     section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
@@ -2000,10 +2199,10 @@ function Test_on_hover_show_info(x=0, y=0) {
     //     Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false });
     //     section.AddItem(widget_text);
     //     widget_text.SetViewGroupIndex(section.group_bufferidxs[0]);
-        
+
     //     widget_text.GenGfxCtx();
     //     // Widget_render(widget_text);
-        
+
     //     Layout_basic_pre_render(section);
     //     View_reset_rendering_buffer_whole_view_group(section.group_bufferidxs[0]);
     //     View_render_from_view_NEW(section.group_bufferidxs[0]);
@@ -2016,7 +2215,7 @@ function Test_on_hover_show_info(x=0, y=0) {
     };
     const clbk_params = {
         info_panel: section,
-        resolve_clbk: {create:'create',destroy:'destroy'},
+        resolve_clbk: { create: 'create', destroy: 'destroy' },
     };
 
     Mesh_event_callback_create(label, Clbk, clbk_params, resolve_clbks);
@@ -2221,7 +2420,7 @@ function Theme_color_hsv_sample() {
         slider_section.GenGfxCtx();
         Layout_basic_pre_render(slider_section);
 
-    Widget_render(slider_section);
+        Widget_render(slider_section);
 
     }
 }
@@ -2906,7 +3105,7 @@ function Theme_color_correction() {
 
         slider_section.GenGfxCtx();
         Layout_basic_pre_render(slider_section);
-    Widget_render(slider_section);
+        Widget_render(slider_section);
 
 
         // OLD
@@ -3018,11 +3217,11 @@ function Multi_color_multi_vertex_mesh(color_buffer, x = 0, y = 0,) { // TEST MU
 
     const dim = [VIEWPORT.WIDTH / 2 - 4, VIEWPORT.HEIGHT / 9]
     const vertices_count = (color_buffer.length / 2) - 1;
-    const slider_hue = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: ROOT_WIDGETS.CREATE_ROOT, 
-        pad: [0, 0], pos: [x, y, 2], dim: dim, 
-        col: color_buffer, num_faces: vertices_count, 
-        name: 'Slider Hue' 
+    const slider_hue = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT,
+        pad: [0, 0], pos: [x, y, 2], dim: dim,
+        col: color_buffer, num_faces: vertices_count,
+        name: 'Slider Hue'
     }));
     Widget_gfx_ready_enable({ mesh: slider_hue, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
     // Widget_gfx_ready_enable({mesh:slider_hue, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
@@ -3130,7 +3329,7 @@ function Test_resize_fill_space_layout() {
     // Proportions slider controls
     const start_proportion = 1;
     {
-        const slider_section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad:[10,10], pos: [0, 600, 0], dim: [400, 300], col: GREY[2], layout: LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name: 'SliderControls' }));
+        const slider_section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [0, 600, 0], dim: [400, 300], col: GREY[2], layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'SliderControls' }));
         Widget_gfx_ready_enable({ mesh: slider_section, enable_sdf_rect: 5, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
         cnt = 0;
@@ -3138,7 +3337,7 @@ function Test_resize_fill_space_layout() {
         {
             // Slider: first row meshes
             const slider_dim = [300, 10], color = YELLOW[4], rcorners = 10, default_font = TEXTURES.MTSDF_CONSOLAS_10;
-            const slider = Create_widget_slider(Style_slider_default_properties({ pos:[0,0,0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.VERTICAL, texture_id: default_font }));
+            const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.VERTICAL, texture_id: default_font }));
             Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, })
             slider.SetInitialValue(start_proportion);
             slider_section.AddItem(slider);
@@ -3147,100 +3346,100 @@ function Test_resize_fill_space_layout() {
                 root_mesh: section,
                 target_mesh: target_meshes[cnt++],
             };
-            
+
             // Connect sliders to gfx program uniforms 
             Slider_connect(slider, (params, slider_val) => {
-                
+
                 const root_mesh = params.clbk_params.root_mesh;
-                
+
                 const target_mesh = params.clbk_params.target_mesh;
                 target_mesh.align.proportion.x = slider_val;
-                
+
                 View_reset_rendering_buffer_whole_view_group(root_mesh.group_bufferidxs[0]);
                 Layout_grow_containers_pre_render(root_mesh);
                 View_render_from_view_NEW(root_mesh.group_bufferidxs[0]);
-                
+
             }, params,
             );
         }
         // Sliders: second row meshes
         {
-            const slider_dim = [300/3, 10], color = YELLOW[4], rcorners = 10, default_font = TEXTURES.MTSDF_CONSOLAS_10;
+            const slider_dim = [300 / 3, 10], color = YELLOW[4], rcorners = 10, default_font = TEXTURES.MTSDF_CONSOLAS_10;
             {
                 // Slider: mesh 1
-                const slider = Create_widget_slider(Style_slider_default_properties({ pos:[0,0,0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.VERTICAL, texture_id: default_font }));
+                const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.VERTICAL, texture_id: default_font }));
                 Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, })
                 slider.SetInitialValue(start_proportion);
                 slider_section.AddItem(slider);
-    
+
                 const params = {
                     root_mesh: section,
                     target_mesh: target_meshes[cnt++],
                 };
-    
+
                 // Connect sliders to gfx program uniforms 
                 Slider_connect(slider, (params, slider_val) => {
-    
+
                     const root_mesh = params.clbk_params.root_mesh;
                     const target_mesh = params.clbk_params.target_mesh;
                     target_mesh.align.proportion.x = slider_val;
-    
+
                     View_reset_rendering_buffer_whole_view_group(root_mesh.group_bufferidxs[0]);
                     Layout_grow_containers_pre_render(root_mesh);
                     View_render_from_view_NEW(root_mesh.group_bufferidxs[0]);
-    
+
                 }, params,
                 );
             }
             {
                 // Slider: mesh 2
-                const slider = Create_widget_slider(Style_slider_default_properties({ pos:[0,0,0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.HORIZONTAL, texture_id: default_font }));
+                const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.HORIZONTAL, texture_id: default_font }));
                 Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, })
                 slider.SetInitialValue(start_proportion);
                 slider_section.AddItem(slider);
-    
+
                 const params = {
                     root_mesh: section,
                     target_mesh: target_meshes[cnt++],
                 };
-    
+
                 // Connect sliders to gfx program uniforms 
                 Slider_connect(slider, (params, slider_val) => {
-    
+
                     const root_mesh = params.clbk_params.root_mesh;
                     const target_mesh = params.clbk_params.target_mesh;
                     target_mesh.align.proportion.x = slider_val;
-    
+
                     View_reset_rendering_buffer_whole_view_group(root_mesh.group_bufferidxs[0]);
                     Layout_grow_containers_pre_render(root_mesh);
                     View_render_from_view_NEW(root_mesh.group_bufferidxs[0]);
-    
+
                 }, params,
                 );
             }
             {
                 // Slider: mesh 3
-                const slider = Create_widget_slider(Style_slider_default_properties({ pos:[0,0,0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.HORIZONTAL, texture_id: default_font }));
+                const slider = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: slider_dim, col: color, name: `Mesh ${cnt}`, layout: LAYOUT.HORIZONTAL, texture_id: default_font }));
                 Widget_gfx_ready_enable({ mesh: slider, enable_sdf_rect: rcorners, })
                 slider.SetInitialValue(start_proportion);
                 slider_section.AddItem(slider);
-    
+
                 const params = {
                     root_mesh: section,
                     target_mesh: target_meshes[cnt++],
                 };
-    
+
                 // Connect sliders to gfx program uniforms 
                 Slider_connect(slider, (params, slider_val) => {
-    
+
                     const root_mesh = params.clbk_params.root_mesh;
                     const target_mesh = params.clbk_params.target_mesh;
                     target_mesh.align.proportion.x = slider_val;
-    
+
                     View_reset_rendering_buffer_whole_view_group(root_mesh.group_bufferidxs[0]);
                     Layout_grow_containers_pre_render(root_mesh);
                     View_render_from_view_NEW(root_mesh.group_bufferidxs[0]);
-    
+
                 }, params,
                 );
             }
@@ -3248,7 +3447,7 @@ function Test_resize_fill_space_layout() {
         }
 
 
-        
+
         slider_section.GenGfxCtx();
         Layout_basic_pre_render(slider_section);
         Widget_render(slider_section);
@@ -3314,7 +3513,7 @@ function Test_resize_fill_space_layout_nested(x = 0, y = 0) {
         }
     }
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     Layout_grow_containers_pre_render(section);
@@ -3387,13 +3586,13 @@ function Test_resize_fill_space_layout_nested_with_widgets(x = 0, y = 0) {
             const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [120, 200], pad: [10, 10], col: GREY[7], layout: layout_vert, name: `H3` })); Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); section.AddItem(s1);
             {
                 const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_vert, name: `c${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc1', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc2', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc3', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc4', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc5', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc6', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Lc7', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc1', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc2', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc3', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc4', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc5', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc6', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Lc7', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
             }
         }
         {
@@ -3401,11 +3600,11 @@ function Test_resize_fill_space_layout_nested_with_widgets(x = 0, y = 0) {
             const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `H4` })); Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); section.AddItem(s1);
             {
                 const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_hor, name: `d1` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Ld1', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Ld1', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
             }
             {
                 const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_hor, name: `d2` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name:'Ld2', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `rect${rect_cnt++} s${parent_cnt}`, name: 'Ld2', pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
             }
             {
                 const layout = LAYOUT.HORIZONTAL;
@@ -3413,8 +3612,8 @@ function Test_resize_fill_space_layout_nested_with_widgets(x = 0, y = 0) {
                 { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: `rect${rect_cnt++} s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
                 { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [0, 0], dim: [40, 40], col: GetSequencedColor(9), layout: layout, name: `rect${rect_cnt++} s${parent_cnt}`, texture_id: TEXTURES.MTSDF_SYMBOLS, sub_texture_id: ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.circle_3 })); Widget_gfx_ready_enable({ mesh: r2 }); s2.AddItem(r2); }
                 // { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [40, 40], col: GetSequencedColor(9), layout: layout, name: `TEXTURE s${parent_cnt}`, texture_id:TEXTURES.SMOKE_1 })); Widget_gfx_ready_enable({ mesh: r2}); s2.AddItem(r2); }
-                { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [40, 40], col: Color_hsv_to_rgb_calibrated(0.56,1,1,1,1,0), layout: layout, name: `TEXTURE s${parent_cnt}`, texture_id:TEXTURES.SMOKE_1 })); Widget_gfx_ready_enable({ mesh: r2}); s2.AddItem(r2); }
-                { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [40, 40], col: Color_hsv_to_rgb_calibrated(0.86,1,1,1,1,0), layout: layout, name: `TEXTURE s${parent_cnt}`, texture_id:TEXTURES.SMOKE_1 })); Widget_gfx_ready_enable({ mesh: r2}); s2.AddItem(r2); }
+                { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [40, 40], col: Color_hsv_to_rgb_calibrated(0.56, 1, 1, 1, 1, 0), layout: layout, name: `TEXTURE s${parent_cnt}`, texture_id: TEXTURES.SMOKE_1 })); Widget_gfx_ready_enable({ mesh: r2 }); s2.AddItem(r2); }
+                { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [40, 40], col: Color_hsv_to_rgb_calibrated(0.86, 1, 1, 1, 1, 0), layout: layout, name: `TEXTURE s${parent_cnt}`, texture_id: TEXTURES.SMOKE_1 })); Widget_gfx_ready_enable({ mesh: r2 }); s2.AddItem(r2); }
                 { const r2 = Create_rect_mesh(Style_rect_default_properties({ pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: `rect${rect_cnt++} s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
             }
         }
@@ -3423,7 +3622,7 @@ function Test_resize_fill_space_layout_nested_with_widgets(x = 0, y = 0) {
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     Layout_grow_containers_pre_render(section);
@@ -3467,7 +3666,7 @@ function Test_resize_layout_grow_containers_1(x = 0, y = 0) {
     }
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -3496,23 +3695,23 @@ function Test_resize_layout_grow_containers_2(x = 0, y = 0) {
     const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); section.AddItem(s1);
     {
         const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_vert, name: `s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme:Color_theme_slider_auto(0.56,0.7,.24,0), pos:[0,0,0], dim: [80,10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
-                                
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+        { const r2 = Create_widget_slider(Style_slider_default_properties({ theme: Color_theme_slider_auto(0.56, 0.7, .24, 0), pos: [0, 0, 0], dim: [80, 10], name: `Slider${rect_cnt++}`, layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s2.AddItem(r2); }
+
     }
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -3535,11 +3734,11 @@ function Test_resize_layout_grow_containers_3(x = 0, y = 0) {
 
     const layout_hor = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
-   
+
 
     parent_cnt++;
-    const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+    const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
     section.AddItem(s1);
     {
         // // const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_vert, name: `s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
@@ -3557,15 +3756,15 @@ function Test_resize_layout_grow_containers_3(x = 0, y = 0) {
 
 
             // const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Dp`, theme:Color_theme_dropdown_auto(.1, .7, .18, 0), pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-            const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
-                text: `Dp`, name:'Dp',
-                theme:Color_theme_dropdown_auto(.1, .7, .18, 0), 
-                pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, 
-                text_pad: text_pad, font_size: font_size, 
+            const dp = Create_widget_dropdown(Style_dropdown_default_properties({
+                text: `Dp`, name: 'Dp',
+                theme: Color_theme_dropdown_auto(.1, .7, .18, 0),
+                pos: [0, 0, 0], dim: [100, 100], text_col: WHITE, pad: pad,
+                text_pad: text_pad, font_size: font_size,
                 // layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
                 // layout: layout_hor
             }));
-            Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}})
+            Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.HOVER } })
             s1.AddItem(dp);
             Dropdown_roots_set_root(dp, dp);
 
@@ -3581,12 +3780,12 @@ function Test_resize_layout_grow_containers_3(x = 0, y = 0) {
             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
-            
-            
+
+
             {
 
-                const dp1 = Create_widget_dropdown(Style_dropdown_default_properties({ text: `dp1`, name:'dp1', theme:Color_theme_dropdown_auto(.1, .7, .18, 0),  pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-                Widget_gfx_ready_enable({ mesh: dp1, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}})
+                const dp1 = Create_widget_dropdown(Style_dropdown_default_properties({ text: `dp1`, name: 'dp1', theme: Color_theme_dropdown_auto(.1, .7, .18, 0), pos: [0, 0, 0], dim: [100, 100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+                Widget_gfx_ready_enable({ mesh: dp1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.HOVER } })
                 dp.AddToMenu(dp1);
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
@@ -3594,15 +3793,15 @@ function Test_resize_layout_grow_containers_3(x = 0, y = 0) {
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
             }
-            
+
         }
-        
+
     }
 
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -3626,12 +3825,12 @@ function Test_resize_layout_grow_containers_4(x = 0, y = 0) {
     const layout_hor = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
 
-  
+
 
     { // With dropdown widget
         parent_cnt++;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
         section.AddItem(s1);
         {
             // // const s2 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[4], layout: layout_vert, name: `s${parent_cnt}` })); Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 5, }); s1.AddItem(s2);
@@ -3649,15 +3848,15 @@ function Test_resize_layout_grow_containers_4(x = 0, y = 0) {
 
 
                 // const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `Dp`, theme:Color_theme_dropdown_auto(.1, .7, .18, 0), pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-                const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
-                    text: `Dp`, name:'Dp',
-                    theme:Color_theme_dropdown_auto(.1, .7, .18, 0), 
-                    pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, 
-                    text_pad: text_pad, font_size: font_size, 
+                const dp = Create_widget_dropdown(Style_dropdown_default_properties({
+                    text: `Dp`, name: 'Dp',
+                    theme: Color_theme_dropdown_auto(.1, .7, .18, 0),
+                    pos: [0, 0, 0], dim: [100, 100], text_col: WHITE, pad: pad,
+                    text_pad: text_pad, font_size: font_size,
                     // layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
                     // layout: layout_hor
                 }));
-                Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}})
+                Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.HOVER } })
                 s1.AddItem(dp);
                 Dropdown_roots_set_root(dp, dp);
 
@@ -3673,11 +3872,11 @@ function Test_resize_layout_grow_containers_4(x = 0, y = 0) {
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.VERTICAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp.AddToMenu(r2); }
-                
+
                 {
 
-                    const dp1 = Create_widget_dropdown(Style_dropdown_default_properties({ text: `dp1`, name:'dp1', theme:Color_theme_dropdown_auto(.1, .7, .18, 0),  pos:[0,0,0], dim:[100,100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-                    Widget_gfx_ready_enable({ mesh: dp1, enable_sdf_rect: dp_rcorners, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.HOVER}})
+                    const dp1 = Create_widget_dropdown(Style_dropdown_default_properties({ text: `dp1`, name: 'dp1', theme: Color_theme_dropdown_auto(.1, .7, .18, 0), pos: [0, 0, 0], dim: [100, 100], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+                    Widget_gfx_ready_enable({ mesh: dp1, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.CLICK_UP | LISTEN_EVENT_TYPES.HOVER } })
                     dp.AddToMenu(dp1);
                     { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
                     { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
@@ -3685,48 +3884,48 @@ function Test_resize_layout_grow_containers_4(x = 0, y = 0) {
                     { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
                     { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); dp1.AddToMenu(r2); }
                 }
-                
+
             }
 
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
 
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-            }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            }
+
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
@@ -3743,7 +3942,7 @@ function Test_resize_layout_grow_containers_4(x = 0, y = 0) {
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -3767,12 +3966,12 @@ function Test_resize_layout_grow_containers_5(x = 0, y = 0) {
     const layout_hor = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
 
-  
+
 
     { // With dropdown widget
         parent_cnt++;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
         section.AddItem(s1);
         {
             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
@@ -3783,39 +3982,39 @@ function Test_resize_layout_grow_containers_5(x = 0, y = 0) {
             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
 
 
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
 
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-            }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 // { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
@@ -3832,7 +4031,7 @@ function Test_resize_layout_grow_containers_5(x = 0, y = 0) {
                 // { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
                 // { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            
+
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
@@ -3849,7 +4048,7 @@ function Test_resize_layout_grow_containers_5(x = 0, y = 0) {
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -3873,123 +4072,123 @@ function Test_resize_layout_grow_containers_many(x = 0, y = 0) {
     const layout_hor = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
 
-    const bright1=.24, bright2=.26, bright3=.5;
-  
+    const bright1 = .24, bright2 = .26, bright3 = .5;
+
 
     { // With dropdown widget
         parent_cnt++;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
         section.AddItem(s1);
 
         let hue = -0.05;
-        
+
         {
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
 
 
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0,1,.8,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0, 1, .8, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56,1,1,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56, 1, 1, 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13,1,1.,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13, 1, 1., 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22,1,.9,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22, 1, .9, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            
+
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
@@ -4006,7 +4205,7 @@ function Test_resize_layout_grow_containers_many(x = 0, y = 0) {
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -4030,240 +4229,240 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
     const layout_hor = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
 
-    const bright1=.24, bright2=.26, bright3=.5;
-  
+    const bright1 = .24, bright2 = .26, bright3 = .5;
+
 
     { // With dropdown widget
         parent_cnt++;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
         section.AddItem(s1);
 
         let hue = -0.05;
-        
+
         {
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
 
 
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0,1,.8,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0, 1, .8, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56,1,1,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56, 1, 1, 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13,1,1.,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13, 1, 1., 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22,1,.9,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22, 1, .9, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            
+
         }
 
     }
     { // With dropdown widget
         parent_cnt++;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` })); 
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, }); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ dim: [0, 0], pad: [10, 10], col: GREY[7], layout: layout_hor, name: `s${parent_cnt}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 5, });
         section.AddItem(s1);
 
         let hue = -0.05;
-        
+
         {
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
-            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
+            { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
 
 
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0,1,.8,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(0, 1, .8, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56,1,1,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56, 1, 1, 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13,1,1.,1,.8), layout: layout_hor, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.13, 1, 1., 1, .8), layout: layout_hor, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            { 
-                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22,1,.9,1,.8), layout: layout_vert, name: 'rect' })); 
-                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); 
-                s1.AddItem(rect2); 
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+            {
+                const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.22, 1, .9, 1, .8), layout: layout_vert, name: 'rect' }));
+                Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 });
+                s1.AddItem(rect2);
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
+                { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue += 0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
             }
-            
+
         }
 
     }
@@ -4271,7 +4470,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 
 
 
-    
+
     section.GenGfxCtx();
     TEMP_Calculate_layout_grow_count(section);
     // Layout_basic_pre_render(section);
@@ -4296,7 +4495,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 //     const layout_vert = LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.GROW_VERTICAL | LAYOUT.GROW_HORIZONTAL;
 
 //     const bright1=.24, bright2=.26, bright3=.5;
-  
+
 
 //     { // With dropdown widget
 //         parent_cnt++;
@@ -4305,7 +4504,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 //         section.AddItem(s1);
 
 //         let hue = -0.05;
-        
+
 //         {
 //             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
 //             { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); s1.AddItem(r2); }
@@ -4340,7 +4539,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 //                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
 //                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
 //                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
-                
+
 //             }
 //             { 
 //                 const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.56,1,1,1,.8), layout: layout_hor, name: 'rect' })); 
@@ -4411,7 +4610,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 //                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
 //                 { const r2 = Create_widget_label(Style_label_default_properties({ text: `${rect_cnt++}`, pos: [0, 0, 1], pad: [5, 5], dim: [0, 0], theme: Color_theme_label_auto(hue+=0.05, .6, bright1, 1), layout: LAYOUT.HORIZONTAL, texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12 })); Widget_gfx_ready_enable({ mesh: r2, enable_sdf_rect: 10 }); rect2.AddItem(r2); }
 //             }
-            
+
 //             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
 //             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_vert, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
 //             // { const rect2 = Create_rect_mesh(Style_rect_default_properties({ pad: [5, 5], dim: [0, 0], col: GetSequencedColor(9), layout: layout_hor, name: 'rect' })); Widget_gfx_ready_enable({ mesh: rect2, enable_sdf_rect: 10 }); s1.AddItem(rect2); }
@@ -4428,7 +4627,7 @@ function Test_resize_layout_grow_containers_many_compound(x = 0, y = 0) {
 
 
 
-    
+
 //     section.GenGfxCtx();
 //     TEMP_Calculate_layout_grow_count(section);
 //     // Layout_basic_pre_render(section);
@@ -4478,7 +4677,7 @@ function Test_reload_app() {
 function Test_rotate_section_with_round_corners() {
 
     const line1 = SdfLine(GREEN[7], [300, 300, 5], [200, 10], _, true);
-    Time_intervals_create(16, 'TEST ROTATION', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+    Time_intervals_create(1, 'TEST ROTATION', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
         const mesh = params.params
         const rot = (Timer_get_global_timer()) * 1;
         Mesh_rotate_z(mesh, rot);
@@ -4681,14 +4880,14 @@ function CreateSimpleWidgetText(x, y) {
         font_size: 40,
         // text: `1234567890`,
         text: `12`,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         // variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0,
         pad: [10, 6],
     });
     Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
     // widget_text.sid.inst = (SID.ATTR.COL4);
-    widget_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3);
+    widget_text.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     // widget_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.VPOS2);
 
     /********************************************************************************************************************************************************/
@@ -4713,7 +4912,7 @@ function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget te
         texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         font_size: 10,
         text: `|Widget_Text inside a Section\n| This is a new line @#-$%`,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0,
         pad: [10, 6],
         layout: LAYOUT.HORIZONTAL,
@@ -4730,7 +4929,7 @@ function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget te
         texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         font_size: 10,
         text: `|This is a new widget_text,\naligned verticaly inside the section`,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S5_0,
         pad: [10, 6],
         layout: LAYOUT.VERTICAL,
@@ -4767,7 +4966,7 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         col: ORANGER[9],
         texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         text: `|Widget_Text inside a Section\n| This is a new line @#-$%`,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S8_0,
         // sub_texture_id, 
         pad: [10, 6],
@@ -4785,7 +4984,7 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         font_size: 10,
         text: `|This is a new widget_text,\naligned verticaly inside the section`,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S2_0,
         pad: [10, 6],
     });
@@ -4823,13 +5022,13 @@ function CreateTextInSectionWithNewLineWithControls() { // GOOD!! render text fr
         // Render
         ctrl_panel.GenGfxCtx();
         Layout_basic_pre_render(ctrl_panel);
-    Widget_render(ctrl_panel);
+        Widget_render(ctrl_panel);
     }
 }
 function CreateTextInSection(text, font_size) { // GOOD!! render text from widget text directly to a section or stand alone. ABLE TO create layout with VERTICAL alignment via the new implementation
 
     const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [50, 250, 0], col: TRANSPARENCY(GREY[7], .5) }));
-    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 1, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+    Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 1, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
 
     const text_mesh = Create_widget_text({
@@ -4842,7 +5041,7 @@ function CreateTextInSection(text, font_size) { // GOOD!! render text from widge
         texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         font_size: font_size,
         text: text,
-        is_debug_mesh: 0x0,
+        is_debug_mesh: 0x0n,
         variant_idx: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5,
         pad: [10, 6],
         layout: LAYOUT.HORIZONTAL,
@@ -5011,20 +5210,20 @@ function Rotatable_section_with_rcorners_via_attribute_rotation(pos) {
 
     return section;
 }
-function Pivotal_rotation_horizontal_2mesh_rigging(x=300, y=300) {
+function Pivotal_rotation_horizontal_2mesh_rigging(x = 300, y = 300) {
 
     const marg = [20, 20];
     const dim = [120, 20];
 
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x,y,0], dim: dim, col: BLUEL[5], name: 'section', layout:LAYOUT.HORIZONTAL }));
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x, y, 0], dim: dim, col: BLUEL[5], name: 'section', layout: LAYOUT.HORIZONTAL }));
     // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect:10, enable_attr_angle:true});
     Widget_gfx_ready_enable({ mesh: section, });
     section.GenGfxCtx();
     Layout_basic_pre_render(section);
     Widget_render(section);
-    
-    const section2 = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x+dim[0]*2,y,0], dim: dim, col: Color_hsv_to_rgb_calibrated(.28,1,1,.5,.7,0), name: 'section2', layout:LAYOUT.HORIZONTAL }));
+
+    const section2 = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x + dim[0] * 2, y, 0], dim: dim, col: Color_hsv_to_rgb_calibrated(.28, 1, 1, .5, .7, 0), name: 'section2', layout: LAYOUT.HORIZONTAL }));
     // Widget_gfx_ready_enable({ mesh: section2, enable_sdf_rect:10, enable_attr_angle:true, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     Widget_gfx_ready_enable({ mesh: section2, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     section2.GenGfxCtx();
@@ -5032,7 +5231,7 @@ function Pivotal_rotation_horizontal_2mesh_rigging(x=300, y=300) {
     Widget_render(section2);
 
 
-    const origin = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x-10,y+10,0], dim: [10,10], col: Color_hsv_to_rgb_calibrated(.12,1,1,.5,.7,0), name: 'section2', layout:LAYOUT.HORIZONTAL }));
+    const origin = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x - 10, y + 10, 0], dim: [10, 10], col: Color_hsv_to_rgb_calibrated(.12, 1, 1, .5, .7, 0), name: 'section2', layout: LAYOUT.HORIZONTAL }));
     // Widget_gfx_ready_enable({ mesh: origin, enable_sdf_rect:10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     Widget_gfx_ready_enable({ mesh: origin, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     origin.GenGfxCtx();
@@ -5050,20 +5249,20 @@ function Pivotal_rotation_horizontal_2mesh_rigging(x=300, y=300) {
 
             const target_mesh = params.clbk_params.target_mesh;
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, -target_mesh.geom.dim[0], 0);
 
             const follow_mesh = params.clbk_params.follow_mesh;
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
 
@@ -5071,26 +5270,26 @@ function Pivotal_rotation_horizontal_2mesh_rigging(x=300, y=300) {
 
     return section;
 }
-function Pivotal_rotation_vertical_2mesh_rigging(x=300, y=300) {
+function Pivotal_rotation_vertical_2mesh_rigging(x = 300, y = 300) {
 
     const marg = [20, 20];
     const dim = [20, 120];
 
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x,y,0], dim: dim, col: BLUEL[5], name: 'section', layout:LAYOUT.HORIZONTAL }));
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x, y, 0], dim: dim, col: BLUEL[5], name: 'section', layout: LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: section, });
     section.GenGfxCtx();
     Layout_basic_pre_render(section);
     Widget_render(section);
-    
-    const section2 = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x,y+dim[1]*2,0], dim: dim, col: Color_hsv_to_rgb_calibrated(.28,1,1,.5,.7,0), name: 'section2', layout:LAYOUT.HORIZONTAL }));
+
+    const section2 = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x, y + dim[1] * 2, 0], dim: dim, col: Color_hsv_to_rgb_calibrated(.28, 1, 1, .5, .7, 0), name: 'section2', layout: LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: section2, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     section2.GenGfxCtx();
     Layout_basic_pre_render(section2);
     Widget_render(section2);
 
 
-    const origin = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x+10,y-10,0], dim: [10,10], col: Color_hsv_to_rgb_calibrated(.12,1,1,.5,.7,0), name: 'section2', layout:LAYOUT.HORIZONTAL }));
+    const origin = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x + 10, y - 10, 0], dim: [10, 10], col: Color_hsv_to_rgb_calibrated(.12, 1, 1, .5, .7, 0), name: 'section2', layout: LAYOUT.HORIZONTAL }));
     Widget_gfx_ready_enable({ mesh: origin, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } });
     origin.GenGfxCtx();
     Widget_render(origin);
@@ -5108,30 +5307,30 @@ function Pivotal_rotation_vertical_2mesh_rigging(x=300, y=300) {
 
             const target_mesh = params.clbk_params.target_mesh;
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, 0, -target_mesh.geom.dim[1]);
 
             const follow_mesh = params.clbk_params.follow_mesh;
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
     }
 
     return section;
 }
-function Pivotal_robot_rigging(x=300, y=300) {
+function Pivotal_robot_rigging(x = 300, y = 300) {
 
-    const create_robot = function (player, player_dim_x, player_dim_y, player_pos_x, player_pos_y){
-    
+    const create_robot = function (player, player_dim_x, player_dim_y, player_pos_x, player_pos_y) {
+
         // const ratios = {
         //     head_x:.5, head_y:.26,
         //     body_x:.8,  body_y:.19,
@@ -5139,75 +5338,75 @@ function Pivotal_robot_rigging(x=300, y=300) {
         //     legs_x:.34, legs_y:.34,
         // };
         const ratios = {
-            head_x:.4, head_y:.26,
-            body_x:.7,  body_y:.18,
-            arms_x:.24, arms_y:.45,
-            legs_x:.30, legs_y:.38,
+            head_x: .4, head_y: .26,
+            body_x: .7, body_y: .18,
+            arms_x: .24, arms_y: .45,
+            legs_x: .30, legs_y: .38,
         };
         const a = 1.0;
         const bright = 1.0;
 
-        const head_dim_x = player_dim_x*ratios.head_x;
-        const head_dim_y = player_dim_y*ratios.head_y;
+        const head_dim_x = player_dim_x * ratios.head_x;
+        const head_dim_y = player_dim_y * ratios.head_y;
         const head_pos_x = player_pos_x + player_dim_x - head_dim_x;
         const head_pos_y = (player_pos_y);
 
-        const head = Create_rect_mesh(Style_rect_default_properties({pos:[head_pos_x, head_pos_y, 0], dim:[head_dim_x, head_dim_y],col:Color_hsv_to_rgb_calibrated(.11, 1., 1., 1., 1., .0), name:'Player-Head', }));
-        Widget_gfx_ready_enable({mesh:head, }); 
+        const head = Create_rect_mesh(Style_rect_default_properties({ pos: [head_pos_x, head_pos_y, 0], dim: [head_dim_x, head_dim_y], col: Color_hsv_to_rgb_calibrated(.11, 1., 1., 1., 1., .0), name: 'Player-Head', }));
+        Widget_gfx_ready_enable({ mesh: head, });
         player.AddItem(head);
 
-        const body_dim_x = player_dim_x*ratios.body_x;
-        const body_dim_y = player_dim_y*ratios.body_y;
+        const body_dim_x = player_dim_x * ratios.body_x;
+        const body_dim_y = player_dim_y * ratios.body_y;
         const body_pos_x = head.geom.pos[0] + head.geom.dim[0] - body_dim_x;
-        const body_pos_y = (head.geom.pos[1] + head_dim_y*2);
+        const body_pos_y = (head.geom.pos[1] + head_dim_y * 2);
 
-        const arm_dim_x = player_dim_x*ratios.arms_x;
-        const arm_dim_y = player_dim_y*ratios.arms_y;
-        const arm_pos_x = body_pos_x ;
+        const arm_dim_x = player_dim_x * ratios.arms_x;
+        const arm_dim_y = player_dim_y * ratios.arms_y;
+        const arm_pos_x = body_pos_x;
         const arm_pos_y = body_pos_y;
 
-        const leg_dim_x = player_dim_x*ratios.legs_x;
-        const leg_dim_y = player_dim_y*ratios.legs_y;
+        const leg_dim_x = player_dim_x * ratios.legs_x;
+        const leg_dim_y = player_dim_y * ratios.legs_y;
         const leg_pos_x = body_pos_x;
-        const leg_pos_y = (body_pos_y + body_dim_y*2*2);
+        const leg_pos_y = (body_pos_y + body_dim_y * 2 * 2);
 
-        const arm_lt = Create_rect_mesh(Style_rect_default_properties({pos:[arm_pos_x+body_dim_x-arm_dim_x, arm_pos_y, 0], dim:[arm_dim_x, arm_dim_y/2],col:Color_hsv_to_rgb_calibrated(.10, 1., 1., a, bright, .0), name:'Player-arm-left-top', }));
-        Widget_gfx_ready_enable({mesh:arm_lt,  }); 
+        const arm_lt = Create_rect_mesh(Style_rect_default_properties({ pos: [arm_pos_x + body_dim_x - arm_dim_x, arm_pos_y, 0], dim: [arm_dim_x, arm_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.10, 1., 1., a, bright, .0), name: 'Player-arm-left-top', }));
+        Widget_gfx_ready_enable({ mesh: arm_lt, });
         player.AddItem(arm_lt);
-        const arm_lb = Create_rect_mesh(Style_rect_default_properties({pos:[arm_pos_x+body_dim_x-arm_dim_x, arm_pos_y+arm_dim_y, 0], dim:[arm_dim_x, arm_dim_y/2],col:Color_hsv_to_rgb_calibrated(.21, 1., 1, a, bright, .0), name:'Player-arm-left-bot', }));
-        Widget_gfx_ready_enable({mesh:arm_lb}); 
+        const arm_lb = Create_rect_mesh(Style_rect_default_properties({ pos: [arm_pos_x + body_dim_x - arm_dim_x, arm_pos_y + arm_dim_y, 0], dim: [arm_dim_x, arm_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.21, 1., 1, a, bright, .0), name: 'Player-arm-left-bot', }));
+        Widget_gfx_ready_enable({ mesh: arm_lb });
         player.AddItem(arm_lb);
 
-        const leg_lt = Create_rect_mesh(Style_rect_default_properties({pos:[leg_pos_x+body_dim_x-leg_dim_x, leg_pos_y, 0], dim:[leg_dim_x, leg_dim_y/2],col:Color_hsv_to_rgb_calibrated(.73, 1., 1., a, .8, .0), name:'Player-leg-left-top', }));
-        Widget_gfx_ready_enable({mesh:leg_lt,  }); 
+        const leg_lt = Create_rect_mesh(Style_rect_default_properties({ pos: [leg_pos_x + body_dim_x - leg_dim_x, leg_pos_y, 0], dim: [leg_dim_x, leg_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.73, 1., 1., a, .8, .0), name: 'Player-leg-left-top', }));
+        Widget_gfx_ready_enable({ mesh: leg_lt, });
         player.AddItem(leg_lt);
-        const leg_lb = Create_rect_mesh(Style_rect_default_properties({pos:[leg_pos_x+body_dim_x-leg_dim_x, leg_pos_y+leg_dim_y, 0], dim:[leg_dim_x, leg_dim_y/2],col:Color_hsv_to_rgb_calibrated(.86, 1., 1., a, bright, .0), name:'Player-leg-left-bot', }));
-        Widget_gfx_ready_enable({mesh:leg_lb,  }); 
+        const leg_lb = Create_rect_mesh(Style_rect_default_properties({ pos: [leg_pos_x + body_dim_x - leg_dim_x, leg_pos_y + leg_dim_y, 0], dim: [leg_dim_x, leg_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.86, 1., 1., a, bright, .0), name: 'Player-leg-left-bot', }));
+        Widget_gfx_ready_enable({ mesh: leg_lb, });
         player.AddItem(leg_lb);
 
 
-        const body = Create_rect_mesh(Style_rect_default_properties({pos:[body_pos_x, body_pos_y, 0], dim:[body_dim_x, body_dim_y],col:Color_hsv_to_rgb_calibrated(.48, 1., 1., a, bright, .0), name:'Player-Body1', }));
-        Widget_gfx_ready_enable({mesh:body,  }); 
+        const body = Create_rect_mesh(Style_rect_default_properties({ pos: [body_pos_x, body_pos_y, 0], dim: [body_dim_x, body_dim_y], col: Color_hsv_to_rgb_calibrated(.48, 1., 1., a, bright, .0), name: 'Player-Body1', }));
+        Widget_gfx_ready_enable({ mesh: body, });
         player.AddItem(body);
-        const body2 = Create_rect_mesh(Style_rect_default_properties({is_root:0x0, pos:[body_pos_x, body_pos_y+body_dim_y*2, 0], dim:[body_dim_x, body_dim_y],col:Color_hsv_to_rgb_calibrated(.57, 1., 1., a, bright, .0), name:'Player-Body2', }));
-        Widget_gfx_ready_enable({mesh:body2,  }); 
+        const body2 = Create_rect_mesh(Style_rect_default_properties({ is_root: 0x0, pos: [body_pos_x, body_pos_y + body_dim_y * 2, 0], dim: [body_dim_x, body_dim_y], col: Color_hsv_to_rgb_calibrated(.57, 1., 1., a, bright, .0), name: 'Player-Body2', }));
+        Widget_gfx_ready_enable({ mesh: body2, });
         player.AddItem(body2);
 
 
         // Legs
-        const leg_rt = Create_rect_mesh(Style_rect_default_properties({pos:[leg_pos_x+body_dim_x-leg_dim_x, leg_pos_y, 0], dim:[leg_dim_x, leg_dim_y/2],col:Color_hsv_to_rgb_calibrated(.9, 1., 1., a, bright, .0), name:'Player-leg-right-top', }));
-        Widget_gfx_ready_enable({mesh:leg_rt,  }); 
+        const leg_rt = Create_rect_mesh(Style_rect_default_properties({ pos: [leg_pos_x + body_dim_x - leg_dim_x, leg_pos_y, 0], dim: [leg_dim_x, leg_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.9, 1., 1., a, bright, .0), name: 'Player-leg-right-top', }));
+        Widget_gfx_ready_enable({ mesh: leg_rt, });
         player.AddItem(leg_rt);
-        const leg_rb = Create_rect_mesh(Style_rect_default_properties({pos:[leg_pos_x+body_dim_x-leg_dim_x, leg_pos_y+leg_dim_y, 0], dim:[leg_dim_x, leg_dim_y/2],col:Color_hsv_to_rgb_calibrated(.34, 1., 1, a, bright, .0), name:'Player-leg-right-bot', }));
-        Widget_gfx_ready_enable({mesh:leg_rb,  }); 
+        const leg_rb = Create_rect_mesh(Style_rect_default_properties({ pos: [leg_pos_x + body_dim_x - leg_dim_x, leg_pos_y + leg_dim_y, 0], dim: [leg_dim_x, leg_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.34, 1., 1, a, bright, .0), name: 'Player-leg-right-bot', }));
+        Widget_gfx_ready_enable({ mesh: leg_rb, });
         player.AddItem(leg_rb);
 
         // Right Arm
-        const arm_rt = Create_rect_mesh(Style_rect_default_properties({pos:[arm_pos_x+body_dim_x-arm_dim_x, arm_pos_y, 0], dim:[arm_dim_x, arm_dim_y/2],col:Color_hsv_to_rgb_calibrated(.29, 1., 1., a, bright, .0), name:'Player-arm-right-top', }));
-        Widget_gfx_ready_enable({mesh:arm_rt,  }); 
+        const arm_rt = Create_rect_mesh(Style_rect_default_properties({ pos: [arm_pos_x + body_dim_x - arm_dim_x, arm_pos_y, 0], dim: [arm_dim_x, arm_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.29, 1., 1., a, bright, .0), name: 'Player-arm-right-top', }));
+        Widget_gfx_ready_enable({ mesh: arm_rt, });
         player.AddItem(arm_rt);
-        const arm_rb = Create_rect_mesh(Style_rect_default_properties({pos:[arm_pos_x+body_dim_x-arm_dim_x, arm_pos_y+arm_dim_y, 0], dim:[arm_dim_x, arm_dim_y/2],col:Color_hsv_to_rgb_calibrated(.43, 1., 1, a, bright, .0), name:'Player-arm-right-bot', }));
-        Widget_gfx_ready_enable({mesh:arm_rb,  }); 
+        const arm_rb = Create_rect_mesh(Style_rect_default_properties({ pos: [arm_pos_x + body_dim_x - arm_dim_x, arm_pos_y + arm_dim_y, 0], dim: [arm_dim_x, arm_dim_y / 2], col: Color_hsv_to_rgb_calibrated(.43, 1., 1, a, bright, .0), name: 'Player-arm-right-bot', }));
+        Widget_gfx_ready_enable({ mesh: arm_rb, });
         player.AddItem(arm_rb);
 
     }
@@ -5216,14 +5415,14 @@ function Pivotal_robot_rigging(x=300, y=300) {
     const dim = [200, 300];
 
 
-    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x,y,0], dim: dim, col: Color_hsv_to_rgb_calibrated(.16, 0., 1., 1., .25, .0), name: 'section', layout:LAYOUT.HORIZONTAL }));
-    Widget_gfx_ready_enable({ mesh: section, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+    const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: marg, pos: [x, y, 0], dim: dim, col: Color_hsv_to_rgb_calibrated(.16, 0., 1., 1., .25, .0), name: 'section', layout: LAYOUT.HORIZONTAL }));
+    Widget_gfx_ready_enable({ mesh: section, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
-    create_robot(section, dim[0], dim[0]*1.66, x, y)
-    
+    create_robot(section, dim[0], dim[0] * 1.66, x, y)
+
     section.GenGfxCtx();
     Widget_render(section);
-    
+
 
     let sliders_ypos = 10;
 
@@ -5254,9 +5453,9 @@ function Pivotal_robot_rigging(x=300, y=300) {
     //                 leg_rt = params.clbk_params.legs.right_t,
     //                 leg_rb = params.clbk_params.legs.right_b;
 
-            
+
     //         const rot = slider_val * (Math.PI * 4);
-            
+
     //         const vertex_positions = Mesh_rotate_z_with_pivot(leg_rt, rot, 0, -leg_rt.geom.dim[1]);
 
     //         const follow_mesh = leg_rb;
@@ -5275,125 +5474,125 @@ function Pivotal_robot_rigging(x=300, y=300) {
     // }
     {
         const slider = CreateSlider(_, 10, sliders_ypos, 0., 'right arm', 340);
-        sliders_ypos+=50
+        sliders_ypos += 50
         const child = section.children.buffer;
         const params = {
             target_mesh: section,
-            arms:{left_t:child[1], left_b:child[2],right_t:child[9],right_b:child[10],},
+            arms: { left_t: child[1], left_b: child[2], right_t: child[9], right_b: child[10], },
         };
 
         Slider_connect(slider, (params, slider_val) => {
 
-            const   target_mesh = params.clbk_params.arms.left_t,
-                    follow_mesh = params.clbk_params.arms.left_b;
+            const target_mesh = params.clbk_params.arms.left_t,
+                follow_mesh = params.clbk_params.arms.left_b;
 
-            
+
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, 0, -target_mesh.geom.dim[1]);
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
     }
     {
         const slider = CreateSlider(_, 10, sliders_ypos, 0., 'left arm', 340);
-        sliders_ypos+=50
+        sliders_ypos += 50
 
         const child = section.children.buffer;
         const params = {
-            arms:{left_t:child[1], left_b:child[2],right_t:child[9],right_b:child[10],},
+            arms: { left_t: child[1], left_b: child[2], right_t: child[9], right_b: child[10], },
         };
 
         Slider_connect(slider, (params, slider_val) => {
 
-            const   target_mesh = params.clbk_params.arms.right_t,
-                    follow_mesh = params.clbk_params.arms.right_b;
+            const target_mesh = params.clbk_params.arms.right_t,
+                follow_mesh = params.clbk_params.arms.right_b;
 
-            
+
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, 0, -target_mesh.geom.dim[1]);
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
     }
     {
         const slider = CreateSlider(_, 10, sliders_ypos, 0., 'right leg', 340);
-        sliders_ypos+=50
+        sliders_ypos += 50
 
         const child = section.children.buffer;
         const params = {
-            legs:{left_t:child[3], left_b:child[4],right_t:child[7],right_b:child[8],},
+            legs: { left_t: child[3], left_b: child[4], right_t: child[7], right_b: child[8], },
         };
 
         Slider_connect(slider, (params, slider_val) => {
 
-            const   target_mesh = params.clbk_params.legs.right_t,
-                    follow_mesh = params.clbk_params.legs.right_b;
+            const target_mesh = params.clbk_params.legs.right_t,
+                follow_mesh = params.clbk_params.legs.right_b;
 
-            
+
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, 0, -target_mesh.geom.dim[1]);
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
     }
     {
         const slider = CreateSlider(_, 10, sliders_ypos, 0., 'left leg', 340);
-        sliders_ypos+=50
+        sliders_ypos += 50
 
         const child = section.children.buffer;
         const params = {
-            legs:{left_t:child[3], left_b:child[4],right_t:child[7],right_b:child[8],},
+            legs: { left_t: child[3], left_b: child[4], right_t: child[7], right_b: child[8], },
         };
 
         Slider_connect(slider, (params, slider_val) => {
 
-            const   target_mesh = params.clbk_params.legs.left_t,
-                    follow_mesh = params.clbk_params.legs.left_b;
+            const target_mesh = params.clbk_params.legs.left_t,
+                follow_mesh = params.clbk_params.legs.left_b;
 
-            
+
             const rot = slider_val * (Math.PI * 4);
-            
+
             const vertex_positions = Mesh_rotate_z_with_pivot(target_mesh, rot, 0, -target_mesh.geom.dim[1]);
 
-            const new_vposx = (vertex_positions[0]+vertex_positions[2]+vertex_positions[4]+vertex_positions[6])/2;
-            const new_vposy = (vertex_positions[1]+vertex_positions[3]+vertex_positions[5]+vertex_positions[7])/2;
+            const new_vposx = (vertex_positions[0] + vertex_positions[2] + vertex_positions[4] + vertex_positions[6]) / 2;
+            const new_vposy = (vertex_positions[1] + vertex_positions[3] + vertex_positions[5] + vertex_positions[7]) / 2;
 
 
             const x = follow_mesh.geom.pos[0] + new_vposx;
             const y = follow_mesh.geom.pos[1] + new_vposy;
 
-            Gl_set_wpos_x(follow_mesh.gfx, x+follow_mesh.geom.dim[0],);
-            Gl_set_wpos_y(follow_mesh.gfx, y+follow_mesh.geom.dim[1],);
+            Gl_set_wpos_x(follow_mesh.gfx, x + follow_mesh.geom.dim[0],);
+            Gl_set_wpos_y(follow_mesh.gfx, y + follow_mesh.geom.dim[1],);
         }, params,
         );
     }
@@ -5401,7 +5600,7 @@ function Pivotal_robot_rigging(x=300, y=300) {
     return section;
 }
 
-function SectionResizable(pos, dim= [200, 200]) {
+function SectionResizable(pos, dim = [200, 200]) {
 
     const tr = 1.;
     const marg = [10, 10];
@@ -5449,10 +5648,9 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
             font_size: 10,
             text_col: WHITE,
-            is_debug_mesh: false,
+            is_debug_mesh: 0x0n,
             style: [10, 10, 0],
             layout: LAYOUT.VERTICAL,
-            is_debug_mesh: false,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
         section.AddItem(btn);
@@ -5467,10 +5665,9 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
             font_size: 10,
             text_col: WHITE,
-            is_debug_mesh: false,
+            is_debug_mesh: 0x0n,
             style: [10, 10, 0],
             layout: LAYOUT.VERTICAL,
-            is_debug_mesh: false,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
         section.AddItem(btn);
@@ -5485,10 +5682,10 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
             font_size: 10,
             text_col: WHITE,
-            is_debug_mesh: false,
+            is_debug_mesh: 0x0n,
             style: [10, 10, 0],
             layout: LAYOUT.VERTICAL,
-            is_debug_mesh: false,
+            is_debug_mesh: 0x0n,
         }));
         Widget_gfx_ready_enable({ mesh: btn, enable_sdf_rect: 10, })
         section.AddItem(btn);
@@ -5517,7 +5714,7 @@ function CreateLabel(is_root = ROOT_WIDGETS.CREATE_ROOT, name = 'Label', font, v
         font_size: font_size,
         text_col: _,
         layout: LAYOUT.VERTICAL,
-        is_debug_mesh: false,
+        is_debug_mesh: 0x0n,
     }));
     Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } });
 
@@ -5556,7 +5753,7 @@ function CreateButton(x = 20, y = 400, is_root = ROOT_WIDGETS.CREATE_ROOT) {
 
         btn.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
         btn.GenGfxCtx();
-    Widget_render(btn);
+        Widget_render(btn);
     }
 
     // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, btn, .001, 0.6, .6, 0)
@@ -5586,7 +5783,7 @@ function CreateSwitchSimple(pos, is_root = ROOT_WIDGETS.CREATE_ROOT) {
     if (is_root & ROOT_WIDGETS.CREATE_ROOT) {
 
         switch1.GenGfxCtx();
-    Widget_render(switch1);
+        Widget_render(switch1);
     }
 
     return switch1;
@@ -5624,7 +5821,7 @@ function CreateSliderSimple(is_root = ROOT_WIDGETS.CREATE_ROOT) {
     return slider;
 }
 /** */
-function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name = 'S', dimx=120) {
+function CreateSlider(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, initial_val = .5, name = 'S', dimx = 120) {
 
     const pos = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? [x, y, 0] : [0, 0, 0]
 
@@ -5671,10 +5868,10 @@ function SdfLine(col, pos, dim, render_instanced_flags = 0x0, enable_angle = fal
 /** */
 function Instanced_geometry(col, pos, dim) {
 
-    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0,0,1.,.1,.5,0), name: 'instanced geom panel', }));
+    const panel = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0], pos: pos, dim: dim, col: Color_hsv_to_rgb_calibrated(0, 0, 1., .1, .5, 0), name: 'instanced geom panel', }));
     Widget_gfx_ready_enable({ mesh: panel, enable_sdf_rect: 10, })
 
-    const w=200, h=5., d=1, r_corners = 1;
+    const w = 200, h = 5., d = 1, r_corners = 1;
     let hue = .1;
     const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
@@ -5683,12 +5880,12 @@ function Instanced_geometry(col, pos, dim) {
     // const inst_attribs = (SID.ATTR.COL4);
 
 
-    for(let i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
 
-        const line = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [0, 0], pos: [10,(d+h)*((i+1)*2),0], dim: [w,h], 
-            col: Color_hsv_to_rgb_calibrated(hue+=.01,1,1.,1.,1.,0), 
-            name: `line-inst ${i}`,  
+        const line = Create_rect_mesh(Style_rect_default_properties({
+            pad: [0, 0], pos: [10, (d + h) * ((i + 1) * 2), 0], dim: [w, h],
+            col: Color_hsv_to_rgb_calibrated(hue += .01, 1, 1., 1., 1., 0),
+            name: `line-inst ${i}`,
         }));
         // Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
         Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
@@ -5703,7 +5900,7 @@ function Instanced_geometry(col, pos, dim) {
     }
 
 
-    
+
     panel.GenGfxCtx();
     Widget_render(panel);
 
@@ -5741,7 +5938,7 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
         const col = YELLOWR[7];
         for (let i = 0; i < sub_dp1_count; i++) {
 
-            
+
             // { // Label
             //     const count = 1; const brightness_increments = 1/count; let brightness =  0;
             //     for (let i = 0; i < count; i++) {
@@ -5774,10 +5971,10 @@ function CreateDropdownTree(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CREATE_ROOT)
             // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
             // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.RENDER_GROUP_NEW);
             dp.AddToMenu(dpsub1);
-            
+
             const col1 = TRANSPARENCY(PURPLEB[6], 1.);
             for (let j = 0; j < sub_dp1_count; j++) {
-                
+
                 const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp3' }));
                 Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
                 // dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
@@ -5885,13 +6082,13 @@ function Create_dropdown_hsv_coloring(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CR
     const menu_col = GREY[2];
 
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
-        is_root: is_root, text: `Menu`, 
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({
+        is_root: is_root, text: `Menu`,
         // theme: Color_theme_dropdown_auto(.12, 1., .18, 1.),
         theme: Color_theme_dropdown_auto(.0, .0, .18, 1.0),
-        pos: pos, col: dp_col, 
-        pad: pad, text_pad: text_pad, font_size: font_size, 
-        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF 
+        pos: pos, col: dp_col,
+        pad: pad, text_pad: text_pad, font_size: font_size,
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF
     }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
     // dp.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
@@ -5908,22 +6105,22 @@ function Create_dropdown_hsv_coloring(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CR
         const sub_dp1_count = 5;
         // const sub_dp2_count = 1;
 
-        const increments = 1/sub_dp1_count; 
-        let contrast =  .18, saturation = 0;
+        const increments = 1 / sub_dp1_count;
+        let contrast = .18, saturation = 0;
         for (let i = 0; i < sub_dp1_count; i++) {
 
             { // Label
-                const count = 1; const brightness_increments = 1/count; let brightness =  0;
+                const count = 1; const brightness_increments = 1 / count; let brightness = 0;
                 for (let i = 0; i < count; i++) {
-                    const l = Create_widget_label(Style_label_default_properties({ 
-                        theme: Color_theme_label_auto(.12, saturation, .18, 0), 
-                        text: `0123`, name:'label',
-                        pos: [0, 0, 1], 
-                        font_size: font_size, 
-                        text_pad: [6, 4], 
-                        layout:LAYOUT.VERTICAL, 
+                    const l = Create_widget_label(Style_label_default_properties({
+                        theme: Color_theme_label_auto(.12, saturation, .18, 0),
+                        text: `0123`, name: 'label',
+                        pos: [0, 0, 1],
+                        font_size: font_size,
+                        text_pad: [6, 4],
+                        layout: LAYOUT.VERTICAL,
                     }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     dp.AddToMenu(l);
                     l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
                     brightness += brightness_increments;
@@ -5931,17 +6128,17 @@ function Create_dropdown_hsv_coloring(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CR
             }
 
             { // Label
-                const count = 1; const brightness_increments = 1/count; let brightness =  0;
+                const count = 1; const brightness_increments = 1 / count; let brightness = 0;
                 for (let i = 0; i < count; i++) {
-                    const l = Create_widget_label(Style_label_default_properties({ 
-                        theme: Color_theme_label_auto(.12, .6, contrast, 0), 
-                        text: `0123`, name:'label',
-                        pos: [0, 0, 1], 
-                        font_size: font_size, 
-                        text_pad: [6, 4], 
-                        layout:LAYOUT.HORIZONTAL, 
+                    const l = Create_widget_label(Style_label_default_properties({
+                        theme: Color_theme_label_auto(.12, .6, contrast, 0),
+                        text: `0123`, name: 'label',
+                        pos: [0, 0, 1],
+                        font_size: font_size,
+                        text_pad: [6, 4],
+                        layout: LAYOUT.HORIZONTAL,
                     }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     dp.AddToMenu(l);
                     l.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
                     brightness += brightness_increments;
@@ -5953,10 +6150,10 @@ function Create_dropdown_hsv_coloring(pos = [0, 0, 0], is_root = ROOT_WIDGETS.CR
             // // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
             // // dpsub1.menu.gfx_ctx_flags = (GFX_CTX_FLAGS.RENDER_GROUP_NEW);
             // dp.AddToMenu(dpsub1);
-            
+
             // const col1 = TRANSPARENCY(PURPLEB[6], 1.);
             // for (let j = 0; j < sub_dp1_count; j++) {
-                
+
             //     const dpsub2 = Create_widget_dropdown(Style_dropdown_default_properties({ is_root: 0x0, text: `${i}${j}`, pos: [0, 0, zpos + 2], col: dp_col, menu_col: menu_col, btn_col: col1, text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'dp3' }));
             //     Widget_gfx_ready_enable({ mesh: dpsub2, enable_sdf_rect: dp_rcorners, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
             //     // dpsub2.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_CHILDREN_DESC|GFX_CTX_FLAGS.RENDER_GROUP_NEW);
@@ -6507,11 +6704,11 @@ function CreateManySections(scene) {
     const rcorners1 = 10;
 
     const blu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], pos: [0, 400, 0], dim: [100, 100], col: TRANSPARENCY(BLUEL[7], tr), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-    Widget_gfx_ready_enable({ 
-        mesh: blu, enable_sdf_rect: rcorners1, 
-        set_state:MESH_STATE_FLAGS.IS_RESIZEABLE,
-        listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE, }, 
-        scroller: { width: 10, max_height: 300, }, 
+    Widget_gfx_ready_enable({
+        mesh: blu, enable_sdf_rect: rcorners1,
+        set_state: MESH_STATE_FLAGS.IS_RESIZEABLE,
+        listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE, },
+        scroller: { width: 10, max_height: 300, },
     });
 
 
@@ -6546,20 +6743,20 @@ function CreateManySections(scene) {
 
                 {
                     //   const s1 = Sections2(_, LAYOUT.VERTICAL);   grey_1.AddItem(s1);
-                      const s1 = s;
+                    const s1 = s;
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
-                    { const s2 = Sections2(_, LAYOUT.VERTICAL);   s1.AddItem(s2); }
-                    { const s2 = Sections2(_, LAYOUT.VERTICAL);   s1.AddItem(s2); }
-                    { const s2 = Sections2(_, LAYOUT.VERTICAL);   s1.AddItem(s2); }
+                    { const s2 = Sections2(_, LAYOUT.VERTICAL); s1.AddItem(s2); }
+                    { const s2 = Sections2(_, LAYOUT.VERTICAL); s1.AddItem(s2); }
+                    { const s2 = Sections2(_, LAYOUT.VERTICAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
                     { const s2 = Sections2(_, LAYOUT.HORIZONTAL); s1.AddItem(s2); }
-                    { const s2 = Sections2(_, LAYOUT.VERTICAL);   s1.AddItem(s2); }
-                    { const s2 = Sections2(_, LAYOUT.VERTICAL);   s1.AddItem(s2); }
+                    { const s2 = Sections2(_, LAYOUT.VERTICAL); s1.AddItem(s2); }
+                    { const s2 = Sections2(_, LAYOUT.VERTICAL); s1.AddItem(s2); }
 
                 }
 
@@ -6655,11 +6852,11 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
     const tr = 1.;
     const rcorners1 = 10;
 
-    const blu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [0, 100, 0], dim: [100, 100], col: TRANSPARENCY(BLUEL[7], tr), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'blu' }));
+    const blu = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [0, 100, 0], dim: [100, 100], col: TRANSPARENCY(BLUEL[7], tr), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'blu' }));
     Widget_gfx_ready_enable({ mesh: blu, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
 
 
-    const red = Create_rect_mesh(Style_rect_default_properties({ pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(REDL[7], tr), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'red' }));
+    const red = Create_rect_mesh(Style_rect_default_properties({ pad: [15, 15], pos: [0, 0, 0], dim: [20, 20], col: TRANSPARENCY(REDL[7], tr), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'red' }));
     Widget_gfx_ready_enable({ mesh: red, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } })
     blu.AddItem(red);
 
@@ -6681,7 +6878,7 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
     //         //     { const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 2], dim: [20, 20], col: TRANSPARENCY(GREY[7], tr), layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); grey_1.AddItem(s1); }
     //         //     { const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [0, 0], pos: [0, 0, 2], dim: [20, 20], col: TRANSPARENCY(GREY[7], tr), layout: LAYOUT.HORIZONTAL })); Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); grey_1.AddItem(s1); }
     //         // }
-       
+
     //     }
 
 
@@ -6716,25 +6913,25 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
     //     Layout_basic_pre_render(newmesh);
     //     Widget_render(newmesh);
     // }
-    
+
 
     /********************************************************************************************************************************************/
     // EXAMPLE: Add two simple label meshes
     let l_y_pos = 20;
     { /** Add label mesh */
         const newmesh = Create_widget_label(Style_label_default_properties({
-            is_root: _, 
+            is_root: _,
             // is_root: ROOT_WIDGETS.CREATE_ROOT,
-            pos: [20,l_y_pos, 0], col: TRANSPARENCY(PURPLER[7], tr), text_pad: [0, 0], text: '1234',
-            texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12, layout: LAYOUT.VERTICAL, is_debug_mesh: false,
+            pos: [20, l_y_pos, 0], col: TRANSPARENCY(PURPLER[7], tr), text_pad: [0, 0], text: '1234',
+            texture_id: TEXTURES.MTSDF_CONSOLAS_1024, font_size: 12, layout: LAYOUT.VERTICAL, is_debug_mesh: 0x0n,
         }));
         Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-        
+
         // newmesh.parent = blu;
         // blu.AddItem(newmesh);
         newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
         // View_buffer_remove_group(1);
-        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
+        newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_ROOT_WIDGET | GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
         // newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_GROUP);
         newmesh.GenGfxCtx();
         Widget_render(newmesh);
@@ -6744,7 +6941,7 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
 
 
 
-    
+
 
     /********************************************************************************************************************************************/
     // EXAMPLE: Add two simple slider meshes
@@ -6752,7 +6949,7 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
     //     const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [100,200,0], dim: [120, 10], col: PURPLE[5] }));
     //     // const newmesh = Create_widget_slider(Style_slider_default_properties({ is_root: _, pos: [100,0,0], dim: [120, 10], col: PURPLE[5] }));
     //     Widget_gfx_ready_enable({ mesh: newmesh, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
-        
+
     //     newmesh.SetViewGroupIndex(blu.group_bufferidxs[0]);
     //     newmesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
     //     newmesh.GenGfxCtx();
@@ -6769,7 +6966,7 @@ function Test_adding_mesh_to_a_view_group_after_has_been_rendered() {
     return blu;
 }
 /** */
-function Test_align_many_sliders(x=0, y=0) {
+function Test_align_many_sliders(x = 0, y = 0) {
 
     const pos = [x, y, 0];
     const tex_id = TEXTURES.MTSDF_CONSOLAS_1024
@@ -7208,11 +7405,11 @@ function CreateUniformPositionPerRenderGroups() {
     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners1, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
 
 
-    const s2 = Sections2(_, LAYOUT.HORIZONTAL); 
-    section.AddItem(s2); 
+    const s2 = Sections2(_, LAYOUT.HORIZONTAL);
+    section.AddItem(s2);
     s2.RenderToNewRenderGroup();
-    const s3 = Sections2(_, LAYOUT.HORIZONTAL); 
-    section.AddItem(s3); 
+    const s3 = Sections2(_, LAYOUT.HORIZONTAL);
+    section.AddItem(s3);
     s3.RenderToNewRenderGroup();
 
     section.GenGfxCtx();
@@ -7224,7 +7421,7 @@ function CreateUniformPositionPerRenderGroups() {
     Time_intervals_create(1000, 'TEST ROTATION', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
         const mesh = params.params;
         Mesh_unif_set_vb_root_wposx(mesh.gfx.vb.render_groupidx, xpos);
-        xpos+=5;
+        xpos += 5;
 
     }, s2)
 
@@ -7237,18 +7434,18 @@ function CreateUniformPositionPerRenderGroups() {
 function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
 
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 100], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .3, 0), 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 100], col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .3, 0),
         layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT,
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
-        set_state:MESH_STATE_FLAGS.IS_RESIZEABLE,
+        set_state: MESH_STATE_FLAGS.IS_RESIZEABLE,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
         scroller: { width: 10, max_height: 100, },
 
     });
-    
+
     // section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
 
 
@@ -7266,7 +7463,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
     const brightness_increments = 1 / count;
     let brightness = 0;
     for (let i = 0; i < count; i++) {
-        
+
         const l = Create_widget_label(Style_label_default_properties({ text: `${i}`, pos: [0, 0, 1], font_size: fontsize, col: Color_hsv_to_rgb_calibrated(0.7, 1., .8, 1, brightness, .0), text_pad: [6, 4], layout: LAYOUT.VERTICAL }))
         Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
         scrolled_section.AddItem(l);
@@ -7283,7 +7480,7 @@ function CreateScrollerClampAlphaTest(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0,
         Layout_basic_pre_render(section)
         Widget_render(section);
     }
-    
+
     const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
     Scoller_component_set_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
     Scroller_component_calculate_handle_pos_dim(scroller_comp);
@@ -7324,14 +7521,14 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
 
     const section_height = 120;
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0), 
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+        col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, 0),
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
-        set_state:MESH_STATE_FLAGS.IS_RESIZEABLE,
+        set_state: MESH_STATE_FLAGS.IS_RESIZEABLE,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
         scroller: { width: 10, max_height: section_height, },
     });
@@ -7350,11 +7547,11 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
     const brightness_increments = 1 / count;
     let brightness = 0;
     for (let i = 0; i < count; i++) {
-        
+
         let cnt = 0;
-        const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-        scrolled_section.AddItem(s1); 
+        const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+        Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+        scrolled_section.AddItem(s1);
         // s1.RenderToNewRenderGroup();
         {
             // const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
@@ -7364,12 +7561,12 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
             // Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
             // s2.AddItem(l);
 
-            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
-            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch' }));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
             s1.AddItem(sw);
 
-            const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-            Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+            const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+            Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
             s1.AddItem(sl);
         }
 
@@ -7383,7 +7580,7 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
         section.GenGfxCtx();
         Layout_basic_pre_render(section)
         Widget_render(section);
-        
+
         const scroller_comp = Components_get_scroller_component(section.scroller_comp_idx);
         Scoller_component_set_scrolled_section(scroller_comp, scrolled_section, section.scroller_comp_idx);
         Scroller_component_calculate_handle_pos_dim(scroller_comp);
@@ -7392,13 +7589,13 @@ function CreateScrollerManyWidgets(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y 
     return section;
 }
 function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
-    
-    
+
+
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
         col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
@@ -7406,7 +7603,7 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         // scroller: { width: 10, max_height: section_height, },
     });
 
-    
+
     const count = num_items;
     // const count = 3;
     let scroller1 = null,
@@ -7415,10 +7612,10 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
     {
         // Scroller parent
         const section_height = 120;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7427,8 +7624,8 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         });
         section.AddItem(s);
         scroller1 = s;
-        
-    
+
+
         // Create scrolled section.
         const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
         Widget_gfx_ready_enable({
@@ -7437,16 +7634,16 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(s.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
             // s1.RenderToNewRenderGroup();
             {
                 // const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
@@ -7456,15 +7653,15 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
                 // Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
                 // s2.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch' }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
                 // const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
                 // Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
                 // s1.AddItem(sl);
             }
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7472,10 +7669,10 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
     {
         // Scroller parent
         const section_height = 160;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7484,8 +7681,8 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         });
         section.AddItem(s);
         scroller2 = s;
-    
-    
+
+
         // Create scrolled section.
         const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [x, y, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
         Widget_gfx_ready_enable({
@@ -7494,33 +7691,33 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(s.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
-            let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
-            {
-                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:`${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
 
-                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            let cnt = 0;
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
+            {
+                const s2 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.8, .8, 1, .8, .4, 0), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: s2, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); s1.AddItem(s2); s2.gfx_ctx_flags = (GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL);
+
+                const l = Create_widget_label(Style_label_default_properties({ text: `HI!`, pos: [0, 0, 1], font_size: font_size, col: BLUEL[7], text_pad: [6, 4], layout: LAYOUT.HORIZONTAL, name: `l${cnt++}` }));
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s2.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch' }));
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
-                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
             }
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7537,17 +7734,17 @@ function CreateScrollerDeepNested(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y =
         Scroller_component_calculate_handle_pos_dim(scroller1.scroller_comp);
         Scroller_component_calculate_handle_pos_dim(scroller2.scroller_comp);
     }
-    
+
     return section;
 }
 function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
-    
-    
+
+
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
         col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
@@ -7555,14 +7752,14 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         // scroller: { width: 10, max_height: section_height, },
     });
 
-    
-    const text_pad = [12, 6],
-          pad = [6, 6],
-          dp_rcorners = 7,
-          dp_col = GREY[4],
-          menu_col = GREY[2];
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+    const text_pad = [12, 6],
+        pad = [6, 6],
+        dp_rcorners = 7,
+        dp_col = GREY[4],
+        menu_col = GREY[2];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
     Dropdown_roots_set_root(dp, dp);
     section.AddItem(dp);
@@ -7578,10 +7775,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
     {
         // Scroller parent
         const section_height = 110;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7600,41 +7797,41 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(scroller1.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
-                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
-                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
-                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col:
+                    Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0),
+                layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}`
             }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: [6, 4], layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
-                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
-                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14),
+                    handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch'
                 }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
                 // const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
                 // Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
                 // s1.AddItem(sl);
             }
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7642,10 +7839,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
     {
         // Scroller parent
         const section_height = 110;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7664,21 +7861,21 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(scroller2.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
-            
-            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
-            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
+
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch' }));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
             s1.AddItem(sw);
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7686,10 +7883,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
     {
         // Scroller parent
         const section_height = 110;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7701,10 +7898,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         dp.menu.AddChildScrollerIdx(scroller3.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
 
         // Create scrolled section.
-        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
-            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
         }));
         Widget_gfx_ready_enable({
             mesh: scrolled_section, enable_sdf_rect: 15,
@@ -7712,45 +7909,45 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(scroller3.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
-                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
-                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
-                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col:
+                    Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0),
+                layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}`
             }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: [6, 4], layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
-                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
-                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14),
+                    handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch'
                 }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
-                
-                const sl = Create_widget_slider(Style_slider_default_properties({ 
-                    pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', 
-                    theme: Color_theme_slider_auto(.57, .8, .18, 0), 
-                    layout:LAYOUT.VERTICAL 
+
+                const sl = Create_widget_slider(Style_slider_default_properties({
+                    pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample',
+                    theme: Color_theme_slider_auto(.57, .8, .18, 0),
+                    layout: LAYOUT.VERTICAL
                 }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
             }
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7758,10 +7955,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
     {
         // Scroller parent
         const section_height = 110;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT 
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7773,10 +7970,10 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         dp.menu.AddChildScrollerIdx(scroller4.scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
 
         // Create scrolled section.
-        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
-            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
         }));
         Widget_gfx_ready_enable({
             mesh: scrolled_section, enable_sdf_rect: 15,
@@ -7784,21 +7981,21 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(scroller4.scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
-            
-            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'}));
-            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({ pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}` }));
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
+
+            const sw = Create_widget_switch_simple(Style_switch_default_properties({ pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch' }));
+            Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
             s1.AddItem(sw);
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7815,17 +8012,17 @@ function CreateDropdownWithScroller(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y
         Scroller_component_calculate_handle_pos_dim(scroller3.scroller_comp);
         Scroller_component_calculate_handle_pos_dim(scroller4.scroller_comp);
     }
-    
+
     return section;
 }
 function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8) {
-    
-    
+
+
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
         col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
@@ -7833,14 +8030,14 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
         // scroller: { width: 10, max_height: section_height, },
     });
 
-    
-    const text_pad = [12, 6],
-          pad = [6, 6],
-          dp_rcorners = 7,
-          dp_col = GREY[4],
-          menu_col = GREY[2];
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
+    const text_pad = [12, 6],
+        pad = [6, 6],
+        dp_rcorners = 7,
+        dp_col = GREY[4],
+        menu_col = GREY[2];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ text: `ROOT`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
     Dropdown_roots_set_root(dp, dp);
     section.AddItem(dp);
@@ -7850,24 +8047,24 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
     const num_scrollers = 5;
     const scrollers = [];
     // Scroll sample 1
-    for (let dps = 0; dps < num_scrollers; dps++){
+    for (let dps = 0; dps < num_scrollers; dps++) {
 
         const count = num_items;
-        
-        const dp_sub1 = Create_widget_dropdown(Style_dropdown_default_properties({ 
-            is_root: 0x0, text: `dp_sub${dps}`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
-            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
-            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`dp_sub${dps}`
+
+        const dp_sub1 = Create_widget_dropdown(Style_dropdown_default_properties({
+            is_root: 0x0, text: `dp_sub${dps}`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col,
+            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size,
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `dp_sub${dps}`
         }));
         Widget_gfx_ready_enable({ mesh: dp_sub1, enable_sdf_rect: dp_rcorners, });
         dp.AddToMenu(dp_sub1);
 
         // Scroller parent
         const section_height = 110;
-        const s = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name:'FIXED'
+        const s = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+            col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name: 'FIXED'
         }));
         Widget_gfx_ready_enable({
             mesh: s, enable_sdf_rect: 15,
@@ -7879,10 +8076,10 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
         dp_sub1.menu.AddChildScrollerIdx(scrollers[dps].scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
 
         // Create scrolled section.
-        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
-            pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
-            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
-            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ScrolledSection' 
+        const scrolled_section = Create_rect_mesh(Style_rect_default_properties({
+            pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
+            col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0),
+            layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ScrolledSection'
         }));
         Widget_gfx_ready_enable({
             mesh: scrolled_section, enable_sdf_rect: 15,
@@ -7890,41 +8087,41 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
         scrolled_section.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
         s.AddItem(scrolled_section);
         Scoller_component_set_scrolled_section(scrollers[dps].scroller_comp, scrolled_section);
-        
+
         // Create scrolled section items
         const brightness_increments = 1 / count;
         let brightness = 0;
         for (let i = 0; i < count; i++) {
-            
+
             let cnt = 0;
-            const s1 = Create_rect_mesh(Style_rect_default_properties({ 
-                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: 
-                Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0), 
-                layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF , name:`${cnt++}` 
+            const s1 = Create_rect_mesh(Style_rect_default_properties({
+                pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col:
+                    Color_hsv_to_rgb_calibrated(.13, 1, 1, .8, brightness, 0),
+                layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${cnt++}`
             }));
-            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER} }); 
-            scrolled_section.AddItem(s1); 
+            Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+            scrolled_section.AddItem(s1);
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: [6, 4], layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `Switch ${i}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: [6, 4], layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(l);
 
-                const sw = Create_widget_switch_simple(Style_switch_default_properties({ 
-                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14), 
-                    handle_col: _, hover_margin: 8, layout:LAYOUT.HORIZONTAL, name:'Switch'
+                const sw = Create_widget_switch_simple(Style_switch_default_properties({
+                    pos: [0, 0, 1], size: 20, col: GREY[5], theme: Color_theme_switch_auto(.14),
+                    handle_col: _, hover_margin: 8, layout: LAYOUT.HORIZONTAL, name: 'Switch'
                 }));
-                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: sw, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 s1.AddItem(sw);
 
-                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout:LAYOUT.VERTICAL }));
-                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, }); 
+                const sl = Create_widget_slider(Style_slider_default_properties({ pos: [0, 0, 0], dim: [120, 15], name: 'Slider Sample', col: GREY[5], theme: Color_theme_slider_auto(.0, .8, .18, 0), layout: LAYOUT.VERTICAL }));
+                Widget_gfx_ready_enable({ mesh: sl, enable_sdf_rect: 10, });
                 s1.AddItem(sl);
             }
-    
+
             brightness += brightness_increments;
         }
     }
@@ -7943,7 +8140,7 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
         // Scroller_component_calculate_handle_pos_dim(scroller3.scroller_comp);
         // Scroller_component_calculate_handle_pos_dim(scroller4.scroller_comp);
     }
-    
+
     return section;
 }
 
@@ -7952,60 +8149,60 @@ function CreateDropdownWithScrollerManyDps(is_root = ROOT_WIDGETS.CREATE_ROOT, x
 /** */
 function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, num_items = 1, font_size = 8, view_groupidx) {
 
-        
+
     const _is_root = (is_root & ROOT_WIDGETS.CREATE_ROOT) ? is_root : _;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: is_root, pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
         col: Color_hsv_to_rgb_calibrated(.6, .5, 1, 1, .1, .2), name: 'Root',
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF 
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF
     }));
     Widget_gfx_ready_enable({
         mesh: section, enable_sdf_rect: 15,
         listener: { type: LISTEN_EVENT_TYPES.MOVE },
     });
 
-    
-    const text_pad = [12, 6],
-          pad = [6, 6],
-          dp_rcorners = 7,
-          dp_col = GREY[2],
-          menu_col = GREY[1];
 
-    const dp = Create_widget_dropdown(Style_dropdown_default_properties({ 
-        text: `Meshes`, pos: [0,0,1], col: dp_col, menu_col: menu_col, btn_col: GREY[7], 
-        text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
-        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'Meshes', 
+    const text_pad = [12, 6],
+        pad = [6, 6],
+        dp_rcorners = 7,
+        dp_col = GREY[2],
+        menu_col = GREY[1];
+
+    const dp = Create_widget_dropdown(Style_dropdown_default_properties({
+        text: `Meshes`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col, btn_col: GREY[7],
+        text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size,
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: 'Meshes',
     }));
     Widget_gfx_ready_enable({ mesh: dp, enable_sdf_rect: dp_rcorners, });
     Dropdown_roots_set_root(dp, dp);
     section.AddItem(dp);
 
 
-    
-    
-    
+
+
+
 
     // const meshes = Mesh_buffer_get();
     const root_view = Root_group_view_buffer_get();
     const scrollers = [];
-    
+
     const mesh_idxs = root_view.buffer[view_groupidx];
     const num_meshes = mesh_idxs.boundary;
 
-    const dp_roots = Create_widget_dropdown(Style_dropdown_default_properties({ 
-        is_root: 0x0, text: `root`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
-        btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
-        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`root`
+    const dp_roots = Create_widget_dropdown(Style_dropdown_default_properties({
+        is_root: 0x0, text: `root`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col,
+        btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size,
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `root`
     }));
     Widget_gfx_ready_enable({ mesh: dp_roots, enable_sdf_rect: dp_rcorners, });
     dp.AddItem(dp_roots);
-    
+
     // Scroller parent
     const section_height = 110;
-    const s = Create_rect_mesh(Style_rect_default_properties({ 
-        pad: [10, 10], pos: [x, y, 0], dim: [20, section_height], 
-        col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2), 
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name:'FIXED'
+    const s = Create_rect_mesh(Style_rect_default_properties({
+        pad: [10, 10], pos: [x, y, 0], dim: [20, section_height],
+        col: Color_hsv_to_rgb_calibrated(.73, 1., 1, 1, .1, 2),
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF | LAYOUT.FIXED_HEIGHT, name: 'FIXED'
     }));
     Widget_gfx_ready_enable({
         mesh: s, enable_sdf_rect: 15,
@@ -8017,10 +8214,10 @@ function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, n
     dp_roots.menu.AddChildScrollerIdx(scrollers[0].scroller_comp_idx); // MUST add in order to call recalc on scroller from dp
 
     // Create scrolled section.
-    const scrolled_section = Create_rect_mesh(Style_rect_default_properties({ 
-        pad: [10, 10], pos: [x, y, 0], dim: [20, 20], 
-        col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0), 
-        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name:'ScrolledSection' 
+    const scrolled_section = Create_rect_mesh(Style_rect_default_properties({
+        pad: [10, 10], pos: [x, y, 0], dim: [20, 20],
+        col: Color_hsv_to_rgb_calibrated(.3, 1, 1, 1, .3, 0),
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'ScrolledSection'
     }));
     Widget_gfx_ready_enable({
         mesh: scrolled_section, enable_sdf_rect: 15,
@@ -8030,15 +8227,15 @@ function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, n
     Scoller_component_set_scrolled_section(scrollers[0].scroller_comp, scrolled_section);
 
 
-    for (let j = 0; j <= num_meshes; j++){
-        
+    for (let j = 0; j <= num_meshes; j++) {
+
         const meshidx = mesh_idxs.buffer[j];
         const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
 
-        const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({ 
-            is_root: 0x0, text: `${meshidx}: ${mesh.name}`, pos: [0,0,1], col: dp_col, menu_col: menu_col, 
-            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size, 
-            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name:`${mesh.name}}`
+        const dp_mesh = Create_widget_dropdown(Style_dropdown_default_properties({
+            is_root: 0x0, text: `${meshidx}: ${mesh.name}`, pos: [0, 0, 1], col: dp_col, menu_col: menu_col,
+            btn_col: GREY[7], text_col: WHITE, pad: pad, text_pad: text_pad, font_size: font_size,
+            layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF, name: `${mesh.name}}`
         }));
         Widget_gfx_ready_enable({ mesh: dp_mesh, enable_sdf_rect: dp_rcorners, });
         scrolled_section.AddItem(dp_mesh);
@@ -8047,71 +8244,71 @@ function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, n
             let cnt = 0;
             const l_text_pad = [16, 8];
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `IsActive: ${mesh.state.mask&MESH_STATE_FLAGS.ACTIVE}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `IsActive: ${mesh.state.mask & MESH_STATE_FLAGS.ACTIVE}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: l_text_pad, layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dp_mesh.AddToMenu(l);
                 scrolled_section.AddItem(l);
             }
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `VBidx: ${mesh.gfx.vb.groupidx}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `VBidx: ${mesh.gfx.vb.groupidx}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: l_text_pad, layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dp_mesh.AddToMenu(l);
                 scrolled_section.AddItem(l);
             }
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `RGidx: ${mesh.gfx.vb.render_groupidx}`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                    text: `RGidx: ${mesh.gfx.vb.render_groupidx}`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: l_text_pad, layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dp_mesh.AddToMenu(l);
                 scrolled_section.AddItem(l);
             }
             {
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `Pos: [x:${mesh.geom.pos[0]}, y:${mesh.geom.pos[0]}]`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: l_text_pad, layout:LAYOUT.VERTICAL, name:`l${cnt++}` 
+                    text: `Pos: [x:${mesh.geom.pos[0]}, y:${mesh.geom.pos[0]}]`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: l_text_pad, layout: LAYOUT.VERTICAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dp_mesh.AddToMenu(l);
                 scrolled_section.AddItem(l);
             }
             { // LAYOUT
-                const l = Create_widget_label(Style_label_default_properties({ 
+                const l = Create_widget_label(Style_label_default_properties({
                     theme: Color_theme_label_auto(.58, 1., .03, .0),
-                    text: `Layout:`, pos: [0, 0, 1], font_size: font_size-2, 
-                    text_pad: l_text_pad, layout:LAYOUT.VERTICAL, name:`l${cnt++}` 
+                    text: `Layout:`, pos: [0, 0, 1], font_size: font_size - 2,
+                    text_pad: l_text_pad, layout: LAYOUT.VERTICAL, name: `l${cnt++}`
                 }));
-                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                 // dp_mesh.AddToMenu(l);
                 scrolled_section.AddItem(l);
                 {
-                    const l = Create_widget_label(Style_label_default_properties({ 
+                    const l = Create_widget_label(Style_label_default_properties({
                         theme: Color_theme_label_auto(.58, 1., .03, .0),
-                        text: `Resize-self: ${mesh.align.flags&LAYOUT.RESIZE_SELF}`, pos: [0, 0, 1], font_size: font_size-2, 
-                        text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                        text: `Resize-self: ${mesh.align.flags & LAYOUT.RESIZE_SELF}`, pos: [0, 0, 1], font_size: font_size - 2,
+                        text_pad: l_text_pad, layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                     }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     // dp_mesh.AddToMenu(l);
                     scrolled_section.AddItem(l);
                 }
                 {
-                    const l = Create_widget_label(Style_label_default_properties({ 
+                    const l = Create_widget_label(Style_label_default_properties({
                         theme: Color_theme_label_auto(.58, 1., .03, .0),
-                        text: `Fixed-height: ${mesh.align.flags&LAYOUT.FIXED_HEIGHT}`, pos: [0, 0, 1], font_size: font_size-2, 
-                        text_pad: l_text_pad, layout:LAYOUT.HORIZONTAL, name:`l${cnt++}` 
+                        text: `Fixed-height: ${mesh.align.flags & LAYOUT.FIXED_HEIGHT}`, pos: [0, 0, 1], font_size: font_size - 2,
+                        text_pad: l_text_pad, layout: LAYOUT.HORIZONTAL, name: `l${cnt++}`
                     }));
-                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+                    Widget_gfx_ready_enable({ mesh: l, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
                     // dp_mesh.AddToMenu(l);
                     scrolled_section.AddItem(l);
                 }
@@ -8131,7 +8328,7 @@ function Create_mesh_info_ui(is_root = ROOT_WIDGETS.CREATE_ROOT, x = 0, y = 0, n
         // for (let i = 0; i < scrollers.length; i++)
         //     Scroller_component_calculate_handle_pos_dim(scrollers[i].scroller_comp);
     }
-    
+
     return section;
 }
 
@@ -8159,15 +8356,15 @@ function Sections2(is_root, layout) {
     const dim = [15, 15];
 
     // const grey = Create_rect_mesh(is_root, layout, marg, [0, 0, 0], dim, TRANSPARENCY(GREY[0], tr));
-    const grey = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: marg, pos: [0, 0, 0], dim: [0,0], col: Color_hsv_to_rgb_calibrated(.74, 0, 1, .8, .1, 0), layout: layout|LAYOUT.RESIZE_SELF, name: `#grey${grey_cnt++}` }));
+    const grey = Create_rect_mesh(Style_rect_default_properties({ is_root: is_root, pad: marg, pos: [0, 0, 0], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.74, 0, 1, .8, .1, 0), layout: layout | LAYOUT.RESIZE_SELF, name: `#grey${grey_cnt++}` }));
     Widget_gfx_ready_enable({ mesh: grey, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
 
     // const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [5,5], pos: [0, 0, 0], dim: [0,0], col: Color_hsv_to_rgb_calibrated(.34, 1, tr, 1, .5, 0), layout: layout|LAYOUT.RESIZE_SELF, name: `green${green_cnt++}` }));
-    const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: [0,0], col: Color_hsv_to_rgb_calibrated(.34, 1, tr, 1, .5, 0), layout: layout|LAYOUT.RESIZE_SELF, name: `green${green_cnt++}` }));
+    const green = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: marg, pos: [0, 0, 0], dim: [0, 0], col: Color_hsv_to_rgb_calibrated(.34, 1, tr, 1, .5, 0), layout: layout | LAYOUT.RESIZE_SELF, name: `green${green_cnt++}` }));
     Widget_gfx_ready_enable({ mesh: green, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
     grey.AddItem(green);
 
-    const orange = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [0,0], pos: [0, 0, 0], dim: dim, col: Color_hsv_to_rgb_calibrated(.12, 1, tr, 1, .8, 0), layout: layout, name: `orange${orange_cnt++}` }));
+    const orange = Create_rect_mesh(Style_rect_default_properties({ is_root: _, pad: [0, 0], pos: [0, 0, 0], dim: dim, col: Color_hsv_to_rgb_calibrated(.12, 1, tr, 1, .8, 0), layout: layout, name: `orange${orange_cnt++}` }));
     Widget_gfx_ready_enable({ mesh: orange, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
     green.AddItem(orange);
 
@@ -8203,50 +8400,50 @@ function Sections4(is_root, layout) {
 function Help() {
 
     const font_size = 10;
-    const section = Create_rect_mesh(Style_rect_default_properties({ 
-        is_root:ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10], 
-        pos: [0, 0, 0], dim: [20, 300], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, .8, .05, 0), 
-        layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF, name:'HelpSection' 
+    const section = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10, 10],
+        pos: [0, 0, 0], dim: [20, 300], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, .8, .05, 0),
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'HelpSection'
     }));
-    Widget_gfx_ready_enable({ 
-        mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.MOVE},
+    Widget_gfx_ready_enable({
+        mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.MOVE },
         scroller: { width: 10, max_height: 300, },
-    }); 
+    });
 
 
-    const s1 = Create_rect_mesh(Style_rect_default_properties({ 
-        pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, 1., .15, 0), 
-        layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF , name:'subSection' 
+    const s1 = Create_rect_mesh(Style_rect_default_properties({
+        pad: [10, 10], pos: [0, 0, 0], dim: [20, 20], col: Color_hsv_to_rgb_calibrated(.0, .0, 1, 1., .15, 0),
+        layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF, name: 'subSection'
     }));
-    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20,}); 
+    Widget_gfx_ready_enable({ mesh: s1, enable_sdf_rect: 20, });
     s1.RenderToNewRenderGroup(); // MUST, in order for the scrolled section to be able to move independently
     section.AddItem(s1);
 
     const msg = 'Press the characters in quotes in sequence.\nE.x. "a1": press and hold \'a\', then press \'1\' ';
-    const description = Create_widget_label(Style_label_default_properties({ 
+    const description = Create_widget_label(Style_label_default_properties({
         theme: Color_theme_label_auto(.1, 1., .08, .0),
-        text: msg, pos: [0, 0, 1], font_size: font_size, 
-        text_pad: [8, 6], layout:LAYOUT.VERTICAL|LAYOUT.EXPAND, name:msg,
+        text: msg, pos: [0, 0, 1], font_size: font_size,
+        text_pad: [8, 6], layout: LAYOUT.VERTICAL | LAYOUT.EXPAND, name: msg,
     }));
-    Widget_gfx_ready_enable({ mesh: description, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+    Widget_gfx_ready_enable({ mesh: description, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
     s1.AddItem(description);
 
     let msgs = [];
     for (let i = 1; i < DEBUG_PRINT_KEYS.length; i++) {
 
         msgs[i] = '\"' + DEBUG_PRINT_KEYS[i].key + '\": ' + DEBUG_PRINT_KEYS[i].discr
-        const label = Create_widget_label(Style_label_default_properties({ 
+        const label = Create_widget_label(Style_label_default_properties({
             theme: Color_theme_label_auto(.4, 1., .08, .0),
-            text: msgs[i], pos: [0, 0, 1], font_size: font_size, 
-            text_pad: [8, 6], layout:LAYOUT.VERTICAL|LAYOUT.EXPAND, name:`label${i++}` 
+            text: msgs[i], pos: [0, 0, 1], font_size: font_size,
+            text_pad: [8, 6], layout: LAYOUT.VERTICAL | LAYOUT.EXPAND, name: `label${i++}`
         }));
-        Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } }); 
+        Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
 
         s1.AddItem(label);
 
     }
 
-    
+
     section.GenGfxCtx();
     Layout_basic_pre_render(section);
     Layout_expand_x_axis(section);
@@ -8753,6 +8950,66 @@ function Test_shaders_bubble_flare() { // Shaders Tests
 }
 
 
+function Test_time_intervals_performance() {
+
+    const timer = {
+        
+        sum: 0, 
+        avg: 0,
+        cnt:1,
+        prev: 0,
+        cur: 0,
+    };
+
+
+    const num_intervals = 10;
+    const internal_loop_repetition = 1000;
+
+
+    const o1 = {x:0, y:0};
+    const o2 = {x:0, y:0};
+    for(let i=0; i<num_intervals; i++){
+
+        const params = {
+            o1:o1,
+            o2:o2,
+            timer:timer,
+        };
+        Time_intervals_create(1, 'TestIntervals', TIME_INTERVAL_REPEAT_ALWAYS, (params)=>{
+
+            timer.prev = window.performance.now();
+
+            const o1 = params.params.o1;
+            const o2 = params.params.o2;
+            while(o1.x < internal_loop_repetition) {
+
+                o2.y = (o2.x + o1.y) * o1.x;
+                o1.x++;
+            }
+
+            o1.x = 0;
+
+            timer.cur = window.performance.now();
+            const t = timer.cur - timer.prev;
+            timer.sum += t;
+            timer.avg = timer.sum / timer.cnt;
+            timer.prev = timer.cur;
+            timer.cnt++;
+
+        }, params);
+    }
+
+    console.log(
+        '---- Test_time_intervals_performance ---- \n',
+        '\nNum Intervals:', num_intervals,
+        '\nInternal loop repetition:', internal_loop_repetition,
+        '\nTime average:', timer.avg,
+        '\nTime count:', timer.cnt,
+        '\nTime sum:', timer.sum,
+        // '\n', ,
+    );
+}
+
 
 
 /*******************************************************************************************************************************************************/
@@ -8830,7 +9087,7 @@ function Shader_color_functions_worley_3_types_noise() { // Shaders Tests
 
     // Render
     rect.GenGfxCtx();
-Widget_render(rect);
+    Widget_render(rect);
     rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
     rect.GfxUniformsSetClbk('u_time', () => { return Timer_get_global_timer() + 1; }, rect.gfx.vb.groupidx);
 
@@ -8860,7 +9117,7 @@ function Shader_color_functions_worley_3D() { // Shaders Tests
 
     // Render
     rect.GenGfxCtx();
-Widget_render(rect);
+    Widget_render(rect);
     rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
     rect.GfxUniformsSetClbk('u_time', () => { return Timer_get_global_timer() + 1; }, rect.gfx.vb.groupidx);
 
@@ -8916,7 +9173,7 @@ function Shader_color_functions_voronoi_2_noise() { // Shaders Tests
 
     // Render
     rect.GenGfxCtx();
-Widget_render(rect);
+    Widget_render(rect);
     rect.GfxUniformSetAndUpdate('u_generic_controls', control_values);
     rect.GfxUniformsSetClbk('u_time', () => { return Timer_get_global_timer() + 1; }, rect.gfx.vb.groupidx);
 
@@ -8936,7 +9193,7 @@ function Shader_color_functions_explosion_circle(x = 20, y = 300, w = 200, h = 2
 
     // Render
     mesh.GenGfxCtx();
-Widget_render(mesh);
+    Widget_render(mesh);
     mesh.GfxUniformSetAndUpdate('u_scale2', [scale_down, 1.0]);
 
     const slider_dim = [120 * DEVICE.device_scale, 10 * DEVICE.device_scale];

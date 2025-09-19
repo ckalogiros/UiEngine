@@ -108,11 +108,15 @@ Mult_arr3_scalar(ARKANOID_COLORS.green, color_brightness_ctrl_val.green)
 
 export function Arkanoid_initialize_stages_schema() {
    
-   // abcdefghijklmnopqrstuvwxyz
-   // abcdefgh COLORS
-   // ijklmnop POWER UPS
-   // qrstuvwx UNUSED
-   // yz       UNUSED
+   /**
+    * Create combinations of brick attributes (color, power up) to any brick at any place by OR-ing the attributes. 
+    * 
+    * abcdefghijklmnopqrstuvwxyz
+    * abcdefgh For COLORS
+    * ijklmnop For POWER UPS
+    * qrstuvwx UNUSED
+    * yz       UNUSED
+    */
 
    const ___ = 0x0; // No brick
    const a = ARKANOID_FLAGS.BRICK_COLOR_BLUE; // Brick color type 1

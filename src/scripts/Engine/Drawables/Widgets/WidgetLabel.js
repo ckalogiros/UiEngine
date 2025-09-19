@@ -538,7 +538,7 @@ export class Widget_Label extends Rect_Mesh {
                         // console.log('X Y RESIZE');
 
                         const OnResizeFn = mesh.OnResize;
-                        const idx = Time_intervals_create(10, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
+                        const idx = Time_intervals_create(1, 'ResizeXY Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnResizeFn, mesh);
                         mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
                     }
                     else if (point.x > right - TEMP_RESIZE_MARGIN[0]) { // Its a width resize
@@ -557,7 +557,7 @@ export class Widget_Label extends Rect_Mesh {
             if (!is_resized) { // implement move 
                 // const OnMoveFn = mesh.OnMove;
                 const OnMoveFn = Label_on_move_clbk;
-                const idx = Time_intervals_create(10, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
+                const idx = Time_intervals_create(1, 'Move Widget_Label', TIME_INTERVAL_REPEAT_ALWAYS, OnMoveFn, mesh);
                 mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
             }
 

@@ -115,7 +115,7 @@ export function Str_buffer_mesh_names_store(str, mesh_bufferidx, is_debug_mesh) 
       _str_buffer_mesh_names_index_buffer.AddAtIndex(idx, mesh_bufferidx);
 
 
-      if(NOTIFICATIONS_ON && is_debug_mesh===0) 
+      if(NOTIFICATIONS_ON && is_debug_mesh===0n) 
          Notifications_send(NOTIFICATION_TYPE.STRING_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, mesh_bufferidx);
 
       return idx;

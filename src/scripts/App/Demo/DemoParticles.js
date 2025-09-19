@@ -2397,6 +2397,7 @@ function Create_emitt_switch_panel({ z = 0, emitter = null, emitt_options = { co
       panel.AddItem(emitt_switch);
 
       const evt_params = { target_params: [emitter.idx] };
+      console.warn('Emitter switch:', emitter.idx)
       emitt_switch.Bind(Switch_simple_time_interval_callback, Particle_system_emitt, evt_params);
    }
    if (emitt_options.button_pres_emitt) {

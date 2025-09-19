@@ -10,7 +10,7 @@ import { Scene_set_projection_matrix, Scene_set_screen_res_uniform } from "../..
 import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
-import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int8_buffer } from "../../Core/Buffers.js";
+import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int32_buffer, New_int8_buffer } from "../../Core/Buffers.js";
 import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
@@ -20,7 +20,7 @@ import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunction
 /** */
 export class GfxInfoMesh {
 
-   constructor(gfx = {}) {
+   constructor() {
 
       // TODO: COMMENT, explain variables
       this.sid = INT_NULL;
@@ -44,8 +44,10 @@ export class GfxInfoMesh {
          groupidx: INT_NULL,	// 
          render_groupidx: 0, // The render group the mesh belongs to.
          idxs: New_int8_buffer(_, 'NEW GfxInfo-vbidxs'),	// The vertex buffer (float*) idx that this Mesh is stored to.
-         starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
-         counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
+         // starts: New_int16_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
+         // counts: New_int16_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
+         starts: New_int32_buffer(_, 'GfxInfo-vb starts'),		// The current meshe's starting index in vertex buffer. 
+         counts: New_int32_buffer(_, 'GfxInfo-vb counts'),		// Current size of the float buffer (in floats)
          which_vb: { // If this gfx has attributes scattered between vertex buffers, we need to specify which attribute belongs to which vertex buffer
             col_buf: INT_NULL,   // The index of the vertex buffer the color attribute is stored to
             wpos_buf: INT_NULL,  // The index of the vertex buffer the wpos attribute is stored to
@@ -77,8 +79,7 @@ export class GfxInfoMesh {
       Free_int16_buffer(this.vb.counts);
    }
 
-   CopyVb() {
-
+   Copy() {
       const gfx = {
 
          groupidx: this.vb.groupidx,
@@ -86,14 +87,48 @@ export class GfxInfoMesh {
          starts: this.vb.starts,
          counts: this.vb.counts,
 
-         which_vb: {
-            col_buf: this.vb.which_vb.col_buf,
-            wpos_buf: this.vb.which_vb.wpos_buf,
-            generic_attr1_buf: this.vb.which_vb.generic_attr1_buf,
-            dim_buf: this.vb.which_vb.dim_buf,
-            tex_buf: this.vb.which_vb.tex_buf,
+         sid: this.sid,
+         sceneidx: this.sceneidx,
+         isPrivate: this.isPrivate,
+         num_faces: this.num_faces,
+         vertsPerRect: this.vertsPerRect,
+         attribsPerVertex: this.attribsPerVertex,
+         meshIdx: this.meshIdx,
+         vao: this.vao,
+         is_root_widget_on_reused_vb: this.is_root_widget_on_reused_vb,
+
+         prog: {
+            idx: this.prog.idx,
+            progibidx: this.prog.progibidx,
+            attribsidx: this.prog.attribsidx,
          },
-         is_per_vertex: New_int8_buffer(_, 'NEW GfxInfo-Copy-is_vertex_buffer'), // 
+
+         vb: { // The vertex buffer info the mesh belongs to
+
+            groupidx: this.vb.groupidx,
+            render_groupidx: this.vb.render_groupidx,
+            idxs: this.vb.idxs,
+            starts: this.vb.starts,
+            counts: this.vb.counts,
+            which_vb: { 
+               col_buf: this.vb.which_vb.col_buf,   
+               wpos_buf: this.vb.which_vb.wpos_buf,  
+               generic_attr1_buf: this.vb.which_vb.generic_attr1_buf,
+               dim_buf: this.vb.which_vb.dim_buf,   
+               tex_buf: this.vb.which_vb.tex_buf,   
+            },
+            is_per_vertex: this.is_per_vertex,
+         },
+
+         ib: {
+            idx: this.ib.idx,
+            count: this.ib.count,
+         },
+
+         tb: {
+            id: this.tb.id,
+            idx: this.tb.idx,
+         },
       };
 
       return gfx;
@@ -114,7 +149,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
    gfx_ctx.sceneidx = sceneidx;
    gfx_ctx.num_faces = num_faces;
    gfx_ctx.vertsPerRect = Vertex_buffer_group_get_vertices_per_face(vb_groupidx);
-   gfx_ctx.attribsPerVertex =  Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
+   gfx_ctx.attribsPerVertex = Shader_attributes_get_attribs_per_vertex(prog.attribsidx);
 
    gfx_ctx.vao = vb_group.vao;
 
@@ -162,7 +197,7 @@ function Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, num_
  * I the group in sid is set, then create a new group for the vertex buffers
  * Else default to the default group
  */
-export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL, temp_is_particle_system=false, vb_aprox_size) {
+export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NULL, temp_is_particle_system = false, vb_aprox_size) {
 
 
    // Cash
@@ -276,18 +311,18 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
             }
          }
          // Here we must check for all vb's that are stored globaly(like scrollers, but not for scrollers!) 
-         else if (((flags & GFX_CTX_FLAGS.PRIVATE) === 0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0) && (flags & GFX_CTX_FLAGS.NEW)===0 ) {
+         else if (((flags & GFX_CTX_FLAGS.PRIVATE) === 0 || (flags & GFX_CTX_FLAGS.SCROLLER_VB) === 0) && (flags & GFX_CTX_FLAGS.NEW) === 0) {
             vb_groupidx = Gfx_pool_find_vb_notPrivate(sid, pool_request_flags);
          }
       }
-      
+
       if (vb_groupidx === INT_NULL) {
-         
+
          const is_private = ((flags & GFX_CTX_FLAGS.PRIVATE) || (flags & GFX_CTX_FLAGS.SPECIFIC)) ? BUFFER_STATE.IS_PRIVATE : 0x0;
          vb_group = Vertex_buffer_create(sid, vb_aprox_size, progidx, is_private);
 
          VBI_state_enable(vb_group.idx, BUFFER_STATE.NEEDS_UPDATE);
-         
+
          // For debugging only 
          Vertex_buffer_group_set_mesh_debug_name(vb_group.idx, Mesh_get_name(mesh));
 
@@ -304,20 +339,20 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
          /** NEW IMPLEMENTATION-WITH RENDER GROUPS */
          // Create uniforms for each new vertex buffer
          for (let i = 0; i < uniforms.length; i++) {
-         
+
             if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0) { // Create ONLY for non-block uniforms
-         
+
                const shader_program = Program_get_webgl_program_object(progidx);
                const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, shader_program, uniforms[i].type, uniforms[i].name, progidx, vb_groupidx);
-         
-         
+
+
                uniforms[i].ubidx = ubidx;
                // console.log('### UNIFORM CREATED\n vb_groupidx', vb_groupidx, 'name',  uniforms[i].name, 'ubidx', ubidx)
-               
+
                if (uniforms[i].name === 'u_blend_mode') {
                   Program_store_blend_mode_ubidx(progidx, ubidx);
                }
-       
+
             }
          }
 
@@ -344,9 +379,9 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       // NOTE: Can we use same index buffer for different vertex buffers? No, cause the geometry may have different vertex index break points. Yes, if the geometries do not use connected vertices
       // ibidx = Gfx_pool_find_ib_match_any(sid.shad);
-      
+
       // HACK. For now we need an index buuffer per vertex. So we use the vb index since they MUST be 1 to 1 
-      ibidx = vb_groupidx; 
+      ibidx = vb_groupidx;
 
       if (ibidx === INT_NULL || is_vertex_buffer_created) { // Create new index buffer
 
@@ -366,7 +401,7 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count);
 
-   return {gfx:gfx, is_root_widget_on_reused_vb:is_root_widget_on_reused_vb};
+   return { gfx: gfx, is_root_widget_on_reused_vb: is_root_widget_on_reused_vb };
 
 }
 

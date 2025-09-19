@@ -145,7 +145,7 @@ export function Widget_ready_label(is_root = 0x0, name = 'Label', texture_id = T
       texture_id: texture_id,
       font_size: font_size,
       text_col: color_text,
-      is_debug_mesh: false,
+      is_debug_mesh: 0x0n,
    }));
 
 
@@ -270,7 +270,7 @@ export function Widget_msdf_text_with_scale_slider(is_root = 0x0, name = 'Label 
       texture_id: font,
       font_size: font_size,
       text_col: WHITE,
-      is_debug_mesh: false,
+      is_debug_mesh: 0x0n,
    }));
    Widget_gfx_ready_enable({ mesh: msdf_text, enable_sdf_rect: 4 });
 

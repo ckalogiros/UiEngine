@@ -634,7 +634,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			texture_id:this.mat.texture_file_id, 
 			variant_idx:this.TEMPORARY_variant_idx,
 			pad:pad,
-			is_debug_mesh:false,
+			is_debug_mesh:0x0n,
 		});
 
 		Widget_gfx_ready_enable({mesh:new_text, enable_attr_dim:false,});

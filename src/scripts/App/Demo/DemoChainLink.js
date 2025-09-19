@@ -75,7 +75,7 @@ export function Demo_chain_link(x=0, y=0) {
    }
 
 
-   Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_chain_link, params);
+   Time_intervals_create(1, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_chain_link, params);
 
 
    return head;

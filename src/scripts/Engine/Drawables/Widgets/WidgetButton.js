@@ -91,7 +91,7 @@ export class Widget_Button extends Widget_Label {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params
-            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            const idx = Time_intervals_create(1, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
             State_mesh_set_clickhold(mesh);

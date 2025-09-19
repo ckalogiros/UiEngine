@@ -351,7 +351,7 @@ function Scroller_component_onClick(params) {
 
       if ((bar.type & MESH_TYPE.WIDGET_SCROLLER_BAR) && bar.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
-         const idx = Time_intervals_create(16, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
+         const idx = Time_intervals_create(1, 'Move Scroller Handle', TIME_INTERVAL_REPEAT_ALWAYS, Scroller_component_on_update_handle, bar);
          bar.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
          State_mesh_set_grabed(bar);
          bar.StateEnable(MESH_STATE_FLAGS.IN_GRAB);

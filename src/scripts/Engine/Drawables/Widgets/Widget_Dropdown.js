@@ -626,7 +626,7 @@ alert('00000111119999922222')
        * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
        * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
        */
-      const idx = Time_intervals_create(10, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, dp);
+      const idx = Time_intervals_create(1, 'Move Widget_Dropdown', TIME_INTERVAL_REPEAT_ALWAYS, Rect_mesh_on_move_clbk, dp);
       dp.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
       if (Mesh_state_check(dp, MESH_STATE_FLAGS.IS_GRABABLE)) {

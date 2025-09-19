@@ -51,6 +51,7 @@ export class Text_Mesh extends Mesh {
       this.last_charidx = properties.text.length;
       
       this.type |= MESH_TYPE.TEXT_MESH | properties.is_debug_mesh;
+      // this.type |= MESH_TYPE.TEXT_MESH;
       this.font_size = properties.font_size;
 
       this.text_width = 0;

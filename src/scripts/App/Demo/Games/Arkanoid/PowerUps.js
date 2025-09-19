@@ -1,6 +1,6 @@
 "use strict"
 
-import { Bitwise_calc_bit_length_from_flag_base } from "../../../../Engine/Core/BitwiseOps.js";
+import { Bitwise32_get_bitlen_from_bitpos } from "../../../../Engine/Core/BitwiseOps/Bitwise32Ops.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
 import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
@@ -167,7 +167,7 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
    h = POWUP_INIT_SIZE;
 
    // Calculate an index from flag, starting from index 0 by using a base
-   const color_index = Bitwise_calc_bit_length_from_flag_base(powup_type_flag, ARKANOID_FLAGS.POWUP_BASE);
+   const color_index = Bitwise32_get_bitlen_from_bitpos(powup_type_flag, ARKANOID_FLAGS.POWUP_BASE);
    const color = POWUP_COLORS_ARRAY[color_index];
 
    if (freeidx >= 0) {

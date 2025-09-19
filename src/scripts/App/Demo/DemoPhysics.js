@@ -795,7 +795,7 @@ export function Elastic_collisions(x = 0, y = 0, root_widget = 0x0, controls_cre
       mnemonics: mnemonics,
    }
    
-   Time_intervals_create(16, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_elastic_collisions_balls, animation_params);
+   Time_intervals_create(1, 'ParticlesBallTail', TIME_INTERVAL_REPEAT_ALWAYS, Animate_elastic_collisions_balls, animation_params);
    
    return {
       ellastic_collisions_balls: balls_buffer,
