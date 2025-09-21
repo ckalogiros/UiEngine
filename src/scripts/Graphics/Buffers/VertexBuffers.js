@@ -16,6 +16,7 @@ import { Mesh_buffer_get_mesh_byidx, Mesh_buffer_get_mesh_num_faces } from "../.
 import { Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Engine/Core/MeshUniformsBuffer.js";
 import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Vertex_buffer_render_group_get_render_group } from "./RenderGroups.js";
+import { GL_GET_ERROR } from "../../GlobalFunctions.js";
 
 
 
@@ -49,6 +50,7 @@ export function Vertex_buffer_create(sid, size = MIN_VERTEX_BUFFER_SIZE, progidx
 
     const vao = Gl_vertex_array_object_get_by_vaoidx(vaoidx); // Get VAO
     gfxCtx.gl.bindVertexArray(vao.vao);
+    GL_STATE.BOUND_VAOIDX = vaoidx;
 
 
     const attribsidx = Program_get_shader_attributes_index(progidx);
@@ -85,7 +87,6 @@ export function Vertex_buffer_create(sid, size = MIN_VERTEX_BUFFER_SIZE, progidx
         const vb_buffer = Typed_array_create_from_type(buffer_type, calibrated_size);
         const vbo = gfxCtx.gl.createBuffer();
         gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, vbo);
-        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, DRAW_TYPE, 0);
         const vbidx = _vertex_buffers_data.Add(vb_buffer);
         
         // Create vertex buffer info
@@ -100,11 +101,14 @@ export function Vertex_buffer_create(sid, size = MIN_VERTEX_BUFFER_SIZE, progidx
         
         
         Shader_attributes_enable(attribsidx, attrib_divisor, vbinfo.attribs_info, vbidx)
+        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, DRAW_TYPE, 0);
         
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
         
-        if (vbidx !== vb_infoidx) alert('vbidx !== vb_infoidx\nAt Vertex_buffer_create()\nAt VertexBuffers.js')
+        if (vbidx !== vb_infoidx) alert('vbidx !== vb_infoidx\nAt Vertex_buffer_create()\nAt VertexBuffers.js');
+
+        if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber, 'VertexBuffers-inst geom');
 
     }
     if (sid.attr) {
@@ -137,25 +141,30 @@ export function Vertex_buffer_create(sid, size = MIN_VERTEX_BUFFER_SIZE, progidx
         const vb_buffer = Typed_array_create_from_type(buffer_type, calibrated_size);
         const vbo = gfxCtx.gl.createBuffer();
         gfxCtx.gl.bindBuffer(gfxCtx.gl.ARRAY_BUFFER, vbo);
-        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, DRAW_TYPE, 0);
+        // gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, DRAW_TYPE, 0);
         const vbidx = _vertex_buffers_data.Add(vb_buffer);
-
+        
         // Create vertex buffer info
         const vbinfo = new Vertex_Buffer_Info(calibrated_size, vbo, vbidx, buffer_type, sid.attr & ~sid.inst);
         vbinfo.SetAddFn(attribsidx, sid.attr & ~sid.inst, 0x0);
         vbinfo.vertices_per_face = (sid.shad & SID.SHAD.INDEXED) ? VERTS_PER_RECT_INDEXED : VERTS_PER_RECT;
         const vb_infoidx = _vertex_buffer_infos.Add(vbinfo);
-
+        
         // Calculate the attributes info specific for the attributes of this vertex buffer.
         vbinfo.attribs_info = attribs.attribs_info;
         vbinfo.attribs_indexing = attribs.attribs_indexing;
-
+        
         Shader_attributes_enable(attribsidx, attrib_divisor, vbinfo.attribs_info, vbidx);
-
+        gfxCtx.gl.bufferData(gfxCtx.gl.ARRAY_BUFFER, vb_buffer, DRAW_TYPE, 0);
+        
         // Store the vbidx to the group
         vb_group.vb_idxs.Add(vbidx);
-
+        
         if (vbidx !== vb_infoidx) alert('vbidx !== vb_infoidx\nAt Vertex_buffer_create()\nAt VertexBuffers.js')
+        
+        vbinfo.state.mask |= BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
+
+        if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber, 'VertexBuffers-attr geom');
 
     }
 
@@ -169,6 +178,9 @@ export function Vertex_buffer_create(sid, size = MIN_VERTEX_BUFFER_SIZE, progidx
         Notifications_send(NOTIFICATION_TYPE.VERTEX_BUFFER_IDXS.NOTIF, NOTIFICATION_TYPE.FLAGS.CREATE, vb_groupidx);
 
 
+    gfxCtx.gl.bindVertexArray(null);
+    GL_STATE.BOUND_VAOIDX = INT_NULL;
+    
     return vb_group;
 }
 
@@ -521,6 +533,13 @@ export function Vertex_buffer_group_get_shader_attributes_index(vb_groupidx) {
 /** */
 export function Vertex_buffer_group_store_render_groupidx(vb_groupidx, render_groupidx) {
     _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.Add(render_groupidx);
+    // console.log('VB ASSIGN RG', render_groupidx, _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.buffer)
+}
+/** */
+export function Vertex_buffer_group_remove_render_groupidx(vb_groupidx) {
+    // console.log(_vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs)
+    _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.Reset();
+    // console.log(_vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs)
     // console.log('VB ASSIGN RG', render_groupidx, _vertex_buffer_groups.buffer[vb_groupidx].render_groupidxs.buffer)
 }
 
@@ -1072,6 +1091,8 @@ export function Vertex_buffer_add_vertices_from_render_group(gfx, geom, mat, _nu
         render_group.num_instances = 1;
     }
 
+    GL_GET_ERROR(new Error().lineNumber);
+
     return start_attribute_index;
     // return render_group.count;
 
@@ -1179,6 +1200,8 @@ export function Vertex_buffer_init_vertices_for_particles(gfx, texidx, _num_face
         render_group.draw_count += num_faces * INDICES_PER_RECT;
         render_group.num_instances = 1;
     }
+
+    GL_GET_ERROR(new Error().lineNumber);
 
     return start_attribute_index;
 

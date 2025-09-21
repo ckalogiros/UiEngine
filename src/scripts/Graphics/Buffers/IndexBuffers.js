@@ -2,8 +2,6 @@
 
 
 import { New_generic_buffer } from '../../Engine/Core/Buffers.js';
-import { Floor } from '../../Helpers/Math/MathOperations.js';
-import { Vertex_buffer_render_group_get_render_group } from './RenderGroups.js';
 import { Typed_array_create_from_type } from './TypedArrayBuffersInterface.js';
 
 
@@ -55,7 +53,7 @@ function Index_buffer_set_ib_data(gl, buffer) {
 
    console.log('----------------- INDEX BUFFER:BINDING AND SETTING DATA. ')
    console.log(' ibidx:', buffer.ibidx, 'count:', buffer.count, 'vCount:', buffer.vCount)
-   // GL_GET_ERROR(new Error().lineNumber)
+   if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber)
    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 }
 /** Returns struct: { ibidx:INT, ibo:OBJ } */
@@ -70,7 +68,7 @@ function Index_buffer_create(type, size) {
 
    ret.ibidx = _index_buffers.Add(ib);
    ret.ibo = gfxCtx.gl.createBuffer();
-   gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
+   // gfxCtx.gl.bindBuffer(gfxCtx.gl.ELEMENT_ARRAY_BUFFER, ret.ibo);
 
 
    return ret;

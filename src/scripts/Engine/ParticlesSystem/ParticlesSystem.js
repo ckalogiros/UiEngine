@@ -375,10 +375,10 @@ class Emitter {
          unif: 0x0,
          // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
-         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
          // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
          // inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
-         inst: 0x0,
+         // inst: 0x0,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
          blend_options: 0x0,
@@ -984,13 +984,8 @@ export function Particle_system_init_particles(emitter) {
           
    if(emitter.sid.inst !== 0x0) {
 
-      // emitter.Update_gfx_buffers_fn_inst(
-      //    emitter.gfx.vb.groupidx+1, 0, 
-      //    emitter.geom.dim[0], emitter.geom.dim[1],
-      //    emitter.mat.style.rcorners, 
-      // );
       emitter.Update_gfx_buffers_fn_inst(
-            emitter.gfx.vb.groupidx+1, 0, 
+            emitter.gfx.vb.idxs.buffer[1], 0, 
             emitter.mat.col[0], emitter.mat.col[1], emitter.mat.col[2], emitter.mat.col[3],
             0, 0, 
             emitter.geom.dim[0], emitter.geom.dim[1],
@@ -998,8 +993,7 @@ export function Particle_system_init_particles(emitter) {
             0, 
             0,0,0,0,
             0,0,0,0,
-            // particle.generic.a, particle.generic.b,
-            0,0,
+            0,0, // particle.generic.a, particle.generic.b,
       );
 
    }
@@ -1321,7 +1315,8 @@ export function Particle_system_update() {
 
 
             emitter.Update_gfx_buffers_fn(
-               emitter.gfx.vb.groupidx, particle.start, 
+               // emitter.gfx.vb.groupidx, particle.start, 
+               emitter.gfx.vb.idxs.buffer[0], particle.start, 
                particle.col[0], particle.col[1], particle.col[2], particle.col[3],
                particle.pos[0], particle.pos[1], 
                particle.dim[0], particle.dim[1],
@@ -1331,15 +1326,15 @@ export function Particle_system_update() {
                particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
                particle.generic.a, particle.generic.b,
             );
-
+            
             // vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot, uv
             // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
-
-
+            
+            
             particle.time += emitter.t_step;
-
+            
             if (particle.time >= emitter.life_time) {
-
+               
                // Reset particle for reuse
                particle.is_alive = false;
                particle.time = emitter.geom.time;

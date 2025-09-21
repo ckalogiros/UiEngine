@@ -19,9 +19,6 @@ const GL_TYPES = {
    FLOAT_MAT4x3: 35690,
 }
 
-export function GL_GET_ERROR(line, info=''){
-   console.error('line:', line, ' Error code:', gfxCtx.gl.getError(), 'info:', info)
-}
 
 
 // Generic Bit Flags array. 

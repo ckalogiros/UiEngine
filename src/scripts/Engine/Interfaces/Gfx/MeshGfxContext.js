@@ -11,7 +11,7 @@ import { Uniforms_buffer_create_uniform } from "../../../Graphics/Buffers/Unifor
 import { Gfx_pool_find_vb_notActive_and_private, Gfx_pool_find_vb_notPrivate } from "./GfxPool.js";
 import { Find_gfx_match_from_mesh_tree } from "./GfxContextFindMatch.js";
 import { Free_int16_buffer, Free_int8_buffer, New_int16_buffer, New_int32_buffer, New_int8_buffer } from "../../Core/Buffers.js";
-import { Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
+import { GL_GET_ERROR, Sid_check_match, Sid_make_copy } from "../../../GlobalFunctions.js";
 import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 
 
@@ -385,8 +385,13 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
 
       if (ibidx === INT_NULL || is_vertex_buffer_created) { // Create new index buffer
 
+         const vb_group = Vertex_buffer_group_get_byidx(vb_groupidx);
+         gfxCtx.gl.bindVertexArray(vb_group.vao);
+         // GL_STATE.BOUND_VAO = vb_group.vao;
+         // GL_STATE.BOUND_VAOIDX = vb_group.vaoidx;
          const ib_info = Index_buffer_info_create(sid, _);
          ibidx = ib_info.ibidx;
+         gfxCtx.gl.bindVertexArray(null);
 
          Program_store_index_buffer_idx(progidx, ibidx); // Store the indexbuffer index to the programs ib array
       }
@@ -400,6 +405,8 @@ export function Gfx_generate_context(FLAGS, mesh, specific_vb_groupidx = INT_NUL
    }
 
    const gfx = Generate_mesh_gfx_info(sid, sceneidx, progidx, vb_groupidx, ibidx, mesh_count);
+
+   GL_GET_ERROR(new Error().lineNumber);
 
    return { gfx: gfx, is_root_widget_on_reused_vb: is_root_widget_on_reused_vb };
 

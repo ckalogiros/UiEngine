@@ -171,6 +171,15 @@ export function Sid_check_unif_match_sids(sid_unif, unif_name) {
 
 
 
+export function GL_GET_ERROR(line, info=''){
+   // console.log(gfxCtx.gl.getError());
+   const gl_error = gfxCtx.gl.getError();
+   if(gl_error !== 0) 
+      console.error('line:', line, ' Error code:', gl_error, 'info:', info)
+}
+
+
+
 /******************************************************************************************************************************************/
 // DEBUG
 /** */
@@ -285,4 +294,21 @@ export function Sid_create_name_by_sid(sid){
    // if (sid.pass) str[k] += '\n'
 
    return str;
+}
+function TEMP_Shader_operation_get_name_by_id(shader_op) {
+
+    if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW) return 'SIMPLE_GLOW';
+    else if(shader_op & SID.SHADER_OPERATIONS.DIST_RECT_FILLED) return 'DIST_RECT_FILLED';
+    else if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2) return 'SIMPLE_GLOW2';
+    else if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2_RECT) return 'SIMPLE_GLOW2_RECT';
+    else if(shader_op & SID.SHADER_OPERATIONS.BUBBLE) return 'BUBBLE';
+    else if(shader_op & SID.SHADER_OPERATIONS.FLARE) return 'FLARE';
+    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE) return 'INNER_SHADOW_CIRCLE';
+    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE) return 'INNER_SPECULAR_CIRCLE';
+    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2) return 'INNER_SHADOW_RECT2';
+    else if(shader_op & SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT) return 'OUTER_SHADOW_RECT';
+    else if(shader_op & SID.SHADER_OPERATIONS.SDF_RECT) return 'SDF_RECT';
+    else if(shader_op & SID.SHADER_OPERATIONS.OUTER_GLOW_RECT) return 'OUTER_GLOW_RECT';
+    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT) return 'INNER_SHADOW_RECT';
+    else return 'NULL';
 }

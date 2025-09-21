@@ -139,7 +139,7 @@ export class Mesh {
             margin_y: 0,
             row: 0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
         };
-''
+
         this.parent = null;
 
         this.listeners = null;

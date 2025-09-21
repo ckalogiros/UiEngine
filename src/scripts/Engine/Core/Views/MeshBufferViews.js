@@ -3,7 +3,7 @@
 import { Sid_check_match } from "../../../GlobalFunctions.js";
 import { Index_buffer_reset } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Vertex_buffer_render_group_create, Vertex_buffer_render_group_get_size, Vertex_buffer_render_group_remove, Vertex_buffer_render_group_reset_draw_count, Vertex_buffer_render_group_set_draw_count_from_num_faces, Vertex_buffer_render_group_set_num_faces } from "../../../Graphics/Buffers/RenderGroups.js";
-import { Vertex_buffer_calculate_starts_per_render_group, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_ibidx, Vertex_buffer_group_get_texidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_group_update_scissorbox, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Vertex_buffer_calculate_starts_per_render_group, Vertex_buffer_calculate_vertexbuffer_render_group_starts, Vertex_buffer_group_create_scissorbox, Vertex_buffer_group_get, Vertex_buffer_group_get_byidx, Vertex_buffer_group_get_ibidx, Vertex_buffer_group_get_texidx, Vertex_buffer_group_remove_render_groupidx, Vertex_buffer_group_store_render_groupidx, Vertex_buffer_group_update_scissorbox, Vertex_buffer_reset_to_index_NEW } from "../../../Graphics/Buffers/VertexBuffers.js";import { Mesh_get_name } from "../../Drawables/Operations/MeshPropertiesFunctions.js";
 import { Renderqueue_set_active } from "../../Renderers/Renderer/RenderQueue.js";
 import { Free_generic_buffer, Free_int16_buffer, New_generic_buffer, New_int16_buffer, New_int8_buffer } from "../Buffers.js";
 import { Mesh_buffer_get_mesh_byidx } from "../MeshBuffer.js";
@@ -634,7 +634,7 @@ export function View_destroy_view_group_and_meshes(groupidx) {
 
                const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
                if ((mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) && mesh.is_gfx_inserted) {
-                  // console.warn(i,j,k,'DESTROY MESH ->>>>>>>>>>', mesh.name, 'meshidx', meshidx);
+                  console.warn(i,j,k,'DESTROY MESH ->>>>>>>>>>', mesh.name, 'meshidx', meshidx);
                   mesh.Destroy();
                }
             }
@@ -642,9 +642,10 @@ export function View_destroy_view_group_and_meshes(groupidx) {
          
          Vertex_buffer_render_group_remove(rg.render_groupidx); // Remove render group storage 
          view.vb.buffer[view_vbidx].rg.RemoveByIdx(view_rgidx);
-
+         
       }
-
+      
+      Vertex_buffer_group_remove_render_groupidx(view.vb.buffer[view_vbidx].vb_groupidx)
       const ibidx = Vertex_buffer_group_get_ibidx(view.vb.buffer[view_vbidx].vb_groupidx);
       Index_buffer_reset(ibidx)
    }
@@ -830,8 +831,6 @@ export function View_render_whole_view_group_NEW(view_groupidx) {
                   const mesh = Mesh_buffer_get_mesh_byidx(meshidx);
                   if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
                      mesh.AddToGfx();
-                     // if (!mesh.is_gfx_inserted) mesh.AddToGfx();
-                     // else mesh.AddToGfxFromReset();
                   }
                }
             }

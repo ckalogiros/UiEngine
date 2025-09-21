@@ -13,7 +13,7 @@ const gfxCtx = {
 
 
 
-
+const DEBUG_GL = true;
 
 
 
@@ -21,6 +21,7 @@ const GL_STATE = {
     BOUND_PROG_IDX: INT_NULL, // The current bound gl program index
     BOUND_PROG: INT_NULL, // The current bound gl program 
     BOUND_VAO: INT_NULL, // The current bound vertex array  
+    BOUND_VAOIDX: INT_NULL, // The current bound vertex array index
     BOUND_VBO: INT_NULL, // The current bound vertex buffer 
     BOUND_VBIDX: INT_NULL, // The current bound vertex buffer index
     BOUND_IBO: INT_NULL, // The current bound vertex buffer 
@@ -581,23 +582,7 @@ const FB = {
 
 
 
-function TEMP_Shader_operation_get_name_by_id(shader_op) {
 
-    if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW) return 'SIMPLE_GLOW';
-    else if(shader_op & SID.SHADER_OPERATIONS.DIST_RECT_FILLED) return 'DIST_RECT_FILLED';
-    else if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2) return 'SIMPLE_GLOW2';
-    else if(shader_op & SID.SHADER_OPERATIONS.SIMPLE_GLOW2_RECT) return 'SIMPLE_GLOW2_RECT';
-    else if(shader_op & SID.SHADER_OPERATIONS.BUBBLE) return 'BUBBLE';
-    else if(shader_op & SID.SHADER_OPERATIONS.FLARE) return 'FLARE';
-    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_CIRCLE) return 'INNER_SHADOW_CIRCLE';
-    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SPECULAR_CIRCLE) return 'INNER_SPECULAR_CIRCLE';
-    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT2) return 'INNER_SHADOW_RECT2';
-    else if(shader_op & SID.SHADER_OPERATIONS.OUTER_SHADOW_RECT) return 'OUTER_SHADOW_RECT';
-    else if(shader_op & SID.SHADER_OPERATIONS.SDF_RECT) return 'SDF_RECT';
-    else if(shader_op & SID.SHADER_OPERATIONS.OUTER_GLOW_RECT) return 'OUTER_GLOW_RECT';
-    else if(shader_op & SID.SHADER_OPERATIONS.INNER_SHADOW_RECT) return 'INNER_SHADOW_RECT';
-    else return 'NULL';
-}
 
 
 

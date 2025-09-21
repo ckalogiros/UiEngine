@@ -55,13 +55,14 @@ import { Collision_detection_add_object, Collision_detection_create_group, Physi
 import { Mouse_get_pos_dif, Mouse_get_posy } from '../Engine/Controls/Input/Mouse.js';
 import { Visual_debug_create, Visual_debug_create_properties } from '../Engine/VisualDebug/VisualDebug.js';
 import { Program_get_programs } from '../Graphics/ShaderPrograms.js';
-import { TEMP_Update_all_vertex_buffers } from '../Graphics/GlDraw.js';
+import { Update_all_webgl_vertex_buffers } from '../Graphics/GlDraw.js';
 import { Get_emitter_free_particle_buffer, Get_emitter_particle_buffer } from '../Engine/ParticlesSystem/ParticlesSystem.js';
 import { Static_particle_system_init_particles, Static_particle_system_update, Static_particles_gen_gfx_ctx, Static_particles_set_need_update } from '../Engine/ParticlesSystem/ParticlesSystemStatic.js';
 import { Bitwise32_operations_run_tests } from '../Engine/Core/BitwiseOps/Bitwise32Ops.js';
 import { Bitwise64_operations_run_tests, Bitwise_opps_get_bitpos_from_bitmask, Bitwise_opps_get_bitpos_from_bitmask_looped, Test_js_bigUint64 } from '../Engine/Core/BitwiseOps/Bitwise64Ops.js';
 import { Performance_timer_start, Performance_timer_stop } from '../Engine/Timers/PerformanceTimers.js';
 import { Time_get_delta_time_in_ms, Time_get_time } from '../Engine/Timers/Time.js';
+import { GL_GET_ERROR } from '../GlobalFunctions.js';
 
 
 
@@ -261,7 +262,7 @@ export function TestWidgetsGeneric() {
 
     let yy = 0, pp = 23;
     { // Statistics
-        const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
+        // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
@@ -386,6 +387,15 @@ export function TestWidgetsGeneric() {
         // Jump_physics_2();
     }
 
+    { // Visual Debug
+
+        // Visual_debug_mouse(ROOT_WIDGETS.CREATE_ROOT, 100, 100, 30, 250);  
+
+        Demo_visual_debug_glow_particles();
+
+        // Demo_visual_debug_explosion_particles();
+
+    }
 
     /*************************************************************************************************************************/
     // Test: Layout
@@ -539,15 +549,6 @@ export function TestWidgetsGeneric() {
         // Window_menu_2();
     }
 
-    { // Visual Debug
-
-        // Visual_debug_mouse(ROOT_WIDGETS.CREATE_ROOT, 100, 100, 30, 250);  
-
-        Demo_visual_debug_glow_particles();
-
-        // Demo_visual_debug_explosion_particles();
-
-    }
 
     { // Instanced Geometry
 
@@ -866,12 +867,11 @@ export function TestWidgetsGeneric() {
         // Test_js_bigUint64();
     }
 
-
+GL_GET_ERROR(new Error().lineNumber);
 
     // Vertex_buffer_build_index_buffer_all();
-
-    TEMP_Update_all_vertex_buffers(gfxCtx.gl);
-
+    Update_all_webgl_vertex_buffers(gfxCtx.gl);
+GL_GET_ERROR(new Error().lineNumber);
 }
 
 function Demo_visual_debug_glow_particles() {
@@ -879,24 +879,24 @@ function Demo_visual_debug_glow_particles() {
     {
         const transform_parameters=[.48, .5, .19, .01, .2]
         const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.12,1,1,1,.6,0));
-        Visual_debug_buffer_cells(160, 130, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+        // Visual_debug_buffer_cells(160, 130, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
     }
-    {
-        const transform_parameters=[.48, .5, .19, .04, .45]
-        const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 240, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.58,1,1,1,.7,0));
-        Visual_debug_buffer_cells(160, 370, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
-    }
-    {
-        const transform_parameters=[.48, .5, .19, .07, .7]
-        const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 480, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.3,1,1,1,.5,0));
-        Visual_debug_buffer_cells(160, 610, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
-    }
-    const params = {};
-    Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
+    // {
+    //     const transform_parameters=[.48, .5, .19, .04, .45]
+    //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 240, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.58,1,1,1,.7,0));
+    //     Visual_debug_buffer_cells(160, 370, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+    // }
+    // {
+    //     const transform_parameters=[.48, .5, .19, .07, .7]
+    //     const ret = Create_glow_particles(VIEWPORT.RIGHT-270, 480, ROOT_WIDGETS.CREATE_ROOT, false, 1, _, transform_parameters, Color_hsv_to_rgb_calibrated(.3,1,1,1,.5,0));
+    //     Visual_debug_buffer_cells(160, 610, ROOT_WIDGETS.CREATE_ROOT, _, ret.emitter);
+    // }
+//     const params = {};
+//     Time_intervals_create(1, 'Visual Debug', TIME_INTERVAL_REPEAT_ALWAYS, (params) => {
         
-        Static_particle_system_update(); 
+//         Static_particle_system_update(); 
 
-    }, params);
+//     }, params);
 }
 function Demo_visual_debug_explosion_particles() {
 
@@ -4693,16 +4693,14 @@ function CreateSimpleWidgetText(x, y) {
     Widget_gfx_ready_enable({ mesh: widget_text, enable_attr_dim: false, listener: { type: LISTEN_EVENT_TYPES.MOVE } });
 
     // widget_text.sid.inst = (SID.ATTR.COL4);
+    // widget_text.sid.inst = (SID.ATTR.WPOS3);
     widget_text.sid.inst = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
-    // widget_text.sid.inst = (SID.ATTR.COL4|SID.ATTR.WPOS3|SID.ATTR.VPOS2);
 
     /********************************************************************************************************************************************************/
     // Render
     widget_text.GenGfxCtx();
     Widget_render(widget_text);
 
-    // Vertex_buffer_calculate_vertexbuffer_render_group_starts();
-    // View_render_from_view_NEW(widget_text.group_bufferidxs[0]);
 
 }
 function CreateTextInSectionWithNewLine() { // GOOD!! render text from widget text directly to a section or stand alone. ABLE TO create layout with VERTICAL alignment via the new implementation
@@ -5679,11 +5677,11 @@ function Instanced_geometry(col, pos, dim) {
 
     const w = 200, h = 5., d = 1, r_corners = 1;
     let hue = .1;
-    const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    const inst_attribs = (SID.ATTR.COL4);
+    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
     // const inst_attribs = (SID.ATTR.WPOS3 | SID.ATTR.DIM2);
     // const inst_attribs = (SID.ATTR.WPOS3);
-    // const inst_attribs = (SID.ATTR.COL4);
 
 
     for (let i = 0; i < 10; i++) {

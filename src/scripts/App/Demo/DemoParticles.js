@@ -199,14 +199,14 @@ export function Create_glow_particles(x = 0, y = 0, root_widget = 0x0, controls_
    const switch_panel = Create_emitt_switch_panel({ z: zpos, emitter: emitter, emitt_options: { continuous_emitt: true, button_pres_emitt: true } });
    controls_section.AddItem(switch_panel);
 
+   const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
+   controls_section.AddItem(colorpicker_panel);
       
       
    /****************************************************************************************************************/
    // Create slider controls
    if (controls_create) { // Create slider controls only if this is to be rendered from this function
 
-      const colorpicker_panel = Create_color_picker_switch_panel(zpos, emitter);
-      controls_section.AddItem(colorpicker_panel);
 
       const parameters = [.48, .5, .19, .08, .4, .04, .04, .55];
       const controls_buffer = Create_particles_controls(emitter, YELLOWL[4], parameters, generic_controls_parameters, 'u_generic_controls');
@@ -2422,7 +2422,6 @@ function Create_color_picker_switch_panel(z, emitter) {
    panel.AddItem(label);
 
    const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({ theme: Color_theme_switch_auto(.6, 1., .2, .0), pos: [0, 0, 1], size: 18, col: GREY[1], name: 'color_picker_switch' }));
-   // const colorpicker_switch = Create_widget_switch_simple(Style_switch_default_properties({ theme: Color_theme_switch_auto(.76, 1., .0, .0), pos: [0, 0, 1], size: 18, col: GREY[1], name: 'color_picker_switch' }));
    Widget_gfx_ready_enable({ mesh: colorpicker_switch, enable_sdf_rect: 18, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.CLICK_UP } })
    panel.AddItem(colorpicker_switch);
 

@@ -2,6 +2,7 @@
 
 import { New_generic_buffer  } from "../Engine/Core/Buffers.js";
 import { Str_buffer_get_by_idx, Str_buffer_store } from "../Engine/Core/StringBuffer.js";
+import { GL_GET_ERROR } from "../GlobalFunctions.js";
 import { Shader_Attributes } from "./ShaderBitFlags.js";
 
 
@@ -238,7 +239,8 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
 
    const vb_attribs = _shader_attribs_buffer.buffer[attribsidx].attribs_loc;
    
-   const stride = attribs_info.count;
+   const stride = attribs_info.locs.length<=1 ? 0 : attribs_info.count;
+   // const stride = attribs_info.count;
    
    const start_loc = attribs_info.locs[0];
    const stop_loc = attribs_info.locs[attribs_info.locs.length-1]+1;
@@ -257,9 +259,11 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
       const size = vb_attribs[i].sizes;
       const offset = vb_attribs[i].offsets;
 
-      gfxCtx.gl.enableVertexAttribArray(location);
       gfxCtx.gl.vertexAttribPointer(location, size, gl_type, false, stride * FLOAT32_BYTE_SIZE, offset * FLOAT32_BYTE_SIZE);
       gfxCtx.gl.vertexAttribDivisor(location, attribs_divisor);
+      gfxCtx.gl.enableVertexAttribArray(location);
+
+      if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber, 'ShaderAttributes.js');
 
       if(DEBUG_INFO) console.log(
          'loc', location,
@@ -284,7 +288,7 @@ export function Shader_attributes_enable(attribsidx, attribs_divisor, attribs_in
 
 
 /****************************************************************************************************************************************************/
-// DEBUG
+// DEBUG-PRINT
 /****************************************************************************************************************************************************/
 
 

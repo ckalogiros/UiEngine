@@ -88,15 +88,6 @@ export class Rect_Mesh extends Mesh {
 
       return idx;
    }
-   /** */
-   // AddChild(mesh) {
-
-   //    mesh.idx = this.children.Add(mesh);
-
-   //    mesh.parent = this;
-
-   //    return mesh.idx;
-   // }
 
 
 
