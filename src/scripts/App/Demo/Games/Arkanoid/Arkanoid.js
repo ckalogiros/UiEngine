@@ -1,814 +1,868 @@
 "use strict"
 
-import { Mouse_get_posx } from "../../../../Engine/Controls/Input/Mouse.js";
-import { Create_widget_label, Create_rect_mesh, Create_widget_slider } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
-import { Effects_explosion_circle_init_buffer, Effects_explosion_circle_update, Effects_explosion_glow_init_buffer, Effects_explosion_glow_update, Effects_print } from "../../../../Engine/Drawables/Effects/Effects.js";
-import { BLUEL, GREEN, GREY, TRANSPARENT, WHITE } from "../../../../Engine/Drawables/Material/Colors.js";
-import { Particle_system_emitter_set_position_x } from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
-import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../../../Engine/Timers/TimeIntervals.js";
-import { CopyArr4, Floor, Mult_arr3_scalar } from "../../../../Helpers/Math/MathOperations.js";
-import { ARK_STATE, ARKANOID_COLORS, Arkanoid_initialize_flags, Arkanoid_initialize_stages_schema } from "./ArkanoidConstants.js";
-import { Arkanoid_balls_destroy, Arkanoid_balls_reset, Ball_create, Ball_get_main_ball, Ball_init_buffer, Ball_print, Ball_release, Ball_reset, BALL_SIZE, Ball_update } from "./Ball.js";
-import { Animation_, Arkanoid_bricks_destroy, Arkanoid_bricks_reset, Bricks_init_buffer, Bricks_reset_all_deactivated_bricks, Bricks_set_stage_bricks } from "./Bricks.js";
-import { Arkanoid_coin_destroy, Arkanoid_coin_reset, Coin_init_buffer, Coin_is_all_animations_finished, Coin_print, Coin_set_false_is_all_animations_finished, COIN_SIZE, COIN_TEXTURE, Coin_update } from "./Coin.js";
-import { Arkanoid_bulletgun_destroy, Arkanoid_bulletgun_reset, Bullet_create, Bullet_init_buffer, Bullet_update, Gun_disable, Gun_update_pos_x } from "./BulletGun.js";
-import { Arkanoid_player_reset, Player_init, Player_set_position } from "./Player.js";
-import { Arkanoid_powerup_reset, Arkanoid_powup_destroy, Powup_init_buffer, Powup_print, Powup_remove_all } from "./PowerUps.js";
-import { Arkanoid_scoremod_destroy, Arkanoid_scoremod_reset, Score_mod_init_buffer } from "./ScoreMod.js";
-import { View_activate_all_vbs_in_renderqueue, View_deactivate_all_vbs_in_renderqueue } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { Check_intersection_point_rect } from "../../../../Engine/Drawables/Operations/Intersections.js";
-import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
-import { Renderqueue_set_priority_by_vb } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
-import { Gl_set_rgb } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Slider_connect } from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
-import { Controls_create_slider_controls_from_shader_uniform_buffer_with_panel } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js";
-import { Mesh_animations_create } from "../../../../Engine/Animations/MeshAnimations.js";
-import { Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_set_wpos_x, Mesh_update_set_wpos_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
-import { Mesh_listener_change_clbk, Mesh_set_name } from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
-import { Layout_basic_pre_render } from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
-import { Arkanoid_create_ui_menu } from "./ArkanoidUi.js";
-import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
+import {Mouse_get_posx} from "../../../../Engine/Controls/Input/Mouse.js";
+import {Create_widget_label, Create_rect_mesh, Create_widget_slider} from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import {
+    Effects_explosion_circle_init_buffer,
+    Effects_explosion_circle_update,
+    Effects_explosion_glow_init_buffer,
+    Effects_explosion_glow_update,
+    Effects_print
+} from "../../../../Engine/Drawables/Effects/Effects.js";
+import {BLUEL, GREEN, GREY, TRANSPARENT, WHITE} from "../../../../Engine/Drawables/Material/Colors.js";
+import {Particle_system_emitter_set_position_x} from "../../../../Engine/ParticlesSystem/ParticlesSystem.js";
+import {Time_intervals_create, Time_intervals_destroy_byidx} from "../../../../Engine/Timers/TimeIntervals.js";
+import {CopyArr4, Floor, Mult_arr3_scalar} from "../../../../Helpers/Math/MathOperations.js";
+import {ARK_STATE, ARKANOID_COLORS, Arkanoid_initialize_flags, Arkanoid_initialize_stages_schema} from "./ArkanoidConstants.js";
+import {Arkanoid_balls_destroy, Arkanoid_balls_reset, Ball_create, Ball_get_main_ball, Ball_init_buffer, Ball_print, Ball_release, Ball_reset, BALL_SIZE, Ball_update} from "./Ball.js";
+import {Animation_, Arkanoid_bricks_destroy, Arkanoid_bricks_reset, Bricks_init_buffer, Bricks_reset_all_deactivated_bricks, Bricks_set_stage_bricks} from "./Bricks.js";
+import {
+    Arkanoid_coin_destroy,
+    Arkanoid_coin_reset,
+    Coin_init_buffer,
+    Coin_is_all_animations_finished,
+    Coin_print,
+    Coin_set_false_is_all_animations_finished,
+    COIN_SIZE,
+    COIN_TEXTURE,
+    Coin_update
+} from "./Coin.js";
+import {Arkanoid_bulletgun_destroy, Arkanoid_bulletgun_reset, Bullet_create, Bullet_init_buffer, Bullet_update, Gun_disable, Gun_update_pos_x} from "./BulletGun.js";
+import {Arkanoid_player_reset, Player_init, Player_set_position} from "./Player.js";
+import {Arkanoid_powerup_reset, Arkanoid_powup_destroy, Powup_init_buffer, Powup_print, Powup_remove_all} from "./PowerUps.js";
+import {Arkanoid_scoremod_destroy, Arkanoid_scoremod_reset, Score_mod_init_buffer} from "./ScoreMod.js";
+import {View_activate_all_vbs_in_renderqueue, View_deactivate_all_vbs_in_renderqueue} from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import {Check_intersection_point_rect} from "../../../../Engine/Drawables/Operations/Intersections.js";
+import {
+    Widget_gfx_ready_enable,
+    Style_label_default_properties,
+    Style_rect_default_properties,
+    Style_slider_default_properties
+} from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import {Renderqueue_set_priority_by_vb} from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
+import {Gl_set_rgb} from "../../../../Graphics/Buffers/VertexBuffersOps.js";
+import {Slider_connect} from "../../../../Engine/Drawables/Widgets/WidgetSlider.js";
+import {Controls_create_slider_controls_from_shader_uniform_buffer_with_panel} from "../../../../Engine/Drawables/Widgets/Helpers/WidgetGenericControlsReady.js";
+import {Mesh_animations_create} from "../../../../Engine/Animations/MeshAnimations.js";
+import {Mesh_get_real_pos_x, Mesh_get_real_pos_xy, Mesh_set_wpos_x, Mesh_update_set_wpos_x} from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import {Mesh_listener_change_clbk, Mesh_set_name} from "../../../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import {Layout_basic_pre_render} from "../../../../Engine/Drawables/Operations/AlignNestedSections.js";
+import {Arkanoid_create_ui_menu} from "./ArkanoidUi.js";
+import {Widget_render} from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
-
-
-
-const ARKANOID_MENU_DIM_Y = 50;
-export const ARKANOID_SECTION_DIM_X = 300, ARKANOID_SECTION_DIM_Y = 350;
-const ARKANOID_SECTION_PAD_X = 100, ARKANOID_SECTION_PAD_Y = 100;
+const ARKANOID_MENU_DIM_Y = 40;
+export const ARKANOID_SECTION_DIM_X = 300, ARKANOID_SECTION_DIM_Y = 300;
+const ARKANOID_SECTION_PAD_X = 200, ARKANOID_SECTION_PAD_Y = 100;
 
 
 let arkanoid_panel_mesh = null;
 
 export const _arkanoid_struct = {
 
-   start_menu: {
-      panel: { view_group: null, mesh: null },
-      start_btn: { view_group: null, mesh: null },
-   },
-   game_menu: {
-      panel: { view_group: null, mesh: null, pos_x: 0, pos_y: 0 },
-   },
-   game_panel: {
-      panel: { view_group: null, mesh: null },
-      player: { view_group: null, mesh: null },
-      balls: { view_group: null, mesh: null },
-      balls_tail_emitter: { view_group: null },
-      bricks: { view_group: null, mesh: null },
-      fx_explosion_circle: { view_group: null },
-      fx_explosion_glow: { view_group: null },
-      coins: { view_group: null },
-      powups: { view_group: null },
-      gun: { view_group: null },
-   },
-   stage_finish: {
-      panel: null,
-   },
-   in_game: { update_loop_time_interval_idx: INT_NULL, },
+    start_menu: {
+        panel: {view_group: null, mesh: null},
+        start_btn: {view_group: null, mesh: null},
+    },
+    game_menu: {
+        panel: {view_group: null, mesh: null, pos_x: 0, pos_y: 0},
+    },
+    game_panel: {
+        panel: {view_group: null, mesh: null},
+        player: {view_group: null, mesh: null},
+        balls: {view_group: null, mesh: null},
+        balls_tail_emitter: {view_group: null},
+        bricks: {view_group: null, mesh: null},
+        fx_explosion_circle: {view_group: null},
+        fx_explosion_glow: {view_group: null},
+        coins: {view_group: null},
+        powups: {view_group: null},
+        gun: {view_group: null},
+    },
+    stage_finish: {
+        panel: null,
+    },
+    in_game: {update_loop_time_interval_idx: INT_NULL,},
 
-   // score:null, 
-   score_text: null,
-   score_num_text: null,
-   score_mod_text: null,
-   score_mod_num_text: null,
-   score_num: 0,
-   score_mod_num: 0,
-   score_base_num: 10,
-   combo_text: null,
-   combo_num_text: null,
-   combo_num: 0,
-   coins_texture: null,
-   coins_num_text: null,
-   coins_num: 0,
+    // score:null,
+    score_text: null,
+    score_num_text: null,
+    score_mod_text: null,
+    score_mod_num_text: null,
+    score_num: 0,
+    score_mod_num: 0,
+    score_base_num: 10,
+    combo_text: null,
+    combo_num_text: null,
+    combo_num: 0,
+    coins_texture: null,
+    coins_num_text: null,
+    coins_num: 0,
 
-   is_stage_completed_initiated: false,
-   is_last_ball_lost: false,
+    is_stage_completed_initiated: false,
+    is_last_ball_lost: false,
 
 };
 
 
-
-
-
 /** Getters for root panel */
 // TODO: Remove 'arkanoid_panel_mesh' and use '_arkanoid_struct.game_panel'
-export function Arkanoid_get_main_panel_padxy() { return { x: ARKANOID_SECTION_PAD_X, y: ARKANOID_SECTION_PAD_Y + ARKANOID_MENU_DIM_Y * 2 }; }
-export function Arkanoid_get_main_panel_padx() { return ARKANOID_SECTION_PAD_X; }
-export function Arkanoid_get_main_panel_pady() { return ARKANOID_SECTION_PAD_Y + ARKANOID_MENU_DIM_Y * 2; }
-export function TEMP_Arkanoid_get_main_panel() { return arkanoid_panel_mesh; }
-export function Arkanoid_get_panel_pos_x() { return arkanoid_panel_mesh.geom.pos[0]; }
-export function Arkanoid_get_panel_center_pos_x() { return arkanoid_panel_mesh.geom.pos[0] + arkanoid_panel_mesh.geom.dim[0]; }
-export function Arkanoid_get_panel_dim_x() { return arkanoid_panel_mesh.geom.dim[0]; }
-export function Arkanoid_get_panel_dim_y() { return arkanoid_panel_mesh.geom.dim[1]; }
-export function Arkanoid_get_panel_right() { return arkanoid_panel_mesh.geom.pos[0] + arkanoid_panel_mesh.geom.dim[0] * 2; }
-export function Arkanoid_get_panel_bottom() { return arkanoid_panel_mesh.geom.pos[1] + arkanoid_panel_mesh.geom.dim[1] * 2; }
+export function Arkanoid_get_main_panel_padxy() {
+    return {x: ARKANOID_SECTION_PAD_X, y: ARKANOID_SECTION_PAD_Y + ARKANOID_MENU_DIM_Y * 2};
+}
 
+export function Arkanoid_get_main_panel_padx() {
+    return ARKANOID_SECTION_PAD_X;
+}
+
+export function Arkanoid_get_main_panel_pady() {
+    return ARKANOID_SECTION_PAD_Y + ARKANOID_MENU_DIM_Y * 2;
+}
+
+export function TEMP_Arkanoid_get_main_panel() {
+    return arkanoid_panel_mesh;
+}
+
+export function Arkanoid_get_panel_pos_x() {
+    return arkanoid_panel_mesh.geom.pos[0];
+}
+
+export function Arkanoid_get_panel_center_pos_x() {
+    return arkanoid_panel_mesh.geom.pos[0] + arkanoid_panel_mesh.geom.dim[0];
+}
+
+export function Arkanoid_get_panel_dim_x() {
+    return arkanoid_panel_mesh.geom.dim[0];
+}
+
+export function Arkanoid_get_panel_dim_y() {
+    return arkanoid_panel_mesh.geom.dim[1];
+}
+
+export function Arkanoid_get_panel_right() {
+    return arkanoid_panel_mesh.geom.pos[0] + arkanoid_panel_mesh.geom.dim[0] * 2;
+}
+
+export function Arkanoid_get_panel_bottom() {
+    return arkanoid_panel_mesh.geom.pos[1] + arkanoid_panel_mesh.geom.dim[1] * 2;
+}
 
 
 /** */
-export function Arkanoid_initialize(initial_y_pos=0) {
+export function Arkanoid_initialize(initial_y_pos = 0) {
 
-   Arkanoid_initialize_flags();
+    Arkanoid_initialize_flags();
 
-   Arkanoid_initialize_stages_schema()
+    Arkanoid_initialize_stages_schema()
 
-   ARK_STATE.RESET(ARK_STATE.START);
-   // ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
+    ARK_STATE.RESET(ARK_STATE.START);
+    // ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
-   let ypos = initial_y_pos + ARKANOID_SECTION_PAD_Y;
+    let ypos = initial_y_pos + ARKANOID_SECTION_PAD_Y;
 
-   // ypos += 40 // Add a padd to the game panel from the menu panel
-   Arkanoid_initialize_game(ARKANOID_SECTION_PAD_X, initial_y_pos);
-   View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
-   Arkanoid_initialize_start_menu(ARKANOID_SECTION_PAD_X, ypos);
+    // ypos += 40 // Add a padd to the game panel from the menu panel
+    Arkanoid_initialize_game(ARKANOID_SECTION_PAD_X, initial_y_pos);
+    View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
+    Arkanoid_initialize_start_menu(ARKANOID_SECTION_PAD_X, ypos);
 
 }
+
 /** */
 function Arkanoid_load_state(state) {
 
-   // Unload
-   if (ARK_STATE.IS(ARK_STATE.START)) { // Case the game is at start menu
-      View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.start_menu.panel.view_group);
-   }
-   else if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) {
-      View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
-      Time_intervals_destroy_byidx(_arkanoid_struct.in_game.update_loop_time_interval_idx);
-      _arkanoid_struct.in_game.update_loop_time_interval_idx = INT_NULL;
-   }
+    // Unload
+    if (ARK_STATE.IS(ARK_STATE.START)) { // Case the game is at start menu
+        View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.start_menu.panel.view_group);
+    } else if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) {
+        View_deactivate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
+        Time_intervals_destroy_byidx(_arkanoid_struct.in_game.update_loop_time_interval_idx);
+        _arkanoid_struct.in_game.update_loop_time_interval_idx = INT_NULL;
+    }
 
-   ARK_STATE.RESET(state);
+    ARK_STATE.RESET(state);
 
-   // Load
-   if (ARK_STATE.IS(ARK_STATE.START)) { // Case the game is at start menu
-      View_activate_all_vbs_in_renderqueue(_arkanoid_struct.start_menu.panel.view_group);
-      Coin_set_false_is_all_animations_finished();
-   }
-   else if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) { // Case the game is at the start stage
-      View_activate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
-      Bricks_reset_all_deactivated_bricks();
-      // // Bricks_set_stage_bricks(_arkanoid_struct.game_panel.panel.pos_x, _arkanoid_struct.game_panel.panel.pos_y, _arkanoid_struct.game_panel.panel.view_group[0]);
-      Bricks_set_stage_bricks(0, 0, _arkanoid_struct.game_panel.panel.view_group[0]);
-      Arkanoid_create_brick_animation();
-      ARK_STATE.ADD(ARK_STATE.BALL_START);
-   }
+    // Load
+    if (ARK_STATE.IS(ARK_STATE.START)) { // Case the game is at start menu
+        View_activate_all_vbs_in_renderqueue(_arkanoid_struct.start_menu.panel.view_group);
+        Coin_set_false_is_all_animations_finished();
+    } else if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) { // Case the game is at the start stage
+        View_activate_all_vbs_in_renderqueue(_arkanoid_struct.game_panel.panel.view_group);
+        Bricks_reset_all_deactivated_bricks();
+        // // Bricks_set_stage_bricks(_arkanoid_struct.game_panel.panel.pos_x, _arkanoid_struct.game_panel.panel.pos_y, _arkanoid_struct.game_panel.panel.view_group[0]);
+        Bricks_set_stage_bricks(0, 0, _arkanoid_struct.game_panel.panel.view_group[0]);
+        Arkanoid_create_brick_animation();
+        ARK_STATE.ADD(ARK_STATE.BALL_START);
+    }
 }
+
 /** Mouse click event callback */
 function Arkanoid_on_click_callback(params) {
 
-   if (ARK_STATE.IS(ARK_STATE.BALL_START)) { // Case the ball is at start position
-      Ball_release(params.evt_params.player);
-      ARK_STATE.REMOVE(ARK_STATE.BALL_START);
-   }
-   else if (ARK_STATE.IS(ARK_STATE.START)) {
+    if (ARK_STATE.IS(ARK_STATE.BALL_START)) { // Case the ball is at start position
+        Ball_release(params.evt_params.player);
+        ARK_STATE.REMOVE(ARK_STATE.BALL_START);
+    } else if (ARK_STATE.IS(ARK_STATE.START)) {
 
-      const intersects = Check_intersection_point_rect(Mesh_get_real_pos_xy(_arkanoid_struct.start_menu.start_btn), _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
-      // const intersects = Check_intersection_point_rect(_arkanoid_struct.start_menu.start_btn.geom.pos, _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
-      if (intersects)
-         Arkanoid_load_state(ARK_STATE.IN_GAME_PLAY);
+        const intersects = Check_intersection_point_rect(Mesh_get_real_pos_xy(_arkanoid_struct.start_menu.start_btn), _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
+        // const intersects = Check_intersection_point_rect(_arkanoid_struct.start_menu.start_btn.geom.pos, _arkanoid_struct.start_menu.start_btn.geom.dim, params.click_pos,);
+        if (intersects)
+            Arkanoid_load_state(ARK_STATE.IN_GAME_PLAY);
 
-   }
-   else if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
-      Bullet_create();
-   }
+    } else if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
+        Bullet_create();
+    }
 }
+
 /** */
 function Arkanoid_initialize_start_menu(x, y) {
 
-   const section = Create_rect_mesh(Style_rect_default_properties({
-      is_root:ROOT_WIDGETS.CREATE_ROOT, 
-      pad:[0, 0], pos:[x, y, 0], 
-      // pad:[0, 0], pos:[0, 500, 0], 
-      dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], 
-      col:TRANSPARENCY(GREY[1], 1.0)}
-   ));
-   Widget_gfx_ready_enable({mesh:section, enable_sdf_rect:20, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-   Mesh_set_name(section, 'Arkanoid-Start Menu Panel');
+    const section = Create_rect_mesh(Style_rect_default_properties({
+            is_root: ROOT_WIDGETS.CREATE_ROOT,
+            pad: [0, 0], pos: [x, y, 0],
+            // pad:[0, 0], pos:[0, 500, 0],
+            dim: [ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y],
+            col: TRANSPARENCY(GREY[1], 1.0)
+        }
+    ));
+    Widget_gfx_ready_enable({mesh: section, enable_sdf_rect: 20, listener: {type: LISTEN_EVENT_TYPES.CLICK_UP}});
+    Mesh_set_name(section, 'Arkanoid-Start Menu Panel');
 
-   section.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   const control_values = [.7, .8, .4, .0];
-   section.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-   
-   
-   
-   
-   /*******************************************************************************************/
-   // Load menu button
-   // const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:ARKANOID_COLORS.blue, dim:[16, 16], text_pad:[40, 15]}));
-   const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:TRANSPARENCY(ARKANOID_COLORS.blue, .7), dim:[16, 16], text_pad:[40, 15]}));
-   Widget_gfx_ready_enable({mesh:start_menu_btn, enable_sdf_rect:20, enable_pass_vpos:true, listener:{type:LISTEN_EVENT_TYPES.HOVER}});
-   
-   start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   start_menu_btn.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-   
-   
-   section.AddItem(start_menu_btn);
-   
-   _arkanoid_struct.start_menu.start_btn = start_menu_btn;
-   
-   let posx = ARKANOID_SECTION_DIM_X - start_menu_btn.geom.dim[0];
-   let posy = ARKANOID_SECTION_DIM_Y - start_menu_btn.geom.dim[1];
-   start_menu_btn.MoveNoGfxUpdate(posx, posy);
-      
-   
-   
-
-   /*******************************************************************************************/
-   // Render
-   section.GenGfxCtx();
-   // Layout_basic_pre_render(section);
-   Widget_render(section);
-   
-   section.GfxUniformSetAndUpdate('u_generic_controls', control_values);
-   // section.GfxUniformsSetClbk('u_blend_mode', () => { return section.sid.blend_options; }, section.gfx.vb.groupidx);
-   // section.GfxUniformsSetClbk('u_generic_controls', () => { return control_values; }, section.gfx.vb.groupidx);
-
-   _arkanoid_struct.start_menu.panel.view_group = section.group_bufferidxs;
-
-   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, 0.5, .0, true)
-   // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, )
+    section.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+    const control_values = [.7, .8, .4, .0];
+    section.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
 
+    /*******************************************************************************************/
+    // Load menu button
+    // const start_menu_btn = Create_widget_label(Style_label_default_properties({text:'Start', pos:[0, 0, 1], font_size:40, col:ARKANOID_COLORS.blue, dim:[16, 16], text_pad:[40, 15]}));
+    const start_menu_btn = Create_widget_label(Style_label_default_properties({
+        text: 'Start',
+        pos: [0, 0, 1],
+        font_size: 40,
+        col: TRANSPARENCY(ARKANOID_COLORS.blue, .7),
+        dim: [16, 16],
+        text_pad: [40, 15]
+    }));
+    Widget_gfx_ready_enable({mesh: start_menu_btn, enable_sdf_rect: 20, enable_pass_vpos: true, listener: {type: LISTEN_EVENT_TYPES.HOVER}});
 
-   return section;
+    start_menu_btn.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+    start_menu_btn.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
+
+
+    section.AddItem(start_menu_btn);
+
+    _arkanoid_struct.start_menu.start_btn = start_menu_btn;
+
+    let posx = ARKANOID_SECTION_DIM_X - start_menu_btn.geom.dim[0];
+    let posy = ARKANOID_SECTION_DIM_Y - start_menu_btn.geom.dim[1];
+    start_menu_btn.MoveNoGfxUpdate(posx, posy);
+
+
+    /*******************************************************************************************/
+    // Render
+    section.GenGfxCtx();
+    // Layout_basic_pre_render(section);
+    Widget_render(section);
+
+    section.GfxUniformSetAndUpdate('u_generic_controls', control_values);
+    // section.GfxUniformsSetClbk('u_blend_mode', () => { return section.sid.blend_options; }, section.gfx.vb.groupidx);
+    // section.GfxUniformsSetClbk('u_generic_controls', () => { return control_values; }, section.gfx.vb.groupidx);
+
+    _arkanoid_struct.start_menu.panel.view_group = section.group_bufferidxs;
+
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, 0.5, .0, true)
+    // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.GB, start_menu_btn, .0015, .5, 1.1, )
+
+
+    return section;
 }
+
 /** */
 function Arkanoid_initialize_game(x, y) {
 
-   const menu = Arkanoid_create_ui_menu(x, y, ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y)
-   _arkanoid_struct.menu = menu;
-   // const group_idx = menu.group_bufferidxs[0];
-   
-   
-   let ypos = y + ARKANOID_MENU_DIM_Y * 2;
-   
-   
-   
-   /***************************************************************************************************************/
-   // Create game panel
-   const control_values = [.7, .6, .8, 1.]; 
-   
-   const game_panel = Create_rect_mesh(Style_rect_default_properties({
-      is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[0, 0], 
-      pos:[ARKANOID_SECTION_PAD_X, ypos, 0], 
-      dim:[ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y], 
-      col:TRANSPARENCY(GREY[4],.2), layout:LAYOUT.VERTICAL,
-   }));
-   Widget_gfx_ready_enable({mesh:game_panel, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.CLICK_UP}});
-   Mesh_set_name(game_panel,'Arkanoid-Game Panel');
-   
-   // game_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   game_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT);
-   game_panel.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-   
-   
-   // Render
-   game_panel.GenGfxCtx();
-   Layout_basic_pre_render(game_panel);
-   Widget_render(game_panel);
-   
-   const group_idx = game_panel.group_bufferidxs[0];
+    const menu = Arkanoid_create_ui_menu(x, y, ARKANOID_SECTION_DIM_X, ARKANOID_MENU_DIM_Y)
+    _arkanoid_struct.menu = menu;
+    // const group_idx = menu.group_bufferidxs[0];
 
 
-
-   game_panel.GfxUniformSetAndUpdate('u_generic_controls', control_values);
-   game_panel.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, game_panel.gfx.vb.groupidx);
+    let ypos = y + ARKANOID_MENU_DIM_Y * 2;
 
 
-   arkanoid_panel_mesh = game_panel;
-   _arkanoid_struct.game_panel.panel.view_group = game_panel.group_bufferidxs;
-   _arkanoid_struct.game_panel.panel.mesh = game_panel;
-   _arkanoid_struct.game_panel.panel.pos_x = game_panel.geom.pos[0] ;
-   _arkanoid_struct.game_panel.panel.pos_y = game_panel.geom.pos[1];
+    /***************************************************************************************************************/
+    // Create game panel
+    const control_values = [.7, .6, .8, 1.];
+
+    const game_panel = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [0, 0],
+        pos: [ARKANOID_SECTION_PAD_X, ypos, 0],
+        dim: [ARKANOID_SECTION_DIM_X, ARKANOID_SECTION_DIM_Y],
+        col: TRANSPARENCY(GREY[4], .2), layout: LAYOUT.VERTICAL,
+    }));
+    Widget_gfx_ready_enable({mesh: game_panel, enable_sdf_rect: 10, listener: {type: LISTEN_EVENT_TYPES.CLICK_UP}});
+    Mesh_set_name(game_panel, 'Arkanoid-Game Panel');
+
+    // game_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+    game_panel.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT);
+    game_panel.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
 
+    // Render
+    game_panel.GenGfxCtx();
+    Layout_basic_pre_render(game_panel);
+    Widget_render(game_panel);
+
+    const group_idx = game_panel.group_bufferidxs[0];
 
 
-
-   /***********************************************************************************/
-   // Create game meshes
-   const parent = game_panel;
-
-   const player = Player_init(0, 0, group_idx, parent);
-   const player_posx = game_panel.geom.pos[0] + ARKANOID_SECTION_DIM_X - player.mesh.geom.dim[0];
-   const player_posy = game_panel.geom.pos[1] + ARKANOID_SECTION_DIM_Y * 2 - (player.mesh.geom.dim[1] * 2 + 20); // 20: some padd from bottom
-   Player_set_position(player_posx, player_posy);
-   _arkanoid_struct.game_panel.player.view_group = player.mesh.group_bufferidxs;
-   _arkanoid_struct.game_panel.player.mesh = player;
-   
-   // Explosions
-   const fx_explosion_circle = Effects_explosion_circle_init_buffer(group_idx, parent);
-   _arkanoid_struct.game_panel.fx_explosion_circle.view_group = fx_explosion_circle.mesh.group_bufferidxs;
-   const fx_explosion_glow = Effects_explosion_glow_init_buffer(group_idx, parent);
-   _arkanoid_struct.game_panel.fx_explosion_glow.view_group = fx_explosion_glow.mesh.group_bufferidxs;
-   
-   const br_pos_x = game_panel.geom.pos[0];
-   const br_pos_y = game_panel.geom.pos[0];
-   const brick = Bricks_init_buffer(br_pos_x, br_pos_y, group_idx, parent);
-   // _arkanoid_struct.game_panel.bricks.view_group = brick.mesh.group_bufferidxs;
-   _arkanoid_struct.game_panel.bricks.mesh = brick;
+    game_panel.GfxUniformSetAndUpdate('u_generic_controls', control_values);
+    game_panel.GfxUniformsSetClbk('u_generic_controls', () => {
+        return control_values;
+    }, game_panel.gfx.vb.groupidx);
 
 
-   const ball_buffer = Ball_init_buffer(0, 0, group_idx, parent);
-   const ball_posx = player.mesh.geom.pos[0] + BALL_SIZE * 2;
-   const ball_posy = player.mesh.geom.pos[1] - BALL_SIZE * 2;
-   const ball = Ball_create(ball_posx, ball_posy)
-   _arkanoid_struct.game_panel.balls.view_group = ball.mesh.group_bufferidxs;
-   _arkanoid_struct.game_panel.balls.mesh = ball;
+    arkanoid_panel_mesh = game_panel;
+    _arkanoid_struct.game_panel.panel.view_group = game_panel.group_bufferidxs;
+    _arkanoid_struct.game_panel.panel.mesh = game_panel;
+    _arkanoid_struct.game_panel.panel.pos_x = game_panel.geom.pos[0];
+    _arkanoid_struct.game_panel.panel.pos_y = game_panel.geom.pos[1];
 
 
+    /***********************************************************************************/
+    // Create game meshes
+    const parent = game_panel;
 
-   // Pre initialize buffers
-   // Coin
-   const coin = Coin_init_buffer(group_idx, parent, _);
-   _arkanoid_struct.game_panel.coins.view_group = coin.mesh.group_bufferidxs;
-   // Power ups
-   const powup = Powup_init_buffer(group_idx, parent,);
-   _arkanoid_struct.game_panel.powups.view_group = powup.mesh.group_bufferidxs;
-   // Fire bullet power up
-   const gun = Bullet_init_buffer(0, 0, group_idx, parent);
-   _arkanoid_struct.game_panel.gun.view_group = gun.mesh.group_bufferidxs;
-   // Score modifier text
-   const score_vb_grouidxs = Score_mod_init_buffer(group_idx, parent,);
+    const player = Player_init(0, 0, group_idx, parent);
+    const player_posx = game_panel.geom.pos[0] + ARKANOID_SECTION_DIM_X - player.mesh.geom.dim[0];
+    const player_posy = game_panel.geom.pos[1] + ARKANOID_SECTION_DIM_Y * 2 - (player.mesh.geom.dim[1] * 2 + 20); // 20: some padd from bottom
+    Player_set_position(player_posx, player_posy);
+    _arkanoid_struct.game_panel.player.view_group = player.mesh.group_bufferidxs;
+    _arkanoid_struct.game_panel.player.mesh = player;
+
+    // Explosions
+    const fx_explosion_circle = Effects_explosion_circle_init_buffer(group_idx, parent);
+    _arkanoid_struct.game_panel.fx_explosion_circle.view_group = fx_explosion_circle.mesh.group_bufferidxs;
+    const fx_explosion_glow = Effects_explosion_glow_init_buffer(group_idx, parent);
+    _arkanoid_struct.game_panel.fx_explosion_glow.view_group = fx_explosion_glow.mesh.group_bufferidxs;
+
+    const br_pos_x = game_panel.geom.pos[0];
+    const br_pos_y = game_panel.geom.pos[0];
+    const brick = Bricks_init_buffer(br_pos_x, br_pos_y, group_idx, parent);
+    // _arkanoid_struct.game_panel.bricks.view_group = brick.mesh.group_bufferidxs;
+    _arkanoid_struct.game_panel.bricks.mesh = brick;
 
 
-   const ball_release_params = { player: player };
-   Mesh_listener_change_clbk(game_panel, E.C, Arkanoid_on_click_callback, ball_release_params);
+    const ball_buffer = Ball_init_buffer(0, 0, group_idx, parent);
+    const ball_posx = player.mesh.geom.pos[0] + BALL_SIZE * 2;
+    const ball_posy = player.mesh.geom.pos[1] - BALL_SIZE * 2;
+    const ball = Ball_create(ball_posx, ball_posy)
+    _arkanoid_struct.game_panel.balls.view_group = ball.mesh.group_bufferidxs;
+    _arkanoid_struct.game_panel.balls.mesh = ball;
 
 
-   console.warn('player', player.mesh.geom.pos);
-   console.warn('ball', ball.mesh.geom.pos);
-   console.warn('arkanoid_struct', _arkanoid_struct);
+    // Pre initialize buffers
+    // Coin
+    const coin = Coin_init_buffer(group_idx, parent, _);
+    _arkanoid_struct.game_panel.coins.view_group = coin.mesh.group_bufferidxs;
+    // Power ups
+    const powup = Powup_init_buffer(group_idx, parent,);
+    _arkanoid_struct.game_panel.powups.view_group = powup.mesh.group_bufferidxs;
+    // Fire bullet power up
+    const gun = Bullet_init_buffer(0, 0, group_idx, parent);
+    _arkanoid_struct.game_panel.gun.view_group = gun.mesh.group_bufferidxs;
+    // Score modifier text
+    const score_vb_grouidxs = Score_mod_init_buffer(group_idx, parent,);
 
-   View_activate_all_vbs_in_renderqueue(game_panel.group_bufferidxs)
+
+    const ball_release_params = {player: player};
+    Mesh_listener_change_clbk(game_panel, E.C, Arkanoid_on_click_callback, ball_release_params);
+
+
+    console.warn('player', player.mesh.geom.pos);
+    console.warn('ball', ball.mesh.geom.pos);
+    console.warn('arkanoid_struct', _arkanoid_struct);
+
+    View_activate_all_vbs_in_renderqueue(game_panel.group_bufferidxs)
 
 }
 
 /** */
 export function Arkanoid_create_update_game_loop() {
 
-   const params = {
-      panel: _arkanoid_struct.game_panel.panel.mesh,
-      player: _arkanoid_struct.game_panel.player.mesh,
-      ball: _arkanoid_struct.game_panel.balls.mesh,
-      tail_emitter_idx: _arkanoid_struct.game_panel.balls.mesh.tail_emitter_idx,
-   };
-   _arkanoid_struct.in_game.update_loop_time_interval_idx = Time_intervals_create(1, 'Arkanoid Update', TIME_INTERVAL_REPEAT_ALWAYS, Arkanoid_run, params,);
+    const params = {
+        panel: _arkanoid_struct.game_panel.panel.mesh,
+        player: _arkanoid_struct.game_panel.player.mesh,
+        ball: _arkanoid_struct.game_panel.balls.mesh,
+        tail_emitter_idx: _arkanoid_struct.game_panel.balls.mesh.tail_emitter_idx,
+    };
+    _arkanoid_struct.in_game.update_loop_time_interval_idx = Time_intervals_create(1, 'Arkanoid Update', TIME_INTERVAL_REPEAT_ALWAYS, Arkanoid_run, params,);
 }
+
 /** */
 function Arkanoid_run(params) {
 
-   if (Coin_is_all_animations_finished()) {
-      Arkanoid_initiate_stage_completed(params.params.player);
-   }
-   if (ARK_STATE.IS(ARK_STATE.LAST_BALL_LOST)) {
-      Arkanoid_initiate_ball_start(params.params.player);
-      ARK_STATE.REMOVE(ARK_STATE.LAST_BALL_LOST);
-      ARK_STATE.ADD(ARK_STATE.BALL_START);
-   }
+    if (Coin_is_all_animations_finished()) {
+        Arkanoid_initiate_stage_completed(params.params.player);
+    }
+    if (ARK_STATE.IS(ARK_STATE.LAST_BALL_LOST)) {
+        Arkanoid_initiate_ball_start(params.params.player);
+        ARK_STATE.REMOVE(ARK_STATE.LAST_BALL_LOST);
+        ARK_STATE.ADD(ARK_STATE.BALL_START);
+    }
 
-   const panel = params.params.panel;
-   const player = params.params.player;
-   const game_panel_pos_x = Mesh_get_real_pos_x(panel);
-   let mouse_posx = Mouse_get_posx();
-
-
-   const player_half_dimx = player.mesh.geom.dim[0];
+    const panel = params.params.panel;
+    const player = params.params.player;
+    const game_panel_pos_x = Mesh_get_real_pos_x(panel);
+    let mouse_posx = Mouse_get_posx();
 
 
-   const bound_left = game_panel_pos_x;
-   const bound_right = game_panel_pos_x + panel.geom.dim[0] * 2;
-
-   let posx = mouse_posx - game_panel_pos_x - player_half_dimx;
-
-   // Limit player move to the left and right panel bounds
-   if (posx > bound_right - player_half_dimx * 2) posx = bound_right - player_half_dimx * 2;
-   else if (posx < bound_left - player_half_dimx * 2) posx = bound_left - player_half_dimx * 2;
-
-   // Set player's new position
-   const new_posx = posx;
-   player.mesh.geom.pos[0] = new_posx;
-   Mesh_update_set_wpos_x(player.mesh);
+    const player_half_dimx = player.mesh.geom.dim[0];
 
 
-   const pl_left = player.mesh.geom.pos[0];
-   const pl_right = player.mesh.geom.pos[0] + player.mesh.geom.dim[0] * 2;
+    const bound_left = game_panel_pos_x;
+    const bound_right = game_panel_pos_x + panel.geom.dim[0] * 2;
 
-   const apos = panel.geom.pos
-   if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) {
+    let posx = mouse_posx - game_panel_pos_x - player_half_dimx;
 
-      if (ARK_STATE.IS(ARK_STATE.BALL_START)) { // Case the ball is not moving AKA game in 'ARK_STATE_IN_START'
-         // Ball follows player and constrain it in players width 
+    // Limit player move to the left and right panel bounds
+    if (posx > bound_right - player_half_dimx * 2) posx = bound_right - player_half_dimx * 2;
+    else if (posx < bound_left - player_half_dimx * 2) posx = bound_left - player_half_dimx * 2;
 
-         const ball = Ball_get_main_ball();
-         
-         // Make the ball not leave the players's width area
-         if (ball.mesh.geom.pos[0] < pl_left) {
-            ball.mesh.geom.pos[0] = pl_left;
-            Mesh_set_wpos_x(ball.mesh, pl_left);
-            Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
-         }
-         else if (ball.mesh.geom.pos[0] > pl_right) {
-            // STATE.loop.paused = true
-            ball.mesh.geom.pos[0] = pl_right;
-            Mesh_set_wpos_x(ball.mesh, pl_right);
-            Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
-         }
-      }
-      else {
-
-         const bound_local_left = (apos[0]);
-         const bound_local_right = (apos[0] + panel.geom.dim[0] * 2);
-         const bound_local_bottom = (apos[1] + panel.geom.dim[1] * 2);
-         const bound_local_top = apos[1];
-         Ball_update(bound_local_left, bound_local_right, bound_local_top, bound_local_bottom, player.mesh.geom.pos, player.mesh.geom.dim);
-      }
-
-      // Update fire bullet power up
-      if (ARK_STATE.IS(ARK_STATE.GUN_ENABLED)) {
-         Gun_update_pos_x(player.mesh.geom.pos[0] + player_half_dimx);
-      }
-      if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
-         Bullet_update();
-      }
-
-      Coin_update();
+    // Set player's new position
+    const new_posx = posx;
+    player.mesh.geom.pos[0] = new_posx;
+    Mesh_update_set_wpos_x(player.mesh);
 
 
-      // Update Effects
-      Effects_explosion_glow_update();
-      // Effects_explosion_circle_update();
+    const pl_left = player.mesh.geom.pos[0];
+    const pl_right = player.mesh.geom.pos[0] + player.mesh.geom.dim[0] * 2;
 
-   }
+    const apos = panel.geom.pos
+    if (ARK_STATE.IS(ARK_STATE.IN_GAME_PLAY)) {
+
+        if (ARK_STATE.IS(ARK_STATE.BALL_START)) { // Case the ball is not moving AKA game in 'ARK_STATE_IN_START'
+            // Ball follows player and constrain it in players width
+
+            const ball = Ball_get_main_ball();
+
+            // Make the ball not leave the players's width area
+            if (ball.mesh.geom.pos[0] < pl_left) {
+                ball.mesh.geom.pos[0] = pl_left;
+                Mesh_set_wpos_x(ball.mesh, pl_left);
+                Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
+            } else if (ball.mesh.geom.pos[0] > pl_right) {
+                // STATE.loop.paused = true
+                ball.mesh.geom.pos[0] = pl_right;
+                Mesh_set_wpos_x(ball.mesh, pl_right);
+                Particle_system_emitter_set_position_x(ball.tail_emitter_idx, ball.mesh.geom.pos[0]);
+            }
+        } else {
+
+            const bound_local_left = (apos[0]);
+            const bound_local_right = (apos[0] + panel.geom.dim[0] * 2);
+            const bound_local_bottom = (apos[1] + panel.geom.dim[1] * 2);
+            const bound_local_top = apos[1];
+            Ball_update(bound_local_left, bound_local_right, bound_local_top, bound_local_bottom, player.mesh.geom.pos, player.mesh.geom.dim);
+        }
+
+        // Update fire bullet power up
+        if (ARK_STATE.IS(ARK_STATE.GUN_ENABLED)) {
+            Gun_update_pos_x(player.mesh.geom.pos[0] + player_half_dimx);
+        }
+        if (ARK_STATE.IS(ARK_STATE.FIRE_BULLET_ENABLED)) {
+            Bullet_update();
+        }
+
+        Coin_update();
+
+        // Update Effects
+        Effects_explosion_glow_update();
+        // Effects_explosion_circle_update();
+
+    }
 
 }
+
 /** */
 function Arkanoid_initiate_stage_completed(player) {
 
-   // Ball_print();
-   // Coin_print();
-   // Powup_print();
-   // Effects_print();
+    // Ball_print();
+    // Coin_print();
+    // Powup_print();
+    // Effects_print();
 
-   // Reset all game meshes
-   Ball_reset(player.mesh.geom.pos[0] + BALL_SIZE * 2, player.mesh.geom.pos[1] - BALL_SIZE * 2);
-   Gun_disable();
-   Powup_remove_all();
+    // Reset all game meshes
+    Ball_reset(player.mesh.geom.pos[0] + BALL_SIZE * 2, player.mesh.geom.pos[1] - BALL_SIZE * 2);
+    Gun_disable();
+    Powup_remove_all();
 
-   Arkanoid_combo_counter_reset();
+    Arkanoid_combo_counter_reset();
 
-   Arkanoid_load_state(ARK_STATE.START);
+    Arkanoid_load_state(ARK_STATE.START);
 }
+
 /** */
 function Arkanoid_initiate_ball_start(player) {
 
-   // Reset all game meshes
-   Gun_disable();
-   Powup_remove_all();
+    // Reset all game meshes
+    Gun_disable();
+    Powup_remove_all();
 
-   Arkanoid_combo_counter_reset();
+    Arkanoid_combo_counter_reset();
 
-   const ball_posy = player.mesh.geom.pos[1] - BALL_SIZE * 2;
-   Ball_create(player.mesh.geom.pos[0] + player.mesh.geom.dim[0], ball_posy,);
+    const ball_posy = player.mesh.geom.pos[1] - BALL_SIZE * 2;
+    Ball_create(player.mesh.geom.pos[0] + player.mesh.geom.dim[0], ball_posy,);
 
-   ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
+    ARK_STATE.RESET(ARK_STATE.IN_GAME_PLAY);
 
 }
 
 /** */
 function Arkanoid_create_brick_animation() {
 
-   Animation_();
+    Animation_();
 }
 
 
 /** */
 export function Arkanoid_score_mod_add(score_mod_num) {
 
-   _arkanoid_struct.score_mod_num += score_mod_num;
-   _arkanoid_struct.score_num = _arkanoid_struct.score_mod_num * _arkanoid_struct.score_base_num;
-   _arkanoid_struct.score_text.text_mesh.RenderTextFromNumber(_arkanoid_struct.score_num);
+    _arkanoid_struct.score_mod_num += score_mod_num;
+    _arkanoid_struct.score_num = _arkanoid_struct.score_mod_num * _arkanoid_struct.score_base_num;
+    _arkanoid_struct.score_text.text_mesh.RenderTextFromNumber(_arkanoid_struct.score_num);
 }
+
 /** */
 export function Arkanoid_score_calc(score_mod_num) {
 
-   _arkanoid_struct.score_mod_num += score_mod_num;
-   _arkanoid_struct.score_mod_num_text.text_mesh.RenderTextFromNumber(_arkanoid_struct.score_mod_num);
-   _arkanoid_struct.score_num += (_arkanoid_struct.score_base_num);
-   _arkanoid_struct.score_num += (_arkanoid_struct.score_base_num * _arkanoid_struct.combo_num + 1);
-   _arkanoid_struct.score_num_text.text_mesh.RenderTextFromNumber(Floor(_arkanoid_struct.score_num));
+    _arkanoid_struct.score_mod_num += score_mod_num;
+    _arkanoid_struct.score_mod_num_text.text_mesh.RenderTextFromNumber(_arkanoid_struct.score_mod_num);
+    _arkanoid_struct.score_num += (_arkanoid_struct.score_base_num);
+    _arkanoid_struct.score_num += (_arkanoid_struct.score_base_num * _arkanoid_struct.combo_num + 1);
+    _arkanoid_struct.score_num_text.text_mesh.RenderTextFromNumber(Floor(_arkanoid_struct.score_num));
 }
+
 /** */
 export function Arkanoid_combo_counter_get() {
-   return _arkanoid_struct.combo_num;
+    return _arkanoid_struct.combo_num;
 }
+
 /** */
 export function Arkanoid_combo_counter_reset() {
-   _arkanoid_struct.combo_num = 0;
-   _arkanoid_struct.combo_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.combo_num}`);
+    _arkanoid_struct.combo_num = 0;
+    _arkanoid_struct.combo_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.combo_num}`);
 }
+
 /** */
 export function Arkanoid_combo_counter_add(val) {
-   _arkanoid_struct.combo_num += val;
-   _arkanoid_struct.combo_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.combo_num}`);
+    _arkanoid_struct.combo_num += val;
+    _arkanoid_struct.combo_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.combo_num}`);
 
 }
+
 /** */
 export function Arkanoid_coin_counter_add(val) {
-   _arkanoid_struct.coins_num += val;
-   _arkanoid_struct.coins_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.coins_num}`);
+    _arkanoid_struct.coins_num += val;
+    _arkanoid_struct.coins_num_text.text_mesh.RenderTextFromString(`x${_arkanoid_struct.coins_num}`);
 
 }
-
-
 
 
 /** */
 export function Arkanoid_reset() {
 
-   Arkanoid_scoremod_reset();
-   Arkanoid_powerup_reset();
-   Arkanoid_player_reset();
-   Arkanoid_coin_reset();
-   Arkanoid_bulletgun_reset();
-   Arkanoid_bricks_reset();
-   Arkanoid_balls_reset();
+    Arkanoid_scoremod_reset();
+    Arkanoid_powerup_reset();
+    Arkanoid_player_reset();
+    Arkanoid_coin_reset();
+    Arkanoid_bulletgun_reset();
+    Arkanoid_bricks_reset();
+    Arkanoid_balls_reset();
 
 }
-
-
 
 
 /** */
 export function Arkanoid_free_buffers() {
 
-   Arkanoid_scoremod_destroy();
-   Arkanoid_powup_destroy();
-   Arkanoid_coin_destroy();
-   Arkanoid_bulletgun_destroy();
-   Arkanoid_bricks_destroy();
-   Arkanoid_balls_destroy();
+    Arkanoid_scoremod_destroy();
+    Arkanoid_powup_destroy();
+    Arkanoid_coin_destroy();
+    Arkanoid_bulletgun_destroy();
+    Arkanoid_bricks_destroy();
+    Arkanoid_balls_destroy();
 
 }
 
 
-
-
-
-
-
-
-
-
+/* Testers */
 export function Arkanoid_test_game_options() {
 
-   const bricks_ratio = 75 / 40;
-   const brick_dim_x = 20*bricks_ratio;
-   const brick_dim_y = 20;
+    const bricks_ratio = 75 / 40;
+    const brick_dim_x = 20 * bricks_ratio;
+    const brick_dim_y = 20;
 
-   const yellow = new Float32Array([1, .65, 0, 1]);
-   const purple = new Float32Array([.75, 0, 1., 1]);
-   const blue = new Float32Array([0, .5, 1, 1]);
-   const green = new Float32Array([0., 1., 0., 1]);
+    const yellow = new Float32Array([1, .65, 0, 1]);
+    const purple = new Float32Array([.75, 0, 1., 1]);
+    const blue = new Float32Array([0, .5, 1, 1]);
+    const green = new Float32Array([0., 1., 0., 1]);
 
-   const meshes = [];
+    const meshes = [];
 
-   // const slider_ctrl_init_val = [.75, .65, 1., .5,];
-   const slider_ctrl_init_val = {
-      yellow:.75,
-      purple:.65,
-      blue:1.,
-      green:.5,
-   };
+    // const slider_ctrl_init_val = [.75, .65, 1., .5,];
+    const slider_ctrl_init_val = {
+        yellow: .75,
+        purple: .65,
+        blue: 1.,
+        green: .5,
+    };
 
-   let vb_groupidx = INT_NULL;
+    let vb_groupidx = INT_NULL;
 
-   let posx = 300;
-   let posy = 10;
+    let posx = 300;
+    let posy = 10;
 
-   const control_values = [.4, .75, 1., .23];
-   // const control_values = [1., .26, .8, .0];
+    const control_values = [.4, .75, 1., .23];
+    // const control_values = [1., .26, .8, .0];
 
-   const mesh_yellow = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[brick_dim_x, brick_dim_y], col:yellow, name:'brick yellow',}));
-   {
-      Widget_gfx_ready_enable({mesh:mesh_yellow, enable_sdf_rect:10, enable_src_color_in_main:true, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-      mesh_yellow.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-      mesh_yellow.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-      
-      // mesh_yellow.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      mesh_yellow.GenGfxCtx(); 
-      Widget_render(mesh_yellow);
+    const mesh_yellow = Create_rect_mesh(Style_rect_default_properties({is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [posx, posy, 1], dim: [brick_dim_x, brick_dim_y], col: yellow, name: 'brick yellow',}));
+    {
+        Widget_gfx_ready_enable({mesh: mesh_yellow, enable_sdf_rect: 10, enable_src_color_in_main: true, listener: {type: LISTEN_EVENT_TYPES.MOVE}});
+        mesh_yellow.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        mesh_yellow.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
-      mesh_yellow.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, mesh_yellow.gfx.vb.groupidx);
+        // mesh_yellow.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+        mesh_yellow.GenGfxCtx();
+        Widget_render(mesh_yellow);
 
-      vb_groupidx = mesh_yellow.gfx.vb.groupidx;
-      meshes.push(mesh_yellow);
-   }
-   
-   posy+=brick_dim_y*2+20
-   const mesh_purple = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[brick_dim_x, brick_dim_y], col:purple, name:'brick purple',}));
-   mesh_purple.SetViewGroupIndex(0);
-   {
-      Widget_gfx_ready_enable({mesh:mesh_purple, enable_sdf_rect:10, enable_src_color_in_main:true, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-      mesh_purple.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-      mesh_purple.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-      
-      mesh_purple.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      Widget_render(mesh_purple);
-      
-      mesh_purple.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, mesh_purple.gfx.vb.groupidx);
-      
-      meshes.push(mesh_purple);
-      
-   }
-   
-   posy+=brick_dim_y*2+20;
-   const mesh_blue = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[brick_dim_x, brick_dim_y], col:blue, name:'brick blue',}));
-   mesh_blue.SetViewGroupIndex(0);
-   {
-      Widget_gfx_ready_enable({mesh:mesh_blue, enable_sdf_rect:10, enable_src_color_in_main:true, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
+        mesh_yellow.GfxUniformsSetClbk('u_generic_controls', () => {
+            return control_values;
+        }, mesh_yellow.gfx.vb.groupidx);
 
-      mesh_blue.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      mesh_blue.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-      
-      mesh_blue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      Widget_render(mesh_blue);
+        vb_groupidx = mesh_yellow.gfx.vb.groupidx;
+        meshes.push(mesh_yellow);
+    }
 
-      mesh_blue.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, mesh_blue.gfx.vb.groupidx);
-      
-      meshes.push(mesh_blue);
-      
-   }
-   
-   posy+=brick_dim_y*2+20;
-   const mesh_green = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[brick_dim_x, brick_dim_y], col:green, name:'brick green',}));
-   mesh_green.SetViewGroupIndex(0);
-   {
-      Widget_gfx_ready_enable({mesh:mesh_green, enable_sdf_rect:10, enable_src_color_in_main:true, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-      mesh_green.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-      mesh_green.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
-      
-      mesh_green.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
-      Widget_render(mesh_green);
+    posy += brick_dim_y * 2 + 20
+    const mesh_purple = Create_rect_mesh(Style_rect_default_properties({is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [posx, posy, 1], dim: [brick_dim_x, brick_dim_y], col: purple, name: 'brick purple',}));
+    mesh_purple.SetViewGroupIndex(0);
+    {
+        Widget_gfx_ready_enable({mesh: mesh_purple, enable_sdf_rect: 10, enable_src_color_in_main: true, listener: {type: LISTEN_EVENT_TYPES.MOVE}});
+        mesh_purple.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        mesh_purple.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
-      mesh_green.GfxUniformsSetClbk('u_generic_controls', ()=>{ return control_values; }, mesh_green.gfx.vb.groupidx);
+        mesh_purple.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+        Widget_render(mesh_purple);
 
-      meshes.push(mesh_green);
-   
-   }
-   
+        mesh_purple.GfxUniformsSetClbk('u_generic_controls', () => {
+            return control_values;
+        }, mesh_purple.gfx.vb.groupidx);
 
-   /**************************************************************************************************************************************/
-   // Controls
+        meshes.push(mesh_purple);
 
-   const controls_panel = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pad:[10,10], pos:[posx, 320, 1], col:GREY[6], name:'panel', layout:LAYOUT.VERTICAL|LAYOUT.RESIZE_SELF,}));
-   Widget_gfx_ready_enable({mesh:controls_panel, enable_sdf_rect:10, listener:{type:LISTEN_EVENT_TYPES.MOVE}});
-   const slider_dim=[120, 20], color=GREY[4], rcorners=10, font=TEXTURES.MTSDF_CONSOLAS_1024;
+    }
 
-   {
-      // for(let i=0; i < meshes.length; i++){
-      //    const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:meshes[i].mat.col, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
-      //    Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
-      //    slider.SetInitialValue(slider_ctrl_init_val[i]);
-      //    controls_panel.AddItem(slider)
-   
-      //    // Connect sliders to gfx program uniforms 
-      //    Slider_connect(slider, (params, slider_val) => {
-      //       const target_mesh = params.clbk_params.target_mesh;
-      //       const color = [
-      //          target_mesh.mat.col[0]*slider_val,  
-      //          target_mesh.mat.col[1]*slider_val,  
-      //          target_mesh.mat.col[2]*slider_val,  
-      //       ];
-      //       if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
-      //       if(slider.gfx) Gl_set_rgb(slider.gfx, color)
-      //       }, { target_mesh:meshes[i] },
-      //    );
-      // }
-      {
-         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:yellow, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
-         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
-         slider.SetInitialValue(slider_ctrl_init_val.yellow);
-         controls_panel.AddItem(slider)
-   
-         // Connect sliders to gfx program uniforms 
-         Slider_connect(slider, (params, slider_val) => {
-            const target_mesh = params.clbk_params.target_mesh;
-            const color = [
-               target_mesh.mat.col[0]*slider_val,  
-               target_mesh.mat.col[1]*slider_val,  
-               target_mesh.mat.col[2]*slider_val,  
-               // target_mesh.mat.col[3]*slider_val,  
-            ];
-            if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
-            if(slider.gfx) Gl_set_rgb(slider.gfx, color)
-            }, { target_mesh:mesh_yellow },
-         );
-      }
-      {
-         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:purple, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
-         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
-         slider.SetInitialValue(slider_ctrl_init_val.purple);
-         controls_panel.AddItem(slider)
-   
-         // Connect sliders to gfx program uniforms 
-         Slider_connect(slider, (params, slider_val) => {
-            const target_mesh = params.clbk_params.target_mesh;
-            const color = [
-               target_mesh.mat.col[0]*slider_val,  
-               target_mesh.mat.col[1]*slider_val,  
-               target_mesh.mat.col[2]*slider_val,  
-               target_mesh.mat.col[3],  
-            ];
-            
-            if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color);
-            if(slider.gfx) Gl_set_rgb(slider.gfx, color);
+    posy += brick_dim_y * 2 + 20;
+    const mesh_blue = Create_rect_mesh(Style_rect_default_properties({is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [posx, posy, 1], dim: [brick_dim_x, brick_dim_y], col: blue, name: 'brick blue',}));
+    mesh_blue.SetViewGroupIndex(0);
+    {
+        Widget_gfx_ready_enable({mesh: mesh_blue, enable_sdf_rect: 10, enable_src_color_in_main: true, listener: {type: LISTEN_EVENT_TYPES.MOVE}});
 
-            }, { target_mesh:mesh_purple, prev_col: mesh_purple.mat.col},
-         );
-      }
-      {
-         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:blue, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
-         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
-         slider.SetInitialValue(slider_ctrl_init_val.blue);
-         controls_panel.AddItem(slider)
-   
-         // Connect sliders to gfx program uniforms 
-         Slider_connect(slider, (params, slider_val) => {
-            const target_mesh = params.clbk_params.target_mesh;
-            const color = [
-               target_mesh.mat.col[0]*slider_val,  
-               target_mesh.mat.col[1]*slider_val,  
-               target_mesh.mat.col[2]*slider_val,  
-               // target_mesh.mat.col[3]*slider_val,  
-            ];
-            if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
-            if(slider.gfx) Gl_set_rgb(slider.gfx, color)
-            }, { target_mesh:mesh_blue },
-         );
-      }
-      {
-         const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:green, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
-         Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
-         slider.SetInitialValue(slider_ctrl_init_val.green);
-         controls_panel.AddItem(slider)
-   
-         // Connect sliders to gfx program uniforms 
-         Slider_connect(slider, (params, slider_val) => {
-            const target_mesh = params.clbk_params.target_mesh;
-            const color = [
-               target_mesh.mat.col[0]*slider_val,  
-               target_mesh.mat.col[1]*slider_val,  
-               target_mesh.mat.col[2]*slider_val,  
-               // target_mesh.mat.col[3]*slider_val,  
-            ];
-            if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
-            if(slider.gfx) Gl_set_rgb(slider.gfx, color)
-            }, { target_mesh:mesh_green },
-         );
-      }
-   }
+        mesh_blue.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+        mesh_blue.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
+
+        mesh_blue.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+        Widget_render(mesh_blue);
+
+        mesh_blue.GfxUniformsSetClbk('u_generic_controls', () => {
+            return control_values;
+        }, mesh_blue.gfx.vb.groupidx);
+
+        meshes.push(mesh_blue);
+
+    }
+
+    posy += brick_dim_y * 2 + 20;
+    const mesh_green = Create_rect_mesh(Style_rect_default_properties({is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [posx, posy, 1], dim: [brick_dim_x, brick_dim_y], col: green, name: 'brick green',}));
+    mesh_green.SetViewGroupIndex(0);
+    {
+        Widget_gfx_ready_enable({mesh: mesh_green, enable_sdf_rect: 10, enable_src_color_in_main: true, listener: {type: LISTEN_EVENT_TYPES.MOVE}});
+        mesh_green.EnableGfxOperations(SID.SHADER_OPERATIONS.INNER_SHADOW_RECT, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+        mesh_green.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
+
+        mesh_green.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+        Widget_render(mesh_green);
+
+        mesh_green.GfxUniformsSetClbk('u_generic_controls', () => {
+            return control_values;
+        }, mesh_green.gfx.vb.groupidx);
+
+        meshes.push(mesh_green);
+
+    }
 
 
-   const panel = Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh_yellow, slider_dim, control_values, 'u_generic_controls', 0x0, 0, 0); 
-   controls_panel.AddItem(panel);
+    /**************************************************************************************************************************************/
+    // Controls
 
-   controls_panel.GenGfxCtx(); 
-   Layout_basic_pre_render(controls_panel);
-   Widget_render(controls_panel);
+    const controls_panel = Create_rect_mesh(Style_rect_default_properties({
+        is_root: ROOT_WIDGETS.CREATE_ROOT,
+        pad: [10, 10],
+        pos: [posx, 320, 1],
+        col: GREY[6],
+        name: 'panel',
+        layout: LAYOUT.VERTICAL | LAYOUT.RESIZE_SELF,
+    }));
+    Widget_gfx_ready_enable({mesh: controls_panel, enable_sdf_rect: 10, listener: {type: LISTEN_EVENT_TYPES.MOVE}});
+    const slider_dim = [120, 20], color = GREY[4], rcorners = 10, font = TEXTURES.MTSDF_CONSOLAS_1024;
+
+    {
+        // for(let i=0; i < meshes.length; i++){
+        //    const slider = Create_widget_slider(Style_slider_default_properties({dim:slider_dim, col:meshes[i].mat.col, name:'Scale', layout:LAYOUT.VERTICAL, texture_id:font}));
+        //    Widget_gfx_ready_enable({mesh:slider, enable_sdf_rect:[rcorners, 5],})
+        //    slider.SetInitialValue(slider_ctrl_init_val[i]);
+        //    controls_panel.AddItem(slider)
+
+        //    // Connect sliders to gfx program uniforms
+        //    Slider_connect(slider, (params, slider_val) => {
+        //       const target_mesh = params.clbk_params.target_mesh;
+        //       const color = [
+        //          target_mesh.mat.col[0]*slider_val,
+        //          target_mesh.mat.col[1]*slider_val,
+        //          target_mesh.mat.col[2]*slider_val,
+        //       ];
+        //       if(target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
+        //       if(slider.gfx) Gl_set_rgb(slider.gfx, color)
+        //       }, { target_mesh:meshes[i] },
+        //    );
+        // }
+        {
+            const slider = Create_widget_slider(Style_slider_default_properties({dim: slider_dim, col: yellow, name: 'Scale', layout: LAYOUT.VERTICAL, texture_id: font}));
+            Widget_gfx_ready_enable({mesh: slider, enable_sdf_rect: [rcorners, 5],})
+            slider.SetInitialValue(slider_ctrl_init_val.yellow);
+            controls_panel.AddItem(slider)
+
+            // Connect sliders to gfx program uniforms
+            Slider_connect(slider, (params, slider_val) => {
+                    const target_mesh = params.clbk_params.target_mesh;
+                    const color = [
+                        target_mesh.mat.col[0] * slider_val,
+                        target_mesh.mat.col[1] * slider_val,
+                        target_mesh.mat.col[2] * slider_val,
+                        // target_mesh.mat.col[3]*slider_val,
+                    ];
+                    if (target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
+                    if (slider.gfx) Gl_set_rgb(slider.gfx, color)
+                }, {target_mesh: mesh_yellow},
+            );
+        }
+        {
+            const slider = Create_widget_slider(Style_slider_default_properties({dim: slider_dim, col: purple, name: 'Scale', layout: LAYOUT.VERTICAL, texture_id: font}));
+            Widget_gfx_ready_enable({mesh: slider, enable_sdf_rect: [rcorners, 5],})
+            slider.SetInitialValue(slider_ctrl_init_val.purple);
+            controls_panel.AddItem(slider)
+
+            // Connect sliders to gfx program uniforms
+            Slider_connect(slider, (params, slider_val) => {
+                    const target_mesh = params.clbk_params.target_mesh;
+                    const color = [
+                        target_mesh.mat.col[0] * slider_val,
+                        target_mesh.mat.col[1] * slider_val,
+                        target_mesh.mat.col[2] * slider_val,
+                        target_mesh.mat.col[3],
+                    ];
+
+                    if (target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color);
+                    if (slider.gfx) Gl_set_rgb(slider.gfx, color);
+
+                }, {target_mesh: mesh_purple, prev_col: mesh_purple.mat.col},
+            );
+        }
+        {
+            const slider = Create_widget_slider(Style_slider_default_properties({dim: slider_dim, col: blue, name: 'Scale', layout: LAYOUT.VERTICAL, texture_id: font}));
+            Widget_gfx_ready_enable({mesh: slider, enable_sdf_rect: [rcorners, 5],})
+            slider.SetInitialValue(slider_ctrl_init_val.blue);
+            controls_panel.AddItem(slider)
+
+            // Connect sliders to gfx program uniforms
+            Slider_connect(slider, (params, slider_val) => {
+                    const target_mesh = params.clbk_params.target_mesh;
+                    const color = [
+                        target_mesh.mat.col[0] * slider_val,
+                        target_mesh.mat.col[1] * slider_val,
+                        target_mesh.mat.col[2] * slider_val,
+                        // target_mesh.mat.col[3]*slider_val,
+                    ];
+                    if (target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
+                    if (slider.gfx) Gl_set_rgb(slider.gfx, color)
+                }, {target_mesh: mesh_blue},
+            );
+        }
+        {
+            const slider = Create_widget_slider(Style_slider_default_properties({dim: slider_dim, col: green, name: 'Scale', layout: LAYOUT.VERTICAL, texture_id: font}));
+            Widget_gfx_ready_enable({mesh: slider, enable_sdf_rect: [rcorners, 5],})
+            slider.SetInitialValue(slider_ctrl_init_val.green);
+            controls_panel.AddItem(slider)
+
+            // Connect sliders to gfx program uniforms
+            Slider_connect(slider, (params, slider_val) => {
+                    const target_mesh = params.clbk_params.target_mesh;
+                    const color = [
+                        target_mesh.mat.col[0] * slider_val,
+                        target_mesh.mat.col[1] * slider_val,
+                        target_mesh.mat.col[2] * slider_val,
+                        // target_mesh.mat.col[3]*slider_val,
+                    ];
+                    if (target_mesh.gfx) Gl_set_rgb(target_mesh.gfx, color)
+                    if (slider.gfx) Gl_set_rgb(slider.gfx, color)
+                }, {target_mesh: mesh_green},
+            );
+        }
+    }
 
 
-   Arkanoid_test_power_up();
+    const panel = Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh_yellow, slider_dim, control_values, 'u_generic_controls', 0x0, 0, 0);
+    controls_panel.AddItem(panel);
+
+    controls_panel.GenGfxCtx();
+    Layout_basic_pre_render(controls_panel);
+    Widget_render(controls_panel);
+
+
+    Arkanoid_test_power_up();
 }
 
 function Arkanoid_test_power_up() {
 
-   const ctrl_val = { yellow:.75, purple:.65, blue:1., green:.5, };
-   const yellow = new Float32Array([1, .65, 0, 1]); Mult_arr3_scalar(yellow, ctrl_val.yellow);
-   const purple = new Float32Array([.75, 0, 1., 1]); Mult_arr3_scalar(purple, ctrl_val.purple);
-   const blue = new Float32Array([0, .5, 1, 1]); Mult_arr3_scalar(blue, ctrl_val.blue);
-   const green = new Float32Array([0., 1., 0., 1]); Mult_arr3_scalar(green, ctrl_val.green);
+    const ctrl_val = {yellow: .75, purple: .65, blue: 1., green: .5,};
+    const yellow = new Float32Array([1, .65, 0, 1]);
+    Mult_arr3_scalar(yellow, ctrl_val.yellow);
+    const purple = new Float32Array([.75, 0, 1., 1]);
+    Mult_arr3_scalar(purple, ctrl_val.purple);
+    const blue = new Float32Array([0, .5, 1, 1]);
+    Mult_arr3_scalar(blue, ctrl_val.blue);
+    const green = new Float32Array([0., 1., 0., 1]);
+    Mult_arr3_scalar(green, ctrl_val.green);
 
-   const size = 40;
-   const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[10, 10, 3], dim:[size, size], col:yellow, name:'PowupMesh', }));
-   Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:false,});
-
-
-   mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
-   mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-   // this.control_values = [1, 1., 1., 1., .14, 1,];
-   // const control_values = [1, 1., 1., 1., .44, 1,];
-   const control_values = [.59, .78, 1., .18, .09, .36];
-   mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
+    const size = 40;
+    const mesh = Create_rect_mesh(Style_rect_default_properties({is_root: ROOT_WIDGETS.CREATE_ROOT, pos: [10, 10, 3], dim: [size, size], col: yellow, name: 'PowupMesh',}));
+    Widget_gfx_ready_enable({mesh: mesh, enable_sdf_rect: 10, enable_src_color_in_main: false,});
 
 
-   mesh.GenGfxCtx();
-   Widget_render(mesh);
+    mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.FLARE, SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY);
+    mesh.EnableGfxOperations(SID.SHADER_OPERATIONS.BUBBLE, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
+    // this.control_values = [1, 1., 1., 1., .14, 1,];
+    // const control_values = [1, 1., 1., 1., .44, 1,];
+    const control_values = [.59, .78, 1., .18, .09, .36];
+    mesh.EnableGfxUniforms({unif: SID.UNIF.FS_GENERIC_CONTROLS}, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, control_values.length);
 
-   mesh.GfxUniformSetAndUpdate('u_generic_controls', control_values);
+
+    mesh.GenGfxCtx();
+    Widget_render(mesh);
+
+    mesh.GfxUniformSetAndUpdate('u_generic_controls', control_values);
 
 
-
-   const slider_dim=[120, 20], color=GREY[4], rcorners=10, font=TEXTURES.MTSDF_CONSOLAS_1024;
-   Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh, slider_dim, control_values, 'u_generic_controls', ROOT_WIDGETS.CREATE_ROOT, 0, 320); 
+    const slider_dim = [120, 20], color = GREY[4], rcorners = 10, font = TEXTURES.MTSDF_CONSOLAS_1024;
+    Controls_create_slider_controls_from_shader_uniform_buffer_with_panel(mesh, slider_dim, control_values, 'u_generic_controls', ROOT_WIDGETS.CREATE_ROOT, 0, 320);
 
 }

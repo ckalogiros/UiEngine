@@ -158,26 +158,26 @@ export function Program_create_program(sid, uniforms, shader_ops_idxs) {
 	return progidx;
 }
 
-function Program_create_shared_uniform(shader_program,) {
-
-	// Uniforms_block_create_shared_uniform(sid.unif, prog.shader_program, uniforms);
-	const uniforms = [
-		{
-			name:'u_projection',
-			type:UNIF_TYPE.MAT4,
-			shader:UNIFORM.IS_SHARED,
-		},
-		{
-			name:'u_screen_res',
-			type:UNIF_TYPE.FVEC2,
-			shader:UNIFORM.IS_SHARED,
-		},
-	];
-
-	const sid_unif = SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SCREEN_RESOLUTION;
-
-	Uniforms_block_create_shared_uniform(sid_unif, shader_program, uniforms);
-}
+// function Program_create_shared_uniform(shader_program,) {
+//
+// 	// Uniforms_block_create_shared_uniform(sid.unif, prog.shader_program, uniforms);
+// 	const uniforms = [
+// 		{
+// 			name:'u_projection',
+// 			type:UNIF_TYPE.MAT4,
+// 			shader:UNIFORM.IS_SHARED,
+// 		},
+// 		{
+// 			name:'u_screen_res',
+// 			type:UNIF_TYPE.FVEC2,
+// 			shader:UNIFORM.IS_SHARED,
+// 		},
+// 	];
+//
+// 	const sid_unif = SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SCREEN_RESOLUTION;
+//
+// 	Uniforms_block_create_shared_uniform(sid_unif, shader_program, uniforms);
+// }
 
 
 
@@ -293,7 +293,7 @@ class Gl_Program {
 
 
 
-// export function Program_sinitialize_blend_mode_ubidx(progidx, blend_mode) {
+// export function Program_initialize_blend_mode_ubidx(progidx, blend_mode) {
 // 	const prog = _programs.buffer[progidx];
 // 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
 // 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
@@ -303,7 +303,7 @@ class Gl_Program {
 // 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
 // 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
 // }
-/** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access throug Program */
+/** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access through Program */
 export function Program_store_blend_mode_ubidx(progidx, ubidx) {
 	const prog = _programs.buffer[progidx];
 	prog.blend_mode_ubidx = ubidx;

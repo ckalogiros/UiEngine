@@ -109,7 +109,7 @@ export function Gl_draw(gl) {
 
     let progidx = INT_NULL;
     let progs = Program_get_programs();
-    if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+    // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
     
     for (let i = 0; i < drawQueueCount; i++) {
         
@@ -133,7 +133,7 @@ export function Gl_draw(gl) {
             console.error('Program link error:', gl.getProgramInfoLog(progs.buffer[progidx].shader_program));
         }
 
-        if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+        // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
 
 
 
@@ -146,7 +146,7 @@ export function Gl_draw(gl) {
             GL_STATE.BOUND_VAOIDX = vb_group.vaoidx;
             // console.log()
             // console.log('@@@ VAO', vb_group.vaoidx)
-            if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+            // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
 
         }
 
@@ -158,8 +158,8 @@ export function Gl_draw(gl) {
             ib_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
             GL_STATE.BOUND_IBO = ib_info.ibo;
             GL_STATE.BOUND_IBIDX = ib_info.ibidx;
-            if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
-            console.log('@@@ INDEX bufferData', ib_info.ibidx)
+            // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+            // console.log('@@@ INDEX bufferData', ib_info.ibidx)
         }
 
         for (let j = 0; j <= vb_group.render_groupidxs.boundary; j++) {
@@ -174,7 +174,7 @@ export function Gl_draw(gl) {
             if (vb_group.has_scissorbox) {
                 gl.enable(gl.SCISSOR_TEST);
                 gl.scissor(vb_group.scissorbox[0], vb_group.scissorbox[1], vb_group.scissorbox[2], vb_group.scissorbox[3]);
-                if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+                // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
             }
                 
             // if (GL_STATE.BOUND_TEXTURE_IDX !== vb_group.texidx && progs.buffer[progidx].sid.attr & SID.ATTR.TEX2 && vb_group.texidx !== INT_NULL ) {
@@ -182,7 +182,7 @@ export function Gl_draw(gl) {
                 const texture = Texture_get_texture_unit_byidx(vb_group.texidx);
                 Gl_texture_unit_bind(gl, texture);
                 gl.uniform1i(progs.buffer[progidx].shaderinfo.uniforms.sampler, texture.texidx);
-                if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+                // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
             }
             
             for (let k = 0; k <= vb_group.vb_idxs.boundary; k++) {
@@ -205,9 +205,9 @@ export function Gl_draw(gl) {
                     GL_STATE.BOUND_VBIDX = vb_info.vbidx;
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE_FROM_REALLOC;
                     render_group.state &= ~RENDER_GROUP_STATE.NEEDS_UPDATE_FROM_REALLOC;
-                    if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+                    // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
                     // if(vb_groupidx===2) console.log('bufferData', vb_groupidx)
-                    console.log('@@@ bufferData', vb_groupidx)
+                    // console.log('@@@ bufferData', vb_groupidx)
                 }
                 else if (render_group.state & RENDER_GROUP_STATE.NEEDS_UPDATE) {
                     
@@ -215,7 +215,7 @@ export function Gl_draw(gl) {
                     gl.bindBuffer(gl.ARRAY_BUFFER, vb_info.vbo)
                     /*              (gl.ARRAY_BUFFER, dst_offset:IN_BYTES, buffer.data, src_offset:IN_ELEMENTS, byte_length:IN_ELEMENTS */
                     gl.bufferSubData(gl.ARRAY_BUFFER, render_group.start*FLOAT32_BYTE_SIZE, vb_data, render_group.start, render_group.count);
-                    if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+                    // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
                     // console.log('@@@ bufferSubData', vb_groupidx)
                     
                     vb_info.state.mask &= ~BUFFER_STATE.NEEDS_UPDATE;
@@ -232,13 +232,15 @@ export function Gl_draw(gl) {
              *      num vertices per instance
              *      num instances
              */
-            if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
+            // if(DEBUG_GL) GL_GET_ERROR(new Error().lineNumber);
             gl.drawElementsInstanced(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, render_group.index_offset*UINT16_BYTE_SIZE, render_group.num_instances);
-            // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 1);
+            // // gl.drawElementsInstanced(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0, 1);
+            //
+            // // gl.drawArraysInstanced(gl.TRIANGLES, 0, render_group.draw_count, render_group.num_instances);
+            // // gl.drawArraysInstanced(gl.TRIANGLES, 0, 4, render_group.num_instances);
+            // // gl.drawArraysInstanced(gl.TRIANGLES, 0, 3, 1);
 
-            // gl.drawArraysInstanced(gl.TRIANGLES, 0, render_group.draw_count, render_group.num_instances);
-            // gl.drawArraysInstanced(gl.TRIANGLES, 0, 4, render_group.num_instances);
-            // gl.drawArraysInstanced(gl.TRIANGLES, 0, 3, 1);
+            // gl.drawElements(gl.TRIANGLES, render_group.draw_count, gl.UNSIGNED_SHORT, 0);
 
             if (vb_group.has_scissorbox) gl.disable(gl.SCISSOR_TEST);
 

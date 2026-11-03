@@ -212,7 +212,7 @@ export function Effects_explosion_circle_update() {
 
       if(ex.is_active && ex.needs_auto_update) {
 
-         // Stop exlposion animation if time limit is reached   
+         // Stop explosion animation if time limit is reached
          if (ex.timer >= ex.timer_limit + ex.timer_step) {
             Effect_explosion_circle_remove_mesh_byidx(ex.idx);
          }
@@ -233,7 +233,7 @@ export function Effects_explosion_circle_update() {
 
 const _effect_explosion_glow_mesh_buffer = New_generic_buffer(_, '_effect_explosion_glow_mesh_buffer');
 const _free_effect_explosion_glow_idx_buffer = New_int8_buffer(PRE_INITIALIZED_EXPLOSION_MESHES, '_free_effect_explosion_glow_idx_buffer');
-let eee = true;
+let init_uniforms_flag = true;
 /** */
 class Effect_Mesh_Explosion_Glow {
 
@@ -262,9 +262,9 @@ class Effect_Mesh_Explosion_Glow {
       View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
       
       // Initialize generic uniforms, only once(first mesh initialization)
-      if(eee) {
+      if(init_uniforms_flag) {
          mesh.GfxUniformSetAndUpdate('u_generic_controls', generic_controls_parameters);
-         eee = false;
+         init_uniforms_flag = false;
       }
       
       Renderqueue_set_active(mesh.gfx.vb.groupidx, true);

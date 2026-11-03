@@ -46,7 +46,7 @@ const _ready_animations_buffer = [
  * HERE:
  * Για να εχουμε σωστη διαχειρηση των callback animations of the mesh class,
  * we need to create a resolveCallback function pointer in the mesh class and pass it with Mesh_event_callback_create.
- * So int the event listeners, the mesh will call the resolveCallback function pointer, which will call the callback function.
+ * So init the event listeners, the mesh will call the resolveCallback function pointer, which will call the callback function.
  * That way user chooses the callback function to be called when the event is triggered in the event listeners.
  */
 

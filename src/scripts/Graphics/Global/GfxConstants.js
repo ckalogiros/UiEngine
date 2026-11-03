@@ -489,32 +489,11 @@ const UNIF_TYPE = {
     BOOL: _CNT<<=0x1, // BOOL 
     IVEC2: _CNT<<=0x1, // _VEC2
     IVEC3: _CNT<<=0x1, // _VEC3
-    UIVEC4: _CNT<<=0x1, // _VEC4
 
     UINT: _CNT<<=0x1, // UINT
     UIVEC2: _CNT<<=0x1, // _VEC2
     UIVEC3: _CNT<<=0x1, // _VEC3
     UIVEC4: _CNT<<=0x1, // _VEC4
-    
-    // FLOAT: 0x1406, // FLOAT
-    // FVEC2: 0x8b50, // _VEC2
-    // FVEC3: 0x8b51, // _VEC3
-    // FVEC4: 0x8b52, // _VEC4
-    // FVEC6: 0x8b52, // _VEC5
-    // MAT2: 0x8b5a, // _MAT2
-    // MAT3: 0x8b5b, // _MAT3
-    // MAT4: 0x8b5c, // _MAT4
-    // INT: 0x8b56, // INT, 
-    // BOOL: 0x8b53, // BOOL 
-    // IVEC2: 0x8b57, // _VEC2
-    // IVEC3: 0x8b58, // _VEC3
-    // UIVEC4: 0x8b59, // _VEC4
-
-    // UINT: 0x1405, // UINT
-    // UIVEC2: 0x8dc6, // _VEC2
-    // UIVEC3: 0x8dc7, // _VEC3
-    // UIVEC4: 0x8dc8, // _VEC4
-
 
 	GetSizeInBytes(type, id) {
 
@@ -555,6 +534,20 @@ const UNIF_TYPE = {
             case this.UIVEC3: return 'vec3'; 
             case this.UIVEC4: return 'vec4';
             default: alert('Wrong type. See UNIF_TYPE .GetStr()') 
+        }
+    },
+
+    GetStrFromSize(size){
+        switch(size){
+            case 4    :  return 'float';
+            case 8    :  return 'vec2';
+            case 12   :  return 'vec3';
+            case 4*4  :  return 'vec4';
+            case 4*2*2:  return 'mat2';
+            case 4*3*3:  return 'mat3';
+            case 4*4*4:  return 'mat4';
+
+            default: alert('Wrong type. See UNIF_TYPE .GetStr()')
         }
     }
 };

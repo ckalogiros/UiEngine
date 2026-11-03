@@ -95,17 +95,17 @@ function Bitwise32_opps_get_bitpos_from_bitmask(bit_mask) {
 }
 /** Interleaved data buffers. 
  * Extract bits from bit position taking into consideration a stride of interleaved values stored in the same buffer
- * In case of Arkanoid game, we store color and powerUps in a 32bit int, and we retrieve an index denoting wether is a color attribute or powerUp attribute 
+ * In case of Arkanoid game, we store color and powerUps in a 32bit int, and we retrieve an index denoting weather is a color attribute or powerUp attribute
  * */
 export function Bitwise32_get_bitlen_from_bitpos(bit_mask, bit_pos) {
 
-   alert('6661554132219839043. Reimplement Me')
+   // alert('6661554132219839043. Reimplement Me')
 
-   // if (bit_mask === 0) return 0; // Edge case: 0 has no bits set
+   if (bit_mask === 0) return 0; // Edge case: 0 has no bits set
    // const bit_pos = Bitwise_opps_get_bitpos_from_bitmask(bit_mask);
-   // const  index = 32 - Math.clz32(bit_mask);
-   // const  base_index = 32 - Math.clz32(bit_pos);
-   // return index-base_index;
+   const  index = 32 - Math.clz32(bit_mask);
+   const  base_index = 32 - Math.clz32(bit_pos);
+   return index-base_index;
 
    // OLD
    // // Count the number of leading zeros and subtract from 32 (for 32-bit integers)

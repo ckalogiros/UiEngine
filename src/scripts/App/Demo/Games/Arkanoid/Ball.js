@@ -117,7 +117,7 @@ export class Ball {
          const particles_size = BALL_DIM_X * scale;
          const mod = BALL_SPEED * .002; // Avoid very long tails with increased speed// HACK: configure the ball tail according to ball speed(Thats if the particles system has the creation of intermidiate particles creation enabled)
          const tail_emitter = Create_particle_emitter(Style_particles_system_default_properties({
-            name:'NoiseTestParticles', 
+            name:'BallNoiseParticles',
             col:color, pos:[0, 0, 10], dim:[particles_size, particles_size], 
             t_step:0.015 + mod, life_time:1, accel:0, deccel:.96, gravity:-1, max_speed:4, 
             num_particles_per_frame:1,  is_continuous_emmit:true, num_particles:1,

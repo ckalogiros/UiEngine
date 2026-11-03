@@ -600,8 +600,6 @@ const fs_op_simple_glow = `
     c *=c;
 
     simple_glow_color = vec4(c*rev_time*rev_time) * src_color;
-
-    // return vec4(c*rev_time*rev_time);
       
   }
 /*** Operation simple-glow End ***/

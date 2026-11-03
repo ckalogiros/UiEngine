@@ -4,7 +4,23 @@ import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
 import { Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
 import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time, Gl_particles_batch_set_vpos2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2, Gl_particles_batch_set_vpos2, Gl_particles_batch_set_instanced_wpos3_time, Gl_particles_batch_set_col4_vpos2_dim2_rcorner, Gl_particles_batch_set_vpos2_dim2_rcorner, Gl_particles_batch_set_instanced_col4_wpos3_time } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import {
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_dim2_time,
+    Gl_particles_batch_set_vpos2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2,
+    Gl_particles_batch_set_vpos2,
+    Gl_particles_batch_set_instanced_wpos3_time,
+    Gl_particles_batch_set_col4_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_time,
+    Gl_particles_batch_set_vpos2_dim2
+} from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
@@ -596,7 +612,7 @@ class Emitter {
             time: params.time !== undefined ? params.time : 0,
          };
          this.sid.shad |= SID.SHAD.FN_NOISE;
-         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to current mesh
          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
@@ -941,6 +957,9 @@ function Set_update_function_pointers(emitter) {
       }
       else if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
          emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.DIM2)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_dim2;
       }
    }
    else { // TODO: OLD, implement clearly what attributes the particle emitter has(like in VertexBufferFillOps.js)

@@ -1106,7 +1106,6 @@ const INFO_LISTEN_EVENT_TYPE = {
 
 	LISTENERS: _CNT <<= 0x1,
 	MOUSE: _CNT <<= 0x1,
-	MOUSE: _CNT <<= 0x1,
 
 }
 

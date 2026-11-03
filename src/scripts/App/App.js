@@ -24,7 +24,7 @@ import { Particles_system_reset } from '../Engine/ParticlesSystem/ParticlesSyste
 import { Styles_hover_margin_reset, Styles_margin_reset, Styles_pad_reset } from '../Engine/Styles.js';
 import { Generic_buffers_container_reset } from '../Engine/Core/Buffers.js';
 import { Root_group_buffer_reset_dealocate } from '../Engine/Core/Views/RootView.js';
-import { Shader_bit_flags_build_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
+import { Shader_bit_flags_get_SID_ATTR } from '../Graphics/ShaderBitFlags.js';
 import { Uv_texture_reset_buffers } from '../Engine/Loaders/Textures/TextureUvMap.js';
 import { State_reset } from '../GlobalFunctions.js';
 import { Vertex_buffer_render_group_reset_g_buffer } from '../Graphics/Buffers/RenderGroups.js';
@@ -37,9 +37,8 @@ let renderer = null;
 
 export function AppInit() {
 
-    SID.ATTR = Shader_bit_flags_build_SID_ATTR();
-    SID.ATTR = Shader_bit_flags_build_SID_ATTR();
-    // SID.Init();
+    // assign the global SID.ATTR variable to the SID_ATTR
+    SID.ATTR = Shader_bit_flags_get_SID_ATTR();
 
 
     Time_intervals_init_time();

@@ -220,7 +220,12 @@ The answer lies in its multifaceted role in both protecting and facilitating hea
 
 
 
-
+/*
+ * Worth showing:
+ *
+ * Shader Operations:
+ *      Test_shaders_bubble_flare()
+ */
 export function TestWidgetsGeneric() {
 
 
@@ -230,38 +235,19 @@ export function TestWidgetsGeneric() {
 
     /** Some testing */
     // Test_queue_buffer();
-
-
     // const section = Test_adding_mesh_to_a_view_group_after_has_been_rendered();
-
-    // Test_on_hover_show_info(200, 300);
-
-    // const a = .8
-    // const menu = Test_colored_labels_with_hsv(0, 10, 20, .2, a);
-    // const w = menu.geom.dim[0]*2;
-    // Test_colored_labels_with_hsv((w*1), 10, 20, .3, a);
-    // Test_colored_labels_with_hsv((w*2), 10, 20, .4, a);
-    // Test_colored_labels_with_hsv((w*3), 10, 20, .5, a);
-    // Test_colored_labels_with_hsv((w*4), 10, 20, .6, a);
-    // Test_colored_labels_with_hsv((w*5), 10, 20, .7, a);
-    // Test_colored_labels_with_hsv((w*6), 10, 20, .8, a);
-    // Test_colored_labels_with_hsv((w*7), 10, 20, .9, a);
-    // Test_colored_labels_with_hsv((w*8), 10, 20, 1., a);
-
-    // Test_colored_labels_with_hsv((w*9), 10, 20, .1, .1);
-    // Test_colored_labels_with_hsv((w*10), 10, 20, .2, .2);
-    // Test_colored_labels_with_hsv((w*11), 10, 20, .3, .3);
-    // Test_colored_labels_with_hsv((w*12), 10, 20, .4, .4);
-    // Test_colored_labels_with_hsv((w*13), 10, 20, .5, .5);
-    // Test_colored_labels_with_hsv((w*14), 10, 20, .6, .6);
-    // Test_colored_labels_with_hsv((w*15), 10, 20, .7, .7);
-    // Test_colored_labels_with_hsv((w*16), 10, 20, .8, .8);
-    // Test_colored_labels_with_hsv((w*17), 10, 20, .9, .9);
+    // Test_on_hover_show_info(200, 300); // NOT WORKING:RE-IMPLEMENT
+    // Test: New implementation -> VB render groups PLUS reset (by group) and rerender (by rendergroup)
+    // Test_create_render_groups_resize_and_rerender();
+    // Test_create_remove_render_groups();
+    // Test_time_intervals_performance();
 
 
 
     let yy = 0, pp = 23;
-    { // Statistics
+
+    // Statistics-Performance rendering tools
+    {
         // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
@@ -275,287 +261,19 @@ export function TestWidgetsGeneric() {
     }
 
 
-    // Test: New implementation -> VB render groups PLUS reset (by group) and rerender (by rendergroup) 
-    // Test_create_render_groups_resize_and_rerender();
-    // Test_create_remove_render_groups();
-
-
-
-
-    // Test_time_intervals_performance();
-
-
-
-
     // Demo_page();
     // Demos_welcome_menu();
 
-    { // Games
+    // Games
+    {
         // Arkanoid_initialize(0);
         // Arkanoid_test_game_options();
-
         // Tetris(ROOT_WIDGETS.CREATE_ROOT, 20, 132);
         // Game_snake(45, true, true);
     }
 
-    { // Quick widget enable
-        // CreateSimpleWidgetText(120, 280)
-        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
-        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
-        // CreateLabel(_, '||||||\n|||||||||||||||||||||||||||||||\n|||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 20, 300, _, _, _, 60);
-        // CreateLabel(_, '||||||||||||||||||||||||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
-        // CreateLabel(_, '||||||||||||||||||||||||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 10);
-        // CreateLabel(_, 'AAAA', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 180, _, _, _, 18);
-        // CreateLabel(_, 'AAAAAAAAAAAA\nAAAAAAAAAAAA', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
-        // const label = CreateLabel(_, 'QPKJDHBSIUIJDKJKDJKDUDJ<', TEXTURES.MTSDF_COMIC_1024, _, 300, 100, _, _, _, 18);
-        // CreateSliderSimple();
-        // Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, 'Ready Slider', _,)
-        // CreateDropdownTree([100, 200, 0])
-        // CreateScrollerClampAlphaTest(_, 100, 400, 1000, 12)
-        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
-        // const line = Test_rotate_section_with_round_corners();
-
-    }
-
-    { // Test many render groups
-        // const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 200, 0], dim: [100, 100], col: TRANSPARENCY(GREY[1], 1), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-        // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
-
-        // const label = CreateLabel(0x0, '|',  TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
-        // section.AddItem(label);
-
-        // const dp = CreateDropdownTree([100, 200, 0], 0x0);
-        // section.AddItem(dp);
-
-        // section.GenGfxCtx();
-        // Layout_basic_pre_render(section);
-        // Widget_render(section);
-    }
-
-    { // Test: Tool-tip info
-        // const info_panel = Create_info_panel_tool_tip(10, 600);
-        // // const event_clbk_params = {
-        // //     Clbk: (params) => {
-        // //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
-        // //     },
-        // //     clbk_params: {
-        // //         info_panel: info_panel,
-        // //     },
-        // // }
-        // const Clbk = (params) => {
-        //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
-        //     };
-        // const clbk_params = {
-        //         info_panel: info_panel,
-        //     };
-
-        // let k = 0, y=50;
-        // { 
-        //     const section = Create_rect_mesh(Style_rect_default_properties({ 
-        //         is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10], 
-        //         pos: [200,300,0], dim: [0,0], col: GREY[2], 
-        //         name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
-        //     }));
-        //     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
-
-        //     for(let i=0; i<13; i++){
-        //         const label = Create_widget_label(Style_label_default_properties({
-        //             pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
-        //             texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL, 
-        //         }));
-        //         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-        //         section.AddItem(label);
-        //         Mesh_event_callback_create(label, Clbk, clbk_params, Resolve_mesh_info_tool_tip);
-        //     }
-
-        //     section.GenGfxCtx();
-        //     Layout_basic_pre_render(section);
-        //     Widget_render(section);
-
-        // }
-
-    }
-
-    { // Physics2D Engine
-
-        // Test_physics2D_collision_detection_many_rects();
-        // Test_physics2D_collision_detection_obstract_collider();
-        // Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug();
-
-        // Jump_physics();
-        // Spring_physics();
-        // Jump_physics_2();
-    }
-
-    { // Visual Debug
-
-        // Visual_debug_mouse(ROOT_WIDGETS.CREATE_ROOT, 100, 100, 30, 250);  
-
-        Demo_visual_debug_glow_particles();
-
-        // Demo_visual_debug_explosion_particles();
-
-    }
-
-    /*************************************************************************************************************************/
-    // Test: Layout
+    // Annimations
     {
-        // Test_alignment();
-        // TestAlignNew([0, 200, 0])
-        // Test_align_many_sliders();
-
-        // Test_resize_fill_space_layout();
-        // Test_resize_fill_space_layout_nested(_, 0);
-        // Test_resize_fill_space_layout_nested_with_widgets();
-
-        // Test_resize_layout_grow_containers_1();
-        // Test_resize_layout_grow_containers_2();
-        // Test_resize_layout_grow_containers_3();
-        // Test_resize_layout_grow_containers_4();
-        // Test_resize_layout_grow_containers_5();
-        // Test_resize_layout_grow_containers_many();
-        // Test_resize_layout_grow_containers_many_compound();
-    }
-
-
-    /*************************************************************************************************************************/
-    // Test Widgets
-    { // widget plain text
-        // CreateSimpleWidgetText(200, 200)
-        // CreateTextInSectionWithNewLine();
-        // CreateTextInSection(big_text, 5)
-    }
-
-    { // Widget: Label-buttons
-
-        // const w = 45 
-        // CreateLabel(_, '0', TEXTURES.MTSDF_CONSOLAS_1024, _, w, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2', TEXTURES.MTSDF_CONSOLAS_1024, _, w*2, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2\n3', TEXTURES.MTSDF_CONSOLAS_1024, _, w*3, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2\n3\n4', TEXTURES.MTSDF_CONSOLAS_1024, _, w*4, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2\n3\n4\n5', TEXTURES.MTSDF_CONSOLAS_1024, _, w*5, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6', TEXTURES.MTSDF_CONSOLAS_1024, _, w*6, 100,_,_,_, 25);
-        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6\n7', TEXTURES.MTSDF_CONSOLAS_1024, _, w*7, 100,_,_,_, 25);
-        // CreateLabel(_, 'Qr|\`\'0123456789', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
-        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n|_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
-        // CreateLabel(_, '|_A\n|_a', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
-        // // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
-        // // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
-        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 50,_,_,_);
-        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5, 300, 190, _, _, _);
-        // Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, 300, 100,18,_,_,_);
-
-        // Render font symbols atlas texture
-        // Render_font_symbols_atlas_texture(30, 50);    
-        // { const s = TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 750, 100, [40, 40], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise); s.align.flags = LAYOUT.VERTICAL; }
-        // { const s = TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 750, 100, [40, 40], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise); s.align.flags = LAYOUT.VERTICAL; }
-
-        // Test: Set Focused
-        // CreateSectionedButtons([100, 20, 0], 'Section 1')
-        // CreateSectionedButtons([100, 170, 0], 'Section 2')
-
-
-        { // MSDF with scale slider
-            // Demo_widgets_msdf_text_rendering(10, 100);
-        }
-
-
-
-        { // With framebuffer. // TODO: re-implement
-
-            // CreateLabel(_, 'Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
-            // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
-            // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, label);
-            // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, label);
-
-            // const button = CreateButton(); 
-            // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, button);
-        }
-
-
-    }
-
-    { // Widget: Slider-switch
-
-        // CreateSliderSimple();
-        // Widget_ready_slider_simple(ROOT_WIDGETS.CREATE_ROOT, 20, 20)
-        // CreateSlider(_, 400, 600);
-        // Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 20, 20, _, 'Ready Slider', _, )
-
-        // CreateSwitchSimple([0, ypos, 0]);
-        // Widget_ready_switch(ROOT_WIDGETS.CREATE_ROOT, 100, 100)
-        // const switch1 = CreateSwitch();
-        // Widget_ready_switch_button(ROOT_WIDGETS.CREATE_ROOT, );
-    }
-
-    { // Textured Meshes
-        // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [256/2, 256/2], WHITE, [0,0], TEXTURES.SMOKE_1);
-        // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [32/2, 32/2], WHITE, [0,0], TEXTURES.COIN);
-        // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [64/2, 73/2], WHITE, [0,0], TEXTURES.TEST_APPLE);
-    }
-
-    { // Test sdf lines
-        // SdfLine(YELLOW[7], [50, 60, 1], [200, 1]);
-        // SdfLine(YELLOW[7], [50, 80, 1], [200, 2]);
-        // SdfLine(YELLOW[7], [50, 100, 1], [200, 3]);
-        // SdfLine(YELLOW[7], [50, 120, 1], [200, 4]);
-        // SdfLine(YELLOW[7], [50, 140, 1], [200, 5]);
-        // SdfLine(YELLOW[7], [50, 160, 1], [200, 6]);
-    }
-
-    { // Section Synthesizes 
-
-        // SectionResizable([50, 50, 0])
-
-        // CreateManySections();
-
-        // CreateUniformPositionPerRenderGroups();
-
-    }
-
-    { // Widget: Dropdown
-
-        // CreateDropdownTree([30, 50, 0])
-        // Create_dropdown_hsv_coloring([30, 50, 0]);
-
-        // CreateDropdownTreeHorizontalLayout();
-
-        // Demo_complicated_widget_layout(0, 200)
-    }
-
-    { // Widget: Scroller
-
-        // const scroller = CreateScrollerClampAlphaTest(_, 30, 100, 10, 16);
-        // CreateScrollerManyWidgets(_, 30, 100, 10, 16);
-        // CreateScrollerDeepNested(_, 30, 100, 10, 16);
-        // CreateDropdownWithScroller(_, 30, 100, 10, 16);
-        // const widget = CreateDropdownWithScrollerManyDps(_, 30, 100, 10, 10);
-
-        // Create_mesh_info_ui(_, 230, 100, 10, 10, widget.group_bufferidxs[0]);
-
-    }
-
-    { // Widget: Colorpicker
-
-        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, _, _, _, _, _, 0x0);
-
-        /** Colorpicker Instanced Geometry*/
-        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.WPOS3|SID.ATTR.DIM2)
-        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.DIM2)
-
-    }
-
-    { // Window menu
-        // Window_menu_2();
-    }
-
-
-    { // Instanced Geometry
-
-        // Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
-    }
-
-    { // Annimations
 
         { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribute
             // Test_rotate_section_with_round_corners();
@@ -586,9 +304,9 @@ export function TestWidgetsGeneric() {
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, label, .03, 0., 1.,)
 
             // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10], SID.ATTR.COL4|SID.ATTR.WPOS3);
-            // // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
+            // // // const line = SdfLine(GREEN[7], [300, 300, 5], [200, 10]);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.R, line, .01, .1, 1., _, .5, false)
-            // // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
+            // // // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.XY, line, .5, -5., 5., 0)
             // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.X, line, .1, -3., 3., 0)
             // Mesh_animations_create(ANIMATIONS.TYPE.WPOS|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.POS.Y, line, .1*.75, -3., 3., 0)
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.RGB, line, .004, .4, .8, _, .8, true)
@@ -602,9 +320,10 @@ export function TestWidgetsGeneric() {
         }
     }
 
-    { // DEMOS
-
-        { // Demo Particles 
+    // DEMOS
+    {
+        // Demo Particles
+        {
 
             // Create_glow_particles(VIEWPORT.RIGHT-270, 0, ROOT_WIDGETS.CREATE_ROOT, true, 1);
 
@@ -616,24 +335,23 @@ export function TestWidgetsGeneric() {
 
             // Create_smoke_particles();
 
-            // Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
-            // Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, false, 28, );
+            Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
 
             // Test_noise_shader(); // NOT IMPLEMENTED
 
         }
-
-        { // Demos Physics
+        // Demos Physics
+        {
 
             // const total_height = Elastic_collisions(100, 200, ROOT_WIDGETS.CREATE_ROOT, true, true);
-
+            //
             // Sattelite_rotation([0, 100]);
 
             // Demo_chain_link();
 
         }
-
-        { // Demos Widgets
+        // Demos Widgets
+        {
 
             let y = 0;
             const pad = 50;
@@ -660,8 +378,8 @@ export function TestWidgetsGeneric() {
             // /* Resizable widgets */
 
         }
-
-        { // Demo Animations
+        // Demo Animations
+        {
 
             // Demo_animations();
             // Demo_animations_with_slider_slope();
@@ -690,11 +408,8 @@ export function TestWidgetsGeneric() {
         }
     }
 
-    { // Reload
-        // Test_reload_app();
-    }
-
-    { // Coloring
+    // Coloring
+    {
 
         // Test_hsv_color_sequence_from_integer_input();
         // Theme_color_hsv_sample();
@@ -729,8 +444,7 @@ export function TestWidgetsGeneric() {
                 // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 190)
             }
             { // Luminance
-
-                // const contrast = 1.8;
+                // const contrast = 2.5;
                 // const red = Luminance_rgb(RED[9], contrast);
                 // const yel = Luminance_rgb(YELLOW[9], contrast);
                 // const green = Luminance_rgb(GREEN[9], contrast);
@@ -740,27 +454,71 @@ export function TestWidgetsGeneric() {
                 // const black = Luminance_rgb(BLACK, contrast);
                 // const white = Luminance_rgb(WHITE, contrast);
                 // const HUE_COLOR = [
-                //     red, red, 
+                //     red, red,
                 //     yel, yel,
-                //     green, green, 
+                //     green, green,
                 //     cyan, cyan,
                 //     blue, blue,
                 //     magenta, magenta,
-
-                //     black, black, 
-                //     white, white, 
-                //     black, black, 
-                //     white, white, 
+                //
+                //     black, black,
+                //     white, white,
+                //     black, black,
+                //     white, white,
                 // ];
-                // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 600)
+                // Multi_color_multi_vertex_mesh(HUE_COLOR, 0, 200)
             }
 
         }
 
+        /* Test colors: background to text */
+        {
+            // const a = .8
+            // const menu = Test_colored_labels_with_hsv(0, 10, 20, .2, a);
+            // const width = menu.geom.dim[0]*2;
+            // let w = width;
+            /// static text color, background color change
+            {
+                // Test_colored_labels_with_hsv((w), 10, 20, .3, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .4, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .5, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .6, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .7, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .8, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .9, a); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, 1., a); w += width;
+            }
+            /// text color change, background color change
+            {
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .1); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .2, .2); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .3, .3); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .4, .4); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .5, .5); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .6, .6); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .7, .7); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .8, .8); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .9, .9); w += width;
+            }
+
+            /// text color change, static background
+            {
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .1); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .2); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .3); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .4); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .5); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .6); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .7); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .8); w += width;
+                // Test_colored_labels_with_hsv((w), 10, 20, .1, .9); w += width;
+            }
+        }
+
     }
 
-    { // Shader Operations
-
+    // Shader Operations
+    {
         // Test_shader_operations_all_with_uncomment()
 
         // Test_shaders_operations_inner_shadow_rect();
@@ -788,90 +546,355 @@ export function TestWidgetsGeneric() {
         // Shader_color_functions_glow_sphere(_, _);
 
     }
+    // Some basic widgets
+    {
+        // CreateSimpleWidgetText(120, 280)
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
+        // CreateLabel(_, '||||||\n|||||||||||||||||||||||||||||||\n|||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 20, 300, _, _, _, 60);
+        // CreateLabel(_, '||||||||||||||||||||||||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
+        // CreateLabel(_, '||||||||||||||||||||||||||||', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 10);
+        // CreateLabel(_, 'AAAA', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 180, _, _, _, 18);
+        // CreateLabel(_, 'AAAAAAAAAAAA\nAAAAAAAAAAAA', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 18);
+        // const label = CreateLabel(_, 'QPKJDHBSIUIJDKJKDJKDUDJ<', TEXTURES.MTSDF_COMIC_1024, _, 300, 100, _, _, _, 18);
+        // CreateSliderSimple();
+        // Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, 'Ready Slider', _,)
+        // CreateDropdownTree([100, 200, 0])
+        // CreateScrollerClampAlphaTest(_, 100, 400, 1000, 12)
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 500, 140, _, _, _, _, _, _, 0x0);
+        // const line = Test_rotate_section_with_round_corners();
+
+    }
+
+    // Test many render groups
+    // const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 200, 0], dim: [100, 100], col: TRANSPARENCY(GREY[1], 1), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+    // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
+    {
+
+        // const label = CreateLabel(0x0, '|',  TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
+        // section.AddItem(label);
+
+        // const dp = CreateDropdownTree([100, 200, 0], 0x0);
+        // section.AddItem(dp);
+
+        // section.GenGfxCtx();
+        // Layout_basic_pre_render(section);
+        // Widget_render(section);
+    }
+
+    // Test: Tool-tip info
+    // const info_panel = Create_info_panel_tool_tip(10, 600);
+    // // const event_clbk_params = {
+    // //     Clbk: (params) => {
+    // //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
+    // //     },
+    // //     clbk_params: {
+    // //         info_panel: info_panel,
+    // //     },
+    // // }
+    // const Clbk = (params) => {
+    //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
+    //     };
+    // const clbk_params = {
+    //         info_panel: info_panel,
+    //     };
+    {
+
+        // let k = 0, y=50;
+        // {
+        //     const section = Create_rect_mesh(Style_rect_default_properties({
+        //         is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10],
+        //         pos: [200,300,0], dim: [0,0], col: GREY[2],
+        //         name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+        //     }));
+        //     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
+
+        //     for(let i=0; i<13; i++){
+        //         const label = Create_widget_label(Style_label_default_properties({
+        //             pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
+        //             texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL,
+        //         }));
+        //         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+        //         section.AddItem(label);
+        //         Mesh_event_callback_create(label, Clbk, clbk_params, Resolve_mesh_info_tool_tip);
+        //     }
+
+        //     section.GenGfxCtx();
+        //     Layout_basic_pre_render(section);
+        //     Widget_render(section);
+
+        // }
+
+    }
+
+    // Physics2D Engine
+    {
+        // Test_physics2D_collision_detection_many_rects();
+        // Test_physics2D_collision_detection_obstract_collider();
+        // Test_physics2D_collision_detection_2_rects_sweptAABB_with_debug();
+
+        // Jump_physics();
+        // Spring_physics();
+        // Jump_physics_2();
+    }
+
+    // Visual Debug
+    {
+        // Visual_debug_mouse(ROOT_WIDGETS.CREATE_ROOT, 100, 100, 30, 250);
+        // Demo_visual_debug_glow_particles();
+        // Demo_visual_debug_explosion_particles();
+    }
+
+    // Test: Layout
+    {
+        // Test_alignment();
+        // TestAlignNew([0, 200, 0])
+        // Test_align_many_sliders();
+
+        // Test_resize_fill_space_layout();
+        // Test_resize_fill_space_layout_nested(_, 0);
+        // Test_resize_fill_space_layout_nested_with_widgets();
+
+        // Test_resize_layout_grow_containers_1();
+        // Test_resize_layout_grow_containers_2();
+        // Test_resize_layout_grow_containers_3();
+        // Test_resize_layout_grow_containers_4();
+        // Test_resize_layout_grow_containers_5();
+        // Test_resize_layout_grow_containers_many();
+        // Test_resize_layout_grow_containers_many_compound();
+    }
+
+
+    // widget plain text
+    {
+        // CreateSimpleWidgetText(200, 200)
+        // CreateTextInSectionWithNewLine();
+        // CreateTextInSection(big_text, 5)
+    }
+    // Widget: Label-buttons
+    {
+
+        // const w = 45
+        // CreateLabel(_, '0', TEXTURES.MTSDF_CONSOLAS_1024, _, w, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2', TEXTURES.MTSDF_CONSOLAS_1024, _, w*2, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3', TEXTURES.MTSDF_CONSOLAS_1024, _, w*3, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4', TEXTURES.MTSDF_CONSOLAS_1024, _, w*4, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5', TEXTURES.MTSDF_CONSOLAS_1024, _, w*5, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6', TEXTURES.MTSDF_CONSOLAS_1024, _, w*6, 100,_,_,_, 25);
+        // CreateLabel(_, '0\n1\n2\n3\n4\n5\n6\n7', TEXTURES.MTSDF_CONSOLAS_1024, _, w*7, 100,_,_,_, 25);
+        // CreateLabel(_, 'Qr|\`\'0123456789', TEXTURES.MTSDF_CONSOLAS_1024, _, 5, 400,_,_,_, 65);
+        // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n|_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
+        // CreateLabel(_, '|_A\n|_a', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 700,_,_,_,38);
+        // // CreateLabel(_, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_COMIC_1024, _, 300, 700,_,_,_,18);
+        // // CreateLabel(_, '| Initializing Graphics.', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S10_0, 300, 50,_,_,_,75,);
+        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 50,_,_,_);
+        // CreateLabel(_, 'Widget_Label\n12345\nppao918827', TEXTURES.CONSOLA_VARIANT_FONT, ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES.S1_5, 300, 190, _, _, _);
+        // Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '|_A_B_C_D_E_F_G_H_J_T_Y_U\n_a_b_c_d_e_f_g_h_i_t_r', TEXTURES.MTSDF_CONSOLAS_1024, 300, 100,18,_,_,_);
+
+        // Render font symbols atlas texture
+        // Render_font_symbols_atlas_texture(30, 50);
+        // { const s = TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 750, 100, [40, 40], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_clockwise); s.align.flags = LAYOUT.VERTICAL; }
+        // { const s = TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 750, 100, [40, 40], WHITE, [0, 0], TEXTURES.MTSDF_SYMBOLS, ATLASES_SUB_TEXTURES.MTSDF_SYMBOLS.arrow_anti_clockwise); s.align.flags = LAYOUT.VERTICAL; }
+
+        // Test: Set Focused
+        // CreateSectionedButtons([100, 20, 0], 'Section 1')
+        // CreateSectionedButtons([100, 170, 0], 'Section 2')
+
+
+        { // MSDF with scale slider
+            // Demo_widgets_msdf_text_rendering(10, 100);
+        }
+
+
+
+        { // With framebuffer. // TODO: re-implement
+
+            // CreateLabel(_, 'Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, line);');
+            // CreateLabel('Gl._framebuffer:-{render}|[mesh](FB.agqtpQji,TYPE.DIMENTION!,@23#scene,(label);');
+            // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, label);
+            // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, label);
+
+            // const button = CreateButton();
+            // Gl_framebuffer_render_mesh(FB.NEW, FRAMEBUFFER_TYPE.PORTION_DIMENTION, button);
+        }
+
+
+    }
+    // Widget: Slider-switch
+    {
+
+        // CreateSliderSimple();
+        // Widget_ready_slider_simple(ROOT_WIDGETS.CREATE_ROOT, 20, 20)
+        // CreateSlider(_, 400, 600);
+        // Widget_ready_slider(ROOT_WIDGETS.CREATE_ROOT, 20, 20, _, 'Ready Slider', _, )
+
+        // CreateSwitchSimple([0, ypos, 0]);
+        // Widget_ready_switch(ROOT_WIDGETS.CREATE_ROOT, 100, 100)
+        // const switch1 = CreateSwitch();
+        // Widget_ready_switch_button(ROOT_WIDGETS.CREATE_ROOT, );
+    }
+    // Textured Meshes
+    {
+    // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [256/2, 256/2], WHITE, [0,0], TEXTURES.SMOKE_1);
+    // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [32/2, 32/2], WHITE, [0,0], TEXTURES.COIN);
+    // TexturedRect(ROOT_WIDGETS.CREATE_ROOT, _, 30, 30, [64/2, 73/2], WHITE, [0,0], TEXTURES.TEST_APPLE);
+    }
+    // Test sdf lines
+    {
+        // SdfLine(YELLOW[7], [50, 60, 1], [200, 1]);
+        // SdfLine(YELLOW[7], [50, 80, 1], [200, 2]);
+        // SdfLine(YELLOW[7], [50, 100, 1], [200, 3]);
+        // SdfLine(YELLOW[7], [50, 120, 1], [200, 4]);
+        // SdfLine(YELLOW[7], [50, 140, 1], [200, 5]);
+        // SdfLine(YELLOW[7], [50, 160, 1], [200, 6]);
+    }
+    // Section Synthesizes
+    {
+
+        // SectionResizable([50, 50, 0])
+
+        // CreateManySections();
+
+        // CreateUniformPositionPerRenderGroups();
+
+    }
+    // Widget: Dropdown
+    {
+
+        // CreateDropdownTree([30, 50, 0])
+        // Create_dropdown_hsv_coloring([30, 50, 0]);
+
+        // CreateDropdownTreeHorizontalLayout();
+
+        // Demo_complicated_widget_layout(0, 200)
+    }
+    // Widget: Scroller
+    {
+
+        // const scroller = CreateScrollerClampAlphaTest(_, 30, 100, 10, 16);
+        // CreateScrollerManyWidgets(_, 30, 100, 10, 16);
+        // CreateScrollerDeepNested(_, 30, 100, 10, 16);
+        // CreateDropdownWithScroller(_, 30, 100, 10, 16);
+        // const widget = CreateDropdownWithScrollerManyDps(_, 30, 100, 10, 10);
+
+        // Create_mesh_info_ui(_, 230, 100, 10, 10, widget.group_bufferidxs[0]);
+
+    }
+    // Widget: Colorpicker
+    {
+
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 100, 100, _, _, _, _, _, _, 0x0);
+
+        /** Colorpicker Instanced Geometry*/
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.WPOS3|SID.ATTR.DIM2)
+        // Demo_widgets_colorpicker(ROOT_WIDGETS.CREATE_ROOT, 0, 100, _, _, _, _, _, _, SID.ATTR.DIM2)
+
+    }
+    // Window menu
+    {
+        // Window_menu_2();
+    }
+
+    // Instanced Geometry
+    {
+        // Instanced_geometry(GREEN[7], [100, 100, 5], [300, 300], );
+    }
+
+
+    // Reload
+    {
+        // Test_reload_app();
+    }
+
+
+
+
 
     //////////////////////////////////////////////////////////////////////////////////
     // NOT YET TESTED AND CORRECTED WITH NEW WIDGET CREATION STYLE
-    //////////////////////////////////////////////////////////////////////////////////
-
     // TODO: NEEDS REIMPLEMENTION
-    { // Framebuffer
-
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, helpui);
-
-        // const meshinfo_mesh = MeshInfo()
-        // Time_intervals_create(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh);
-        // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
-
-
-        { // 
-            // const fb = Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.PORTION_DIMENTION, s);
-            // Rotate framebuffer mesh
-            // setInterval(()=>{Gl_rotate_z_2d(fb.render_area.gfx, fb.render_area.geom.dim, Timer_get_global_timer()*Timer_get_global_timer()*.55)}, 16);
-        }
-    }
-
-    // TODO: Group all first letters directives to dropdowns and add button animation (SEE Demo_animations_ready_button_anim())    
-    // const helpui = Help();
-
-    // // Test Quadratic_interpolation
-    // console.log('Quadratic_interpolation');
-    // const max=40, min=30;
-    // console.log('val:0', Quadratic_interpolation(min, max, min));
-    // console.log('val:1', Quadratic_interpolation(min, max, min+((max-min)/2)));
-    // console.log('val:2', Quadratic_interpolation(min, max, max));
-
-    // Tests
+    //////////////////////////////////////////////////////////////////////////////////
     {
-        // Test_find_match_from_parent_descending();
-    }
+
+        { // Framebuffer
+
+            // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, helpui);
+
+            // const meshinfo_mesh = MeshInfo()
+            // Time_intervals_create(64, 'Mesh info tip', TIME_INTERVAL_REPEAT_ALWAYS, MeshInfoUpdate, { mesh: meshinfo_mesh });
+            // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh);
+            // Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.SCREEN_DIMENTION, meshinfo_mesh.children.buffer[0]);
 
 
-    { // Bitwise Operations
-        
-        // Bitwise32_operations_run_tests();
-        // Bitwise64_operations_run_tests();
-        // Test_bitwise_from_book_run_all_tests();
-
-
-        { // Performance Measurment: 1. Get bit_pos from bit_mask through a while loop, 2. Get bit_pos from bit_mask through if statements
-            // let bit_mask = 0x0n;
-            // const n = 1000;
-            // Time_intervals_create(1, 'Test:BITWISE operations performance', TIME_INTERVAL_REPEAT_ALWAYS, ()=>{
-
-            //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1);
-            //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask_looped(bit_mask); // 3x faster than iff statements from Bitwise_opps_get_bitpos_from_bitmask()
-            //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1);
-
-            //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2);
-            //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask(bit_mask);
-            //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2);
-
-            //     bit_mask <<= 0x1n;
-            //     if(bit_mask > MAX_UINT64) bit_mask = 0x0n;
-            // }, )
+            { //
+                // const fb = Gl_framebuffer_render_mesh(FB.STATIC.ID, FRAMEBUFFER_TYPE.PORTION_DIMENTION, s);
+                // Rotate framebuffer mesh
+                // setInterval(()=>{Gl_rotate_z_2d(fb.render_area.gfx, fb.render_area.geom.dim, Timer_get_global_timer()*Timer_get_global_timer()*.55)}, 16);
+            }
         }
 
-    
-        // const xx = 0xaaaaaaaa;
-        // // const xx = 0x0b1010;
-        // // const xx = 0xa0;
-        // console.log(xx.toString(2))
-        // const aa = (xx >> 0x1) & 0x1;
-        // // console.log(aa.toString(2))
-        // for(let i = 0; i < 32; i++) {
-            
-        //     console.log(i, ((xx >> i) & 0x1).toString(2));
-        // }
-        
-        // Test_js_bigUint64();
+        // TODO: Group all first letters directives to dropdowns and add button animation (SEE Demo_animations_ready_button_anim())
+        // const helpui = Help();
+
+        // // Test Quadratic_interpolation
+        // console.log('Quadratic_interpolation');
+        // const max=40, min=30;
+        // console.log('val:0', Quadratic_interpolation(min, max, min));
+        // console.log('val:1', Quadratic_interpolation(min, max, min+((max-min)/2)));
+        // console.log('val:2', Quadratic_interpolation(min, max, max));
+
+        // Tests
+        {
+            // Test_find_match_from_parent_descending();
+        }
+
+
+        { // Bitwise Operations
+
+            // Bitwise32_operations_run_tests();
+            // Bitwise64_operations_run_tests();
+            // Test_bitwise_from_book_run_all_tests();
+
+
+            { // Performance Measurment: 1. Get bit_pos from bit_mask through a while loop, 2. Get bit_pos from bit_mask through if statements
+                // let bit_mask = 0x0n;
+                // const n = 1000;
+                // Time_intervals_create(1, 'Test:BITWISE operations performance', TIME_INTERVAL_REPEAT_ALWAYS, ()=>{
+
+                //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+                //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask_looped(bit_mask); // 3x faster than iff statements from Bitwise_opps_get_bitpos_from_bitmask()
+                //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest1);
+
+                //     Performance_timer_start(PERFORMANCE_TIMERS_IDXS.MiscTest2);
+                //     for(let i=0; i<n; i++) Bitwise_opps_get_bitpos_from_bitmask(bit_mask);
+                //     Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.MiscTest2);
+
+                //     bit_mask <<= 0x1n;
+                //     if(bit_mask > MAX_UINT64) bit_mask = 0x0n;
+                // }, )
+            }
+
+
+            // const xx = 0xaaaaaaaa;
+            // // const xx = 0x0b1010;
+            // // const xx = 0xa0;
+            // console.log(xx.toString(2))
+            // const aa = (xx >> 0x1) & 0x1;
+            // // console.log(aa.toString(2))
+            // for(let i = 0; i < 32; i++) {
+
+            //     console.log(i, ((xx >> i) & 0x1).toString(2));
+            // }
+
+            // Test_js_bigUint64();
+        }
+
+        // GL_GET_ERROR(new Error().lineNumber);
+        // // Vertex_buffer_build_index_buffer_all();
+        // Update_all_webgl_vertex_buffers(gfxCtx.gl);
+        // GL_GET_ERROR(new Error().lineNumber);
     }
 
-GL_GET_ERROR(new Error().lineNumber);
-
-    // Vertex_buffer_build_index_buffer_all();
-    Update_all_webgl_vertex_buffers(gfxCtx.gl);
-GL_GET_ERROR(new Error().lineNumber);
 }
 
 function Demo_visual_debug_glow_particles() {
@@ -1194,8 +1217,8 @@ function Test_physics2D_collision_detection_many_rects() {
 
     // const num_meshes = 80; 
     // const size = 20;
-    const num_meshes = 20;
-    const size = 50;
+    const num_meshes = 40;
+    const size = 10;
     let x = 200, y = 140;
     let hue = .12;
     let v_size = size;
@@ -2024,7 +2047,7 @@ function Test_on_hover_show_info(x = 0, y = 0) {
         resolve_clbk: { create: 'create', destroy: 'destroy' },
     };
 
-    Mesh_event_callback_create(label, Clbk, clbk_params, resolve_clbks);
+    Mesh_event_callback_create(section, Clbk, clbk_params, resolve_clbks);
 }
 
 
@@ -4842,7 +4865,7 @@ function CreateTextInSection(text, font_size) { // GOOD!! render text from widge
         col: Color_hsv_to_rgb_calibrated(.0, .0, 1, 1, 1., .0),
         // texture_id: TEXTURES.MTSDF_COMIC_1024,
         texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
-        texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
+        // texture_id: TEXTURES.CONSOLA_VARIANT_FONT,
         font_size: font_size,
         text: text,
         is_debug_mesh: 0x0n,
@@ -5486,7 +5509,6 @@ function CreateSectionedButtons(pos, name = 'NO NAME') {
             texture_id: TEXTURES.MTSDF_CONSOLAS_1024,
             font_size: 10,
             text_col: WHITE,
-            is_debug_mesh: 0x0n,
             style: [10, 10, 0],
             layout: LAYOUT.VERTICAL,
             is_debug_mesh: 0x0n,
@@ -5677,8 +5699,8 @@ function Instanced_geometry(col, pos, dim) {
 
     const w = 200, h = 5., d = 1, r_corners = 1;
     let hue = .1;
-    const inst_attribs = (SID.ATTR.COL4);
-    // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
+    // const inst_attribs = (SID.ATTR.COL4);
+    const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3);
     // const inst_attribs = (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2);
     // const inst_attribs = (SID.ATTR.WPOS3 | SID.ATTR.DIM2);
     // const inst_attribs = (SID.ATTR.WPOS3);
@@ -5694,15 +5716,10 @@ function Instanced_geometry(col, pos, dim) {
         // Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE | LISTEN_EVENT_TYPES.HOVER } })
         Widget_gfx_ready_enable({ mesh: line, enable_sdf_rect: r_corners, listener: { type: LISTEN_EVENT_TYPES.MOVE } })
         panel.AddItem(line);
-        line.sid.inst = inst_attribs;
+        // line.sid.inst = inst_attribs;
 
 
     }
-
-    {
-
-    }
-
 
 
     panel.GenGfxCtx();
@@ -8350,7 +8367,7 @@ function MeshInfoUpdate(params) {
     // if (infoMesh && infoMesh !== prev_infomesh) { // Avoid update if mesh is same with the mesh of previous update.
     if (infoMesh) {
 
-        prev_infomesh = infoMesh;
+        // prev_infomesh = infoMesh;
 
         textMesh.RenderTextFromString(Mesh_get_name(infoMesh));
 
@@ -8993,7 +9010,8 @@ function Shader_color_functions_explosion_circle(x = 20, y = 300, w = 200, h = 2
     const scale_down = 1.;
     Widget_gfx_ready_enable({ mesh: mesh, enable_unif_scale: [scale_down, 1], });
 
-    mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .2, generic: { a: .0, b: .2 } });
+    // mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .2, generic: { a: .0, b: .2 } });
+    mesh.GfxEnableFn(SID.SHAD.FN_EXPLOSION_CIRCLE, { time: .2, generic: { a: .35, b: .02 } });
 
     // Render
     mesh.GenGfxCtx();

@@ -136,7 +136,6 @@ export class Mesh {
             pad_y: 0,
             margin_x: 0,
             margin_y: 0,
-            margin_y: 0,
             row: 0, // Value of the current meshe's row. Set by Align_ functions, based on mesh's .VERTICAL align flag.
         };
 

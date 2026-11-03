@@ -297,11 +297,11 @@ function Uniform_block_exists(sid) {
    for (let i = 0; i <= _uniform_blocks.boundary; i++) {
 
       if (_uniform_blocks.buffer[i].unif_sid & sid) { // Means that the block exists
-         return true
+         return i
       }
    }
 
-   return false;
+   return INT_NULL;
 }
 /** */
 let ubs_counter = 0;
@@ -335,7 +335,7 @@ class UniformsBlock {
    }
 
 
-   AddLayout(gl, type, typeid, name) {
+   AddLayout(gl, program, type, typeid, name) {
 
       const size = UNIF_TYPE.GetSizeInBytes(type, typeid) / FLOAT32_BYTE_SIZE;
 
@@ -361,8 +361,9 @@ class UniformsBlock {
       this.layout.sizes[locidx] = size;
       this.layout.names[locidx] = name;
 
-      gl.bindBufferBase(gl.UNIFORM_BUFFER, this.binding_index, this.glbuffer);
-      gl.bufferData(gl.UNIFORM_BUFFER, this.buffer, gl.DYNAMIC_DRAW);
+      // gl.bindBufferBase(gl.UNIFORM_BUFFER, this.binding_index, this.glbuffer);
+      // // gl.bufferData(gl.UNIFORM_BUFFER, this.buffer, gl.DYNAMIC_DRAW);
+      // gl.bufferData(gl.UNIFORM_BUFFER, requiredSize, gl.DYNAMIC_DRAW);
 
       return locidx;
    }
@@ -394,10 +395,10 @@ export function Uniforms_block_create_shared_uniform(sid, program, uniforms) {
 
    const gl = gfxCtx.gl;
 
-   let ub_idx = INT_NULL;
+   let ub_idx = Uniform_block_exists(sid);
 
    // Create the shared block, if it is not yet created
-   if (!Uniform_block_exists(sid)) {
+   if (ub_idx === INT_NULL) {
 
       const ub = new UniformsBlock(gl, program, UNIFORM_BLOCK_SHARED_NAME, sid);
       ub_idx = _uniform_blocks.Add(ub);
@@ -422,8 +423,32 @@ export function Uniforms_block_create_shared_uniform(sid, program, uniforms) {
 
 
       if (!found && uniforms[i].shader & UNIFORM.IS_SHARED)
-         _uniform_blocks.buffer[0].AddLayout(gl, uniforms[i].type, UNIF_TYPE.ID, uniforms[i].name);
+         _uniform_blocks.buffer[ub_idx].AddLayout(gl, program, uniforms[i].type, UNIF_TYPE.ID, uniforms[i].name);
    }
+
+    // Get the padded size directly from the shader code
+    const blockIndex = gl.getUniformBlockIndex(program, "Uniform_block_generic");
+    const requiredSize = gl.getActiveUniformBlockParameter(
+        program, blockIndex, gl.UNIFORM_BLOCK_DATA_SIZE
+    );
+    console.log("UBO requiredSize: ", requiredSize); // check what the driver actually reports
+
+    if(requiredSize > _uniform_blocks.buffer[ub_idx].buffer.length){
+        const old_buffer = _uniform_blocks.buffer[ub_idx].buffer;
+        _uniform_blocks.buffer[ub_idx].buffer = new Float32Array(requiredSize);
+        _uniform_blocks.buffer[ub_idx].buffer_size = requiredSize;
+
+        const old_len = old_buffer.length;
+        for (let i = 0; i < old_len; i++) {
+            _uniform_blocks.buffer[ub_idx].buffer[i] = old_buffer[i];
+        }
+    }
+
+    gl.bindBufferBase(gl.UNIFORM_BUFFER, _uniform_blocks.buffer[ub_idx].binding_index, _uniform_blocks.buffer[ub_idx].glbuffer);
+    // gl.bufferData(gl.UNIFORM_BUFFER, this.buffer, gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.UNIFORM_BUFFER, requiredSize, gl.DYNAMIC_DRAW);
+
+    // call bufferData from caller
 
    if(DEBUG.SHADERS) console.log('---- Uniform Shared Block ----\n', _uniform_blocks)
 

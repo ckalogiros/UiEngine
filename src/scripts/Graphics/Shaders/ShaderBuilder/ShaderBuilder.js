@@ -86,6 +86,7 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    let block_created = false;
 
    const len = _uniforms_info.length;
+    let std140_total_size = 0;
 
    for (let i = 0; i < len; i++) {
       if (_uniforms_info[i].shader & UNIFORM.IS_SHARED) {
@@ -98,12 +99,24 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += ` ${type} ${_uniforms_info[i].name};\n`;
+
+          std140_total_size += UNIF_TYPE.GetSizeInBytes(_uniforms_info[i].type, "UNIF_TYPE");
+
       }
 
    }
 
+   const std140_byte_size =  Math.ceil(std140_total_size / 16) * 16;
+   if(std140_byte_size > std140_total_size){
+       const remaining_bytes = std140_byte_size-std140_total_size;
+       const pad_str = UNIF_TYPE.GetStrFromSize(remaining_bytes);
+       uniforms_code += ` ${pad_str} ${'padding'};\n`;
+       // _uniforms_info
+   }
+
    // End uniforms block
    if (block_created) uniforms_code += '};\n';
+
 
 
    // uniforms_code += '\n// ---------- UNIFORMS ----------\n';
@@ -1570,7 +1583,9 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
-      '  if(u_blend_mode == 0) final_color *= 1.0;',
+      // '  if(u_blend_mode == 0) final_color *= 1.0 + float(u_blend_mode);',
+      // '  final_color *= 1.0 + float(u_blend_mode);',
+      '  final_color = blend_decider( final_color, src_color, u_blend_mode );',
 
       true ? '}' : '',
 
