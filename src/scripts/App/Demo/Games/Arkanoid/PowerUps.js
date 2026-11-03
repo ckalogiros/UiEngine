@@ -1,20 +1,19 @@
 "use strict"
 
-import { Bitwise_calc_bit_length_from_flag_base } from "../../../../Engine/Core/BitwiseOps.js";
+import { Bitwise32_get_bitlen_from_bitpos } from "../../../../Engine/Core/BitwiseOps/Bitwise32Ops.js";
 import { Free_generic_buffer, Free_int8_buffer, New_generic_buffer, New_int8_buffer } from "../../../../Engine/Core/Buffers.js";
-import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
-import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
-import { Renderqueue_set_active } from "../../../../Engine/Renderers/Renderer/RenderQueue.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
+import { BLACK, WHITE } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_set_color_rgba, Mesh_update_set_dim_xy } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
 import { Arkanoid_get_panel_dim_x } from "./Arkanoid.js";
-import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoisConstants.js";
+import { ARKANOID_COLORS, ARKANOID_FLAGS } from "./ArkanoidConstants.js";
 import { Ball_animation_scale, Ball_create, BALL_SIZE } from "./Ball.js";
 import { Gun_create_animation } from "./BulletGun.js";
 import { Player_create_animation_scale } from "./Player.js";
+import { View_render_specific_render_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
 
 
 
@@ -52,7 +51,7 @@ export function Arkanoid_powup_destroy() {
 /** */
 class Powup {
 
-   constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, vb_groupidx = INT_NULL) {
+   constructor(x = 0, y = 0, color = WHITE, texture_file_id = INT_NULL, groupidx=INT_NULL, parent=null) {
 
       const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[0, 0, 3], dim:[POWUP_INIT_SIZE, POWUP_INIT_SIZE], col:color, name:'PowupMesh', }));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, enable_src_color_in_main:false,});
@@ -70,22 +69,17 @@ class Powup {
       this.control_values = [.59, .78, 1., .18, .09, .36];
       mesh.EnableGfxUniforms({ unif: SID.UNIF.FS_GENERIC_CONTROLS }, 'u_generic_controls', UNIF_TYPE.FARR, UNIFORM.IN_FS, this.control_values.length);
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_ASC_SEARCH_ALL, vb_groupidx);
+      
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
+      // parent.AddItem(mesh);// HACK: Adding mesh as a child helps for searching from parent to locate all other coins and choose the same render group
 
-
-      mesh.geom.pos[0] = x;
-      mesh.geom.pos[1] = y;
-
-      mesh.Render()
-
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET|GFX_CTX_FLAGS.RENDER_GROUP_MATCH_FROM_RENDER_GROUP);
+      mesh.GenGfxCtx();
+      View_render_specific_render_group(mesh.group_bufferidxs[0], mesh.group_bufferidxs[1], mesh.group_bufferidxs[2], true);
 
       if (powup_vb_groupidx === INT_NULL) powup_vb_groupidx = mesh.gfx.vb.groupidx;
-
-
-      if (vb_groupidx.label === INT_NULL) {
-         Renderqueue_set_active(mesh.gfx.vb.groupidx, true);
-      }
 
       this.idx = _powup_buffer.Add(this);
       this.mesh = mesh;
@@ -140,20 +134,18 @@ export function Powup_remove_all() {
    }
 }
 /** */
-export function Powup_init_buffer(group_idx, parent_root_posidx, parent_mesh_bufferidx, num_effect_meshes = PRE_INITIALIZED_POWUP_MESHES) {
+export function Powup_init_buffer(groupidx, parent, num_effect_meshes = PRE_INITIALIZED_POWUP_MESHES) {
 
    let vb_groupidx = INT_NULL;
    let powup = null;
 
    for (let i = 0; i < num_effect_meshes; i++) {
 
-      powup = new Powup(_, _, _, _, vb_groupidx);
+      powup = new Powup(_, _, _, _, groupidx, parent);
       vb_groupidx = powup.mesh.gfx.vb.groupidx;
 
-      // Add to View Group
-      View_add_to_group(powup.mesh, group_idx);
       // Implement to draw wpos from a root uniform wpos 
-      if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(powup.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+      if (parent !== null) Mesh_unif_hack_parent_root_wpos(powup.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
       Powup_remove_byidx(powup.idx);
    }
@@ -175,7 +167,7 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
    h = POWUP_INIT_SIZE;
 
    // Calculate an index from flag, starting from index 0 by using a base
-   const color_index = Bitwise_calc_bit_length_from_flag_base(powup_type_flag, ARKANOID_FLAGS.POWUP_BASE);
+   const color_index = Bitwise32_get_bitlen_from_bitpos(powup_type_flag, ARKANOID_FLAGS.POWUP_BASE);
    const color = POWUP_COLORS_ARRAY[color_index];
 
    if (freeidx >= 0) {
@@ -187,12 +179,12 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
       powup.geom.pos[1] = y - h + h_src;
       Gl_set_wpos_xy(powup.gfx, powup.geom.pos[0] + w, powup.geom.pos[1] + h);
 
+      
       powup.geom.dim[0] = w;
       powup.geom.dim[1] = h;
+      Mesh_update_set_dim_xy(powup);
 
-      powup.geom.SetDimXY(powup.gfx, w, h);
-
-      powup.SetColorRGBA(color);
+      Mesh_set_color_rgba(powup, color);
 
       _powup_buffer.buffer[idx].is_active = true;
 
@@ -202,7 +194,7 @@ export function Powup_create(x, y, w, h, w_src = 0, h_src = 0, powup_type_flag, 
    else { // If no apropriate free mesh was found, create new mesh
 
       // TODO: How to find the vb idx if a new text needs to be created in the already created vb?
-      const powup = new Powup(x - w + w_src, y - h + h_src, color, _, powup_vb_groupidx);
+      const powup = new Powup(x - w + w_src, y - h + h_src, color,);
       idx = powup.idx;
    }
 

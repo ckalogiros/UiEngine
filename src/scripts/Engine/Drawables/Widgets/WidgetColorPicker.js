@@ -1,20 +1,21 @@
 "use strict"
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties, Style_slider_simple_default_properties } from "./Helpers/WidgetEnableProperties.js";
+import { State_mesh_set_clicked, State_mesh_set_focused, State_mesh_set_grabed } from "../../../GlobalFunctions.js";
 import { Gl_set_rgba, Gl_set_rgba_per_vertex, Gl_set_rgba_per_vertex_specify_vertex, Gl_set_rgba_specify_attribute } from "../../../Graphics/Buffers/VertexBuffersOps.js";
 import { CopyArr3, CopyArr4, CopyMat4_arr4, Floor, Mix_vec3_float32Array, Mix_vec4_float32Array } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { Create_rect_mesh, Create_widget_label, Create_widget_slider_simple } from "../../Core/CreateWidget.js";
-import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { Create_rect_mesh, Create_widget_label, Create_widget_slider_simple } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_add_vb_root_wpos } from "../../Core/MeshUniformsBuffer.js";
-import { Root_group_per_vb_meshidx_view_get_all_roots } from "../../Core/Views/RootView.js";
 import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
 import { Info_listener_dispatch_event } from "../DebugInfo/InfoListeners.js";
-import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, PURPLE, RED, REDL, WHITE, YELLOW } from "../Material/Base/Colors.js";
+import { BLACK, BLUE, BLUEL, COLOR_GRADIENT_HORIZONTAL, COLOR_GRADIENT_VERTICAL, CYAN, GREEN, GREY, PURPLE, RED, REDL, WHITE, YELLOW } from "../Material/Colors.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
-import { Style_label_default_properties, Style_rect_default_properties, Style_slider_simple_default_properties } from "./WidgetReadyStyles.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add, Mesh_listener_create, Mesh_set_name, Mesh_state_check } from "../Operations/MeshPropertiesFunctions.js";
 import { Slider_simple_connect, Slider_simple_set_value } from "./WidgetSlider.js";
+import { View_add_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 
@@ -60,13 +61,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const scale = .6;
 
       if (properties.col !== _ && properties.col[0].constructor !== Float32Array) alert('Colorpicker needs Multicolor for the constructor\nConsider passing an array of 4 COLORS')
-      // super(mesh_bufferidx, {is_root:is_root, options:options, pad:[margin[0] * scale, margin[1] * scale], pos, dim:[dim[0] * scale, dim[1] * scale], col:col, name:name, style:style, num_faces:num_faces, is_debug_mesh:is_debug_mesh});
-   // super(mesh_bufferidx, { 
-   //    is_root: is_root, pad: [margin[0] * scale, margin[1] * scale], 
-   //    pos, dim: [dim[0] * scale, dim[1] * scale], col: [GREY[1], GREY[3], GREY[1], GREY[3]], 
-   //    name: name, style: style, num_faces: num_faces, 
-   //    layout:LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL, is_debug_mesh: is_debug_mesh,
-   // });
 
       properties.col = COLOR_GRADIENT_VERTICAL(GREY[8], GREY[4]);
       super(mesh_bufferidx, properties);
@@ -74,10 +68,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
       this.AlignNEW.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
 
       // Multi color vertex
-      this.options |= SECTION.RESIZE_PARENT;
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.align.flags = LAYOUT.RESIZE_SELF|LAYOUT.HORIZONTAL;
-
       this.label_r = null;
       this.label_g = null;
       this.label_b = null;
@@ -115,14 +105,11 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: color_pick, enable_sdf_rect: properties.rcorners.color_pick, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
-      color_pick.state.mask &= ~MESH_STATE.ACTIVE;
       color_pick_idx = panel.AddItem(color_pick);
-
 
 
       /******************************************************************************/
       // Create panel for the color presentation and info labels
-      // const panel2 = Create_widget_section(Style_section_default_properties({options:SECTION.VERTICAL, pad:[20 * scale, 20 * scale], pos:[0, 0, 1], col:COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), name:'Inner Panel 1', style:style, num_meshes:1, is_debug_mesh:is_debug_mesh}));
       const panel2 = Create_rect_mesh(Style_rect_default_properties({ 
          pad: [20 * scale, 20 * scale], pos: [0, 0, 1], col: COLOR_GRADIENT_VERTICAL(GREY[5], GREY[1]), 
          name: 'Inner Panel 1', num_meshes: 1, is_debug_mesh: properties.is_debug_mesh, 
@@ -130,9 +117,9 @@ export class Widget_Color_Picker extends Rect_Mesh {
       }));
       Widget_gfx_ready_enable({ mesh: panel2, enable_sdf_rect: properties.rcorners.panel2, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
       panel2_idx = panel.AddItem(panel2);
-
-
-
+      
+      
+      
       /******************************************************************************/
       // Create the color present mesh
       const color_present_mesh = Create_rect_mesh(Style_rect_default_properties({ 
@@ -215,7 +202,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
          num_faces: 1, layout: LAYOUT.HORIZONTAL, 
       }));
       Widget_gfx_ready_enable({ mesh: slider_tran, enable_sdf_rect: properties.rcorners.slider_trans, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
-      slider_tran.SetName('Slider Transparency');
+      Mesh_set_name(slider_tran, 'Slider Transparency');
       // slider_tran.align.flags = LAYOUT.HORIZONTAL;
 
       slider_trans_idx = panel.AddItem(slider_tran);
@@ -247,7 +234,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
       Widget_gfx_ready_enable({ mesh: slider_hue, enable_sdf_rect: properties.rcorners.slider_hue, enable_col_per_vertex: true, enable_blend_mode: SID.BLEND_OPTIONS.BLEND_MODE_ADD });
 
       slider_hue.sid.shad |= SID.SHAD.INDEXED_PATT_CONNECTED_FACES_X;
-      slider_hue.SetName('Slider Hue');
+      Mesh_set_name(slider_hue, 'Slider Hue');
       // slider_hue.align.flags = LAYOUT.VERTICAL;
       slider_hue_idx = this.AddItem(slider_hue);
 
@@ -347,19 +334,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
       // NOTE: The call must happen once per vb, so it is sufficient to make the call for every mesh of the widget that belongs to a different vb group
       this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 
-      if (unif_name === 'u_wposxy') {
-
-         // Call for each root mesh in every vertex buffer
-         const root_meshes = Root_group_per_vb_meshidx_view_get_all_roots(this.root_bufferidx, unif_name, Clbk, clbk_params);
-         const len = root_meshes.length;
-         for (let i = 1; i < len; i++) {
-
-            const root_mesh = Mesh_buffer_get_mesh_byidx(root_meshes[i]);
-            root_mesh.SetClbkGfxUniforms(unif_name, Clbk, root_mesh.root_posidx);
-
-         }
-      }
-
    }
 
 
@@ -367,8 +341,10 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       if (this.gfx_ctx_parent === INT_NULL) { // Set for the first time, if gfx_ctx_parent=INT_NULL from initialization
 
-         this.gfx_ctx_flags = FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+         if ((this.gfx_ctx_flags  & GFX_CTX_FLAGS.NEW)===0) {
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+         }
 
          if (recurse) {
             for (let i = 0; i <= this.children.boundary; i++) {
@@ -406,18 +382,22 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      this.gfx = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
-
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
+      
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
+      // alert('IMPLEMENT: Create View for colorpicker widget')
+      
       for (let i = 0; i <= this.children.boundary; i++) {
          if (this.children.buffer[i]) this.children.buffer[i].GenGfxCtx(FLAGS, specific_vb_groupidx);
       }
-
+      
    }
 
 
    Render() {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) {
+      if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          // super.AddToGfx();
          super.AddToGfx();
          for (let i = 0; i <= this.children.boundary; i++) {
@@ -461,26 +441,26 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const color_present_mesh = panel2.children.buffer[color_present_idx];
 
       { // Color Pick Panel
-         color_pick_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP)
+         Mesh_listener_create(color_pick_mesh, LISTEN_EVENT_TYPES.CLICK_UP)
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
             target_mesh: mesh,
             params: null,
          };
-         color_pick_mesh.AddListenEvent(E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(color_pick_mesh, E.C, mesh.OnClickColorPick, evt_params, parent_listeners[E.C]);
       }
 
       { // Hue Slider
          // For the hue slider, we create a click event from the Widget Slider class, so that on slider huue click we run the sliders click event.
-         hue_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+         Mesh_listener_create(hue_mesh, LISTEN_EVENT_TYPES.CLICK_UP);
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
             target_mesh: hue_mesh,
             params: null,
          };
-         hue_mesh.AddListenEvent(E.C, hue_mesh.OnClick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(hue_mesh, E.C, hue_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
          /**
           * Here we set up a connection between the slider and this class 'OnClickHuePick()'.
@@ -504,14 +484,14 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       { // Tranparency Slider
          // Create the click event on the slider class
-         transp_slider_mesh.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+         Mesh_listener_create(transp_slider_mesh, LISTEN_EVENT_TYPES.CLICK_UP);
          const evt_params = { // Create the parameters to pass for the switch's click event. 
             EventClbk: null,
             targetBindingFunctions: null,
             target_mesh: transp_slider_mesh,
             params: null,
          };
-         transp_slider_mesh.AddListenEvent(E.C, transp_slider_mesh.OnClick, evt_params, parent_listeners[E.C]);
+         Mesh_listener_add(transp_slider_mesh, E.C, transp_slider_mesh.OnClick, evt_params, parent_listeners[E.C]);
 
          // Create the callback that the slider will call to run the local method for transparency slider
          const clbk_params_transparency_slider = {
@@ -537,7 +517,7 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
       // TODO: Implement Resize functionality
 
-      STATE.mesh.SetClicked(widget);
+      State_mesh_set_clicked(widget);
 
       if (widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] === INT_NULL) {
 
@@ -545,16 +525,15 @@ export class Widget_Color_Picker extends Rect_Mesh {
           * The Move event runs only when the mesh is GRABED. That means that the timeInterval 
           * is created and destroyed upon 'onClickDown' and 'onClickUp' respectively.
           */
-         const idx = Time_intervals_create(10, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
+         const idx = Time_intervals_create(1, 'Move Widget_Color_Picker', TIME_INTERVAL_REPEAT_ALWAYS, On_move_clbk, widget);
          widget.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.MOVE, idx);
 
-         if (widget.StateCheck(MESH_STATE.IS_GRABABLE)) {
+         if (Mesh_state_check(widget, MESH_STATE_FLAGS.IS_GRABABLE)) {
 
-            STATE.mesh.SetGrabed(widget);
-            STATE.mesh.SetFocused(widget);
+            State_mesh_set_grabed(widget);
+            State_mesh_set_focused(widget);
             Info_listener_dispatch_event(INFO_LISTEN_EVENT_TYPE.UI_INFO_FOCUSED, { focused: this })
-            widget.StateEnable(MESH_STATE.IN_GRAB | MESH_STATE.IN_FOCUS);
-            // Mesh_set_root_in_focus(widget.root_bufferidx);
+            widget.StateEnable(MESH_STATE_FLAGS.IN_GRAB | MESH_STATE_FLAGS.IN_FOCUS);
          }
 
       }
@@ -614,7 +593,6 @@ export class Widget_Color_Picker extends Rect_Mesh {
        *    ( ( Ceil( (x/w)*P )-1 )*2 ) + 2
        * ]
        */
-
 
 
 
@@ -816,8 +794,8 @@ export class Widget_Color_Picker extends Rect_Mesh {
       const panel2 = panel.children.buffer[panel2_idx]; // HACk: we do not have a dedicated idx var for the panel, but we know its the first child
 
       const click_pos = params.click_pos;
-      const x = click_pos[0] - color_pick_mesh.GetPosX(); // Tranform to mesh coordinates (0 t0 mesh dim)
-      const y = click_pos[1] - color_pick_mesh.GetPosY(); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const x = click_pos.x -  Mesh_get_real_pos_x(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
+      const y = click_pos.y -  Mesh_get_real_pos_y(color_pick_mesh); // Tranform to mesh coordinates (0 t0 mesh dim)
       widget.color_pick_click_pos = [x, y];
 
       const percentagex = (x / color_pick_mesh.geom.dim[0] / 2); // Calc the percentage 
@@ -978,12 +956,13 @@ export class Widget_Color_Picker extends Rect_Mesh {
 
 
 
+/** */
 function On_move_clbk(params) {
 
    const widget = params.params;
 
    // Destroy the time interval calling this function if the mesh is not grabed.
-   if (widget.StateCheck(MESH_STATE.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
+   if (Mesh_state_check(widget, MESH_STATE_FLAGS.IN_GRAB) === 0 && widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE] !== INT_NULL) {
 
       const intervalIdx = widget.timeIntervalsIdxBuffer.buffer[INTERVALS.MOVE];
       Time_intervals_destroy_byidx(intervalIdx);

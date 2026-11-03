@@ -12,6 +12,7 @@ import { New_generic_buffer } from "../../Core/Buffers.js";
 
 
 
+/** */
 export class Info_Listeners {
 
 
@@ -79,26 +80,18 @@ export class Info_Listeners {
 }
 
 
-
-
 const _info_listeners = new Info_Listeners();
-
+/** */
 export function Info_listener_create_event(TYPE_IDX, Clbk, source_params, evt_params) {
 
    return _info_listeners.AddEvent(TYPE_IDX, Clbk, source_params, evt_params);
 }
-
-
-
-
+/** */
 export function Info_listener_dispatch_event(TYPE_IDX, trigger_params) {
 
    _info_listeners.DispatchEvents(TYPE_IDX, trigger_params);
 }
-
-
-
-
+/** */
 export function Info_listener_remove_event(event_idx) {
    if (event_idx === INT_NULL) {
       console.error('Info_listener_remove_event is NULL. event_idx:', event_idx);
@@ -106,18 +99,11 @@ export function Info_listener_remove_event(event_idx) {
    }
    _info_listeners.RemoveEvent(event_idx);
 }
-
-
-
-
+/** */
 export function Info_listener_get_event(TYPE_IDX) {
 
    return _info_listeners.GetEvent(TYPE_IDX);
 }
-
-
-
-
 /**Debug-Print */
 export function Info_listener_print_buffer() {
 

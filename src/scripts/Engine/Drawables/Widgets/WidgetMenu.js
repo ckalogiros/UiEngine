@@ -2,16 +2,17 @@
 
 import { Widget_Button } from "./WidgetButton.js";
 import { Align_text_in_rect_parent } from "../Operations/Alignment.js";
-import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "../../Core/CreateWidget.js";
+import { Create_widget_close_btn, Create_widget_label, Create_widget_minimize_btn } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { BLUEL, GREY, WHITE } from "../Material/Base/Colors.js";
-import { REL_POS } from "../Operations/RelativePosComponent.js";
+import { BLUEL, GREY, WHITE } from "../Material/Colors.js";
 import { Clipy_from_tree_recursive } from "../Operations/Clip.js";
 import { View_get_view_vb_root_meshidx } from "../../Core/Views/MeshBufferViews.js";
-import { Root_group_view_buffer_add_mesh, Root_group_reset_gfxs } from "../../Core/Views/RootView.js";
-import { Style_label_default_properties, Style_rect_default_properties } from "./WidgetReadyStyles.js";
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Root_group_view_buffer_add_mesh } from "../../Core/Views/RootView.js";
+import { Widget_gfx_ready_enable, Style_label_default_properties, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
+import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
+import { Mesh_get_real_pos_y } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create, Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
 
 
 
@@ -61,7 +62,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       this.type |= MESH_TYPE.WIDGET_MENU_BAR;
       
       this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      // this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
       
       // this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.EXPAND;
       this.align.flags = LAYOUT.RESIZE_SELF | LAYOUT.HORIZONTAL | LAYOUT.FIXED_WIDTH;
@@ -270,16 +270,16 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
    }
@@ -312,7 +312,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       const pad = [0, 0]; // IMPORTANT: If we are to set the dim of the close_btn's to a 'y padding', we better set the close_btn.pad[1] to 0
 
 
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       const close_btn = Create_widget_close_btn(ROOT_WIDGET_FLAGS, root, text, [0, 0, this.geom.pos[2] + 1], fontsize, TRANSPARENCY(col, 1.0), text_col, pad, bold, style, font);
 
@@ -334,7 +333,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
                   child.geom.dim[0] = this.geom.dim[1];
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -344,13 +343,11 @@ export class Widget_Menu_Bar extends Rect_Mesh {
          close_btn.geom.dim[1] = this.geom.dim[1];
          // close_btn.geom.dim[0] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, close_btn);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, close_btn);
       }
 
 
       menu_close_btn_idx = this.AddItem(close_btn);
-
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, close_btn.idx);
 
    }
 
@@ -366,7 +363,6 @@ export class Widget_Menu_Bar extends Rect_Mesh {
       const pad = [0, 0];
 
 
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
 
       if (root.mesh_bufferidx === this.mesh_bufferidx) {
          console.error('FAIL TO CREATE MINIMIZE BUTTON. REASON: The root passed should not be the menu');
@@ -395,7 +391,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -406,28 +402,19 @@ export class Widget_Menu_Bar extends Rect_Mesh {
          minimize_btn.geom.dim[0] = this.geom.dim[1];
 
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, minimize_btn);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, minimize_btn);
       }
 
 
       this.AddItem(minimize_btn);
 
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, minimize_btn.idx);
-
    }
 
 
-   // TODO: pass: REL_POS right-left-middle, so user can assign the rel pos of the mesh
    AddToMenuBar(mesh, RelPosAlign) {
 
-      // if (!this.rel_comp) this.rel_comp = Relative_pos_comp_create_new_comp();
-
-
       // Any mesh of bese type Section, must be calculated(position/size) independent of any other mesh of the menu bar and/or parent/parent-children
-      // if(mesh.type & MESH_TYPE.SECTION_MESH) mesh.options |= this.options = SECTION.INDEPENDENT;
-      if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
-
-      const align_item_flag = (RelPosAlign !== undefined) ? RelPosAlign : REL_POS.LEFT;
+      // if (mesh.type & MESH_TYPE.SECTION_MESH) mesh.OptionsEnable(SECTION.INDEPENDENT);
 
 
       // Set the height of the menu item to be the same across all other items
@@ -446,7 +433,7 @@ export class Widget_Menu_Bar extends Rect_Mesh {
                   child.geom.dim[1] = this.geom.dim[1];
 
                   // Because we changed the size of the button, we need to realign the text
-                  Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, child);
+                  Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, child);
                }
             }
          }
@@ -455,16 +442,12 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 
          mesh.geom.dim[1] = this.geom.dim[1];
          // Because we changed the size of the button, we need to realign the text
-         Align_text_in_rect_parent(ALIGN.HOR_CENTER | ALIGN.VERT_CENTER, mesh);
+         Align_text_in_rect_parent(TEXT_ALIGN.HOR_CENTER | TEXT_ALIGN.VERT_CENTER, mesh);
       }
 
 
 
       this.AddItem(mesh)
-
-      // TODO: Use the parem 'RelPosAlign', but first implement correctly the 'REL_POS.LEFT' alingment
-      // Relative_pos_comp_add_child_to_comp(REL_POS.RIGHT, this, mesh.idx);
-      // if (RelPosAlign & REL_POS.RIGHT) Relative_pos_comp_add_child_to_comp(align_item_flag, this, mesh.idx);
 
    }
 }
@@ -473,31 +456,26 @@ export class Widget_Menu_Bar extends Rect_Mesh {
 export class Close_Button extends Widget_Button {
 // export class Close_Button extends Section {
 
-   constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
-      // pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, texture_id=INT_NULL, sub_texture_id=INT_NULL, is_debug_mesh) {
-      pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, _, is_debug_mesh) {
+   // constructor(mesh_bufferidx, ROOT_WIDGET_FLAGS, root, text, pos, fontsize, col = GREY[3], text_col = WHITE,
+   // pad = [0, 0], bold = .4, style = { rcorners: 6, feather: 5, border: 0 }, font = TEXTURES.DEFAULT_FONT, _, is_debug_mesh) {
+   constructor(mesh_bufferidx, properties) {
 
-      super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
-      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, _, pad, pos, _, col, _, style,_, texture_id, sub_texture_id, is_debug_mesh);
+      // super(Style_button_default_properties({mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh}));
+      // super(mesh_bufferidx, ROOT_WIDGET_FLAGS, text, _, pos, fontsize, col, text_col, [10,6], bold, style, font, is_debug_mesh);
+      super(mesh_bufferidx, properties);
 
-      this.GfxUniformsEnable({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.GfxUniformsEnable({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3 }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      this.EnableGfx(MESH_ENABLE.GFX.ATTR_R_CORNERS, 10);
-      this.EnableGfxOperations(SID.SHADER_OPERATIONS.SDF_RECT, SID.BLEND_OPTIONS.BLEND_MODE_ADD);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-      this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT;
+      // Mesh_listener_create(this, LISTEN_EVENT_TYPES.HOVER);
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
+      // this.align.flags = LAYOUT.HORIZONTAL|LAYOUT.FLOAT_RIGHT;
       
-      this.SetName('close_btn');
-
       // Set a callback function for the destruction of the menu and its window on clicking the close button.
       const params = {
          source_params: this,
-         evt_params: root, // root should be the root widget from which the recursive destruction should start.
+         evt_params: properties.target_mesh, // root should be the root widget from which the recursive destruction should start.
       }
 
       // Pass the root and the callback for destroying the parent widget
-      this.CreateEventCallback(params);
+      Mesh_event_callback_create(this, Clbk, clbk_params);
    }
 
 
@@ -536,7 +514,8 @@ export class Close_Button extends Widget_Button {
       root.Destroy(root);
 
       if (root.event_clbks) {
-         root.event_clbks.buffer[0].evt_clbks();
+         const params = root.event_clbks.buffer[0].params;
+         root.event_clbks.buffer[0].evt_clbks(params);
       }
 
    }
@@ -564,7 +543,7 @@ export class Widget_Minimize extends Widget_Button {
          evt_params: root,
       }
 
-      this.CreateEventCallback(params);
+      Mesh_event_callback_create(this, Clbk, clbk_params);
 
    }
 
@@ -599,7 +578,7 @@ export class Widget_Minimize extends Widget_Button {
       const minim_mesh = params.source_params;
       const root = params.evt_params;
 
-      STATE.mesh.SetClicked(minim_mesh);
+      State_mesh_set_clicked(minim_mesh);
 
 
       if (minim_mesh.group_bufferidxs[0] === INT_NULL) {
@@ -616,7 +595,7 @@ export class Widget_Minimize extends Widget_Button {
 
 
             // Reset Graphics buffers;
-            Root_group_reset_gfxs(root.root_bufferidx)
+            // Root_group_reset_gfxs(root.root_bufferidx)
 
             // Store the root children tree structure to a temporary place, so that can be retrieved on maximize
             const menu_bar = root.children.buffer[0]; // CAUTION: First child suppose to be the menu_bar. What happens if it is at a different index???
@@ -630,7 +609,8 @@ export class Widget_Minimize extends Widget_Button {
             }
 
             root.children.ResetFull(); // Reset the children's buffer and allocate new array
-            root.AddChild(menu_bar);
+            // root.AddChild(menu_bar);
+            root.AddItem(menu_bar);
 
 
             // Store pos and dim of the un-munimized root mesh
@@ -658,14 +638,14 @@ export class Widget_Minimize extends Widget_Button {
             // Set Graphics
             root.Rerender(); // We need to re-render the whole vb. Many meshes have been excluded from the minimize action
 
-            root.StateDisable(MESH_STATE.IS_RESIZEABLE);
+            root.StateDisable(MESH_STATE_FLAGS.IS_RESIZEABLE);
             minim_mesh.toggle = true;
 
          }
          else { // Maximize - toggle on
 
             // Gfx_deactivate_no_listeners_touch(root);
-            Root_group_reset_gfxs(root.root_bufferidx)
+            // Root_group_reset_gfxs(root.root_bufferidx)
 
             root.children.Reset();
             root.children = minim_mesh.stored_children_meshes;
@@ -706,14 +686,14 @@ export class Widget_Minimize extends Widget_Button {
             // Get the group root mesh to Recalc position/dimentions 
             const group_rootidx = View_get_view_vb_root_meshidx(root.group_bufferidxs);
             const group_root = Mesh_buffer_get_mesh_byidx(group_rootidx);
-            const clip_top = group_root.GetPosY();
+            const clip_top = Mesh_get_real_pos_y(group_root);
             const clip_bottom = clip_top + group_root.geom.dim[1] * 2;
             Clipy_from_tree_recursive(group_root, clip_top, clip_bottom);
 
 
             root.Rerender();
 
-            root.StateEnable(MESH_STATE.IS_RESIZEABLE);
+            root.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
             minim_mesh.toggle = false;
          }
       }

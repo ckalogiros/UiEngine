@@ -24,8 +24,7 @@ class Controller {
 
 }
 
-
-
+/** */
 export class OrbitControls extends Controller {
 
    constructor() {
@@ -49,9 +48,7 @@ export class OrbitControls extends Controller {
    }
 
 }
-
-
-
+/** */
 export function ControlsCreateContol(type) {
 
    switch (type) {

@@ -1,3 +1,5 @@
+* Uniform block rename to uniforms shared block
+
 * The enabling of attributes for a mesh could call a function to read the shader code and extract all essential variables 
    and use them to create attributes and passes to fragment shader
 

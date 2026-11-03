@@ -5,28 +5,45 @@ import { Renderqueue_print_active, Renderqueue_print_all } from "../../Renderers
 import { Time_intervals_print } from "../../Timers/TimeIntervals.js";
 import { FramebufferPrintBuffer, FramebufferPrintBufferAll } from "../../../Graphics/Buffers/FrameBuffers.js";
 import { Dropdown_roots_print_root_buffer } from "../../Drawables/Widgets/Widget_Dropdown.js";
-import { Mesh_buffer_print, Mesh_buffer_print_loop, Mesh_per_vb_print, Mesh_per_vb_print_loop } from "../../Core/MeshBuffer.js";
+import { Mesh_buffer_print, Mesh_buffer_print_loop, Mesh_buffer_print_loop_detailed, Mesh_per_vb_print, Mesh_per_vb_print_loop } from "../../Core/MeshBuffer.js";
 import { Str_buffer_print, Str_buffer_mesh_names_print, Str_buffer_mesh_names_print_loop, Str_buffer_print_loop } from "../../Core/StringBuffer.js";
-import { Gl_vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
+import { Vertex_buffer_print } from "../../../Graphics/Buffers/VertexBuffers.js";
 import { Gl_index_buffer_print } from "../../../Graphics/Buffers/IndexBuffers.js";
 import { Gl_vertex_array_object_print } from "../../../Graphics/Buffers/VertexArrays.js";
 import { Gl_program_print } from "../../../Graphics/ShaderPrograms.js";
 import { Shader_attributes_print } from "../../../Graphics/ShaderAttributes.js";
-import { View_buffer_print, View_buffer_print_loop } from "../../Core/Views/MeshBufferViews.js";
+import { View_buffer_print, View_buffer_print_loop, View_buffer_print_roots } from "../../Core/Views/MeshBufferViews.js";
 import { Styles_hover_margin_print, Styles_hover_margin_print_loop, Styles_margin_print, Styles_margin_print_loop, Styles_pad_buffer_print, Styles_pad_buffer_print_loop } from "../../Styles.js";
 import { Dbg_info_ui_print_entries_table, TEMP_mesh_buffer_info_ui_print_entries_table } from "../../Drawables/DebugInfo/DebugInfoUi.js";
 import { DEBUG_INFO_BUFFERS_PRINT, DEBUG_INFO_BUFFERS_PRINT2 } from "../../Core/Buffers.js";
 import { Uniforms_buffer_block_print, Uniforms_buffer_print } from "../../../Graphics/Buffers/UniformBuffers.js";
 import { Mesh_animations_print } from "../../Animations/MeshAnimations.js";
-import { Root_uniforms_for_wpos } from "../../Core/MeshUniformsBuffer.js";
+import { Root_print_loop_uniforms_for_wpos, Root_print_uniforms_for_wpos } from "../../Core/MeshUniformsBuffer.js";
 import { Callback_animations_print } from "../../Animations/CallbackAnimations.js";
-import { Particle_system_print_info } from "../../ParticlesSystem/ParticlesSystem.js";
+import { Particle_system_print_all_particles, Particle_system_print_free_particles_buffer, Particle_system_print_info } from "../../ParticlesSystem/ParticlesSystem.js";
 import { Notifications_print, Notifications_print_loop } from "../../Drawables/DebugInfo/DebugInfoUiNotifications.js";
 import { Texture_buffer_print } from "../../Loaders/Textures/Texture.js";
-import { Widget_root_per_vb_meshidx_print_w4, Root_group_buffer_print_w1, Root_group_buffer_print_w6, Root_group_vbidx_buffer_print_loop_w2, Root_group_vbidx_buffer_print_w3 } from "../../Core/Views/RootView.js";
+import { Root_group_buffer_print_w1, Root_group_buffer_print_w6 } from "../../Core/Views/RootView.js";
 import { Shaders_print_loop } from "../../../Graphics/GlShaders.js";
 import { Arkanois_print_scrore_mod } from "../../../App/Demo/Games/Arkanoid/ScoreMod.js";
 import { Uvmaps_print } from "../../Loaders/Textures/TextureUvMap.js";
+import { Vertex_buffer_render_group_print_loop } from "../../../Graphics/Buffers/RenderGroups.js";
+import { Events_buffer_print, RegisterEvent } from "../../Events/Events.js";
+
+
+
+/**
+ * // TODO
+ * Implement storing all keyboard strokes in a buffer (128).
+ * The buffer should be a queue, replacing old strokes, first in - last replaced.
+ * Preferably a bit field of 4 floats x32 bits for fast stroke analysis 
+ * Use the buffer to check if a certain key stroke happened in recent time.
+ * 
+ * Should we also implement timing of strokes???
+ */
+
+
+
 
 _CNT = 0;
 const p = _CNT++;
@@ -43,6 +60,7 @@ const i1 = _CNT++;
 const l1 = _CNT++;
 const l2 = _CNT++;
 const l3 = _CNT++;
+const l4 = _CNT++;
 const s1 = _CNT++;
 const s2 = _CNT++;
 const s3 = _CNT++;
@@ -50,6 +68,7 @@ const s4 = _CNT++;
 const dp = _CNT++;
 const m1 = _CNT++;
 const m2 = _CNT++;
+const m3 = _CNT++;
 const w1 = _CNT++;
 const w2 = _CNT++;
 const w3 = _CNT++;
@@ -57,8 +76,10 @@ const w4 = _CNT++;
 const w5 = _CNT++;
 const w6 = _CNT++;
 const w7 = _CNT++;
+const w8 = _CNT++;
 const va = _CNT++;
 const vb = _CNT++;
+const vr = _CNT++;
 const vi = _CNT++;
 const vp = _CNT++;
 const vs = _CNT++;
@@ -84,6 +105,8 @@ const y2 = _CNT++;
 const u1 = _CNT++;
 const u2 = _CNT++;
 const e1 = _CNT++;
+const e2 = _CNT++;
+const e3 = _CNT++;
 const n1 = _CNT++;
 const n2 = _CNT++;
 
@@ -98,6 +121,7 @@ const q8 = _CNT++;
 const q9 = _CNT++;
 
 
+/** */
 export const DEBUG_PRINT_KEYS = [
 
 
@@ -218,6 +242,15 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'l4',
+      discr: 'Events_buffer_print',
+      func: (e)=>{
+         console.log('------------------ Events_buffer_print ------------------')
+         Events_buffer_print();
+
+      },
+   },
+   {
       key: 's1',
       discr: 'Str_buffer_print()',
       func: (e)=>{
@@ -274,6 +307,14 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'm3',
+      discr: 'Mesh_buffer_print_loop_detailed',
+      func: (e)=>{
+         console.log('------------------ Mesh_buffer_print_loop_detailed() ------------------');
+         Mesh_buffer_print_loop_detailed();
+      },
+   },
+   {
       key: 'w1',
       discr: 'Root_group_buffer_print_w1',
       func: (e)=>{
@@ -283,26 +324,23 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'w2',
-      discr: 'Root_group_vbidx_buffer_print_loop_w2',
+      discr: 'EMPTY',
       func: (e)=>{
-         console.log('------------------ Root_group_vbidx_buffer_print_loop_w2() ------------------');
-         Root_group_vbidx_buffer_print_loop_w2();
+         console.log('------------------ EMPTY() ------------------');
       },
    },
    {
       key: 'w3',
-      discr: 'Root_group_vbidx_buffer_print_w3',
+      discr: 'EMPTY',
       func: (e)=>{
-         console.log('------------------ Root_group_vbidx_buffer_print_w3() ------------------');
-         Root_group_vbidx_buffer_print_w3();
+         console.log('------------------ EMPTY() ------------------');
       },
    },
    {
       key: 'w4',
-      discr: 'Widget_root_per_vb_meshidx_print_w4',
+      discr: 'EMPTY',
       func: (e)=>{
-         console.log('------------------ Widget_root_per_vb_meshidx_print_w4() ------------------');
-         Widget_root_per_vb_meshidx_print_w4();
+         console.log('------------------ EMPTY() ------------------');
       },
    },
    {
@@ -322,10 +360,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'w7',
-      discr: 'Root_uniforms_for_wpos',
+      discr: 'Root_print_loop_uniforms_for_wpos',
       func: (e)=>{
-         console.log('------------------ Root_uniforms_for_wpos() ------------------');
-         Root_uniforms_for_wpos();
+         console.log('------------------ Root_print_loop_uniforms_for_wpos() ------------------');
+         Root_print_loop_uniforms_for_wpos();
+      },
+   },
+   {
+      key: 'w8',
+      discr: 'Root_print_uniforms_for_wpos',
+      func: (e)=>{
+         console.log('------------------ Root_print_uniforms_for_wpos() ------------------');
+         Root_print_uniforms_for_wpos();
       },
    },
    {
@@ -338,10 +384,18 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'vb',
-      discr: 'Gl_vertex_buffer_print',
+      discr: 'Vertex_buffer_print',
       func: (e)=>{
-         console.log('------------------ Gl_vertex_buffer_print() ------------------');
-         Gl_vertex_buffer_print();
+         console.log('------------------ Vertex_buffer_print() ------------------');
+         Vertex_buffer_print();
+      },
+   },
+   {
+      key: 'vr',
+      discr: 'Vertex_buffer_render_group_print_loop',
+      func: (e)=>{
+         console.log('------------------ Vertex_buffer_render_group_print_loop() ------------------');
+         Vertex_buffer_render_group_print_loop();
       },
    },
    {
@@ -426,10 +480,10 @@ export const DEBUG_PRINT_KEYS = [
    },
    {
       key: 'g4',
-      discr: 'EMPTY',
+      discr: 'View_buffer_print_roots()',
       func: (e)=>{
-         console.log('------------------ EMPTY ------------------');
-
+         console.log('------------------ View_buffer_print_roots ------------------');
+         View_buffer_print_roots();
       },
    },
    {
@@ -545,6 +599,22 @@ export const DEBUG_PRINT_KEYS = [
       },
    },
    {
+      key: 'e2',
+      discr: 'Particle_system_print_all_particles()',
+      func: (e)=>{
+         console.log('------------------ Particle_system_print_all_particles() ------------------');
+         Particle_system_print_all_particles();
+      },
+   },
+   {
+      key: 'e3',
+      discr: 'Particle_system_print_free_particles_buffer()',
+      func: (e)=>{
+         console.log('------------------ Particle_system_print_free_particles_buffer() ------------------');
+         Particle_system_print_free_particles_buffer();
+      },
+   },
+   {
       key: 'n1',
       discr: 'Notifications_print()',
       func: (e)=>{
@@ -635,11 +705,10 @@ export const DEBUG_PRINT_KEYS = [
 
 
 let _keys_buffer = [];
-
 let On_key_down_callback = null;
 let On_key_up_callback = null;
 
-console.log('Keyboard Debugging keys:', DEBUG_PRINT_KEYS)
+/** */
 export function OnKeyDown(e){
 
    e.stopPropagation();
@@ -665,20 +734,27 @@ export function OnKeyDown(e){
       });
    }
 }
-
+/** */
 export function Input_keyboard_bind_keydown_callback(Clbk){
 
    On_key_down_callback = Clbk;
 }
-
+/** */
 export function Input_keyboard_bind_keyup_callback(Clbk){
 
    On_key_up_callback = Clbk;
 }
-
+/** */
 export function OnKeyUp(e){
    
    e.stopPropagation();
+
+   const params = {
+      key: e.which
+   };
+   // console.log(e.which)
+   // console.log(e)
+   RegisterEvent(EVENT_HANDLER_TYPE.KEY_PRESS, params);
 
 
    // Case the user needs keyboard input, shoyld bind a callback that will be called here.
@@ -721,6 +797,7 @@ export function OnKeyUp(e){
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[l1].func(e);  
          else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[l2].func(e);  
          else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[l3].func(e);  
+         else if  (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[l4].func(e);  
       }
       else if  (_keys_buffer[0].key === 's') { 
          
@@ -732,6 +809,7 @@ export function OnKeyUp(e){
       else if  (_keys_buffer[0].key === 'm') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[m1].func(e);  
          else if  (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[m2].func(e);  
+         else if  (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[m3].func(e);  
       }
       else if  (_keys_buffer[0].key === 'd' && _keys_buffer[1].key === 'p') { 
          DEBUG_PRINT_KEYS[dp].func(e);  
@@ -747,10 +825,12 @@ export function OnKeyUp(e){
          else if  (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[w5].func(e);  
          else if  (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[w6].func(e);  
          else if  (_keys_buffer[len].key === '7') DEBUG_PRINT_KEYS[w7].func(e);  
+         else if  (_keys_buffer[len].key === '8') DEBUG_PRINT_KEYS[w8].func(e);  
       }
       else if  (_keys_buffer[0].key === 'v') { 
          if       (_keys_buffer[len].key === 'a') DEBUG_PRINT_KEYS[va].func(e);  
          else if       (_keys_buffer[len].key === 'b') DEBUG_PRINT_KEYS[vb].func(e);  
+         else if       (_keys_buffer[len].key === 'r') DEBUG_PRINT_KEYS[vr].func(e);  
          else if       (_keys_buffer[len].key === 'i') DEBUG_PRINT_KEYS[vi].func(e);  
          else if       (_keys_buffer[len].key === 'p') DEBUG_PRINT_KEYS[vp].func(e);  
          else if       (_keys_buffer[len].key === 's') DEBUG_PRINT_KEYS[vs].func(e);  
@@ -771,8 +851,8 @@ export function OnKeyUp(e){
          else if       (_keys_buffer[len].key === 'd') DEBUG_PRINT_KEYS[gd].func(e);  
          else if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[g1].func(e);  
          else if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[g2].func(e);  
-         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g2].func(e);  
-         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[g2].func(e);  
+         else if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[g3].func(e);  
+         else if       (_keys_buffer[len].key === '4') DEBUG_PRINT_KEYS[g4].func(e);  
          else if       (_keys_buffer[len].key === '5') DEBUG_PRINT_KEYS[g5].func(e);  
          else if       (_keys_buffer[len].key === '6') DEBUG_PRINT_KEYS[g6].func(e);  
       }
@@ -786,6 +866,8 @@ export function OnKeyUp(e){
       }
       else if  (_keys_buffer[0].key === 'e') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[e1].func(e);  
+         if       (_keys_buffer[len].key === '2') DEBUG_PRINT_KEYS[e2].func(e);  
+         if       (_keys_buffer[len].key === '3') DEBUG_PRINT_KEYS[e3].func(e);  
       }
       else if  (_keys_buffer[0].key === 'n') { 
          if       (_keys_buffer[len].key === '1') DEBUG_PRINT_KEYS[n1].func(e);  
@@ -810,23 +892,23 @@ export function OnKeyUp(e){
    else if(len === 0){
 
    if       (_keys_buffer[len].key === 'p') { DEBUG_PRINT_KEYS[p].func(e); }
-   else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations', `\n  1:${DEBUG_PRINT_KEYS[a1].discr}\n  2:${DEBUG_PRINT_KEYS[a2].discr}\n  3:${DEBUG_PRINT_KEYS[a3].discr}\n  4:${DEBUG_PRINT_KEYS[a4].discr}`); }
-   else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue', `\n  1:${DEBUG_PRINT_KEYS[r1].discr},  2:${DEBUG_PRINT_KEYS[r2].discr}`); }
-   else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer', `\n  1:${DEBUG_PRINT_KEYS[f1].discr},  2:${DEBUG_PRINT_KEYS[f2].discr}, 3:${DEBUG_PRINT_KEYS[f3].discr}`);  }
-   else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue', `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }
-   else if  (_keys_buffer[len].key === 'l') { console.log('@ Event Listeners', `\n  1:${DEBUG_PRINT_KEYS[l1].discr}\n  2:${DEBUG_PRINT_KEYS[l2].discr}\n  3:${DEBUG_PRINT_KEYS[l3].discr}`); }
-   else if  (_keys_buffer[len].key === 's') { console.log('@ String Buffer', `\n  1:${DEBUG_PRINT_KEYS[s1].discr}\n  2:${DEBUG_PRINT_KEYS[s2].discr}\n  3:${DEBUG_PRINT_KEYS[s3].discr}\n  4:${DEBUG_PRINT_KEYS[s4].discr}`); }
-   else if  (_keys_buffer[len].key === 'w') { console.log('@ Widget Root', `\n  1:${DEBUG_PRINT_KEYS[w1].discr}\n  2:${DEBUG_PRINT_KEYS[w2].discr}\n  3:${DEBUG_PRINT_KEYS[w3].discr}\n  4:${DEBUG_PRINT_KEYS[w4].discr}\n  5:${DEBUG_PRINT_KEYS[w5].discr}\n  6:${DEBUG_PRINT_KEYS[w6].discr}\n  7:${DEBUG_PRINT_KEYS[w7].discr}`); }
-   else if  (_keys_buffer[len].key === 't') { console.log('@ Styles', `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}\n--\n  7:${DEBUG_PRINT_KEYS[t7].discr}`); }
-   else if  (_keys_buffer[len].key === 'v') { console.log('@ GL', `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}\n  1:${DEBUG_PRINT_KEYS[v1].discr}` ); }
-   else if  (_keys_buffer[len].key === 'g') { console.log('@ +++', `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  d:${DEBUG_PRINT_KEYS[gd].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
-   else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer', `\n  1:${DEBUG_PRINT_KEYS[m1].discr}, 2:${DEBUG_PRINT_KEYS[m2].discr}`); }
-   else if  (_keys_buffer[len].key === 'y') { console.log('@ Debug ui entries table', `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
-   else if  (_keys_buffer[len].key === 'u') { console.log('@ Uniform', `\n  1:${DEBUG_PRINT_KEYS[u1].discr}\n  2:${DEBUG_PRINT_KEYS[u2].discr}`); }
-   else if  (_keys_buffer[len].key === 'e') { console.log('@ Particles System', `\n  1:${DEBUG_PRINT_KEYS[e1].discr}\n`); }
-   else if  (_keys_buffer[len].key === 'n') { console.log('@ Notifications System', `\n  1:${DEBUG_PRINT_KEYS[n1].discr}\n   2:${DEBUG_PRINT_KEYS[n2].discr}\n`); }
+   else if  (_keys_buffer[len].key === 'a') { console.log('@ Buffers Allocations',     `\n  1:${DEBUG_PRINT_KEYS[a1].discr}\n  2:${DEBUG_PRINT_KEYS[a2].discr}\n  3:${DEBUG_PRINT_KEYS[a3].discr}\n  4:${DEBUG_PRINT_KEYS[a4].discr}`); }
+   else if  (_keys_buffer[len].key === 'r') { console.log('@ Render Queue',            `\n  1:${DEBUG_PRINT_KEYS[r1].discr},  2:${DEBUG_PRINT_KEYS[r2].discr}`); }
+   else if  (_keys_buffer[len].key === 'f') { console.log('@ Frame Buuffer',           `\n  1:${DEBUG_PRINT_KEYS[f1].discr},  2:${DEBUG_PRINT_KEYS[f2].discr},  3:${DEBUG_PRINT_KEYS[f3].discr}`);  }
+   else if  (_keys_buffer[len].key === 'i') { console.log('@ Time Intervals Queue',    `\n  1:${DEBUG_PRINT_KEYS[i1].discr}`); }
+   else if  (_keys_buffer[len].key === 'l') { console.log('@ Event Listeners',         `\n  1:${DEBUG_PRINT_KEYS[l1].discr}\n  2:${DEBUG_PRINT_KEYS[l2].discr}\n  3:${DEBUG_PRINT_KEYS[l3].discr}\n  4:${DEBUG_PRINT_KEYS[l4].discr}`); }
+   else if  (_keys_buffer[len].key === 's') { console.log('@ String Buffer',           `\n  1:${DEBUG_PRINT_KEYS[s1].discr}\n  2:${DEBUG_PRINT_KEYS[s2].discr}\n  3:${DEBUG_PRINT_KEYS[s3].discr}\n  4:${DEBUG_PRINT_KEYS[s4].discr}`); }
+   else if  (_keys_buffer[len].key === 'w') { console.log('@ Widget Root',             `\n  1:${DEBUG_PRINT_KEYS[w1].discr}\n  2:${DEBUG_PRINT_KEYS[w2].discr}\n  3:${DEBUG_PRINT_KEYS[w3].discr}\n  4:${DEBUG_PRINT_KEYS[w4].discr}\n  5:${DEBUG_PRINT_KEYS[w5].discr}\n  6:${DEBUG_PRINT_KEYS[w6].discr}\n  7:${DEBUG_PRINT_KEYS[w7].discr}\n  8:${DEBUG_PRINT_KEYS[w8].discr}`); }
+   else if  (_keys_buffer[len].key === 't') { console.log('@ Styles',                  `\n  1:${DEBUG_PRINT_KEYS[t1].discr}\n  2:${DEBUG_PRINT_KEYS[t2].discr}\n  3:${DEBUG_PRINT_KEYS[t3].discr}\n  4:${DEBUG_PRINT_KEYS[t4].discr}\n  5:${DEBUG_PRINT_KEYS[t5].discr}\n  6:${DEBUG_PRINT_KEYS[t6].discr}\n  7:${DEBUG_PRINT_KEYS[t7].discr}`); }
+   else if  (_keys_buffer[len].key === 'v') { console.log('@ GL',                      `\n  a:${DEBUG_PRINT_KEYS[va].discr}\n  b:${DEBUG_PRINT_KEYS[vb].discr}\n  r:${DEBUG_PRINT_KEYS[vr].discr}\n  i:${DEBUG_PRINT_KEYS[vi].discr}\n  p:${DEBUG_PRINT_KEYS[vp].discr}\n  s:${DEBUG_PRINT_KEYS[vs].discr}\n  1:${DEBUG_PRINT_KEYS[v1].discr}` ); }
+   else if  (_keys_buffer[len].key === 'g') { console.log('@ +++',                     `\n  s:${DEBUG_PRINT_KEYS[gs].discr}\n  w:${DEBUG_PRINT_KEYS[gw].discr}\n  d:${DEBUG_PRINT_KEYS[gd].discr}\n  1:${DEBUG_PRINT_KEYS[g1].discr}\n  2:${DEBUG_PRINT_KEYS[g2].discr}\n  3:${DEBUG_PRINT_KEYS[g3].discr}\n  4:${DEBUG_PRINT_KEYS[g4].discr}\n  5:${DEBUG_PRINT_KEYS[g5].discr}\n  6:${DEBUG_PRINT_KEYS[g6].discr}`); }
+   else if  (_keys_buffer[len].key === 'm') { console.log('@ Mesh Buffer',             `\n  1:${DEBUG_PRINT_KEYS[m1].discr}\n  2:${DEBUG_PRINT_KEYS[m2].discr}\n  2:${DEBUG_PRINT_KEYS[m2].discr}`); }
+   else if  (_keys_buffer[len].key === 'y') { console.log('@ Debug ui entries table',  `\n  1:${DEBUG_PRINT_KEYS[y1].discr}\n  2:${DEBUG_PRINT_KEYS[y2].discr}`); }
+   else if  (_keys_buffer[len].key === 'u') { console.log('@ Uniform',                 `\n  1:${DEBUG_PRINT_KEYS[u1].discr}\n  2:${DEBUG_PRINT_KEYS[u2].discr}`); }
+   else if  (_keys_buffer[len].key === 'e') { console.log('@ Particles System',        `\n  1:${DEBUG_PRINT_KEYS[e1].discr}\n  2:${DEBUG_PRINT_KEYS[e2].discr}\n 3:${DEBUG_PRINT_KEYS[e3].discr}\n`); }
+   else if  (_keys_buffer[len].key === 'n') { console.log('@ Notifications System',    `\n  1:${DEBUG_PRINT_KEYS[n1].discr}\n  2:${DEBUG_PRINT_KEYS[n2].discr}\n`); }
    // Misc
-   else if  (_keys_buffer[len].key === 'q') { console.log('@ Notifications System', `\n  1:${DEBUG_PRINT_KEYS[q1].discr}\n  2:${DEBUG_PRINT_KEYS[q2].discr}\n  3:${DEBUG_PRINT_KEYS[q3].discr}\n  4:${DEBUG_PRINT_KEYS[q4].discr}\n  5:${DEBUG_PRINT_KEYS[q5].discr}\n  6:${DEBUG_PRINT_KEYS[q6].discr}\n  7:${DEBUG_PRINT_KEYS[q7].discr}\n  8:${DEBUG_PRINT_KEYS[q8].discr}\n  9:${DEBUG_PRINT_KEYS[q9].discr}\n`); }}
+   else if  (_keys_buffer[len].key === 'q') { console.log('@ Notifications System',    `\n  1:${DEBUG_PRINT_KEYS[q1].discr}\n  2:${DEBUG_PRINT_KEYS[q2].discr}\n  3:${DEBUG_PRINT_KEYS[q3].discr}\n  4:${DEBUG_PRINT_KEYS[q4].discr}\n  5:${DEBUG_PRINT_KEYS[q5].discr}\n  6:${DEBUG_PRINT_KEYS[q6].discr}\n  7:${DEBUG_PRINT_KEYS[q7].discr}\n  8:${DEBUG_PRINT_KEYS[q8].discr}\n  9:${DEBUG_PRINT_KEYS[q9].discr}\n`); }}
 
    _keys_buffer = [];
 

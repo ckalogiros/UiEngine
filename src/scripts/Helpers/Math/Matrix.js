@@ -259,6 +259,7 @@ export function RotateZ(dim, angle) {
 	const p = [dim[0], dim[1]];
 	const r = [ c, -s, s, c, ];
 
+
 	const newPos = [
 		-p[0]*r[0] + p[1]*r[2],
 		-p[0]*r[1] + p[1]*r[3],
@@ -271,6 +272,42 @@ export function RotateZ(dim, angle) {
 		
 		p[0]*r[0] + -p[1]*r[2],
 		p[0]*r[1] + -p[1]*r[3],
+	];
+
+	return newPos;
+};
+export function RotateZ_with_pivot(dim, angle, pivotx, pivoty) {
+
+	const c = Math.cos(angle);
+	const s = Math.sin(angle);
+	const p = [dim[0], dim[1]];
+
+
+	// const newPos = [
+	// 	-(p[0])*c  + p[1]*s,
+	// 	-(p[0])*-s + p[1]*c,
+		
+	// 	-(p[0])*c  + -p[1]*s,
+	// 	-(p[0])*-s + -p[1]*c,
+		
+	// 	(p[0])*c  + p[1]*s,
+	// 	(p[0])*-s + p[1]*c,
+		
+	// 	(p[0])*c  + -p[1]*s,
+	// 	(p[0])*-s + -p[1]*c,
+	// ];
+
+
+	/** */
+	const newPos = [
+		((-p[0]-pivotx)* Math.cos(angle) + ( p[1]-pivoty)*Math.sin(angle)+pivotx),
+		((-p[0]-pivotx)*-Math.sin(angle) + ( p[1]-pivoty)*Math.cos(angle)+pivoty),
+		((-p[0]-pivotx)* Math.cos(angle) + (-p[1]-pivoty)*Math.sin(angle)+pivotx),
+		((-p[0]-pivotx)*-Math.sin(angle) + (-p[1]-pivoty)*Math.cos(angle)+pivoty),
+		(( p[0]-pivotx)* Math.cos(angle) + ( p[1]-pivoty)*Math.sin(angle)+pivotx),
+		(( p[0]-pivotx)*-Math.sin(angle) + ( p[1]-pivoty)*Math.cos(angle)+pivoty),
+		(( p[0]-pivotx)* Math.cos(angle) + (-p[1]-pivoty)*Math.sin(angle)+pivotx),
+		(( p[0]-pivotx)*-Math.sin(angle) + (-p[1]-pivoty)*Math.cos(angle)+pivoty),
 	];
 
 	return newPos;

@@ -1,6 +1,7 @@
 // export const frag_noise_voronoi_1_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_1() );'
 // export const frag_noise_voronoi_1_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_1() );'
-export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1(scale_down, u_gen_ctrl_map_cnt, time);'
+// export const frag_noise_voronoi_1_call = '   final_color = frag_noise_voronoi_1(scale_down, u_gen_ctrl_map_cnt, time);'
+export const frag_noise_voronoi_1_call = '   final_color = blend_decider( final_color, frag_noise_voronoi_1(scale_down, u_gen_ctrl_map_cnt, time), u_blend_mode );'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
 export const frag_noise_voronoi_1 = `
@@ -245,8 +246,9 @@ vec4 frag_noise_voronoi_1(in float scale_down, inout int u_gen_ctrl_map_cnt, in 
 
 /**********************************************************************************************************************************************************************************/
 // export const frag_noise_voronoi_2_call = '   final_color = blend_color_multiply( final_color, frag_noise_voronoi_2() );'
-export const frag_noise_voronoi_2_call = '   final_color = frag_noise_voronoi_2(scale_down, u_gen_ctrl_map_cnt, time);'
 // export const frag_noise_voronoi_2_call = '   final_color = blend_mode_vec4( final_color, frag_noise_voronoi_2() );'
+// export const frag_noise_voronoi_2_call = '   final_color = frag_noise_voronoi_2(scale_down, u_gen_ctrl_map_cnt, time);'
+export const frag_noise_voronoi_2_call = '   final_color = blend_decider( final_color, frag_noise_voronoi_2(scale_down, u_gen_ctrl_map_cnt, time), u_blend_mode );'
 
 /**WorleyNoise 2 - Works with mesh world pos move */
 export const frag_noise_voronoi_2 = `

@@ -27,7 +27,6 @@ import { metrics_comicsanscz_mtsdf_1024 } from '../../../../../resources/fonts/c
 // import { CONSOLAS_32Hpx } from '../../../../../resources/fonts/consolas_8/metrics/consolas_8.js';
 import { metrics_consolas_mtsdf_1024 } from '../../../../../resources/fonts/consolas_mtsdf/metrics/metrics_consolas_mtsdf_1024.js';
 import { Texture_metrics_create_uvmap, Uv_texture_init_buffers, Uvmaps_print } from "./TextureUvMap.js";
-import { test_arial_msdf } from "../../../../../resources/fonts/TEST/test_arial_msdf.js";
 import { symbols } from "../../../../../resources/fonts/symbols/metrics/symbols.js";
 import { atlas_variants_consola_1024x1024_8px_scale12_extended_ascii } from "../../../../../resources/fonts/atlas_variants/consola/atlas_variants_consola_1024x1024_8px_scale12_extended_ascii.js";
 
@@ -51,78 +50,7 @@ let _textureBufferCount = 0;
 /** */
 const TEXTURE_PATHS = [
 
-	// { // 0
-	// 	img_path: 'fonts/consolas_3',
-	// 	img_name: FONT_CONSOLAS_12px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 1
-	// 	img_path: 'fonts/consolas_4',
-	// 	img_name: FONT_CONSOLAS_16px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 2
-	// 	img_path: 'fonts/consolas_5',
-	// 	img_name: FONT_CONSOLAS_20px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 3
-	// 	img_path: 'fonts/consolas_6',
-	// 	img_name: FONT_CONSOLAS_24px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 4
-	// 	img_path: 'fonts/consolas_7',
-	// 	img_name: FONT_CONSOLAS_28px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 5
-	// 	img_path: 'fonts/consolas_8',
-	// 	img_name: FONT_CONSOLAS_32px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 6
-	// 	img_path: 'fonts/consolas_10',
-	// 	img_name: FONT_CONSOLAS_40px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 7
-	// 	img_path: 'fonts/consolas_12',
-	// 	img_name: FONT_CONSOLAS_49px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 8
-	// 	img_path: 'fonts/consolas_14',
-	// 	img_name: FONT_CONSOLAS_58px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 9
-	// 	img_path: 'fonts/consolas_16',
-	// 	img_name: FONT_CONSOLAS_66px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 10
-	// 	img_path: 'fonts/consolas_28',
-	// 	img_name: FONT_CONSOLAS_116px,
-	// 	img_type: 'bmp',
-		
-	// },
-	// { // 11
-	// 	img_path: 'fonts/consolas_38',
-	// 	img_name: FONT_CONSOLAS_157px,
-	// 	img_type: 'bmp',
-		
-	// },
+	
 	{ // 0
 		img_path: 'fonts/consolas_mtsdf',
 		img_name: FONT_CONSOLAS_MTSDF_1024,
@@ -131,17 +59,11 @@ const TEXTURE_PATHS = [
 	},
 	{ // 1
 		img_path: 'fonts/comic_sans_ms',
-		img_name: FONT_MSDF_COMIC,
+		img_name: FONT_COMIC_MTSDF_1024,
 		img_type: 'png',
 		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
 	},
 	{ // 2
-		img_path: 'fonts/TEST',
-		img_name: TEST_FONT_MSDF_ARIAL,
-		img_type: 'png',
-		// We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-	},
-	{ // 3
 		img_path: 'fonts/atlas_variants/consola',
 		img_name: ATLAS_TEXTURE_VARIANT_FONT_CONSOLA,
 		img_type: 'png',
@@ -149,7 +71,7 @@ const TEXTURE_PATHS = [
 	},
 	/***************************************************************************************************/
 	// Atlas textures variant font sizes
-	{ // 4
+	{ // 3
 		img_path: 'fonts/symbols',
 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
 		img_type: 'png',
@@ -157,7 +79,7 @@ const TEXTURE_PATHS = [
 	},
 	/***************************************************************************************************/
 	// Textures
-	{
+	{ // 4
 		img_path: 'textures',
 		img_name: TEXTURE_SMOKE1,
 		img_type: 'png',
@@ -173,6 +95,13 @@ const TEXTURE_PATHS = [
 		img_path: 'textures',
 		img_name: TEXTURE_TEST_APPLE,
 		img_type: 'png',
+		
+	},
+	{
+		img_path: 'textures',
+		img_name: TEXTURE_SNAKE_BG,
+		// img_type: 'png',
+		img_type: 'jpg',
 		
 	},
 
@@ -231,8 +160,7 @@ function Texture_pair_texture_to_metrics_file(img_name) {
 		// case FONT_CONSOLAS_116px: { return CONSOLAS_116Hpx; }	
 		// case FONT_CONSOLAS_157px: { return CONSOLAS_157Hpx; }	
 		case FONT_CONSOLAS_MTSDF_1024: { return metrics_consolas_mtsdf_1024; }	
-		case FONT_MSDF_COMIC: { return metrics_comicsanscz_mtsdf_1024; }	
-		case TEST_FONT_MSDF_ARIAL: { return test_arial_msdf; }	
+		case FONT_COMIC_MTSDF_1024: { return metrics_comicsanscz_mtsdf_1024; }	
 		case ATLAS_TEXTURE_VARIANT_FONT_CONSOLA: { return atlas_variants_consola_1024x1024_8px_scale12_extended_ascii; }	
 		case TEXTURE_ATLAS_MSDF_SYMBOLS: { return symbols; }	
 		default: console.error('01928374655637.  Texture_pair_texture_to_metrics_file() failed to find metrics for texture:', img_name)
@@ -277,7 +205,7 @@ export function Texture_load_texture_byid(TEX_TYPE, texture_file_id=INT_NULL, va
 		 * If we deal with texture variant, one texture atlas has many font sizes,
 		 * and if the texture is loaded, we need to check if the asked font variant is loaded.
 		 * If it is not, we need to create the metrics and uvmap of the variant,
-		 * else if it is loaded simplyreturn the metrics index for the metrics and uvmap 
+		 * else if it is loaded simply return the metrics index for the metrics and uvmap 
 		 * 
 		 * Solution for one texture many metrics_idxs, is to have a buffer of metrics indexes.
 		 * Check if the texture is of type VARIANT_FONT, and make use of the variant_idx 
@@ -331,7 +259,6 @@ function Gl_texture_unit_delete_all() {
 		if(_textureBuffer[i] !== null){
 			
 			const tbo = _textureBuffer[i].tbo;
-			gfxCtx.gl.activeTexture(_textureBuffer[i].tex_unit_id);
 			gfxCtx.gl.bindTexture(gfxCtx.gl.TEXTURE_2D, null);
 			gfxCtx.gl.deleteTexture(tbo);
 		}

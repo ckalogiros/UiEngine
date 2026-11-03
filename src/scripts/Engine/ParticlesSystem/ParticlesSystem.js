@@ -1,21 +1,46 @@
 "use strict";
 
+import { Sid_check_unif_match_sids } from "../../GlobalFunctions.js";
+import { Vertex_buffer_render_group_set_num_faces, Vertex_buffer_render_group_set_state } from "../../Graphics/Buffers/RenderGroups.js";
 import { Uniforms_buffer_find_ubidx_from_name } from "../../Graphics/Buffers/UniformBuffers.js";
-import { Vertex_buffer_add_vertices_from_reset, Vertex_buffer_set_uniform_value_callback, Vertex_buffer_state_enable, Vertex_buffer_set_and_update_uniform, Vertex_buffer_get_by_vbidx } from "../../Graphics/Buffers/VertexBuffers.js";
-import { Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style2_time, Gl_particles_batch_set_col4_wpos4_dim2_style1_time, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2, Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners } from "../../Graphics/Buffers/VertexBuffersOps.js";
+import { Vertex_buffer_set_uniform_value_callback, Vertex_buffer_set_and_update_uniform, Vertex_buffer_init_vertices_for_particles, Vertex_buffer_group_set_mesh_debug_name } from "../../Graphics/Buffers/VertexBuffers.js";
+import {
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2,
+    Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_dim2_time,
+    Gl_particles_batch_set_vpos2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2,
+    Gl_particles_batch_set_vpos2,
+    Gl_particles_batch_set_instanced_wpos3_time,
+    Gl_particles_batch_set_col4_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_vpos2_dim2_rcorner,
+    Gl_particles_batch_set_instanced_col4_wpos3_time,
+    Gl_particles_batch_set_vpos2_dim2
+} from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Program_store_shader_operations } from "../../Graphics/ShaderPrograms.js";
 import { GetRandomInt, GetSign } from "../../Helpers/Helpers.js";
 import { Abs, Floor, Hash, Magnitude } from "../../Helpers/Math/MathOperations.js";
 import { Rotation_z_get_2D_matrix } from "../../Helpers/Math/Matrix.js";
-import { New_generic_buffer, New_int32_buffer, New_int8_buffer } from "../Core/Buffers.js";
-import { Mesh_unif_get_vb_root_wpos } from "../Core/MeshUniformsBuffer.js";
-import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js";
-import { Material, Material_Texture } from "../Drawables/Material/Base/Material.js";
-import { Gfx_generate_context_for_particle_system } from "../Interfaces/Gfx/MeshGfxContext.js";
+import { New_generic_buffer, New_int8_buffer } from "../Core/Buffers.js";
+import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../Core/MeshUniformsBuffer.js";
+import { Str_buffer_get_by_idx } from "../Core/StringBuffer.js";
+import { View_add_mesh, View_create_new_group, View_render_specific_render_group } from "../Core/Views/MeshBufferViews.js";
+import { Material, Material_Texture } from "../Drawables/Material/Material.js";
+import { Mesh_get_name, Mesh_set_name } from "../Drawables/Operations/MeshPropertiesFunctions.js";
+import { Gfx_generate_context } from "../Interfaces/Gfx/MeshGfxContext.js";
 import { Renderqueue_set_active } from "../Renderers/Renderer/RenderQueue.js";
 import { Performance_timer_start, Performance_timer_stop } from "../Timers/PerformanceTimers.js";
 import { Timer_get_global_timer } from "../Timers/Timers.js";
 
+/**
+ * // TODO: Create all attributes of particles in separate buffers, so that we can copy all positions/time/color attribs in the vertex buffer at once
+ * 2. Remove class's Int32_Buffer_Reversed methods
+ * 3. Implement an interleaved buffer for all particles attributes
+ */
 
 /**
  * // TODO: Implement correctly the fillOp functions
@@ -41,16 +66,123 @@ import { Timer_get_global_timer } from "../Timers/Timers.js";
  * implementation of particle direction. Maybe create some flag for 'EXPOSION' 
  * and create the direction conditionaly from a function.
  * 
- * 
  */
 
+/**
+ * Particles number aproximation
+ * 
+ * aprox: particle/frame * lifetime/frame
+ * Then add some more: Floor(1.1*aprox) + 1
+ */
 
 const speed = 4;
-const speed_ratio = .01
-const max = 210;
-const interpolate = 1 / max;
+const rand_max = 210;
+const interpolate = 1 / rand_max;
 
-const initial_scale = 10;
+
+// class Int32_Buffer_Reversed {
+
+//    constructor(size) {
+//       this.buffer = new Int32Array(size);
+//       this.size = size;
+//       this.count = 0;
+//       this.pos = 0;
+
+//       for(let i=0; i<=this.size-1; i++) {
+//          this.buffer[i] = INT_NULL;
+//       }
+//    }
+//    Add(idx) {  // populate free particles buffer from start to size
+//       this.buffer[this.count] = idx;
+//       this.count++;
+//    }
+//    AddFree(idx) { // Add free particle to free position
+      
+//       this.pos--;
+//       this.buffer[this.pos] = idx;
+//       this.count++;
+//    }
+//    GetNextFree() { // Get most left free particle 
+
+//       if(this.pos < 0 || this.pos >= this.size) {
+//          console.error('Particle index out of bounds: this.pos', this.pos)
+//          // alert()
+//          return undefined;
+//       }
+
+//       // console.log('Add', this.pos, this.buffer[this.pos]);
+//       // console.log('Add', this.buffer[this.pos]);
+//       const freeidx = this.buffer[this.pos];
+//       this.buffer[this.pos] = -1;
+//       this.pos++;
+//       this.count--;
+//       return freeidx;
+//    }
+// }
+class Int32_Buffer_Reversed {
+
+   constructor(size) {
+      this.buffer = new Int32Array(size);
+      this.size = size;
+      this.count = 0;
+      this.pos = 0;
+
+      for(let i=0; i<=this.size-1; i++) {
+         this.buffer[i] = INT_NULL;
+      }
+   }
+   Add(idx) {  // populate free particles buffer from start to size
+      this.buffer[this.count] = idx;
+      this.count++;
+   }
+   AddFree(idx) { // Add free particle to free position
+      
+      this.pos--;
+      this.buffer[this.pos] = idx;
+      this.count++;
+   }
+   GetNextFree() { // Get most left free particle 
+
+      if(this.pos < 0 || this.pos >= this.size) {
+         console.error('Particle index out of bounds: this.pos', this.pos)
+         // alert()
+         return undefined;
+      }
+
+      // console.log('Add', this.pos, this.buffer[this.pos]);
+      // console.log('Add', this.buffer[this.pos]);
+      const freeidx = this.buffer[this.pos];
+      this.buffer[this.pos] = -1;
+      this.pos++;
+      this.count--;
+      return freeidx;
+   }
+}
+
+function Get_free_particle(free) {
+   const free_elem = free.buffer[free.pos];
+   // console.log('Get at:', free.pos, 'elem:', free.buffer[free.pos])
+   free.buffer[free.pos] = INT_NULL;
+   free.count--;
+   free.pos++;
+
+   if(free_elem !== INT_NULL)
+      return free_elem;
+   else if(free.pos >= free.size)
+      alert('Particles: No free elem avaliable');
+
+   return INT_NULL;
+}
+function Store_free_particle(free, idx) {
+
+   if(free.buffer[free.pos-1] !== INT_NULL || free.pos >= free.size || free.pos < 0) {
+      alert('Particles: Free buffer is full for storage');
+      return INT_NULL;
+   }
+   free.buffer[free.pos-1] = idx;
+   free.pos--;
+   // console.log('Store at:', free.pos, 'elem:', free.buffer[free.pos])
+}
 
 
 
@@ -62,13 +194,13 @@ function Polar_coordinates() {
 }
 function Random_coordinates(xdir_neg, xdir_pos, ydir_neg, ydir_pos) {
 
-   const minx = xdir_neg * max
-   const maxx = xdir_pos * max
+   const minx = xdir_neg * rand_max
+   const maxx = xdir_pos * rand_max
    const dx = GetRandomInt(minx, maxx);
    const dirx = (interpolate * dx) + .01053;
 
-   const miny = ydir_neg * max
-   const maxy = ydir_pos * max
+   const miny = ydir_neg * rand_max
+   const maxy = ydir_pos * rand_max
    const dy = GetRandomInt(miny, maxy);
    const diry = (interpolate * dy) + .00953;
    return { x: dirx, y: diry, };
@@ -126,7 +258,8 @@ class Particle {
 
       this.rot = [1, 1, 1, 1];
       // Create random rotation
-      this.angle = (rnd * .5 + 2) * Math.PI * 2;
+      // this.angle = (rnd * .5 + 2) * Math.PI * 2;
+      this.angle = (rnd * 2.5 + 2) * Math.PI * 14;
       this.rot = Rotation_z_get_2D_matrix(this.angle);
 
       if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
@@ -148,20 +281,50 @@ class Particle {
 
       }
    }
-
    SetGfxStart(start) {
       this.start = start;
    }
-
    SetSelfIdx(idx) {
       this.idx = idx;
    }
 }
 
+function TEMP_number_of_particles_aproximation(life_time, t_step, num_particles, has_intermidiate_emission, has_continueus_emitt=true) {
+
+   const fps = 60; // Assuming standard 60 fps
+   const t = (life_time / t_step) / fps;
+   const click_rate = has_continueus_emitt ? 60 : 8; // 8 clicks per 1 second estimation
+   // let cpplt = 1 / (t*click_rate); // 1 / clicks per particle life time
+   let cpplt = (t*click_rate); // 1 / clicks per particle life time
+
+   
+   // let total_particles_per_second = num_particles / cpplt;
+   let total_particles_per_second = num_particles * cpplt;
+   if(has_continueus_emitt) {
+      total_particles_per_second = t*num_particles*fps
+   }
+   
+   console.warn('PARTICLES APROXIMATION:', 
+      '\num_particles', Floor(num_particles), 
+      '\ntotal_particles_per_second', Floor(total_particles_per_second), 
+      '\nt', t.toFixed(2), 
+      '\nt*num_particles*fps', (t*num_particles*fps).toFixed(2), 
+      '\nclicks per particle life time', (t*click_rate).toFixed(2), 
+      '\ncpplt', cpplt.toFixed(2),
+      '\nnum_particles / cpplt', (num_particles / cpplt).toFixed(2)
+   )
+
+   // const total_particles_num = (life_time / t_step) * num_particles * emitt_per_second;
+   const total_particles_num = total_particles_per_second;
+   // TODO: The ammount of extra particles can be aproximated only if we take into consideration the max speed(deriving the max number of particles being put in between the spaces)
+   const extra_particles = has_intermidiate_emission ? total_particles_num*2 : 10;
+   return Floor(total_particles_num)+num_particles+extra_particles;
+}
 
 class Emitter {
 
-   constructor(name, col, pos, dim, t_step = .0001, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, texture_id = INT_NULL, num_particles_per_frame = 1, scale_down = 1) {
+   // constructor(mesh_bufferidx, name, col, pos, dim, t_step = .0001, life_time, accel = 1, deccel = .99, gravity = 0, max_speed = 2, texture_id = INT_NULL, num_particles_per_frame = 1, scale_down = 1) {
+   constructor(mesh_bufferidx, properties) {
 
       this.sid = 0x0;
       this.sceneidx = STATE.scene.active_idx;
@@ -169,26 +332,27 @@ class Emitter {
       this.gfx = null;
       this.type = MESH_TYPE.PARTICLES;
       this.idx = INT_NULL;
-      this.name = name;
-      this.nameidx = Str_buffer_store(name);
+      // this.name = properties.name;
+      // this.nameidx = Str_buffer_store(properties.name);
+      Mesh_set_name(this, properties.name);
       this.parent = null;
+      this.mesh_bufferidx = mesh_bufferidx;
 
 
       this.dir = [0, 0];
-      this.t_step = t_step;
-      this.life_time = life_time;
+      this.t_step = properties.t_step;
+      this.life_time = properties.life_time;
       this.speed = speed;
-      this.texture_id = texture_id;
       this.texidx = INT_NULL;
 
 
-      this.is_active = false;
+      this.state = {mask:0x0};
 
-      this.accel = accel;
-      this.max_speed = max_speed;
-      this.deccel = deccel;
-      this.gravity = gravity;
-      this.max_scale = max_speed;
+      this.accel = properties.accel;
+      this.max_speed = properties.max_speed;
+      this.deccel = properties.deccel;
+      this.gravity = properties.gravity;
+      this.max_scale = properties.max_scale;
 
       this.properties_flags = 0x0; // Set from user by method: EnableProperties()
       this.jigglex = 4;
@@ -196,8 +360,10 @@ class Emitter {
       this.rotation = 0; // TODO: IMPLEMENT
 
       this.left_over = 0;
+      this.total_alive = 0;
 
-      this.UpdateGfxBuffersFn = null; // Function pointer to update the vertex buffer of the particle system
+      this.Update_gfx_buffers_fn_inst = null; // Function pointer to update the vertex buffer of the particle system
+      this.Update_gfx_buffers_fn = null; // Function pointer to update the vertex buffer of the particle system
 
       // Set the cone of variation vector direction. Diagonals are -.5 and +.5 
       this.variation_emission = {
@@ -206,16 +372,29 @@ class Emitter {
          ydir_pos: 1, // Lower quadrant
          ydir_neg: 0, // Upper quadrant
       }
+      
+      const num_particles_aproximation = TEMP_number_of_particles_aproximation(properties.life_time, properties.t_step, properties.num_particles_per_frame, properties.has_intermidiate_emission, properties.is_continuous_emmit);
+      this.vb_aprox_size = num_particles_aproximation;
+
 
       this.particles_buffer = New_generic_buffer(_, 'Particles - particles_buffer');
-      this.free_particles_idxs_buffer = New_int32_buffer(_, 'ParticlesSystem-free_particles_idxs_buffer');
+      
       this.shader_ops_idxs = New_int8_buffer(8, 'ParticleSystem.shader_ops_idxs');
+      
+      this.free_particles = new Int32_Buffer_Reversed(this.vb_aprox_size);
 
+      this.vertex_buffer_start = 0;  // The start position in the vertex buffer(start may vary according to the first particle) 
 
       this.sid = {
          shad: SID.SHAD.INDEXED | SID.SHAD.INDEXED_PATT_DISCONTINUE_4,
          attr: SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3, // TODO: some attribs are activated in the 'Fn Enables'
          unif: 0x0,
+         // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME),
+         inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         // inst: (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2),
+         // inst: (SID.ATTR.WPOS3 | SID.ATTR.TIME),
+         // inst: 0x0,
          shad_ops: 0x0,
          pass: SID.ATTR.COL4,
          blend_options: 0x0,
@@ -223,56 +402,37 @@ class Emitter {
       };
 
 
-      const mat = (this.texture_id === INT_NULL) ? new Material(col) : new Material_Texture(col, this.texture_id);
+      const mat = (properties.texture_id === INT_NULL) ? new Material(properties.col) : new Material_Texture(properties.col, properties.texture_id);
       this.mat = mat;
       this.sid.attr |= mat.sid.attr;
       this.sid.unif |= mat.sid.unif;
       this.sid.shad |= mat.sid.shad;
       this.sid.pass |= mat.sid.pass;
-      this.sid.fx |= mat.sid.fx;
 
-      // this.pos = [pos[0], pos[1], pos[2]];
-      // this.prev_pos = [pos[0], pos[1]];
-      // this.dim = [dim[0], dim[1]];
-      // this.generic = { a: 0, b: 0 };
-      // this.time = 0;
       this.geom = {
-         pos: pos,
-         prev_pos: [pos[0], pos[1]],
-         dim: [dim[0], dim[1]],
+         pos: properties.pos,
+         prev_pos: [properties.pos[0], properties.pos[1]],
+         dim: [properties.dim[0], properties.dim[1]],
          generic: { a: 0, b: 0 },
          time: 0,
-         scale: [scale_down, 1],
+         scale: [properties.scale_down, 1],
+         num_faces:1,
 
       };
 
-      // const geom = new Geometry2D(properties.pos, properties.dim, _, properties.num_faces);
-
-      // From Mesh.js
-      // this.sid = {
-      //    shad: SID.SHAD.INDEXED | (this.geom.sid.shad | this.mat.sid.shad),
-      //    attr: (this.geom.sid.attr | this.mat.sid.attr),
-      //    inst: (this.geom.sid.inst | this.mat.sid.inst),
-      //    unif: this.mat.sid.unif,
-      //    pass: (this.geom.sid.pass | this.mat.sid.pass | SID.ATTR.COL4),
-      //    shad_ops: 0x0,
-      //    fx: 0x0,
-      //    blend_options: 0x0,
-      //    gfx_group: GFX_GROUPS.DEFAULT.MASK, // To denote if the curent mesh is used for debug, so it uses specific gfx buffers for debug ui rendering.
-      // ;
-
+      this.attributes = null;
 
       this.uniforms = [];
-      if (APP.ENABLE_SHADER_PROJECTION_MATRIX)
-         this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
-
+      this.EnableGfxUniforms({ unif: SID.UNIF.PROJECTION_MATRIX }, 'u_projection', UNIF_TYPE.MAT4, UNIFORM.IS_SHARED);
       this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      // this.EnableGfxUniforms({ unif: SID.UNIF.ROOT_WPOS2, pass: SID.ATTR.WPOS3, }, 'u_wposxy', UNIF_TYPE.FVEC2, UNIFORM.IN_VS);
-      // this.EnableGfxUniforms({ unif: SID.UNIF.BLEND_MODE }, 'u_blend_mode', UNIF_TYPE.INT, UNIFORM.IN_FS);
+
+      this.group_bufferidxs = [INT_NULL, INT_NULL, INT_NULL, INT_NULL];
+      this.group_bufferidxs[0] = View_create_new_group(this);
+
+      this.num_particles_per_frame = properties.num_particles_per_frame;
+      this.has_intermidiate_emission = properties.has_intermidiate_emission;
 
 
-      this.num_particles_per_frame = num_particles_per_frame;
-      this.has_intermidiate_emission = false;
 
 
       // Initialize Function Pointers
@@ -282,42 +442,15 @@ class Emitter {
       this.Particle_update_rotation = Particle_update_rotation_empty;
       this.Particle_update_scale = Particle_update_scale_empty;
       this.Particle_update_fade = Particle_update_fade_empty;
+
+      console.log('#### Perticles-Size aproximation', this.vb_aprox_size );
+
    }
-
-
-   Reset() {
-
-      this.particles_buffer.ResetFull();
-      this.free_particles_idxs_buffer.Reset();
-   }
-
-
-
-   ParticleAddToGfx(particle_idx) {
-
-      // Must create geom struct to pass to the GlAdd...() fuunction
-      const geom = {
-         pos: this.particles_buffer.buffer[particle_idx].pos,
-         dim: this.particles_buffer.buffer[particle_idx].dim,
-         time: this.particles_buffer.buffer[particle_idx].time,
-         generic: this.particles_buffer.buffer[particle_idx].generic,
-      }
-
-      const start = Vertex_buffer_add_vertices_from_reset(this.gfx, geom, this.mat, _);
-      this.particles_buffer.buffer[particle_idx].SetGfxStart(start);
-
-
-      return start;
-   }
-
-
    SetDir(xdir = 0, ydir = 0) {
 
       if (xdir !== 0) this.dir[0] = GetSign(xdir);
       if (ydir !== 0) this.dir[1] = GetSign(ydir);
    }
-
-
    SetConeOfDirection(xdir_pos, xdir_neg, ydir_pos, ydir_neg) {
 
       this.variation_emission.xdir_pos = xdir_pos;
@@ -325,13 +458,6 @@ class Emitter {
       this.variation_emission.ydir_pos = ydir_pos;
       this.variation_emission.ydir_neg = ydir_neg;
    }
-
-
-   /**
-    * Enable shader properties.
-    * In order for a mesh to be drawn in a certain way, specific shaders must be build.
-    * Allow the shader constructor to combine different shaders by enabling meshes 'sid' bit field. 
-   */
    /**
     * Enable shader properties.
     * In order for a mesh to be drawn in a certain way, specific shaders must be build.
@@ -438,51 +564,56 @@ class Emitter {
    }
    GfxEnableFn(flags, params) {
 
+
       // Enable shader function calls (from shader main())
       if (flags === SID.SHAD.FN_GLOW) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_GLOW needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       // TODO: See if attr enable and passes are required, It seems NOT
       if (flags === SID.SHAD.FN_INNER_SHADOW) {
-          this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_EXPLOSION_CIRCLE needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-              generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-          };
-          this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_EXPLOSION_GLOW needs: \'time, generic.a, generic.b\' parameters.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+            // generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
+         };
+         this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
-      if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-          this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-          this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
+      if (flags === SID.SHAD.FN_GLOW_SPHERE) {
+         this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
+         this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
+         this.GfxPassAttr(SID.ATTR.WPOS3 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE) {
-          const param = { // Create default attribs values
-              time: params.time !== undefined ? params.time : 0,
-          };
-          this.sid.shad |= SID.SHAD.FN_NOISE;
-          this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-          this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
+         if (params === undefined) alert('Enable shader FN_NOISE needs \'time\' parameter.\nBut no parameters are passed to \'GfxEnableFn()\'');
+         const param = { // Create default attribs values
+            time: params.time !== undefined ? params.time : 0,
+         };
+         this.sid.shad |= SID.SHAD.FN_NOISE;
+         this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to current mesh
+         this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
       }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
       if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
@@ -492,9 +623,9 @@ class Emitter {
       if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
 
       if (params !== undefined) {
-          if (params.blend_mode !== undefined) {
-              this.sid.blend_options |= params.blend_mode;
-          }
+         if (params.blend_mode !== undefined) {
+            this.sid.blend_options |= params.blend_mode;
+         }
       }
 
       // TODO
@@ -503,73 +634,7 @@ class Emitter {
       // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
       // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-  }
-   // GfxEnableFn(flags, params) {
-
-   //    // Enable shader function calls (from shader main())
-   //    if (flags === SID.SHAD.FN_GLOW) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_GLOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       // this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.WPOS2 | SID.ATTR.DIM2 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.VPOS2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === MESH_ENABLE.GFX.FN_INNER_SHADOW) {
-   //       this.sid.shad |= SID.SHAD.FN_INNER_SHADOW;
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_CIRCLE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_CIRCLE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_EXPLOSION_GLOW) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //          generic: params.generic !== undefined ? params.generic : { a: 1, b: 1 },
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_EXPLOSION_GLOW;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.GENERIC2 | SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === MESH_ENABLE.GFX.FN_GLOW_SPHERE) {
-   //       this.sid.shad |= SID.SHAD.FN_GLOW_SPHERE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2,); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.WPOS2 | SID.ATTR.DIM2,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE) {
-   //       const param = { // Create default attribs values
-   //          time: params.time !== undefined ? params.time : 0,
-   //       };
-   //       this.sid.shad |= SID.SHAD.FN_NOISE;
-   //       this.GfxEnableAttr(SID.ATTR.DIM2 | SID.ATTR.TIME, param); // Enable attribute and store attribs value to cuurrent mesh
-   //       this.GfxPassAttr(SID.ATTR.TIME | SID.ATTR.DIM2 | SID.ATTR.WPOS3,); // Enable pass of the attributes to fragment shader
-   //    }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_1) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_2) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_2; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3_TYPES) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3_TYPES; }
-   //    if (flags === SID.SHAD.FN_NOISE_WORLEY_3D) { this.sid.shad |= SID.SHAD.FN_NOISE_WORLEY_3D; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_1) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_1; }
-   //    if (flags === SID.SHAD.FN_NOISE_VORONOI_2) { this.sid.shad |= SID.SHAD.FN_NOISE_VORONOI_2; }
-
-   //    if (params !== undefined) {
-   //       if (params.blend_mode !== undefined) {
-   //          this.sid.blend_options |= params.blend_mode;
-   //       }
-   //    }
-
-   //    // TODO
-   //    // case MESH_ENABLE.GFX.BLEND_OPTIONS: { if (params === null) alert('BLEND_OPTIONS MUST be passed in the params'); this.sid.blend_options |= params; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_1: { this.sid.shad |= SID.SHAD.FS_TEST1; this.sid.shad |= SID.SHAD.FS_TEST1; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_2: { this.sid.shad |= SID.SHAD.FS_TEST2; this.sid.shad |= SID.SHAD.FS_TEST2; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_3: { this.sid.shad |= SID.SHAD.FS_TEST3; this.sid.shad |= SID.SHAD.FS_TEST3; break; }
-   //    // case MESH_ENABLE.GFX.TEST_SHADERS_4: { this.sid.shad |= SID.SHAD.FS_TEST4; this.sid.shad |= SID.SHAD.FS_TEST4; break; }
-   // }
+   }
    EnableGfxUniforms(flags = 0x0, name, type, shader_flags, arr_size = 0) {
 
 
@@ -590,7 +655,7 @@ class Emitter {
 
          if (flags.unif) this.sid.unif |= flags.unif;
          if (flags.pass) this.sid.pass |= flags.pass;
-         if (flags.fx) this.sid.fx |= flags.fx;
+         // if (flags.fx) this.sid.fx |= flags.fx;
       }
 
       // Avoid duplicates
@@ -645,8 +710,8 @@ class Emitter {
 
 
       // Alert if the current mesh system does not have the uniform enabled.
-      console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-      if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+      console.error('No Uniform ', unif_name, ' found for mesh:', Mesh_get_name(this));
+      if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
 
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
       }
@@ -709,15 +774,12 @@ class Emitter {
 
 
       // Alert if the current particle system does not have the uniform enabled.
-      console.error('No Uniform ', unif_name, ' found for mesh:', this.GetName());
-      if (SID.CheckSidUnifByName(this.sid.unif, unif_name) === true) {
+      console.error('No Uniform ', unif_name, ' found for mesh:', Mesh_get_name(this));
+      if (Sid_check_unif_match_sids(this.sid.unif, unif_name) === true) {
          alert('666 - No Uniform Found\nGfxUniformsSetClbk()\nMesh.js\nSEE ERROR')
       }
 
    }
-
-
-
    EnableProperties(which, params = null) {
 
       switch (which) {
@@ -764,12 +826,10 @@ class Emitter {
          }
       }
    }
-
+   SetVbStartIndex(vb_startidx) {
+      this.vertex_buffer_start = vb_startidx;
+   }
    // TODO: Implement Destroy for Emmiters AND add Destroy for the buffers(M_, Int8, Int16)
-
-
-
-
    GetName() {
       return Str_buffer_get_by_idx(this.nameidx);
    }
@@ -780,15 +840,10 @@ class Emitter {
 
 
 const _emitters = New_generic_buffer(_, 'Particle System: Emitter buffer');
+/** */
 export function Particles_system_reset() { return _emitters.ResetFull(); }
-
-
-
-
+/** */
 export function Particles_get_particle_system(idx) { return _emitters.buffer[idx]; }
-
-
-
 /**
  * 
  * @param {*} emitteridx 
@@ -797,16 +852,16 @@ export function Particles_get_particle_system(idx) { return _emitters.buffer[idx
  * @param {*} clbk_params : These are the parameters for the callback function
  * @param {*} val_idx : The index of the uniform element to access. E.x. If uniform is vec3, then an index of 0 will access the first element
  * @param {*} start_val : Set a start value from which the changes(from a slider) will take effect
- * @param {*} max : Set the maximum value that the uniform value will take
+ * @param {*} rand_max : Set the maximum value that the uniform value will take
  */
-export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clbk_params, val_idx = null, start_val = 0, max = 1) {
+export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clbk_params, val_idx = null, start_val = 0, rand_max = 1) {
 
    const emitter = _emitters.buffer[emitteridx];
    const params = {
       slider: clbk_params,
       vb_grouidx: emitter.gfx.vb.groupidx,
       val_idx: val_idx,
-      max: max,
+      rand_max: rand_max,
       start_val: start_val,
    }
    emitter.GfxUniformsSetClbk(unif_name, Clbk, params);
@@ -815,57 +870,157 @@ export function Particles_gfx_uniforms_set_clbk(emitteridx, unif_name, Clbk, clb
 
 
 
+
+/** */
+// TODO: pass an already created sid, for selecting from a gama of shader particles
+export function Particle_system_create_emitter(mesh_bufferidx, properties) {
+
+   const emitter = new Emitter(mesh_bufferidx, properties);
+   const idx = _emitters.Add(emitter);
+   _emitters.buffer[idx].idx = idx;
+
+   // Visual_debug_create(Visual_debug_create_properties({
+   //    is_root:ROOT_WIDGETS.CREATE_ROOT,
+   //    pos:{x:10, y:200},
+   //    dim:{x:30, y:200},
+
+   //    Target_get_cur_val:Get_emitter_free_particle_count,
+   //    Target_get_max_val:Get_emitter_free_particle_size,
+   //    target_get_cur_val_params:idx,
+   //    target_get_max_val_params:idx,
+   // })); 
+
+   return emitter;
+}
+/** */
 export function Particles_gen_gfx_ctx(emitter, parent = null, specific_vb_groupidx) {
 
    if (!parent) console.error('4431623 \nEmmiter should have a parent mesh.')
 
+   const pos_x = emitter.geom.pos[0];
+   const pos_y = emitter.geom.pos[1];
+   emitter.geom.pos[0] = 0;
+   emitter.geom.pos[1] = 0;
+   
    emitter.parent = parent;
    const FLAGS = GFX_CTX_FLAGS.PRIVATE;
-   emitter.gfx = Gfx_generate_context_for_particle_system(FLAGS, emitter, _, specific_vb_groupidx,);
-   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.groupidx);
+   const ret = Gfx_generate_context(FLAGS, emitter, specific_vb_groupidx, true, emitter.vb_aprox_size);
+   emitter.gfx = ret.gfx;
+   emitter.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, emitter.gfx.vb.render_groupidx);
+   // Add to view group
+   View_add_mesh(emitter.group_bufferidxs[0], emitter, ret.is_root_widget_on_reused_vb);
 
-   // emitter.per_vb_bufferidx = Mesh_per_vb_store_mesh(emitter.gfx.vb.groupidx, emitter.mesh_bufferidx);
+   emitter.geom.pos[0] = pos_x;
+   emitter.geom.pos[1] = pos_y;
 
 
-   // TODO: Temporary implementation of assigning the correct gfx update function pointer
-   // TODO: Implement an Abstract function to not use function pointer 
+   Set_update_function_pointers(emitter);
 
-
-   // if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2;
-   if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2;
-   else if (emitter.sid.shad & SID.SHAD.FN_GLOW_SPHERE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_rcorners;
-   else if (emitter.sid.shad & SID.SHAD.FN_NOISE) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time;
-   else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_style1_time_generic2;
-   else if (emitter.sid.attr & (SID.ATTR.GENERIC2)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_time_generic2;
-   else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_vpos2_dim2_tex2_rot4;
-   else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
-   // else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR._R_CORNERS)) emitter.UpdateGfxBuffersFn = Gl_particles_batch_set_col4_wpos4_dim2_style1_time;
-   else alert('Particles-System: No VertexBufferFillOperation function selected.')
-
+   Vertex_buffer_group_set_mesh_debug_name(emitter.gfx.vb.groupidx, emitter.name);
 
    return emitter.gfx.vb.groupidx;
 }
+/** */
+function Set_update_function_pointers(emitter) {
 
+   const sid = emitter.sid;
+   if(sid.inst !== 0x0) {
 
+      // Instanced geometry
+      if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_dim2_time;
+      }
+      else if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.DIM2 | SID.ATTR.TIME | SID.ATTR.GENERIC2)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_dim2_time_generic2;
+      }
+      else if(sid.inst === (SID.ATTR.WPOS3  | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_wpos3_time;
+      }
+      else if(sid.inst === (SID.ATTR.COL4 | SID.ATTR.WPOS3 | SID.ATTR.TIME)) {
+         emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_instanced_col4_wpos3_time;
+      }
+      // COL4 WPOS3 VPOS2 DIM2 TIME RCORNERS
 
+      // Per vertex geometry (for 1 mesh only, gets updated once on particles initialization and keeps constant/unchanged values)
+      const clean_attr = sid.attr & ~sid.inst; // Get the attributes flags without any instance geometry attributes flags
+      if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2;
+      }
+      else if(clean_attr === (SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_col4_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.COL4 | SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_col4_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.DIM2 | SID.ATTR.R_CORNERS)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_dim2_rcorner;
+      }
+      else if(clean_attr === (SID.ATTR.VPOS2 | SID.ATTR.DIM2)) {
+         emitter.Update_gfx_buffers_fn_inst = Gl_particles_batch_set_vpos2_dim2;
+      }
+   }
+   else { // TODO: OLD, implement clearly what attributes the particle emitter has(like in VertexBufferFillOps.js)
 
-// TODO: pass an already created sid, for selecting from a gama of shader particles
-export function Particle_system_create_emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down) {
-
-   const emitter = new Emitter(name, col, pos, dim, t_step, life_time, accel, deccel, gravity, max_speed, texture_id, num_particles_per_frame, scale_down);
-
-   const idx = _emitters.Add(emitter);
-
-   _emitters.buffer[idx].idx = idx;
-
-
-   return idx;
+      if (emitter.sid.shad & SID.SHAD.FN_EXPLOSION_CIRCLE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
+      else if (emitter.sid.shad & SID.SHAD.FN_GLOW_SPHERE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner;
+      else if (emitter.sid.shad & SID.SHAD.FN_NOISE) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time;
+      else if (emitter.sid.attr & SID.ATTR.GENERIC2 && emitter.sid.attr & SID.ATTR.R_CORNERS) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time_generic2;
+      else if (emitter.sid.attr & (SID.ATTR.GENERIC2)) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_time_generic2;
+      else if (emitter.sid.attr & SID.ATTR.TEX2) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_tex2_with_rotation;
+      else if (emitter.sid.attr & (SID.ATTR.DIM2 | SID.ATTR.R_CORNERS | SID.ATTR.TIME)) emitter.Update_gfx_buffers_fn = Gl_particles_batch_set_col4_wpos3_vpos2_dim2_rcorner_time;
+   }
 }
+/** */
+export function Particle_system_init_particles(emitter) {
+   
+   // Pre_init particles
+   for(let i=0; i < emitter.vb_aprox_size; i++) {
 
+      const particle = new Particle(emitter);
+      const particle_idx = emitter.particles_buffer.Add(particle);
+      
+      const start = Vertex_buffer_init_vertices_for_particles(emitter.gfx, emitter.mat.texidx);
+      // const start = Vertex_buffer_add_vertices_from_render_group(emitter.gfx, emitter.geom, emitter.mat, );
+      emitter.particles_buffer.buffer[particle_idx].SetGfxStart(start);
+      
+      // Add to free particles
+      // emitter.free_particles.Add(particle_idx);
+      // Store_free_particle(emitter.free_particles, particle_idx)
+      emitter.free_particles.buffer[i] = particle_idx;
+   }
 
+   Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
+   // Vertex_buffer_render_group_set_draw_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
+   // Vertex_buffer_render_group_set_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.particles_buffer.boundary+1);
+   // emitter.SetVbStartIndex(0);
+   // Vertex_buffer_render_group_set_start(emitter.gfx.vb.render_groupidx, emitter.vertex_buffer_start)
+      
+   View_render_specific_render_group(emitter.group_bufferidxs[0], emitter.group_bufferidxs[1], emitter.group_bufferidxs[2]);
 
+          
+   if(emitter.sid.inst !== 0x0) {
 
+      emitter.Update_gfx_buffers_fn_inst(
+            emitter.gfx.vb.idxs.buffer[1], 0, 
+            emitter.mat.col[0], emitter.mat.col[1], emitter.mat.col[2], emitter.mat.col[3],
+            0, 0, 
+            emitter.geom.dim[0], emitter.geom.dim[1],
+            emitter.mat.style.rcorners, 
+            0, 
+            0,0,0,0,
+            0,0,0,0,
+            0,0, // particle.generic.a, particle.generic.b,
+      );
 
+   }
+
+   console.log('+++++++++++++++++++++++++++++\nParticles Free Buffer:',emitter.free_particles)
+
+}
+/** */
 export function Particle_system_emitt(params) {
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles);
@@ -875,18 +1030,17 @@ export function Particle_system_emitt(params) {
 
       const emitter_idx = params.params.target_params[i]
       const emitter = _emitters.buffer[emitter_idx];
-      let last_elem = emitter.free_particles_idxs_buffer.boundary;
 
       const has_intermidiate_emission = emitter.has_intermidiate_emission;
+      
+      // Case emitter has been deactivated (if all of its particle animations have been stoped)
+      if ((emitter.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0) {
 
-      // Case emitter has been deactivated (if all of its particles animations have been stoped)
-      if (!emitter.is_active) {
-
-         emitter.is_active = true;
+         emitter.state.mask |= MESH_STATE_FLAGS.ACTIVE;
          Renderqueue_set_active(emitter.gfx.vb.groupidx, true);
       }
 
-
+      
       /**
        * 'has_intermidiate_emission'
        * Fill big position gaps (created by great movement speed) with particles
@@ -917,7 +1071,6 @@ export function Particle_system_emitt(params) {
 
          mag += emitter.left_over;
 
-         // const dist = 2;
          dist = emitter.geom.dim[0] / 6;
          const ratio = mag / dist;
          intermediate_num_particles = Floor(ratio);
@@ -925,153 +1078,141 @@ export function Particle_system_emitt(params) {
 
          if (intermediate_num_particles === 0) intermediate_num_particles = 1; // Emitt a particle at least once per frame
 
-         // emitter.mat.col = GetSequencedColor();
-
       }
-
-
 
 
       const stored_pos = [emitter.geom.pos[0], emitter.geom.pos[1]]; // Store the emitters's pos to re-set it
 
       // Choise: If has intermidiate_emission, calculate the num particles from the prev_pos-pos magnitude. Else use the 'num_particles_per_frame' variable
       const num_particles = has_intermidiate_emission ? intermediate_num_particles : emitter.num_particles_per_frame;
-
-
+      
+      
       for (let j = 0; j < num_particles; j++) {
-         // for (let j = 0; j < 1; j++) {
-
-
+         
          if (has_intermidiate_emission) {
-
+            
             const new_pos = [(mag_partition * Math.sin(angle)), (mag_partition * Math.cos(angle))];
             emitter.geom.pos[0] = stored_pos[0] + new_pos[0];
             emitter.geom.pos[1] = stored_pos[1] + new_pos[1];
             emitter.geom.time = emitter.t_step * j;
          }
-
-         if (last_elem === INT_NULL) {
-
-            const particle = new Particle(emitter);
-            const particle_idx = emitter.particles_buffer.Add(particle);
+         
+         // let next_free_particle_idx = emitter.free_particles.GetNextFree();
+         let next_free_particle_idx = Get_free_particle(emitter.free_particles);
+         const particle = emitter.particles_buffer.buffer[next_free_particle_idx];
+         emitter.total_alive++;
+         
+         if (particle !== undefined) { // Reset particle to default values
+            
             particle.is_alive = true;
+            
+            // particle.accel = emitter.accel;
+            particle.deccel = emitter.deccel;
+            particle.grav = emitter.gravity;
+            
+            particle.scale = emitter.max_scale;
+            
+            if (has_intermidiate_emission) particle.time = emitter.t_step * j;
+            // else particle.time = 0;
+            else particle.time = emitter.geom.time;
+            // particle.col[3] -= .2*j;
+            
+            particle.pos[0] = emitter.geom.pos[0];
+            particle.pos[1] = emitter.geom.pos[1];
+            
+            particle.dim[0] = emitter.geom.dim[0];
+            particle.dim[1] = emitter.geom.dim[1];
+            
+            particle.col[0] = emitter.mat.col[0];
+            particle.col[1] = emitter.mat.col[1];
+            particle.col[2] = emitter.mat.col[2];
+            particle.col[3] = emitter.mat.col[3];
+            
+            particle.generic.a = emitter.geom.generic.a;
+            particle.generic.b = emitter.geom.generic.b;
 
-            emitter.ParticleAddToGfx(particle_idx);
+            // console.log(particle.pos[0],particle.pos[1])
+            
+            if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
+               
+               const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
+               particle.dirx = dir.x;
+               particle.diry = dir.y;
+               particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
 
+            }
+            if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
+               
+               const dir = Polar_coordinates()
+               particle.dirx = dir.x;
+               particle.diry = dir.y;
+               
+               particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
+               // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
+               
+            }
+
+            // GLOB_TEMP.visual_debug.AddAtIndex(next_free_particle_idx);
+            // Static_particles_set_need_update(0, true);
+            
          }
          else {
-
-            const particle_idx = emitter.free_particles_idxs_buffer.buffer[last_elem];
-            const particle = emitter.particles_buffer.buffer[particle_idx];
-
-            if (particle !== undefined) {
-
-               particle.is_alive = true;
-
-               // particle.accel = emitter.accel;
-               particle.deccel = emitter.deccel;
-               particle.grav = emitter.gravity;
-
-               // particle.scale = initial_scale;
-               particle.scale = emitter.max_scale;
-
-               if (has_intermidiate_emission) particle.time = emitter.t_step * j;
-               // else particle.time = 0;
-               else particle.time = emitter.geom.time;
-               // particle.col[3] -= .2*j;
-
-               particle.pos[0] = emitter.geom.pos[0];
-               particle.pos[1] = emitter.geom.pos[1];
-
-               particle.dim[0] = emitter.geom.dim[0];
-               particle.dim[1] = emitter.geom.dim[1];
-
-               particle.col[0] = emitter.mat.col[0];
-               particle.col[1] = emitter.mat.col[1];
-               particle.col[2] = emitter.mat.col[2];
-               particle.col[3] = emitter.mat.col[3];
-
-               particle.generic.a = emitter.geom.generic.a;
-               particle.generic.b = emitter.geom.generic.b;
-
-               if (emitter.properties_flags & PARTICLES.HAS_START_POS_VARIATION) {
-
-                  const dir = Random_coordinates(emitter.variation_emission.xdir_neg, emitter.variation_emission.xdir_pos, emitter.variation_emission.ydir_neg, emitter.variation_emission.ydir_pos);
-                  particle.dirx = dir.x;
-                  particle.diry = dir.y;
-                  particle.accel = emitter.accel * (Abs(particle.random_val) * .5 + 1) * 1.4;
-
-               }
-               if (emitter.properties_flags & PARTICLES.HAS_RANDOM_POLAR_COORD) {
-
-                  const dir = Polar_coordinates()
-                  particle.dirx = dir.x;
-                  particle.diry = dir.y;
-
-                  particle.accel = emitter.accel * (particle.random_val * 100 + 100) * .001;
-                  // particle.accel = emitter.accel * (particle.random_val * 50 + 50) * .002;
-
-               }
-
-               // emitter.free_particles_idxs_buffer.RemoveByIdx(last_elem);
-               emitter.free_particles_idxs_buffer.RemoveByIdxSortedVersionLastElemGuarantee();
-               last_elem = emitter.free_particles_idxs_buffer.boundary
-            }
-            else {
-               console.error('0099890099889 UNDEFINED')
-            }
+            console.error('0099890099889 UNDEFINED', 
+               'num_particles', num_particles, 
+               'total_alive', emitter.total_alive,
+               'next_free_particle_idx', next_free_particle_idx,
+            )
+            return;
          }
-
+         
          // increment to the next position
          mag_partition += dist;
       }
-
-
-      // emitter.left_over += mag;
-      // emitter.left_over += mag-mag_partition;
-
-
+      
       emitter.geom.pos[0] = stored_pos[0];
       emitter.geom.pos[1] = stored_pos[1];
       emitter.geom.prev_pos[0] = emitter.geom.pos[0];
       emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-      // if (is_particle_created) {
-
-      //    emitter.geom.pos[0] = stored_pos[0];
-      //    emitter.geom.pos[1] = stored_pos[1];
-
-      //    emitter.geom.prev_pos[0] = emitter.geom.pos[0];
-      //    emitter.geom.prev_pos[1] = emitter.geom.pos[1];
-      // }
-
+      
+      // Instanced Geometry
+      // Vertex_buffer_render_group_add_instance(emitter.gfx.vb.render_groupidx);
+      
+      
+      // Vertex_buffer_render_group_set_num_faces(emitter.gfx.vb.render_groupidx, emitter.total_alive);
+      // // Set DrawCount in the renderBuffer
+      // Vertex_buffer_render_group_set_draw_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.total_alive);
+      // Vertex_buffer_render_group_set_count_from_num_faces(emitter.gfx.vb.render_groupidx, emitter.total_alive);
+      // emitter.SetVbStartIndex(0);
+      // Vertex_buffer_render_group_set_start(emitter.gfx.vb.render_groupidx, emitter.vertex_buffer_start)
+      
    }
 
    Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles);
 
 }
 
+/** */
 export function Particle_system_update() {
 
    if (_emitters.active_count === 0) return;
 
    Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
-
-
-
-
+   
+   
+   
+   
    for (let i = 0; i <= _emitters.boundary; i++) {
-
+      
       const emitter = _emitters.buffer[i];
-      const vb_data = Vertex_buffer_get_by_vbidx(emitter.gfx.vb.groupidx);
-
-      if (!emitter.is_active) continue;
-
+      
+      // if ((emitter.state.mask & MESH_STATE_FLAGS.ACTIVE)===0) continue;
+      
       let needs_update = false;
-
+      
       for (let j = 0; j <= emitter.particles_buffer.boundary; j++) {
-
+         
          const particle = emitter.particles_buffer.buffer[j];
-
+         
          if (particle.is_alive) {
 
             // TODO: For efficiency create 2 loops, and check which case is without if statement
@@ -1085,10 +1226,10 @@ export function Particle_system_update() {
 
                particle.accel *= emitter.deccel;
             }
-
             if (emitter.properties_flags & PARTICLES.HAS_JIGGLE) {
 
                // TODO: Make jiggle slower. Must include time, expand the jiggle through frames
+               // In order to make the jiggle smoother, there must be a smooth interpolation between randomness
                const jigglex = emitter.jigglex;
                const jiggley = emitter.jiggley;
                const x = GetRandomInt(particle.pos[0] - jigglex, particle.pos[0] + jigglex);
@@ -1137,17 +1278,16 @@ export function Particle_system_update() {
                   //    // particle.pos[1] += (y-particle.pos[1])*.02;
                }
             }
-
             if (emitter.properties_flags & PARTICLES.HAS_ROTATION) {
 
-               // let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
                let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
                   ? (emitter.life_time - (particle.time + .8) * .9) * .1
                   : (((particle.time + .8) * .9) * .1) - emitter.life_time;
                if (rotspeed > 0) particle.angle -= rotspeed * 1.;
                particle.rot = Rotation_z_get_2D_matrix(particle.angle);
+               // let rotspeed = 4;
+               // particle.rot = Rotation_z_get_2D_matrix((-particle.time)*rotspeed);
             }
-
             if (emitter.properties_flags & PARTICLES.HAS_SCALE) {
                // For smoke enlarge effect 
                particle.dim[0] *= particle.scale * .0055 + 1;
@@ -1157,7 +1297,6 @@ export function Particle_system_update() {
                   particle.scale *= .98;
                }
             }
-
             // Particle Fade: For smoke effect. 
             if (emitter.properties_flags & PARTICLES.HAS_FADE) {
                const random = Math.random() * .4 + .5;
@@ -1166,83 +1305,72 @@ export function Particle_system_update() {
                }
             }
 
+            /** Alternative NONE conditional upadate(with function pointers) */
+            {
+               // emitter.Particle_update_position(emitter, particle);
+               // emitter.Particle_update_jiggle(emitter, particle);
+               // emitter.Particle_update_rotation(emitter, particle);
+               // emitter.Particle_update_scale(emitter, particle);
+               // emitter.Particle_update_fade(emitter, particle);
+            }
 
-            // emitter.Particle_update_position(emitter, particle);
-            // emitter.Particle_update_jiggle(emitter, particle);
-            // emitter.Particle_update_rotation(emitter, particle);
-            // emitter.Particle_update_scale(emitter, particle);
-            // emitter.Particle_update_fade(emitter, particle);
+
+            if (particle.time >= .99) particle.col[3] = 0.0;
 
 
-            // if (particle.time >= .99) particle.col[3] = 0.0;
-
-
-            // Render Particles
             // Performance_timer_start(PERFORMANCE_TIMERS_IDXS.Particles2);
-            emitter.UpdateGfxBuffersFn(emitter.gfx.vb.groupidx, particle.start, particle.col, particle.pos, particle.time, particle.dim, particle.rot, particle.uv, particle.generic);
+            // Render Particles
+            // emitter.Update_gfx_buffers_fn_inst(
+            //    emitter.gfx.vb.groupidx, particle.start, 
+            //    particle.col[0], particle.col[1], particle.col[2], particle.col[3],
+            //    particle.pos[0], particle.pos[1], 
+            //    particle.dim[0], particle.dim[1],
+            //    emitter.mat.style.rcorners, 
+            //    particle.time, 
+            //    particle.rot[0], particle.rot[1], particle.rot[2], particle.rot[3],
+            //    particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
+            //    particle.generic.a, particle.generic.b,
+            // );
+
+
+            emitter.Update_gfx_buffers_fn(
+               // emitter.gfx.vb.groupidx, particle.start, 
+               emitter.gfx.vb.idxs.buffer[0], particle.start, 
+               particle.col[0], particle.col[1], particle.col[2], particle.col[3],
+               particle.pos[0], particle.pos[1], 
+               particle.dim[0], particle.dim[1],
+               emitter.mat.style.rcorners, 
+               particle.time, 
+               particle.rot[0], particle.rot[1], particle.rot[2], particle.rot[3],
+               particle.uv[0],  particle.uv[1], particle.uv[2], particle.uv[3], 
+               particle.generic.a, particle.generic.b,
+            );
+            
+            // vbidx, start, r,g,b,a, x,y, w,h, rc, t, rot, uv
             // Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
-
-            // { // Update vertex buffer directly
-            //    let index = particle.start;
-            //    const col = particle.col;
-            //    const pos = particle.pos;
-            //    const t = particle.time;
-            //    const generic = particle.generic;
-
-            //    // V1
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V2
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V3
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            //    // V4
-            //    vb_data[index++] = col[0];vb_data[index++] = col[1];vb_data[index++] = col[2];vb_data[index++] = col[3];
-            //    vb_data[index++] = pos[0];vb_data[index++] = pos[1];vb_data[index++] = pos[2];
-            //    index += V_POS_COUNT;
-            //    index += 2; // FOR DIM2
-            //    vb_data[index++] = t;
-            //    vb_data[index++] = generic.a;vb_data[index++] = generic.b;
-
-            // }
-
-
+            
+            
             particle.time += emitter.t_step;
-
+            
             if (particle.time >= emitter.life_time) {
-
+               
                // Reset particle for reuse
                particle.is_alive = false;
-               // particle.time = 0;
                particle.time = emitter.geom.time;
-
-               emitter.free_particles_idxs_buffer.Add(j);
-
-               if (emitter.free_particles_idxs_buffer.boundary === emitter.particles_buffer.boundary) {
-
+               emitter.free_particles.Add(j);
+               // emitter.free_particles.AddFree(j);
+               Store_free_particle(emitter.free_particles, j)
+               emitter.total_alive--;
+               if (emitter.free_particles.boundary === emitter.particles_buffer.boundary) {
                   emitter.is_active = false;
                   Renderqueue_set_active(emitter.gfx.vb.groupidx, false);
-                  // console.error('Renderqueue DEACTIVATED')
+                  // Static_particles_set_need_update(0, false);
                }
 
-               // rotation_speed = initial_rotation_speed;
+               // Remove instanced count
+               // Vertex_buffer_render_group_remove_instance(emitter.gfx.vb.render_groupidx);
+
+               // GLOB_TEMP.visual_debug.Remove(j);
 
             }
 
@@ -1250,16 +1378,23 @@ export function Particle_system_update() {
          }
       }
 
-      if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
 
+      // if (needs_update) Vertex_buffer_state_enable(_emitters.buffer[i].gfx.vb.groupidx, _emitters.buffer[i].gfx.vb.idxs.buffer[0], BUFFER_STATE.NEEDS_UPDATE);
+      if (needs_update) {
+         Vertex_buffer_render_group_set_state(_emitters.buffer[i].gfx.vb.render_groupidx, RENDER_GROUP_STATE.NEEDS_UPDATE);
+         // Static_particles_set_need_update(0, true);
+      }
+
+
+      Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
 
    }
 
-   Performance_timer_stop(PERFORMANCE_TIMERS_IDXS.Particles2);
 
 
 }
 
+/** */
 // Emitter function pointers to update particle functions. It is to replace any if statements inside the 'Update loop'
 function Particle_update_position(emitter, particle) {
    const speed = emitter.speed * particle.accel;
@@ -1271,6 +1406,7 @@ function Particle_update_position(emitter, particle) {
 
    particle.accel *= emitter.deccel;
 }
+/** */
 function Particle_update_jiggle(emitter, particle) {
 
    // TODO: Make jiggle slower. Must include time, expand the jiggle through frames
@@ -1322,6 +1458,7 @@ function Particle_update_jiggle(emitter, particle) {
       //    // particle.pos[1] += (y-particle.pos[1])*.02;
    }
 }
+/** */
 function Particle_update_rotation(emitter, particle) {
    let rotspeed = (emitter.life_time > (particle.time + .8) * .9) * .1
       ? (emitter.life_time - (particle.time + .8) * .9) * .1
@@ -1329,6 +1466,7 @@ function Particle_update_rotation(emitter, particle) {
    if (rotspeed > 0) particle.angle -= rotspeed * 1.;
    particle.rot = Rotation_z_get_2D_matrix(particle.angle);
 }
+/** */
 function Particle_update_scale(emitter, particle) {
    // For smoke enlarge effect 
    particle.dim[0] *= particle.scale * .0055 + 1;
@@ -1338,33 +1476,43 @@ function Particle_update_scale(emitter, particle) {
       particle.scale *= .98;
    }
 }
+/** */
 function Particle_update_fade(emitter, particle) {
    const random = Math.random() * .4 + .5;
    if (particle.time > random) {
       particle.col[3] *= .85;
    }
 }
+/** */
 function Particle_update_position_empty() { }
+/** */
 function Particle_update_jiggle_empty() { }
+/** */
 function Particle_update_rotation_empty() { }
+/** */
 function Particle_update_scale_empty() { }
+/** */
 function Particle_update_fade_empty() { }
 
 
+/** */
 export function Particle_system_emitter_set_size(emitter_idx, size) {
 
    _emitters.buffer[emitter_idx].geom.dim[0] = size;
    _emitters.buffer[emitter_idx].geom.dim[1] = size;
 }
+/** */
 export function Particle_system_emitter_add_size_xy(emitter_idx, sizex, sizey) {
 
    _emitters.buffer[emitter_idx].geom.dim[0] += sizex;
    _emitters.buffer[emitter_idx].geom.dim[1] += sizey;
 }
+/** */
 export function Particle_system_emitter_get_size(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].geom.dim[0];
 }
+/** */
 export function Particle_system_emitter_set_position_xy(emitter_idx, x, y) {
 
    // _emitters.buffer[emitter_idx].prev_pos[0] = _emitters.buffer[emitter_idx].pos[0];
@@ -1372,18 +1520,22 @@ export function Particle_system_emitter_set_position_xy(emitter_idx, x, y) {
    _emitters.buffer[emitter_idx].geom.pos[0] = x;
    _emitters.buffer[emitter_idx].geom.pos[1] = y;
 }
+/** */
 export function Particle_system_emitter_set_position_x(emitter_idx, x) {
    _emitters.buffer[emitter_idx].geom.pos[0] = x;
 }
+/** */
 export function Particle_system_emitter_set_prev_position_xy(emitter_idx) {
 
    _emitters.buffer[emitter_idx].geom.prev_pos[0] = _emitters.buffer[emitter_idx].geom.pos[0];
    _emitters.buffer[emitter_idx].geom.prev_pos[1] = _emitters.buffer[emitter_idx].geom.pos[1];
 }
+/** */
 export function Particle_system_emitter_get_position_xy(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].geom.pos;
 }
+/** */
 export function Particle_system_emitter_enable_intermidiate_emission(emitter_idx) {
 
    return _emitters.buffer[emitter_idx].has_intermidiate_emission = true;
@@ -1391,30 +1543,16 @@ export function Particle_system_emitter_enable_intermidiate_emission(emitter_idx
 
 
 
-/****************************************************************************************************************************************************************/
-// Function Pointers
-function Emitter_particles_set_direction_emission(emitter) {
 
+
+export function Particle_system_set_uwpos_x(emitter, pos_x) {
+
+   Mesh_unif_set_vb_root_wposx(emitter.root_posidx, pos_x);
 }
-function Emitter_particles_set_direction_explosio(emitter) {
+export function Particle_system_set_uwpos_y(emitter, pos_y) {
 
+   Mesh_unif_set_vb_root_wposy(emitter.root_posidx, pos_y);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1435,7 +1573,7 @@ export function Particle_system_print_info() {
    for (let i = 0; i <= _emitters.boundary; i++) {
 
       const emitter = _emitters.buffer[i];
-      const parent = (emitter.parent !== null) ? emitter.parent.GetName() : 'null'
+      const parent = (emitter.parent !== null) ? Mesh_get_name(emitter.parent) : 'null'
 
       console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),
          '\nindex:', emitter.idx,
@@ -1457,6 +1595,38 @@ export function Particle_system_print_info() {
          '\ndirection:', emitter.dir,
          '\nvariation_emission:', emitter.variation_emission,
          '\nuniforms:', emitter.uniforms,
+         '\nParticlesBuffer:', emitter.particles_buffer,
+         '\nParticlesFreeBuffer:', emitter.free_particles.buffer,
+      );
+   }
+}
+export function Particle_system_print_all_particles() {
+
+   console.log('_emitters:\n count:', _emitters.active_count, 'size', _emitters.size)
+   for (let i = 0; i <= _emitters.boundary; i++) {
+      
+      const emitter = _emitters.buffer[i];
+      console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),);
+
+      for (let j = 0; j <= emitter.particles_buffer.boundary; j++) {
+
+         const particle = emitter.particles_buffer.buffer[j];
+         console.log('particle idx:', particle.idx,
+            'is_alive:', particle.is_alive,
+            'start:', particle.start,
+         );
+
+      }
+   }
+}
+export function Particle_system_print_free_particles_buffer() {
+
+   console.log('_emitters:\n count:', _emitters.active_count, 'size', _emitters.size)
+   for (let i = 0; i <= _emitters.boundary; i++) {
+
+      const emitter = _emitters.buffer[i];
+      console.log('emitter:', i, 'name:', Str_buffer_get_by_idx(emitter.nameidx),
+         'free_buffer:', emitter.free_particles.buffer,
       );
    }
 }
@@ -1467,12 +1637,30 @@ export function Particle_system_print_info() {
 
 
 
+/*********************************************************************************************************/
+// VISUAL-DEBUG
+/** */
+function Get_emitter_free_particle_size(emitter_idx) {
 
+   const emitter = _emitters.buffer[emitter_idx];
+   const size = emitter.free_particles.size;
+   return size;
+}
+/** */
+function Get_emitter_free_particle_count(emitter_idx) {
 
+   const emitter = _emitters.buffer[emitter_idx];
+   const count = emitter.free_particles.pos;
+   return count;
+}
+/** */
+export function Get_emitter_free_particle_buffer(emitter_idx) {
 
+   const emitter = _emitters.buffer[emitter_idx];
+   return emitter.free_particles;
+}
+export function Get_emitter_particle_buffer(emitter_idx) {
 
-
-
-
-
-
+   const emitter = _emitters.buffer[emitter_idx];
+   return emitter.particles_buffer;
+}

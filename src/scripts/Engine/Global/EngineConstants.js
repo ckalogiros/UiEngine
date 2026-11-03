@@ -21,13 +21,14 @@ const MIN_INT32 = -2147483648;
 const MAX_UINT8 = 0xff; // 255
 const MAX_UINT16 = 65535;
 const MAX_UINT32 = 0xFFFFFFFF; // 4294967295;
-// const MAX_UINT64 = 0xFFFFFFFFFFFFFFFF; // 18446744073709551615 ;
+const MAX_UINT64 = 0xFFFFFFFFFFFFFFFFn; // 18446744073709551615 ;
 
 const MAX_BIT_MASK = 0xFFFFFFFFFFFFF;
 const MAX_BIT_MASK_COMBINATIONS = 52;
 
-const MILISEC_TO_SEC = 0.001;
-const NANOSEC = 0.000001;
+const MILLISEC_TO_SEC 		= 0.001;
+const MILLISEC_TO_MICROSEC = 1000;
+const MILLISEC_TO_NANOSEC 	= 1000000;
 
 
 const ALL = 0xffff;
@@ -60,53 +61,10 @@ const TEST_CLIP_RIGHT = 10000;
 const RESERVED_MESH = true; // Just for check in Str_buffer. The Create_widget.. function reserves a _mesh_buffer element by setting it to 'true'. So instead of checking against blant  true value, we give it a meaning 
 
 
-
-const APP = {
-	ENABLE_SHADER_PROJECTION_MATRIX: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
-	ENABLE_SHADER_WPOS_UNIFORM: true, // The block uniform 'u_projection_matrix' must be enabled for all app's shader programs.
-}
+const OUT_OF_VIEW = 100000; // Out of screen view in pixels
 
 
-
-
-//
-const TYPES = {
-
-	ID: 'TYPES',
-
-	BOOL: _CNT,
-	INT8: _CNT <<= 0x1,
-	INT16: _CNT <<= 0x1,
-	INT32: _CNT <<= 0x1,
-	UINT8: _CNT <<= 0x1,
-	UINT16: _CNT <<= 0x1,
-	UINT32: _CNT <<= 0x1,
-	FLOAT32: _CNT <<= 0x1,
-	VEC2: _CNT <<= 0x1,
-	VEC3: _CNT <<= 0x1,
-	VEC4: _CNT <<= 0x1,
-	MAT2X2: _CNT <<= 0x1,
-	MAT4X4: _CNT <<= 0x1,
-
-	GetSizeInBytes(type, id) {
-
-		if (id === undefined || id !== this.ID) alert('type not match');
-
-		let size = 0;
-		if (type & this.FLOAT32) size += FLOAT32_BYTE_SIZE;
-		else if (type & this.INT8 || type & this.UINT8) size += INT8_BYTE_SIZE;
-		else if (type & this.INT16 || type & this.UINT16) size += INT16_BYTE_SIZE;
-		else if (type & this.INT32 || type & this.UINT32) size += INT32_BYTE_SIZE;
-		else if (type & this.VEC2) size += VEC2_BYTE_SIZE;
-		else if (type & this.VEC3) size += VEC3_BYTE_SIZE;
-		else if (type & this.VEC4) size += VEC4_BYTE_SIZE;
-		else if (type & this.MAT2X2) size += MAT2X2_BYTE_SIZE;
-		else if (type & this.MAT4X4) size += MAT4X4_BYTE_SIZE;
-
-		return size;
-	}
-}
-
+const MAX_NAME_LENGTH = 13;
 
 
 
@@ -128,6 +86,140 @@ const VEC4_BYTE_SIZE = 4 * FLOAT32_BYTE_SIZE; // 16 Bytes
 const MAT2X2_BYTE_SIZE = 2 * VEC2_BYTE_SIZE; // 16 Bytes
 const MAT4X4_BYTE_SIZE = 4 * VEC4_BYTE_SIZE; // 64 Bytes
 
+
+
+const BITWISE = {
+   x1:  0x1n  ,
+   x2:  0x3n  ,
+   x3:  0x7n  ,
+   x4:  0xfn  ,
+   x5:  0x1fn ,
+   x6:  0x3fn ,
+   x7:  0x7fn ,
+   x8:  0xffn ,
+   x9:  0x1ffn  ,
+   x10: 0x3ffn  ,
+   x11: 0x7ffn  ,
+   x12: 0xfffn  ,
+   x13: 0x1fffn ,
+   x14: 0x3fffn ,
+   x15: 0x7fffn ,
+   x16: 0xffffn,
+   x17: 0x1ffffn  ,
+   x18: 0x3ffffn  ,
+   x19: 0x7ffffn  ,
+   x20: 0xfffffn  ,
+   x21: 0x1fffffn ,
+   x22: 0x3fffffn ,
+   x23: 0x7fffffn ,
+   x24: 0xffffffn,
+   x25: 0x1ffffffn  ,
+   x26: 0x3ffffffn  ,
+   x27: 0x7ffffffn  ,
+   x28: 0xfffffffn  ,
+   x29: 0x1fffffffn ,
+   x30: 0x3fffffffn ,
+   x31: 0x7fffffffn ,
+   x32: 0xffffffffn,
+   x33: 0x1ffffffffn  ,
+   x34: 0x3ffffffffn  ,
+   x35: 0x7ffffffffn  ,
+   x36: 0xfffffffffn  ,
+   x37: 0x1fffffffffn ,
+   x38: 0x3fffffffffn ,
+   x39: 0x7fffffffffn ,
+   x40: 0xffffffffffn,
+   x41: 0x1ffffffffffn  ,
+   x42: 0x3ffffffffffn  ,
+   x43: 0x7ffffffffffn  ,
+   x44: 0xfffffffffffn  ,
+   x45: 0x1fffffffffffn ,
+   x46: 0x3fffffffffffn ,
+   x47: 0x7fffffffffffn ,
+   x48: 0xfffffffffffffn,
+   x49: 0x1ffffffffffffn  ,
+   x50: 0x3ffffffffffffn  ,
+   x51: 0x7ffffffffffffn  ,
+   x52: 0xfffffffffffffn  ,
+   x53: 0x1fffffffffffffn ,
+   x54: 0x3fffffffffffffn ,
+   x55: 0x7fffffffffffffn ,
+   x56: 0xffffffffffffffn,
+   x57: 0x1ffffffffffffffn  ,
+   x58: 0x3ffffffffffffffn  ,
+   x59: 0x7ffffffffffffffn  ,
+   x60: 0xfffffffffffffffn  ,
+   x61: 0x1fffffffffffffffn ,
+   x62: 0x3fffffffffffffffn ,
+   x63: 0x7fffffffffffffffn ,
+   x64: 0xffffffffffffffffn,
+};
+// const BITWISE = {
+//    x1:  { mask:0x1n, 					pos: 0, },
+//    x2:  { mask:0x3n, 					pos: 1, },
+//    x3:  { mask:0x7n, 					pos: 2, },
+//    x4:  { mask:0xfn, 					pos: 3, },
+//    x5:  { mask:0x1fn, 					pos: 4, },
+//    x6:  { mask:0x3fn, 					pos: 5, },
+//    x7:  { mask:0x7fn, 					pos: 6, },
+//    x8:  { mask:0xffn, 					pos: 7, },
+//    x9:  { mask:0x1ffn, 					pos: 8, },
+//    x10: { mask:0x3ffn, 					pos: 9, },
+//    x11: { mask:0x7ffn, 					pos: 10, },
+//    x12: { mask:0xfffn, 					pos: 11, },
+//    x13: { mask:0x1fffn, 				pos: 12, },
+//    x14: { mask:0x3fffn, 				pos: 13, },
+//    x15: { mask:0x7fffn, 				pos: 14, },
+//    x16: { mask:0xffffn, 				pos: 15, },
+//    x17: { mask:0x1ffffn, 				pos: 16, },
+//    x18: { mask:0x3ffffn, 				pos: 17, },
+//    x19: { mask:0x7ffffn, 				pos: 18, },
+//    x20: { mask:0xfffffn, 				pos: 19, },
+//    x21: { mask:0x1fffffn, 				pos: 20, },
+//    x22: { mask:0x3fffffn, 				pos: 21, },
+//    x23: { mask:0x7fffffn, 				pos: 22, },
+//    x24: { mask:0xffffffn, 				pos: 23, },
+//    x25: { mask:0x1ffffffn, 			pos: 24, },
+//    x26: { mask:0x3ffffffn, 			pos: 25, },
+//    x27: { mask:0x7ffffffn, 			pos: 26, },
+//    x28: { mask:0xfffffffn, 			pos: 27, },
+//    x29: { mask:0x1fffffffn, 			pos: 28, },
+//    x30: { mask:0x3fffffffn, 			pos: 29, },
+//    x31: { mask:0x7fffffffn, 			pos: 30, },
+//    x32: { mask:0xffffffffn, 			pos: 31, },
+//    x33: { mask:0x1ffffffffn, 			pos: 32, },
+//    x34: { mask:0x3ffffffffn, 			pos: 33, },
+//    x35: { mask:0x7ffffffffn, 			pos: 34, },
+//    x36: { mask:0xfffffffffn, 			pos: 35, },
+//    x37: { mask:0x1fffffffffn, 		pos: 36, },
+//    x38: { mask:0x3fffffffffn, 		pos: 37, },
+//    x39: { mask:0x7fffffffffn, 		pos: 38, },
+//    x40: { mask:0xffffffffffn, 		pos: 39, },
+//    x41: { mask:0x1ffffffffffn, 		pos: 40, },
+//    x42: { mask:0x3ffffffffffn, 		pos: 41, },
+//    x43: { mask:0x7ffffffffffn, 		pos: 42, },
+//    x44: { mask:0xfffffffffffn, 		pos: 43, },
+//    x45: { mask:0x1fffffffffffn, 		pos: 44, },
+//    x46: { mask:0x3fffffffffffn, 		pos: 45, },
+//    x47: { mask:0x7fffffffffffn, 		pos: 46, },
+//    x48: { mask:0xfffffffffffffn,		pos: 47, },
+//    x49: { mask:0x1ffffffffffffn, 	pos: 48, },
+//    x50: { mask:0x3ffffffffffffn, 	pos: 49, },
+//    x51: { mask:0x7ffffffffffffn, 	pos: 50, },
+//    x52: { mask:0xfffffffffffffn, 	pos: 51, },
+//    x53: { mask:0x1fffffffffffffn, 	pos: 52, },
+//    x54: { mask:0x3fffffffffffffn, 	pos: 53, },
+//    x55: { mask:0x7fffffffffffffn, 	pos: 54, },
+//    x56: { mask:0xffffffffffffffn, 	pos: 55, },
+//    x57: { mask:0x1ffffffffffffffn, 	pos: 56, },
+//    x58: { mask:0x3ffffffffffffffn, 	pos: 57, },
+//    x59: { mask:0x7ffffffffffffffn, 	pos: 58, },
+//    x60: { mask:0xfffffffffffffffn, 	pos: 59, },
+//    x61: { mask:0x1fffffffffffffffn, pos: 60, },
+//    x62: { mask:0x3fffffffffffffffn, pos: 61, },
+//    x63: { mask:0x7fffffffffffffffn, pos: 62, },
+//    x64: { mask:0xffffffffffffffffn, pos: 63, },
+// };
 
 
 
@@ -238,72 +330,6 @@ const STATE = {
 		click_hold: null,
 		click_holdidx: INT_NULL,
 
-		SetHovered(mesh) {
-			this.hovered = mesh;
-			if (!mesh) {
-				this.hoveredIdx = INT_NULL;
-			}
-			else {
-				this.hoveredIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetGrabed(mesh) {
-			this.grabed = mesh;
-			if (!mesh) {
-				this.grabedIdx = INT_NULL;
-			}
-			else {
-				this.grabedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetClicked(mesh) {
-			this.clicked = mesh;
-			if (!mesh) {
-				this.clickedIdx = INT_NULL;
-			}
-			else {
-				this.clickedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetFocused(mesh) {
-
-			this.focused = mesh;
-			if (!mesh) {
-				this.focusedIdx = INT_NULL;
-			}
-			else {
-				this.focusedIdx = mesh.mesh_bufferidx;
-			}
-		},
-		SetClickHold(mesh) {
-
-			this.click_hold = mesh;
-			if (!mesh) {
-				this.click_holdidx = INT_NULL;
-			}
-			else {
-				this.click_holdidx = mesh.mesh_bufferidx;
-			}
-		},
-		CheckAllAndRemove(mesh) {
-			if (mesh === this.hovered) {
-				this.hovered = null;
-				this.hoveredIdx = INT_NULL;
-			}
-			if (mesh === this.clicked) {
-				this.clicked = null;
-				this.grabedIdx = INT_NULL;
-			}
-			if (mesh === this.grabed) {
-				this.grabed = null;
-				this.clickedIdx = INT_NULL;
-			}
-			if (mesh === this.focused) {
-				this.focused = null;
-				this.focusedIdx = INT_NULL;
-			}
-		}
-
 	},
 
 	mouse: {
@@ -311,30 +337,7 @@ const STATE = {
 		activeClickedButtonId: INT_NULL,
 	},
 
-	Reset(){
 
-		// this.scene.active = null;
-		// this.scene.active_idx = null;
-	
-		this.loop.paused = false;
-	
-		this.mesh.hovered = null;
-		this.mesh.hoveredIdx = INT_NULL;
-		
-		this.mesh.clicked = null;
-		this.mesh.clickedIdx = INT_NULL;
-		
-		this.mesh.grabed = null;
-		this.mesh.grabedIdx = INT_NULL;
-		
-		this.mesh.focused = null;
-		this.mesh.focusedIdx = INT_NULL;
-		
-		this.mesh.click_hold = null;
-		this.mesh.click_holdidx = INT_NULL;
-
-		this.mouse.activeClickedButtonId
-	}
 };
 
 
@@ -344,6 +347,71 @@ const STATE = {
 
 
 
+_CNT = 0x1;
+const MESH_STATE_FLAGS = {
+
+	ACTIVE: _CNT,
+	CLIPED_Y: _CNT <<= 1,
+	CLIPED_X: _CNT <<= 1,
+
+	IN_FOCUS: _CNT <<= 1,
+	IN_HOVER: _CNT <<= 1,
+	IN_MOVE: _CNT <<= 1,
+	IN_RESIZE: _CNT <<= 1,
+	IN_GRAB: _CNT <<= 1,
+	IN_HOVER_COLOR: _CNT <<= 1,
+	IN_HOLD_CLICK: _CNT <<= 1,
+	IN_KEY_PRESS: _CNT <<= 1,
+	
+	IS_HOVERABLE: _CNT <<= 1,
+	IS_CLICKABLE: _CNT <<= 1,
+	IS_RESIZEABLE: _CNT <<= 1,
+	IS_MOVABLE: _CNT <<= 1,
+	IS_GRABABLE: _CNT <<= 1,
+	IS_FAKE_EVENT: _CNT <<= 1,
+	IS_FAKE_HOVERABLE: _CNT <<= 1,
+	IS_FAKE_CLICKABLE: _CNT <<= 1,
+	IS_HOVER_COLORABLE: _CNT <<= 1,
+	IS_HOLD_CLICK: _CNT <<= 1,
+	IS_KEY_PRESSABLE: _CNT <<= 1,
+
+	IN_SCALE: _CNT <<= 1,
+	HAS_POPUP: _CNT <<= 1,
+	HAS_CLIP: _CNT <<= 1,
+
+	// Masks for denoting a vertex buffer's uniform wpos as 'sticky, so it will be uupdated accordingly on canvas resize and scroll 
+	STICKY_POSX: _CNT <<= 0x1, 
+	STICKY_POSY: _CNT <<= 0x1,
+
+};
+
+
+
+
+
+
+
+
+_CNT = 0x1;
+const VIEW_GROUP_STATE_FLAGS = {
+
+	ACTIVE: _CNT, 
+	IS_VB_ACTIVATED: _CNT <<= 0x1, // Has the vertex buffer been added to the renderqueue for rendering?
+	// IS_USED:_CNT,
+	IS_RENDERED: _CNT <<= 1,
+
+	// IN_: _CNT <<= 1,
+
+	// HAS_: _CNT <<= 1,
+
+};
+
+
+
+
+
+
+// TODO: Deprecated
 _CNT = 0x1;
 const SECTION = {
 
@@ -381,79 +449,6 @@ const SECTION = {
 
 
 
-_CNT = 0x1;
-const MESH_STATE = {
-
-	ACTIVE: _CNT,
-	CLIPED_Y: _CNT <<= 1,
-	CLIPED_X: _CNT <<= 1,
-
-	IN_FOCUS: _CNT <<= 1,
-	IN_HOVER: _CNT <<= 1,
-	IN_MOVE: _CNT <<= 1,
-	IN_RESIZE: _CNT <<= 1,
-	IN_GRAB: _CNT <<= 1,
-	IN_HOVER_COLOR: _CNT <<= 1,
-	IN_HOLD_CLICK: _CNT <<= 1,
-	
-	IS_HOVERABLE: _CNT <<= 1,
-	IS_CLICKABLE: _CNT <<= 1,
-	IS_RESIZEABLE: _CNT <<= 1,
-	IS_MOVABLE: _CNT <<= 1,
-	IS_GRABABLE: _CNT <<= 1,
-	IS_FAKE_EVENT: _CNT <<= 1,
-	IS_FAKE_HOVERABLE: _CNT <<= 1,
-	IS_FAKE_CLICKABLE: _CNT <<= 1,
-	IS_HOVER_COLORABLE: _CNT <<= 1,
-	IS_HOLD_CLICK: _CNT <<= 1,
-
-	IN_SCALE: _CNT <<= 1,
-	HAS_POPUP: _CNT <<= 1,
-	HAS_CLIP: _CNT <<= 1,
-
-	// Masks for denoting a vertex buffer's uniform wpos as 'sticky, so it will be uupdated accordingly on canvas resize and scroll 
-	STICKY_POSX: _CNT <<= 0x1, 
-	STICKY_POSY: _CNT <<= 0x1,
-
-	
-	ToString(mask) {
-
-		let str = '';
-		if (mask & this.IN_FOCUS) str += 'IN_FOCUS,'
-		if (mask & this.IN_HOVER) str += 'IN_HOVER,'
-		if (mask & this.IN_SCALE) str += 'IN_SCALE,'
-		if (mask & this.IN_MOVE) str += 'IN_MOVE,'
-		if (mask & this.IN_GRAB) str += 'IN_GRAB,'
-		if (mask & this.IN_HOVER_COLOR) str += 'IN_HOVER_COLOR,'
-
-		if (mask & this.IS_MOVABLE) str += 'IS_MOVABLE,'
-		if (mask & this.IS_GRABABLE) str += 'IS_GRABABLE,'
-
-		if (mask & this.CLICKED_MOUSE_L) str += 'CLICKED_MOUSE_L,'
-		if (mask & this.CLICKED_MOUSE_M) str += 'CLICKED_MOUSE_M,'
-		if (mask & this.CLICKED_MOUSE_R) str += 'CLICKED_MOUSE_R,'
-
-		if (mask & this.IS_HOVERABLE) str += 'IS_HOVERABLE,'
-		if (mask & this.HAS_POPUP) str += 'HAS_POPUP,'
-		if (mask & this.IS_HOVER_COLORABLE) str += 'IS_HOVER_COLORABLE,'
-
-		return str;
-		// console.info(str)
-	},
-
-
-	Print(mask) {
-		console.info(this.ToString(mask))
-	}
-
-};
-
-
-
-
-
-
-
 
 _CNT = 0x1;
 const COMPONENTS = {
@@ -467,41 +462,10 @@ const COMPONENTS = {
 
 
 
-const MOUSE = {
-
-	BTN_ID: {
-
-		LEFT: 0,
-		MIDDLE: 1,
-		RIGHT: 2,
-	},
-};
-
-
-
-
-
-
-
-
 
 
 _CNT = 0x1;
-const RENDER_QUEUE_FLAGS = {
-	IS_ACTIVE: _CNT,
-	SKIP_PRIORITY: _CNT <<= 0x1,
-	NEEDS_UPDATE: _CNT <<= 0x1,
-}
-
-
-
-
-
-
-
-
-_CNT = 0x1;
-const ALIGN = {
+const TEXT_ALIGN = {
 
 	LEFT: _CNT,
 	RIGHT: _CNT <<= 0x1,
@@ -524,14 +488,21 @@ const ALIGN = {
 _CNT = 0x1;
 const LAYOUT = {
 
-	HORIZONTAL: _CNT <<= 0x1,
+	HORIZONTAL: _CNT = 0x1,
 	VERTICAL: _CNT <<= 0x1,
 	RESIZE_SELF: _CNT <<= 0x1,
 	FIXED_WIDTH: _CNT <<= 0x1,
 	FIXED_HEIGHT: _CNT <<= 0x1,
 	FLOAT_RIGHT: _CNT <<= 0x1,
 	EXPAND: _CNT <<= 0x1,
-	PRESERVE_SELF_POS: _CNT <<= 0x1,
+	// PRESERVE_SELF_POS: _CNT <<= 0x1,
+
+	// These flags take effect in the "grow" function
+	GROW_HORIZONTAL: _CNT <<= 0x1, // Takes up any space from parent's fixed width
+	GROW_VERTICAL: _CNT <<= 0x1, // Takes up any space from parent's fixed height
+	
+	// These flags are set on parent/root meshes, to denote that have children with "GROW_HORIZONTAL,GROW_VERTICAL" flags
+	TYPE_GROW_CONTAINER: _CNT <<= 0x1, 
 }
 
 
@@ -543,6 +514,10 @@ const LAYOUT = {
 
 const POSITION_CENTER = [0, 0, 0];
 const TEMP_RESIZE_MARGIN = [15, 15];
+
+
+
+
 const POSSITIVE = 0;
 const NEGATIVE = 0;
 
@@ -606,22 +581,7 @@ const TIME_INTERVAL_REPEAT_ALWAYS = 9999999999; // Repeat always a time interval
 
 // Performance Timers indexes. WRITABLE 
 const PERFORMANCE_TIMERS_IDXS = {
-	/**
-		GameLoop
-		GlDraw
-		AllTimersUpdate
-		Batch
-		Batch2
-		SceneUpdate
-		EventListener
-		HoverListener
-		MeshInfoTip
-		FramebufferRendering
-		MiscTest1
-		MiscTest2
-		MiscTest3
-		MiscTest4
-	 */
+
 	GameLoop: INT_NULL,
 	GlDraw: INT_NULL,
 	AllTimersUpdate: INT_NULL,
@@ -636,35 +596,12 @@ const PERFORMANCE_TIMERS_IDXS = {
 	AddToGfxText: INT_NULL,
 	Animations: INT_NULL,
 	Particles: INT_NULL,
+	StaticParticles: INT_NULL,
 	Particles2: INT_NULL,
 	MiscTest1: INT_NULL,
 	MiscTest2: INT_NULL,
 	MiscTest3: INT_NULL,
 	MiscTest4: INT_NULL,
-
-	GetStrName(idx){
-		switch(idx){
-			case this.GameLoop: return 'GameLoop';
-			case this.GlDraw: return 'GlDraw';
-			case this.AllTimersUpdate: return 'AllTimersUpdate';
-			case this.Batch: return 'Batch';
-			case this.Batch2: return 'Batch2';
-			case this.SceneUpdate: return 'SceneUpdate';
-			case this.EventListener: return 'EventListener';
-			case this.HoverListener: return 'HoverListener';
-			case this.MeshInfoTip: return 'MeshInfoTip';
-			case this.FramebufferRendering: return 'FramebufferRendering';
-			case this.AddToGfxRect: return 'AddToGfxRect';
-			case this.AddToGfxText: return 'AddToGfxText';
-			case this.Animations: return 'Animations';
-			case this.Particles: return 'Particles';
-			case this.Particles: return 'Particles2';
-			case this.MiscTest1: return 'MiscTest1';
-			case this.MiscTest2: return 'MiscTest2';
-			case this.MiscTest3: return 'MiscTest3';
-			case this.MiscTest4: return 'MiscTest4';
-		}
-	}
 }
 
 _CNT = 0x1;
@@ -687,86 +624,9 @@ _CNT = 0x1;
 const ROOT_WIDGETS = {
 	NULL: 0x0,
 	CREATE_ROOT: _CNT,
-	// CREATE_BATCH: _CNT <<= 0x1,
 }
 
 
-
-
-
-
-
-
-/*************************************************************************************************/
-//  
-const GFX = {
-	PROG_IDX: 0, 
-	VB_GROUP_IDX: 1,
-	VB_IDX_START: 2,
-
-	SIZE: 2,
-};
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// Commands
-
-_CNT = 0x4;
-const COMMANDS = {
-
-	ID: {
-		MESH_BUFFER_BATCH_DESTROY: _CNT,
-		LISTENERS_BATCH_DESTROY: _CNT <<= 0x1,
-		STYLE_BATCH_DESTROY: _CNT <<= 0x1,
-	}
-};
-
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// 
-const OUT_OF_VIEW = 100000; // Out of screen view in pixels
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-// 
-
-const MAT_ENABLE = {
-	ATTR_VERTEX_COLOR: _CNT++,
-	ATTR_VERTEX_GRADIENT_HORIZONTAL: _CNT++,
-	ATTR_VERTEX_GRADIENT_VERTICAL: _CNT++,
-
-	NONE: 0,
-	LEN: _CNT,
-}
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-//  
 
 
 
@@ -811,27 +671,16 @@ const TEXTURE_TYPE = {
 
 
 // Font textures
-const FONT_CONSOLAS_12px = 'consolas_3';
-const FONT_CONSOLAS_16px = 'consolas_4';
-const FONT_CONSOLAS_20px = 'consolas_5';
-const FONT_CONSOLAS_24px = 'consolas_6';
-const FONT_CONSOLAS_28px = 'consolas_7';
-const FONT_CONSOLAS_32px = 'consolas_8';
-const FONT_CONSOLAS_40px = 'consolas_10';
-const FONT_CONSOLAS_49px = 'consolas_12';
-const FONT_CONSOLAS_58px = 'consolas_14';
-const FONT_CONSOLAS_66px = 'consolas_16';
-const FONT_CONSOLAS_116px = 'consolas_28';
-const FONT_CONSOLAS_157px = 'consolas_38';
 const FONT_CONSOLAS_MTSDF_1024 = 'consolas_mtsdf_1024';
-const FONT_MSDF_COMIC = 'comicz';
-const TEST_FONT_MSDF_ARIAL = 'test_arial_msdf';
+const FONT_COMIC_MTSDF_1024 = 'comicz';
 // Textures Atlases
 const TEXTURE_ATLAS_MSDF_SYMBOLS = 'symbols';
 // Textures
 const TEXTURE_SMOKE1 = 'smoke_1_256';
 const TEXTURE_COIN = 'Coin_1_32';
 const TEXTURE_TEST_APPLE = 'apple_1_64x73';
+// const TEXTURE_SNAKE_BG = 'snake_bg_ai2_1024x1024';
+const TEXTURE_SNAKE_BG = 'snake_bg_cartoon2_474x474';
 // Textures Atlases with variant font sizes
 const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA = 'atlas_variants_consola_1024x1024_8px_scale12_extended_ascii';
 
@@ -861,126 +710,6 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
 
 
 
-// const TEXTURE_PATHS = [
-
-// 	{ // 0
-// 		img_path: 'fonts/consolas_3',
-// 		img_name: FONT_CONSOLAS_12px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 1
-// 		img_path: 'fonts/consolas_4',
-// 		img_name: FONT_CONSOLAS_16px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 2
-// 		img_path: 'fonts/consolas_5',
-// 		img_name: FONT_CONSOLAS_20px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 3
-// 		img_path: 'fonts/consolas_6',
-// 		img_name: FONT_CONSOLAS_24px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 4
-// 		img_path: 'fonts/consolas_7',
-// 		img_name: FONT_CONSOLAS_28px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 5
-// 		img_path: 'fonts/consolas_8',
-// 		img_name: FONT_CONSOLAS_32px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 6
-// 		img_path: 'fonts/consolas_10',
-// 		img_name: FONT_CONSOLAS_40px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 7
-// 		img_path: 'fonts/consolas_12',
-// 		img_name: FONT_CONSOLAS_49px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 8
-// 		img_path: 'fonts/consolas_14',
-// 		img_name: FONT_CONSOLAS_58px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 9
-// 		img_path: 'fonts/consolas_16',
-// 		img_name: FONT_CONSOLAS_66px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 10
-// 		img_path: 'fonts/consolas_28',
-// 		img_name: FONT_CONSOLAS_116px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 11
-// 		img_path: 'fonts/consolas_38',
-// 		img_name: FONT_CONSOLAS_157px,
-// 		img_type: 'bmp',
-// 		metrics: null, 
-// 	},
-// 	{ // 12
-// 		img_path: 'fonts/consolas_mtsdf',
-// 		img_name: FONT_CONSOLAS_MTSDF_1024,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	{ // 13
-// 		img_path: 'fonts/comic_sans_ms',
-// 		img_name: FONT_MSDF_COMIC,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	{ // 14
-// 		img_path: 'fonts/symbol_fonts/test_symbol_fonts',
-// 		img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
-// 		img_type: 'png',
-// 		metrics: null, // We cannot import the metrics file here, so we must set the metrics file in an 'init' function
-// 	},
-// 	/***************************************************************************************************/
-// 	// Textures
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_SMOKE1,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_COIN,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	{
-// 		img_path: 'textures',
-// 		img_name: TEXTURE_TEST_APPLE,
-// 		img_type: 'png',
-// 		metrics: null, 
-// 	},
-// 	// {
-// 	// 	img_path: 'textures',
-// 	// 	img_name: TEXTURE_ATLAS_MSDF_SYMBOLS,
-// 	// 	img_type: 'png',
-// 	// 	metrics: null, 
-// 	// },
-// ];
-
 
 
 
@@ -994,31 +723,13 @@ const ATLAS_TEXTURE_VARIANT_FONT_CONSOLA_SCALES = {
 g_cnt = 0;
 const TEXTURES = {
 
-	// POTENTIAL_BUG: 
-	// IMPORTANT:Font textures MUST precede all other textures
-
-	// Font Textures
-	// CONSOLAS_12px: g_cnt++,
-	// CONSOLAS_16px: g_cnt++,
-	// CONSOLAS_20px: g_cnt++,
-	// CONSOLAS_24px: g_cnt++,
-	// CONSOLAS_28px: g_cnt++,
-	// CONSOLAS_32px: g_cnt++,
-	// CONSOLAS_40px: g_cnt++,
-	// CONSOLAS_49px: g_cnt++,
-	// CONSOLAS_58px: g_cnt++,
-	// CONSOLAS_66px: g_cnt++,
-	// CONSOLAS_116px: g_cnt++,
-	// CONSOLAS_157px: g_cnt++,
-
 	MTSDF_CONSOLAS_1024: g_cnt++, // index:[12]
 	MTSDF_COMIC_1024: g_cnt++,
-	TEST_MSDF_ARIAL: g_cnt++,
 	CONSOLA_VARIANT_FONT: g_cnt++,
 
 	TEXTURE_FONTS_COUNT: g_cnt,
 	
-	MSDF_SYMBOLS:g_cnt++, // index[16]
+	MTSDF_SYMBOLS:g_cnt++, // index[16]
 
 	TEXTURE_ATLASES_COUNT: g_cnt,
 	
@@ -1028,6 +739,7 @@ const TEXTURES = {
 	SMOKE_1:g_cnt++, // g_cnt must be the index of the element in 'TEXTURE_PATHS'. // TODO: Either create the 'TEXTURE_PATHS' element at g_cnt OR set the g_cnt equual to the index this texture represents
 	COIN:g_cnt++, 
 	TEST_APPLE:g_cnt++, 
+	SNAKE_BG:g_cnt++, 
 	
 	COUNT: g_cnt,
 }
@@ -1036,7 +748,7 @@ const TEXTURES = {
 TEXTURES.DEFAULT_FONT = TEXTURES.CONSOLA_VARIANT_FONT;
 
 const ATLASES_SUB_TEXTURES = { // 58 total
-	MSDF_SYMBOLS: {
+	MTSDF_SYMBOLS: {
 		original 	: 0,
 		close_1 		: 1,
 		arrow_left 	: 2,
@@ -1090,10 +802,10 @@ const ATLASES_SUB_TEXTURES = { // 58 total
 		_31: 51,
 		_32: 52,
 		_33: 53,
-		_34: 54,
-		_35: 55,
-		_36: 56,
-		_37: 57,
+		arrow2_left : 54,
+		arrow2_up 	: 55,
+		arrow2_right: 56,
+		arrow2_down : 57,
 	}
 }
 
@@ -1102,8 +814,7 @@ function FONT_IS_MSDF(texture_file_id) {
 	if(
 		texture_file_id === TEXTURES.MTSDF_COMIC_1024 ||
 		texture_file_id === TEXTURES.MTSDF_CONSOLAS_1024 ||
-		// texture_file_id === TEXTURES.TEST_MSDF_ARIAL ||
-		texture_file_id === TEXTURES.MSDF_SYMBOLS
+		texture_file_id === TEXTURES.MTSDF_SYMBOLS
 	) return true;
 
 	return false;
@@ -1224,7 +935,7 @@ const CLBK_ANIMATIONS = {
 // Meshes  
 
 // MESH_TYPE: A bitmask to check if a mesh is of a specific type
-_CNT = 0x1;
+_CNT = 0x1n;
 // MAX cnt is 31 times shifted and the 32nd is valid but a negative number
 // IDEA: Maybe we implement a negative bitfield for another 31 values ???
 // TODO: Not enough space for all types. Re-organize and re-implement
@@ -1232,70 +943,63 @@ const MESH_TYPE = {
 
 	DEBUG_MESH: _CNT,
 
-	GEOMETRY2D: _CNT <<= 1,
-	TEXT_GEOMETRY2D: _CNT <<= 1,
-	GEOMETRY3D: _CNT <<= 1,
-	CUBE_GEOMETRY: _CNT <<= 1,
+	GEOMETRY2D: _CNT <<= 1n,
+	GEOMETRY_LINE: _CNT <<= 1n,
+	TEXT_GEOMETRY2D: _CNT <<= 1n,
+	GEOMETRY3D: _CNT <<= 1n,
+	CUBE_GEOMETRY: _CNT <<= 1n,
 
-	MATERIAL: _CNT <<= 1,
-	FONT_MATERIAL: _CNT <<= 1,
-	ATLAS_TEXTURE_MATERIAL: _CNT <<= 1,
-	TEXTURE_MATERIAL: _CNT <<= 1,
+	MATERIAL: _CNT <<= 1n,
+	FONT_MATERIAL: _CNT <<= 1n,
+	ATLAS_TEXTURE_MATERIAL: _CNT <<= 1n,
+	TEXTURE_MATERIAL: _CNT <<= 1n,
 
-	MESH: _CNT <<= 1,
-	TEXT_MESH: _CNT <<= 1,
-	RECT_MESH: _CNT <<= 1,
-	SECTION_MESH: _CNT <<= 1,
-	SECTION_MESH_ONLY: _CNT <<= 1,
+	MESH: _CNT <<= 1n,
+	TEXT_MESH: _CNT <<= 1n,
+	RECT_MESH: _CNT <<= 1n,
+	SECTION_MESH: _CNT <<= 1n,
+	SECTION_MESH_ONLY: _CNT <<= 1n,
 
-	WIDGET_LABEL: _CNT <<= 1,
-	WIDGET_BUTTON: _CNT <<= 1,
-	WIDGET_SWITCH: _CNT <<= 1,
-	WIDGET_TEXT: _CNT <<= 1,
-	WIDGET_TEXT_DYNAMIC: _CNT <<= 1,
+	WIDGET_LABEL: _CNT <<= 1n,
+	WIDGET_BUTTON: _CNT <<= 1n,
+	WIDGET_TEXT: _CNT <<= 1n,
+	WIDGET_TEXT_DYNAMIC: _CNT <<= 1n,
 
-	WIDGET_SLIDER: _CNT <<= 1,
-	WIDGET_SLIDER_BAR: _CNT <<= 1,
-	WIDGET_SLIDER_HANDLE: _CNT <<= 1,
+	WIDGET_SWITCH: _CNT <<= 1n,
+	WIDGET_SWITCH_HANDLE: _CNT <<= 1n,
 
-	WIDGET_SCROLLER: _CNT <<= 1,
-	WIDGET_SCROLLER_BAR: _CNT <<= 1,
-	WIDGET_SCROLLER_HANDLE: _CNT <<= 1,
+	WIDGET_SLIDER: _CNT <<= 1n,
+	WIDGET_SLIDER_BAR: _CNT <<= 1n,
+	WIDGET_SLIDER_HANDLE: _CNT <<= 1n,
 
-	SCROLLED_SECTION: _CNT <<= 1,
+	WIDGET_SCROLLER: _CNT <<= 1n,
+	WIDGET_SCROLLER_BAR: _CNT <<= 1n,
+	WIDGET_SCROLLER_HANDLE: _CNT <<= 1n,
 
-	WIDGET_POP_UP: _CNT <<= 1,
-	WIDGET_MENU_BAR: _CNT <<= 1,
+	SCROLLED_SECTION: _CNT <<= 1n,
+	
+	WIDGET_DROP_DOWN: _CNT <<= 1n,
+	DROP_DOWN_MENU: _CNT <<= 1n,
+	
+	PARTICLES: _CNT <<= 1n,
 
-	WIDGET_DROP_DOWN: _CNT <<= 1,
-	DROP_DOWN_MENU: _CNT <<= 1,
+	RENAME_ME: _CNT <<= 1n,
+	
+	
+		// WIDGET_POP_UP: _CNT <<= 1n,
+		// WIDGET_MENU_BAR: _CNT <<= 1n,
+	// WIDGET_WINDOW: _CNT <<= 1n,
 
-	WIDGET_WINDOW: _CNT <<= 1,
 
-	PARTICLES: _CNT <<= 1,
+	// SCENE: _CNT <<= 1n,
+	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1n,
+	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1n,
 
-	SCENE: _CNT <<= 1,
-	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
-	// WIDGET_LABEL_TEXT_MESH_MENU_OPTIONS: _CNT <<= 1,
-
+	MAX_BIT:_CNT,
 };
 
-
-
-
-
-
-
-
-
-_CNT = 0;
-const BATCH_FN_IDX = {
-	SET_WPOS4: _CNT++,
-	ADD_WPOS4: _CNT++,
-	SET_POS2: _CNT++,
-	SET_WPOS4_POS2: _CNT++,
-}
-
+console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{ MESH_TYPE }}}}}}}}}}}}}}}}}}}}}}}}}}}', MESH_TYPE);
+if(MESH_TYPE.MAX_BIT===0n) console.error('MESH_TYPE BIT FLAGS OVERFLOW\nValue exceeded int 64');
 
 
 
@@ -1318,34 +1022,6 @@ const PARTICLES = {
 
 }
 
-_CNT = 0;
-const PARTICLES_DIRECTION_CLBK_FN_IDX = {
-	EMISSION: _CNT++,
-	EXPLOSION: _CNT++,
-};
-
-
-
-
-
-
-
-
-/*************************************************************************************************/
-//  Events  
-_CNT = 0x1;
-const LISTENERS_FLAGS = {
-	ANY_HOVER: _CNT <<= 0x1,
-	ANY_CLICK: _CNT <<= 0x1,
-	ANY: _CNT <<= 0x1,
-
-	HOVER: _CNT <<= 0x1,
-	CLICK: _CNT <<= 0x1,
-	ALL: _CNT <<= 0x1,
-
-
-	mask: 0x0, // the variable to sto
-};
 
 
 
@@ -1359,24 +1035,13 @@ const LISTEN_EVENT_TYPES = {
 	HOVER: _CNT <<= 1,
 	CLICK_UP: _CNT <<= 1,
 	MOVE: _CNT <<= 1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+	KEY_PRESS: _CNT <<= 1,
 
 	NULL: _CNT <<= 1,
 
-	GetTypeFromIndex(idx) {
-	}
 };
 
-function Listen_event_types_get_type_from_index(idx) {
 
-	if (idx === LISTEN_EVENT_TYPES_INDEX.HOVER) return LISTEN_EVENT_TYPES.HOVER;
-	if (idx === LISTEN_EVENT_TYPES_INDEX.CLICK) return LISTEN_EVENT_TYPES.CLICK_UP;
-}
-
-function Listen_event_get_idx_from_type(etype) {
-
-	if (etype & LISTEN_EVENT_TYPES.HOVER) return LISTEN_EVENT_TYPES_INDEX.HOVER;
-	if (etype & (LISTEN_EVENT_TYPES.CLICK_UP|LISTEN_EVENT_TYPES.MOVE)) return LISTEN_EVENT_TYPES_INDEX.CLICK;
-}
 
 
 
@@ -1389,26 +1054,23 @@ _CNT = 0;
 const LISTEN_EVENT_TYPES_INDEX = {
 	HOVER: _CNT++, // HOVER event belongs to another class, that is the Listener_Hover class.
 	CLICK: _CNT++,
+	KEY_PRESS: _CNT++,
 	// MOVE event registers with the CLICK event, no need to create new event in the ListeEvents buffer.
 	SIZE: _CNT,
 };
 
 
 
+
+
+
+
 const E = {
 	H: LISTEN_EVENT_TYPES_INDEX.HOVER,
 	C: LISTEN_EVENT_TYPES_INDEX.CLICK,
+	K: LISTEN_EVENT_TYPES_INDEX.KEY_PRESS,
 }
 
-
-
-
-function Listeners_get_event_type_string(event_type_idx) {
-	switch (event_type_idx) {
-		case E.H: return 'Hover';
-		case E.C: return 'Click';
-	}
-}
 
 
 
@@ -1424,6 +1086,8 @@ const EVENT_HANDLER_TYPE = {
 	MOUSE_CLICK_UP: _CNT <<= 0x1,
 	MOUSE_HOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
 	MOUSE_UNHOVER: _CNT <<= 0x1, // MOVE event registers with the CLICK event, no need to create new event in the ListenEvents buffer
+
+	KEY_PRESS: _CNT <<= 0x1, // Keyboard events
 
 };
 
@@ -1441,7 +1105,6 @@ const INFO_LISTEN_EVENT_TYPE = {
 	UI_INFO_FOCUSED: _CNT <<= 0x1,
 
 	LISTENERS: _CNT <<= 0x1,
-	MOUSE: _CNT <<= 0x1,
 	MOUSE: _CNT <<= 0x1,
 
 }
@@ -1532,101 +1195,7 @@ const DEBUG = {
 
 
 
-const DEBUG_INFO = {
 
-	UI_STATS: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_TIMERS: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_MOUSE: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [0, 0, 10]
-	},
-	UI_GFX: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [400, 300, 10]
-	},
-	UI_MESH: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_FOCUSED: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_BATCH: {
-		IS_ON: false,
-		IDX: INT_NULL,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [530, 50, 10]
-	},
-	UI_VB_2D: {
-		IS_ON: false,
-		ROOT_IDX: INT_NULL,
-		MESH_BUFFER_IDX: INT_NULL,
-		POS: [340, 100, 10]
-	},
-
-	Reset(){
-		this.UI_STATS.IS_ON = false;
-		this.UI_STATS.IDX = INT_NULL,
-		this.UI_STATS.MESH_BUFFER_IDX = INT_NULL;
-		this.UI_STATS.POS = [0, 0, 10];
-		
-		this.UI_TIMERS.IS_ON = false;
-		this.UI_TIMERS.IDX = INT_NULL;
-		this.UI_TIMERS.MESH_BUFFER_IDX = INT_NULL;
-		this.UI_TIMERS.POS = [0, 0, 10];
-
-		this.UI_MOUSE.IS_ON = false
-		this.UI_MOUSE.IDX = INT_NULL
-		this.UI_MOUSE.MESH_BUFFER_IDX = INT_NULL
-		this.UI_MOUSE.POS = [0, 0, 10];
-
-		this.UI_GFX.IS_ON = false
-		this.UI_GFX.ROOT_IDX = INT_NULL
-		this.UI_GFX.MESH_BUFFER_IDX = INT_NULL
-		this.UI_GFX.POS = [400, 300, 10];
-		
-		this.UI_MESH.IS_ON = false
-		this.UI_MESH.ROOT_IDX = INT_NULL
-		this.UI_MESH.MESH_BUFFER_IDX = INT_NULL
-		this.UI_MESH.POS = [530, 50, 10]
-		
-		this.UI_FOCUSED.IS_ON = false
-		this.UI_FOCUSED.ROOT_IDX = INT_NULL
-		this.UI_FOCUSED.MESH_BUFFER_IDX = INT_NULL
-		this.UI_FOCUSED.POS = [530, 50, 10]
-		
-		this.UI_BATCH.IS_ON = false
-		this.UI_BATCH.IDX = INT_NULL
-		this.UI_BATCH.ROOT_IDX = INT_NULL
-		this.UI_BATCH.MESH_BUFFER_IDX = INT_NULL
-		this.UI_BATCH.POS = [530, 50, 10]
-		
-		this.UI_VB_2D.IS_ON = false
-		this.UI_VB_2D.ROOT_IDX = INT_NULL
-		this.UI_VB_2D.MESH_BUFFER_IDX = INT_NULL
-		this.UI_VB_2D.POS = [340, 100, 10]
-	}
-};
 
 
 
@@ -1654,10 +1223,6 @@ function ERROR_NULL(obj) {
 
 _CNT = 0;
 const STYLES = { // Default access indices for style arrays
-	// MARG: _CNT++,
-	// PAD: _CNT++,
-	// HOVER_MARG: _CNT++,
-
 	AXIS: {
 		ALL: 0,
 		X: 1,
@@ -1674,37 +1239,7 @@ const STYLES = { // Default access indices for style arrays
 
 /***********************************************************************************************************************************************/
 // Some global values for debug info ui display information'
-const DEBUG_INFO_STRUCTS = {
 
-	BUFFER: {
-		GENERIC: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
-			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		CHARACTER: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
-			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT8: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT16: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-		INT32: {
-			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
-			TOTAL_BUFFER_SIZE: 0,
-			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
-		},
-
-	},
-};
 
 
 
@@ -1715,6 +1250,7 @@ const DEBUG_INFO_STRUCTS = {
 
 /***********************************************************************************************************************************************/
 // INPUT - KEYBOARD
+const INPUT_KEYCODE_SPACE_BAR = 32;
 const INPUT_KEYCODE_LEFT = 37;
 const INPUT_KEYCODE_UP = 38;
 const INPUT_KEYCODE_RIGHT = 39;
@@ -1730,17 +1266,16 @@ const INPUT_KEYCODE_PAUSE = 80;
 
 
 
-/***********************************************************************************************************************************************/
-// TEMPORARY
-const TEMP_TEST_PERFORMANE_COUNTERS = {
 
-	MESH_INFO_UI: {
-		COUNT: 0,
-		MOVE: 0,
-		BATCH_STORE: 0,
-		BATCH_UPDATE: 0,
-	},
-	FRAMEBUFFER: 0,
-	MISC: null,
-	MISC_IDX: INT_NULL,
+
+
+/***********************************************************************************************************************************************/
+// GLOBAL-TEMP
+
+const GLOB_TEMP = {
+	visual_debug: null,
 };
+
+
+
+

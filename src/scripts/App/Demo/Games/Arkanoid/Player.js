@@ -1,15 +1,15 @@
 "use strict";
 
 import { Callback_animations_create } from "../../../../Engine/Animations/CallbackAnimations.js";
-import { Create_rect_mesh } from "../../../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
-import { View_add_to_group } from "../../../../Engine/Core/Views/MeshBufferViews.js";
+import { Create_rect_mesh } from "../../../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Mesh_unif_hack_parent_root_wpos } from "../../../../Engine/Core/MeshUniformsBuffer.js";
 import { Effect_explosion_circle_get_mesh_byidx, Effect_explosion_circle_remove_mesh_byidx, Effects_create_explosion_circle } from "../../../../Engine/Drawables/Effects/Effects.js";
-import { BLUEL } from "../../../../Engine/Drawables/Material/Base/Colors.js";
-import { Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { BLUEL } from "../../../../Engine/Drawables/Material/Colors.js";
+import { Mesh_update_set_dim_x } from "../../../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
 import { Gl_set_alpha, Gl_set_attr_round_corners, Gl_set_dim_x, Gl_set_generic2, Gl_set_time, Gl_set_wpos_x, Gl_set_wpos_xy } from "../../../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Linear_interpolation, Logarithmic_interpolation } from "../../../../Helpers/Math/MathFunctions.js";
-import { Widget_gfx_ready_enable } from "../../../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Widget_render } from "../../../../Engine/Drawables/Widgets/Helpers/WidgetRender.js";
 
 
 
@@ -35,21 +35,24 @@ export function Player_get_pad() { return PLAYER_PAD; }
 /** */
 export class Player {
 
-   constructor(x, y) {
+   constructor(x, y, groupidx, parent) {
 
       const posx = x;
       const posy = y;
 
-      const mesh = Create_rect_mesh(Style_rect_default_properties({pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
+      // const mesh = Create_rect_mesh(Style_rect_default_properties({is_root:ROOT_WIDGETS.CREATE_ROOT, pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
+      const mesh = Create_rect_mesh(Style_rect_default_properties({ pos:[posx, posy, 1], dim:[PLAYER_DIM_X, PLAYER_DIM_Y], col:BLUEL[9], name:'Player',}));
       Widget_gfx_ready_enable({mesh:mesh, enable_sdf_rect:10, });
 
-      mesh.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE, _);
+      // Must be set before GenGfxCtx call
+      mesh.parent = parent; // HACK: Adding parent on the fly! mainly for picking the same rendergroup for all balls
 
-      mesh.Render();
-      mesh.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, mesh.gfx.vb.groupidx);
+      mesh.SetViewGroupIndex(groupidx);
+      mesh.GfxCtxSetFlag(GFX_CTX_FLAGS.PRIVATE|GFX_CTX_FLAGS.FROM_ROOT_WIDGET);
+      mesh.GenGfxCtx();
+      Widget_render(mesh);
 
       this.in_scale_animation = false;
-
       this.mesh = mesh;
 
       _player = this;
@@ -57,14 +60,12 @@ export class Player {
    }
 }
 /** */
-export function Player_init(x, y, group_idx = INT_NULL, parent_root_posidx = INT_NULL, parent_mesh_bufferidx) {
+export function Player_init(x, y, group_idx = INT_NULL, parent = null) {
 
 
-   const player = new Player(x, y, group_idx);
-   // Add to View Group
-   View_add_to_group(player.mesh, group_idx);
+   const player = new Player(x, y, group_idx, parent);
    // Implement to draw wpos from a root uniform wpos 
-   if (parent_root_posidx !== INT_NULL) Mesh_unif_hack_parent_root_wpos(player.mesh.root_posidx, parent_root_posidx, parent_mesh_bufferidx);
+   if (parent !== null) Mesh_unif_hack_parent_root_wpos(player.mesh.gfx.vb.render_groupidx, parent.root_posidx, parent.mesh_bufferidx);
 
    return player;
 }
@@ -130,7 +131,7 @@ export function Player_create_animation_scale() {
    const glow_scalex = 1.;
    const glow_scaley = 2.2;
    const ring_diameter = .0, intensity = .2
-   const glow_fx_idx = Effects_create_explosion_circle(x, y, w * glow_scalex, h * glow_scaley, w, h, TRANSPARENCY(BLUEL[9], 0), ring_diameter, intensity);
+   const glow_fx_idx = Effects_create_explosion_circle(x, y, w * glow_scalex, h * glow_scaley, w, h, TRANSPARENCY(BLUEL[9], 0), ring_diameter, intensity, false);
    const glow_fx = Effect_explosion_circle_get_mesh_byidx(glow_fx_idx);
 
 
@@ -175,9 +176,9 @@ function Player_animation_scale_up_run(params) {
 
    // Update player x dir scale
    const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
+   
    player.geom.dim[0] = sizex;
-
-   player.geom.SetDimX(player.gfx, sizex,);
+   Mesh_update_set_dim_x(player);
    Gl_set_dim_x(player.gfx, sizex,);
    Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
 
@@ -186,9 +187,9 @@ function Player_animation_scale_up_run(params) {
       const glow_fx = params.glow_fx.mesh;
       const glow_current_dimx = params.glow_current_dimx;
       const glow_sizex = glow_current_dimx + (glow_current_dimx * slope * params.glow_scalex);
+      
       glow_fx.geom.dim[0] = glow_sizex;
-
-      glow_fx.geom.SetDimX(glow_fx.gfx, glow_sizex,);
+      Mesh_update_set_dim_x(glow_fx);
       Gl_set_dim_x(glow_fx.gfx, glow_sizex,);
 
       glow_fx.geom.pos[0] = player.geom.pos[0] + player.geom.dim[0];
@@ -238,9 +239,9 @@ function Player_animation_scale_down_run(params) {
 
    // Update coin glow position
    const sizex = player_current_dimx + (player_initial_dimx * scale_factor);
+   
    player.geom.dim[0] = sizex;
-
-   player.geom.SetDimX(player.gfx, sizex,);
+   Mesh_update_set_dim_x(player);
    Gl_set_dim_x(player.gfx, sizex,);
    Gl_set_attr_round_corners(player.gfx, player.mat.style.rcorners + scale_factor);
 

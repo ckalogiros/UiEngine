@@ -1,8 +1,9 @@
 "use strict";
 import { Shaders_load } from './GlShaders.js';
-import { Uniforms_block_buffer_create, Uniforms_buffer_set_uniform } from './Buffers/UniformBuffers.js';
+import { Uniforms_block_create_shared_uniform, Uniforms_buffer_set_uniform } from './Buffers/UniformBuffers.js';
 import { New_generic_buffer, New_int8_buffer } from '../Engine/Core/Buffers.js';
 import { Shader_attributes_get_attrib_offset_by_nameid, Shader_attributes_get_attribs, Shader_attributes_get_attribs_per_vertex } from './ShaderAttributes.js';
+import { Sid_check_match } from '../GlobalFunctions.js';
 
 
 
@@ -42,7 +43,7 @@ export function Progarm_get_program(progidx) {
 
 
 
-export function Progarm_get_webgl_program_object(progidx) {
+export function Program_get_webgl_program_object(progidx) {
 	if (!DISABLE_DEBUG) DEBUG_PRINT(_programs, progidx, new Error().lineNumber)
 	return _programs.buffer[progidx].shader_program;
 }
@@ -100,7 +101,7 @@ export function Program_program_exists_from_sid(sid) {
 
 	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
 	for (let i = 0; i <= _programs.boundary; i++)
-		if (SID.CheckSidMatch(sid, _programs.buffer[i].sid)) return i;
+		if (Sid_check_match(sid, _programs.buffer[i].sid)) return i;
 
 	return INT_NULL;
 }
@@ -118,18 +119,6 @@ export function Program_program_exists_from_index(progidx) {
 
 
 
-/** Returns 'INT_NULL': if program does NOT exist AND 'progidx':if program exists. */
-export function Program_fx_program_exists_from_sid(sid) {
-
-	if (ERROR_NULL(_programs) || ERROR_NULL(_programs.buffer)) return INT_NULL
-	for (let i = 0; i <= _programs.boundary; i++)
-		if (sid.fx === _programs.buffer[i].sid.fx) return i;
-
-	return INT_NULL;
-}
-
-
-
 
 function Create_program(sid, uniforms, shader_ops_idxs) {
 
@@ -139,27 +128,16 @@ function Create_program(sid, uniforms, shader_ops_idxs) {
 	const progidx = _programs.Add(prog);
 	prog.idx = progidx; // Store the programs index to self
 
-	// console.log('Program:', progidx, '_shader_operations index:', prog.shader_ops)
-
-
-	/****************************************************************************************************/
+	
+	
+	// /****************************************************************************************************/
 	// Shared-Block uniforms
-	const ubb_idx = Uniforms_block_buffer_create(sid.unif, prog.shader_program, uniforms);
-	// prog.ubbidx.Add(ub_idx);
-
-
-	/****************************************************************************************************/
-	// Individual uniforms
-	// const len = uniforms.length;
-	// for (let i = 0; i < len; i++) {
-	// 	if ((uniforms[i].shader & UNIFORM.IS_SHARED) === 0){
-
-	// 		const ubidx = Uniforms_buffer_create_uniform(gfxCtx.gl, prog.shader_program, uniforms[i].type, uniforms[i].name, progidx);
-	// 		prog.ubidxs.Add(ubidx);
-	// 		// TEMP_UNIFORM_BUFFER_INDEXES.U_WPOS = ubidx;
-	// 	}
-	// }
-
+	const ubb_idx = Uniforms_block_create_shared_uniform(sid.unif, prog.shader_program, uniforms);
+	
+	// Program_create_shared_uniform(prog.shader_program);
+	
+	
+	// console.log('Program:', progidx, '_shader_operations index:', prog.shader_ops)
 	return progidx;
 
 }
@@ -179,6 +157,27 @@ export function Program_create_program(sid, uniforms, shader_ops_idxs) {
 
 	return progidx;
 }
+
+// function Program_create_shared_uniform(shader_program,) {
+//
+// 	// Uniforms_block_create_shared_uniform(sid.unif, prog.shader_program, uniforms);
+// 	const uniforms = [
+// 		{
+// 			name:'u_projection',
+// 			type:UNIF_TYPE.MAT4,
+// 			shader:UNIFORM.IS_SHARED,
+// 		},
+// 		{
+// 			name:'u_screen_res',
+// 			type:UNIF_TYPE.FVEC2,
+// 			shader:UNIFORM.IS_SHARED,
+// 		},
+// 	];
+//
+// 	const sid_unif = SID.UNIF.PROJECTION_MATRIX | SID.UNIF.SCREEN_RESOLUTION;
+//
+// 	Uniforms_block_create_shared_uniform(sid_unif, shader_program, uniforms);
+// }
 
 
 
@@ -263,7 +262,7 @@ class Gl_Program {
 
 	// Check id sid matches with the program's sid.
 	CheckSidMatch(sid) {
-		return SID.CheckSidMatch(sid, this.sid);
+		return Sid_check_match(sid, this.sid);
 	}
 
 
@@ -294,7 +293,7 @@ class Gl_Program {
 
 
 
-// export function Program_sinitialize_blend_mode_ubidx(progidx, blend_mode) {
+// export function Program_initialize_blend_mode_ubidx(progidx, blend_mode) {
 // 	const prog = _programs.buffer[progidx];
 // 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
 // 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
@@ -304,8 +303,8 @@ class Gl_Program {
 // 	if(prog.blend_mode_ubidx === INT_NULL) alert('Trying to update blend_mode uniform, but the uniform hasn\'t been initialized in the program');
 // 	Uniforms_buffer_set_uniform(prog.blend_mode_ubidx, blend_mode);
 // }
-/** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access throug Program */
-export function Program_stgore_blend_mode_ubidx(progidx, ubidx) {
+/** Needed to store the ubidx of the uniform 'u_blend_mode' for quick access through Program */
+export function Program_store_blend_mode_ubidx(progidx, ubidx) {
 	const prog = _programs.buffer[progidx];
 	prog.blend_mode_ubidx = ubidx;
 }
@@ -431,7 +430,7 @@ export function Program_store_shader_operations(function_operation, blend_mode) 
 		// 'fn_op' Type of: 'SID.SHADER_OPERATIONS.'
 		// 'blend_mode' Type of: 'SID.BLEND_OPTIONS.'
 		const idx = _shader_operations.Add({ fn_op: function_operation, blend_mode: blend_mode });
-		console.log('_shader_operations:', idx, 'fn_op:', function_operation)
+		// console.log('----- _shader_operations:', idx, 'fn_op:', TEMP_Shader_operation_get_name_by_id(function_operation))
 		return idx; // Caller must store the index and send it back from MeshGfxContext.js to provide all necessary shader function operations for the shader program
 	}
 }

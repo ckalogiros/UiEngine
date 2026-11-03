@@ -1,8 +1,9 @@
 "use strict";
 
-import { Mesh_buffer_get, Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
-import { View_get_view_byidx } from "../../Core/Views/MeshBufferViews.js";
-import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
+import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
+import { View_get_group } from "../../Core/Views/MeshBufferViews.js";
+import { Mesh_get_real_pos_x, Mesh_get_real_pos_y } from "./MeshAttributesFunctions.js";
+import { Mesh_get_name, Mesh_listener_remove, Mesh_state_check } from "./MeshPropertiesFunctions.js";
 
 
 
@@ -11,13 +12,13 @@ import { Listener_remove_event_by_idx } from "../../Events/EventListeners.js";
 
 
 
-
+/** */
 export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
    const limit = (clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i<=group.vb.boundary; i++){
    
@@ -36,7 +37,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
          }
          else{
             
-            const right  = mesh.GetPosX() + mesh.geom.defDim[0]*2;
+            const right  = Mesh_get_real_pos_x(mesh) + mesh.geom.defDim[0]*2;
             const reduce = (right) - limit.right;
             alert('CORRECT THIS:\nmesh.geom.pos[0] + mesh.geom.defDim[0]\n At Clip.js')
             // TODO: Also check all 'mesh.geom.pos'
@@ -48,7 +49,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
                mesh.geom.dim[0] -= reduce/2;
                mesh.geom.pos[0] -= reduce/2;
                
-               mesh.state.mask |= MESH_STATE.CLIPED_X;
+               mesh.state.mask |= MESH_STATE_FLAGS.CLIPED_X;
 
                changes_hapened = true;
    
@@ -65,7 +66,7 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
                   mesh.geom.dim[0] = mesh.geom.defDim[0];
                }
 
-               mesh.state.mask &= ~MESH_STATE.CLIPED_X;
+               mesh.state.mask &= ~MESH_STATE_FLAGS.CLIPED_X;
                changes_hapened = true;
             }
          }
@@ -75,15 +76,13 @@ export function Clampx_from_group(group_bufferidx=null, clip_left=null, clip_rig
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_right=null) {
 
    let changes_hapened = false;
    const limit = (clip_left && clip_right) ? { left: clip_left, right: clip_right, } : { left: TEST_CLIP_LEFT, right: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i <= group.vb.boundary; i++){
    
@@ -91,25 +90,25 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
       for(let j=1; j<=meshshes_idx.boundary; j++){
          
          const mesh    = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-         const left    = mesh.GetPosX();
+         const left    = Mesh_get_real_pos_x(mesh);
          const right   = left + mesh.geom.dim[0]*2;
    
          if(left > limit.right){
 
-            if(mesh.state.mask & MESH_STATE.ACTIVE){
+            if(mesh.state.mask & MESH_STATE_FLAGS.ACTIVE){
 
-               mesh.StateDisable(MESH_STATE.ACTIVE);
-               mesh.StateEnable(MESH_STATE.CLIPED_X);
+               mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
+               mesh.StateEnable(MESH_STATE_FLAGS.CLIPED_X);
                changes_hapened = true;
-               mesh.RemoveAllListenEvents();
+               Mesh_listener_remove(mesh);
             }
          }
          else{
             
-            if(mesh.state.mask & MESH_STATE.CLIPED_X){
+            if(mesh.state.mask & MESH_STATE_FLAGS.CLIPED_X){
                
-               mesh.StateEnable(MESH_STATE.ACTIVE);
-               mesh.StateDisable(MESH_STATE.CLIPED_Y);
+               mesh.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+               mesh.StateDisable(MESH_STATE_FLAGS.CLIPED_Y);
                changes_hapened = true;
             }
          }
@@ -119,15 +118,13 @@ export function Clipx_from_group(group_bufferidx=null, clip_left=null, clip_righ
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
    let changes_hapened = false;
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
    
    for(let i=0; i <= group.vb.boundary; i++){
       
@@ -135,31 +132,29 @@ export function Clipy_from_group(group_bufferidx=null, clip_top=null, clip_botto
    
       // TODO: boundary is 1 more than it should (and active_count)
       for(let j=0; j <= meshshes_idx.boundary; j++){
-const mb = Mesh_buffer_get();
-   const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-if(mesh === _)
-   console.log('j', j, 'view', meshshes_idx, 'mesh_buffer', mb)
-         const top      = mesh.GetPosY();
+         // const mb = Mesh_buffer_get();
+         const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
+         const top      = Mesh_get_real_pos_y(mesh);
          const bottom   = top + mesh.geom.dim[1]*2;
 
    
          if(bottom < limit.up || top > limit.down){
 
-            if(mesh.state.mask & MESH_STATE.ACTIVE){
+            if(mesh.state.mask & MESH_STATE_FLAGS.ACTIVE){
 
-               mesh.StateDisable(MESH_STATE.ACTIVE);
-               mesh.StateEnable(MESH_STATE.CLIPED_Y);
+               mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
+               mesh.StateEnable(MESH_STATE_FLAGS.CLIPED_Y);
                changes_hapened = true;
-               mesh.RemoveAllListenEvents();
+               Mesh_listener_remove(mesh);
             }
          }
          else{
             
-            if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+            if(mesh.state.mask & MESH_STATE_FLAGS.CLIPED_Y)
             {
                
-               mesh.StateEnable(MESH_STATE.ACTIVE);
-               mesh.StateDisable(MESH_STATE.CLIPED_Y);
+               mesh.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+               mesh.StateDisable(MESH_STATE_FLAGS.CLIPED_Y);
                changes_hapened = true;
             }
          }
@@ -171,386 +166,15 @@ if(mesh === _)
 
    return changes_hapened;
 }
-
-
-function TEMP_init(group){
-
-   temp.prev_top_out = []
-   temp.prev_top_in = []
-   temp.prev_bot_out = []
-   temp.prev_bot_in = []
-   for(let i=0; i <= group.vb.boundary; i++){
-      
-      const meshshes_idx = group.vb.buffer[i].data;
-      temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
-      temp.prev_top_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[1])
-      // temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
-      // temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[2])
-      // temp.prev_top_out[i] = null;
-      // temp.prev_top_in[i] = Mesh_buffer_get_mesh_byidx(1+i)
-      temp.prev_bot_in[i] = Mesh_buffer_get_mesh_byidx(7+i)
-      temp.prev_bot_out[i] = Mesh_buffer_get_mesh_byidx(9+i)
-
-      // console.log(temp.prev_top_in[i].GetName(), temp.prev_top_out[i].GetName())
-      // console.log(temp.prev_bot_in[i].GetName(), temp.prev_bot_out[i].GetName())
-   }
-}
-const temp = {
-   prev_top_out: null,
-   prev_top_in: null,
-   prev_bot_out: null,
-   prev_bot_in: null,
-} 
-export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null, dir_down) {
-
-
-   
-   let changes_hapened = false;
-   const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
-   
-   const group = View_get_view_byidx(group_bufferidx);
-   // console.log('========================')
-   
-   if(!temp.prev_bot_out && !temp.prev_top_out && !temp.prev_bot_in && !temp.prev_top_in) TEMP_init(group);
-
-   let c = 0;
-   for(let i=0; i <= group.vb.boundary; i++){
-      
-      if(dir_down){
-         
-         let prev_top_in = temp.prev_top_in[i];
-         
-         let cur = prev_top_in;
-         let pos_top = cur.GetPosY()
-         let pos_bot = pos_top + cur.geom.dim[1]*2
-         
-         
-         let mesh_cnt = cur.group_bufferidxs[2];
-         
-         // Check Top Clip
-         if(pos_bot < limit.up){
-            
-            cur.StateDisable(MESH_STATE.ACTIVE);
-            cur.StateEnable(MESH_STATE.CLIPED_Y);
-            changes_hapened = true;
-            
-            temp.prev_top_out[i] = cur;
-            
-            mesh_cnt++;
-            const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-            cur = Mesh_buffer_get_mesh_byidx(meshidx)
-            
-            temp.prev_top_in[i] = cur;
-         }
-
-         cur = temp.prev_bot_out[i];
-         pos_top = cur.GetPosY()
-         // pos_bot = pos_top + cur.geom.dim[1]*2
-         if(pos_top < limit.down){
-            
-            cur.StateEnable(MESH_STATE.ACTIVE);
-            cur.StateDisable(MESH_STATE.CLIPED_Y);
-            changes_hapened = true;
-            
-            temp.prev_bot_in[i] = cur;
-            
-            mesh_cnt = cur.group_bufferidxs[2]+1;
-            const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-            cur = Mesh_buffer_get_mesh_byidx(meshidx)
-            // pos_top = cur.GetPosY();
-            
-            temp.prev_bot_out[i] = cur;
-            // if(i===1){
-            //    console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-            // }
-   
-         }
-      }
-      // if(prev_pos_top > limit.up){
-         
-      //    cur.StateEnable(MESH_STATE.ACTIVE);
-      //    cur.StateDisable(MESH_STATE.CLIPED_Y);
-      //    changes_hapened = true;
-         
-      //    temp.prev_top_in[i] = cur;
-         
-      //    mesh_cnt--;
-      //    if(mesh_cnt===INT_NULL) break;
-      //    const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-      //    cur = Mesh_buffer_get_mesh_byidx(meshidx)
-      //    prev_pos_top = cur.GetPosY();
-         
-      //    temp.prev_top_out[i] = cur;
-      //    // if(i===1){
-      //    //    console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-      //    // }
-
-      // }
-
-
-
-
-
-     
-   }
-
-
-   return changes_hapened;
-}
-// export function TEMP_Clipy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
-
-
-   
-//    let changes_hapened = false;
-//    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
-   
-//    const group = View_get_view_byidx(group_bufferidx);
-//    // console.log('========================')
-   
-//    if(!temp.prev_bot_out || !temp.prev_top_out || !temp.prev_bot_in || !temp.prev_top_in) TEMP_init(group);
-
-//    let c = 0;
-//    for(let i=0; i <= group.vb.boundary; i++){
-      
-      
-//       let prev_top_out = temp.prev_top_out[i];
-//       let prev_top_in = temp.prev_top_in[i];
-//       // let cur = temp.prev_top[i];
-
-//       let cur = prev_top_in;
-//       let prev_pos_top = cur.GetPosY()
-//       let prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
-      
-      
-//       let mesh_cnt = cur.group_bufferidxs[2];
-      
-//       // Check Top Clip
-//       if(prev_pos_bot < limit.up){
-         
-//          while(prev_pos_bot < limit.up){
-
-//             cur.StateDisable(MESH_STATE.ACTIVE);
-//             cur.StateEnable(MESH_STATE.CLIPED_Y);
-//             changes_hapened = true;
-            
-//             mesh_cnt++;
-//             const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//             if(meshidx === INT_NULL) 
-//                break;
-//             cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//             prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
-            
-//             c++
-//          }
-//          if(i===1){
-//             // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-//          }
-
-//          temp.prev_top_out[i] = cur;
-//          // console.log(cur.GetName(), cur.state.mask & MESH_STATE.CLIPED_Y)
-//       }
-//       else if(prev_pos_bot > limit.up){
-
-//          // const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//          // cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//          // while(prev_pos_bot > limit.up && (cur.state.mask & MESH_STATE.CLIPED_Y)===0){
-//          while(prev_pos_bot > limit.up){
-
-//             cur.StateEnable(MESH_STATE.ACTIVE);
-//             cur.StateDisable(MESH_STATE.CLIPED_Y);
-//             changes_hapened = true;
-            
-//             mesh_cnt--;
-//             if(mesh_cnt <= 0) 
-//                break;
-//             const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//             cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//             prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
-            
-//             c++
-//          }
-//          if(i===1){
-//             console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-//          }
-
-//          temp.prev_top_in[i] = cur;
-//       }
-
-
-//       // Run for activating 
-            
-//       let prev_bot_out = temp.prev_bot_out[i];
-//       let prev_bot_in = temp.prev_bot_in[i];
-//       cur = prev_top_in;
-//       // cur = prev_bot_out;
-//       prev_pos_top = cur.GetPosY()
-//       prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
-//       // if(prev_pos_bot < limit.down ){
-//       //    c=0         
-//       //    // while(prev_pos_bot > limit.up){
-//       //    while(prev_pos_bot < limit.down){
-
-//       //       cur.StateEnable(MESH_STATE.ACTIVE);
-//       //       cur.StateDisable(MESH_STATE.CLIPED_Y);
-//       //       changes_hapened = true;
-            
-//       //       mesh_cnt++;
-//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//       //       if(meshidx === INT_NULL) 
-//       //          break;
-//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
-//       //       // console.log(prev_pos_bot, limit.down)
-            
-//       //       c++
-//       //    }
-//       //    if(i===1){
-//       //       // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-//       //    }
-
-//       //    temp.prev_top_in[i] = cur;
-
-//       // }
-//       // else if(prev_pos_bot > limit.down ){
-//       //    c=0         
-//       //    while(prev_pos_bot > limit.down){
-
-//       //       cur.StateDisable(MESH_STATE.ACTIVE);
-//       //       cur.StateEnable(MESH_STATE.CLIPED_Y);
-//       //       changes_hapened = true;
-            
-//       //       mesh_cnt--;
-//       //       if(mesh_cnt < 1) // TODO: less than the top last in
-//       //          break;
-//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//       //       if(meshidx === INT_NULL) 
-//       //          break;
-//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2;
-            
-//       //       c++
-//       //    }
-//       //    if(i===1){
-//       //       // console.log(c, cur.mat.text, 'prevtop = ', cur.GetName())
-//       //    }
-
-//       //    temp.prev_top_out[i] = cur;
-
-//       // }
-
-
-
-
-//       //////////////////////////////////////////////////////////////////////
-
-//       // let prev_bot_out = temp.prev_top_out[i];
-//       // let prev_bot_in = temp.prev_top_in[i];
-//       // cur = prev_bot_out;
-//       // prev_pos_top = cur.GetPosY()
-//       // prev_pos_bot = prev_pos_top + cur.geom.dim[1]*2
-//       // if(prev_pos_top < limit.up){
-         
-//       //    while(cur && cur!==undefined && prev_pos_bot > limit.up){
-            
-//       //       cur.StateDisable(MESH_STATE.ACTIVE);
-//       //       cur.StateEnable(MESH_STATE.CLIPED_Y);
-//       //       changes_hapened = true;
-            
-//       //       prev_pos_bot = cur.GetPosY() + cur.geom.dim[1]*2
-//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt++];
-//       //       if(meshidx === INT_NULL) 
-//       //          break;
-//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
-//       //    }
-//       // }
-
-//       // cur = temp.prev_bot[i];
-//       // let bot_pos_top = temp.prev_bot[i].GetPosY()
-//       // let bot_pos_bot = bot_pos_top + cur.geom.dim[1]*2
-//       // mesh_cnt = cur.group_bufferidxs[2];
-      
-//       // if(bot_pos_bot < limit.down){
-         
-//       //    // while(cur && cur!==undefined && bot_pos_top < limit.down){
-//       //    while(bot_pos_top < limit.down){
-            
-//       //       cur.StateEnable(MESH_STATE.ACTIVE);
-//       //       cur.StateDisable(MESH_STATE.CLIPED_Y);
-//       //       changes_hapened = true;
-            
-//       //       bot_pos_top = cur.GetPosY()
-//       //       mesh_cnt++;
-//       //       const meshidx = group.vb.buffer[i].data.buffer[mesh_cnt];
-//       //       // console.log(meshidx)
-//       //       if(meshidx === INT_NULL) 
-//       //          break;
-//       //       cur = Mesh_buffer_get_mesh_byidx(meshidx)
-
-//       //       c++
-//       //    }
-         
-//       //    if(i===1)
-//       //       console.log(c, cur.mat.text)
-
-//       //    // temp.prev_bot[i] = cur;
-//       // }
-      
-      
-//       // const meshshes_idx = group.vb.buffer[i].data;
-//       // const root_group_mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[0]);
-//       // const root_wposy = root_group_mesh.GetPosY(); // Get the root wpos from each vb root mesh, no need to get the root wpos for every group mesh.
-   
-//       // for(let j=0; j <= meshshes_idx.boundary; j++){
-         
-//       //    const mesh     = Mesh_buffer_get_mesh_byidx(meshshes_idx.buffer[j]);
-//       //    const top      = root_wposy + mesh.geom.pos[1];
-//       //    const bottom   = top + mesh.geom.dim[1]*2;
-
-   
-//       //    if(bottom < limit.up || top > limit.down){
-
-//       //       // if(mesh.state.mask & MESH_STATE.ACTIVE && (mesh.state.mask & MESH_STATE.CLIPED_Y)===0){
-//       //       if(mesh.state.mask & MESH_STATE.ACTIVE){
-
-//       //          // mesh.state.mask &= ~MESH_STATE.ACTIVE;
-//       //          // mesh.state.mask |= MESH_STATE.CLIPED_Y;
-//       //          mesh.StateDisable(MESH_STATE.ACTIVE);
-//       //          mesh.StateEnable(MESH_STATE.CLIPED_Y);
-//       //          changes_hapened = true;
-//       //       }
-//       //    }
-//       //    else{
-            
-//       //       // if(mesh.state.mask & MESH_STATE.CLIPED_Y)
-//       //       {
-            
-//       //          // mesh.state.mask |= MESH_STATE.ACTIVE;
-//       //          // mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
-//       //          mesh.StateEnable(MESH_STATE.ACTIVE);
-//       //          mesh.StateDisable(MESH_STATE.CLIPED_Y);
-//       //          changes_hapened = true;
-//       //       }
-//       //    }
-
-//       // }
-
-//    }
-
-
-//    return changes_hapened;
-// }
-
-export var temp_info = []
-
+/** */
 export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
-   // temp_info = []
-   if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
+   // if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
 
    let changes_hapened = false;
    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
 
 
-   const top   = mesh.GetPosY();
+   const top   = Mesh_get_real_pos_y(mesh);
    const bot   = top + mesh.geom.dim[1]*2;
 
    if((bot >= limit.up && top < limit.up) || (bot > limit.down && top < limit.down)){
@@ -567,21 +191,21 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
 
    if(bot < limit.up || top > limit.down){
       
-      if(mesh.state.mask & MESH_STATE.ACTIVE){
+      if(mesh.state.mask & MESH_STATE_FLAGS.ACTIVE){
    
-         mesh.StateDisable(MESH_STATE.ACTIVE);
-         mesh.StateEnable(MESH_STATE.CLIPED_Y);
+         mesh.StateDisable(MESH_STATE_FLAGS.ACTIVE);
+         mesh.StateEnable(MESH_STATE_FLAGS.CLIPED_Y);
          // console.log('Deactivate', mesh.GetName())
          changes_hapened = true;
       }
    }
    else{
       
-      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+      if(mesh.state.mask & MESH_STATE_FLAGS.CLIPED_Y)
       {
 
-         mesh.StateEnable(MESH_STATE.ACTIVE);
-         mesh.StateDisable(MESH_STATE.CLIPED_Y);
+         mesh.StateEnable(MESH_STATE_FLAGS.ACTIVE);
+         mesh.StateDisable(MESH_STATE_FLAGS.CLIPED_Y);
          // console.log('Activate', mesh.GetName())
          changes_hapened = true;
       }
@@ -589,59 +213,14 @@ export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=
 
    return changes_hapened;
 }
-
-
-// export function Clipy_from_tree_recursive(mesh=null, clip_top=null, clip_bottom=null) {
-
-//    if(mesh.options && (mesh.options & SECTION.INDEPENDENT)) return;
-
-//    let changes_hapened = false;
-//    const limit = (clip_top!==null && clip_bottom!==null) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
-
-
-
-//    const top      = mesh.GetPosY();
-//    const bottom   = top + mesh.geom.dim[1]*2;
-
-//    if((bottom <= limit.down && bottom > limit.up) || (top >= limit.up && top < limit.down)){
-//       // Clip for any children. Only if this mesh is active, else skip
-//       for(let i=0; i <= mesh.children.boundary; i++){
-//          const child = mesh.children.buffer[i];
-//          Clipy_from_tree_recursive(child, clip_top, clip_bottom);
-//       }
-//    }
-
-//    if(bottom < limit.up || top > limit.down){
-      
-//       if(mesh.state.mask & MESH_STATE.ACTIVE){
-   
-//          mesh.StateDisable(MESH_STATE.ACTIVE);
-//          mesh.StateEnable(MESH_STATE.CLIPED_Y);
-//          changes_hapened = true;
-//       }
-//    }
-//    else{
-      
-//       if(mesh.state.mask & MESH_STATE.CLIPED_Y)
-//       {
-//          mesh.StateEnable(MESH_STATE.ACTIVE);
-//          mesh.StateDisable(MESH_STATE.CLIPED_Y);
-//          changes_hapened = true;
-//       }
-//    }
-
-//    return changes_hapened;
-// }
-
-
-
+/** */
 export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bottom=null) {
 
 
    let changes_hapened = false;
    const limit = (clip_bottom) ? { top: clip_top, bottom: clip_bottom, } : { top: TEST_CLIP_LEFT, bottom: TEST_CLIP_RIGHT, }
 
-   const group = View_get_view_byidx(group_bufferidx);
+   const group = View_get_group(group_bufferidx);
 
    for(let i=0; i<=group.vb.boundary; i++){
    
@@ -661,7 +240,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
             mesh.geom.dim[1] -= reduce/2;
             mesh.geom.pos[1] -= reduce/2;
             
-            mesh.state.mask |= MESH_STATE.CLIPED_X;
+            mesh.state.mask |= MESH_STATE_FLAGS.CLIPED_X;
 
             changes_hapened = true;
 
@@ -672,7 +251,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
             mesh.geom.dim[1] -= reduce/2;
             mesh.geom.pos[1] -= reduce/2;
             
-            mesh.state.mask |= MESH_STATE.CLIPED_X;
+            mesh.state.mask |= MESH_STATE_FLAGS.CLIPED_X;
             changes_hapened = true;
          }
       }
@@ -681,9 +260,7 @@ export function Clampy_from_group(group_bufferidx=null, clip_top=null, clip_bott
 
    return changes_hapened;
 }
-
-
-
+/** */
 export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 
    const limit = (clip_top && clip_bottom) ? { up: clip_top, down: clip_bottom, } : { up: TEST_CLIP_TOP, down: TEST_CLIP_BOTTOM, }
@@ -695,32 +272,30 @@ export function Clipy_one_mesh(mesh=null, clip_top=null, clip_bottom=null){
 
    if(bottom < limit.up || top > limit.down){
 
-      if(mesh.state.mask & MESH_STATE.ACTIVE){
+      if(mesh.state.mask & MESH_STATE_FLAGS.ACTIVE){
 
          // Because we dont run from group or root buffer, we need to deactivate any meshe's children (from class).
          // BUG: We need a class method for setting 'CLIPED_Y', else the children meshes will no be activated on a clipy(this or any other clipy function)
          mesh.Deactivate();
-         mesh.state.mask |= MESH_STATE.CLIPED_Y;
-         // console.log(mesh.mesh_bufferidx, mesh.state.mask & MESH_STATE.ACTIVE)
+         mesh.state.mask |= MESH_STATE_FLAGS.CLIPED_Y;
+         // console.log(mesh.mesh_bufferidx, mesh.state.mask & MESH_STATE_FLAGS.ACTIVE)
       }
    }
    else{
       
-      if(mesh.state.mask & MESH_STATE.CLIPED_Y)
+      if(mesh.state.mask & MESH_STATE_FLAGS.CLIPED_Y)
       {
          
          mesh.Activate();
-         mesh.state.mask &= ~MESH_STATE.CLIPED_Y;
+         mesh.state.mask &= ~MESH_STATE_FLAGS.CLIPED_Y;
       }
    }
 }
-
-
-
+/** */
 export function Clipy_chunks_impl(mesh, clampY, renderables) {
 
    const DBG = false
-   if (!mesh.StateCheck(MESH_STATE.HAS_CLIP) || !mesh.children.boundary) return;
+   if (!Mesh_state_check(mesh, MESH_STATE_FLAGS.HAS_CLIP) || !mesh.children.boundary) return;
 
 
    let changes_hapened = false;
@@ -742,7 +317,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
    if (first_top < limit.up) { // NOTE: Avoid checking all meshes. Check only for the upper most mesh that is rendered.
       
       // Check only the first/upper mesh. If it's upper side is greater than the upper limit(clampy+threshold), deactivate all meshes between upper limit and clampy 
-      if (first.state.mask & MESH_STATE.ACTIVE) {
+      if (first.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          
          // Deactivate any mesh between the upper limit and clampy
          for (let i = first.idx; i <= mesh.children.boundary; i++) {
@@ -755,15 +330,15 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
                
                if (c_top < clampY[CLAMP.Y_UP]) {  // Enable all meshes that are lower than the upper limit 
    
-                  child.state.mask &= ~MESH_STATE.ACTIVE;
+                  child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
                   // Widget_group_update_decrement(child.group_bufferidxs, child.geom.num_faces);
-                  if(DBG) console.log('REMOVE', child.mesh_bufferidx, child.GetName())
+                  if(DBG) console.log('REMOVE', child.mesh_bufferidx, Mesh_get_name(child))
                   child.gfx.vb.start = INT_NULL;
                   changes_hapened = true;
    
                   if (child.children.boundary) { // Run for all children widgets recursively
                      // Recurse_mesh_set_active(child, false); // Disable recursively
-                     child.StateDisable(MESH_STATE.ACTIVE);
+                     child.StateDisable(MESH_STATE_FLAGS.ACTIVE);
                   }
                }
                else {
@@ -777,7 +352,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       }
    }
    // ACTIVATE: Handles the upper limit. SEE ### Clamp
-   else if (upper_deactivated && (upper_deactivated.state.mask & MESH_STATE.ACTIVE) === 0) {
+   else if (upper_deactivated && (upper_deactivated.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0) {
       // Activate any deactivated mesh if it's position is greater than the clampy
 
       // If mesh's bottom side greater than clamp y up
@@ -788,13 +363,13 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             const c_top = child.geom.pos[1] - child.geom.dim[1];
             if (c_top > limit.up) {  // Enable all meshes that are below the upper limit 
 
-               child.state.mask |= MESH_STATE.ACTIVE;
-               if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
+               child.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+               if(DBG)console.log('ADD', child.mesh_bufferidx, Mesh_get_name(child))
                changes_hapened = true;
 
                if (child.children.active_count) { // Run for all children widgets recursively
                   // Recurse_mesh_set_active(child, true); // Disable recursively
-                  child.StateEnable(MESH_STATE.ACTIVE);
+                  child.StateEnable(MESH_STATE_FLAGS.ACTIVE);
                }
 
                renderables.first = child.idx;
@@ -816,7 +391,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
    // DEACTIVATE: Handles the lower clamp value. SEE ### Clamp
    if (last_bottom > limit.down) { // NOTE: Avoid checking all meshes. Check only for the lower most mesh that is rendered.
 
-      if (last.state.mask & MESH_STATE.ACTIVE) 
+      if (last.state.mask & MESH_STATE_FLAGS.ACTIVE) 
       {
 
          /**DEBUG*/ if (last.idx === last.root_idx) console.error('The last meshs idx references the scenes mesh buffer and not the parents children buffer')
@@ -828,15 +403,15 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
             const c_top = child.geom.pos[1] - child.geom.dim[1];
             // const c_bottom = child.geom.pos[1] + child.geom.dim[1];
             if (c_top > clampY[CLAMP.Y_DOWN]) {  // Disable all meshes that are higher than the lower limit 
-               child.state.mask &= ~MESH_STATE.ACTIVE;
+               child.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
-               if(DBG)console.log('REMOVE', child.mesh_bufferidx, child.GetName())
+               if(DBG)console.log('REMOVE', child.mesh_bufferidx, Mesh_get_name(child))
                child.gfx.vb.start = INT_NULL;
                changes_hapened = true;
 
                if (child.children.active_count) { // Run for all children widgets recursively
                   // Recurse_mesh_set_active(child, false); // Disable recursively
-                  child.StateDisable(MESH_STATE.ACTIVE);
+                  child.StateDisable(MESH_STATE_FLAGS.ACTIVE);
                }
             }
             else {
@@ -848,7 +423,7 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       }
    }
    // ACTIVATE: Handles the lower limit. SEE ### Clamp
-   // else if (lower_deactivated && (lower_deactivated.state.mask & MESH_STATE.ACTIVE) === 0) {
+   // else if (lower_deactivated && (lower_deactivated.state.mask & MESH_STATE_FLAGS.ACTIVE) === 0) {
    else if (lower_deactivated) {
       // Activate any deactivated mesh if it's position is greater than the clampy
       const lower_bottom = lower_deactivated.geom.pos[1] + lower_deactivated.geom.dim[1]; 
@@ -864,16 +439,16 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
                const c_bottom = child.geom.pos[1] + child.geom.dim[1];
    
                   if (c_bottom < limit.down){ // Enable all meshes that are higher than the lower limit 
-                  child.state.mask |= MESH_STATE.ACTIVE;
+                  child.state.mask |= MESH_STATE_FLAGS.ACTIVE;
    
-                  if(DBG)console.log('ADD', child.mesh_bufferidx, child.GetName())
+                  if(DBG)console.log('ADD', child.mesh_bufferidx, Mesh_get_name(child))
                   changes_hapened = true;
    
                   // Run for all children widgets recursively
                   if (child.children.active_count) {
                      // Disable recursively
                      // Recurse_mesh_set_active(child, true);
-                     child.StateEnable(MESH_STATE.ACTIVE);
+                     child.StateEnable(MESH_STATE_FLAGS.ACTIVE);
                   }
    
                   renderables.last = child.idx;
@@ -883,40 +458,8 @@ export function Clipy_chunks_impl(mesh, clampY, renderables) {
       }
    }
 
-   // TEMP_TEST_PERFORMANE_COUNTERS.MISC = `total:${total_count}, removed:${count1}, added:${count2}`;
-
    return changes_hapened;
 }
-
-
-
-function Recurse_mesh_set_active(mesh, flag_activate) {
-
-   for (let i = 0; i <= mesh.children.boundary; i++) {
-
-      const child = mesh.children.buffer[i];
-      if (child) {
-
-         if (flag_activate) {
-            child.state.mask |= MESH_STATE.ACTIVE;
-         }
-         else {
-            child.state.mask &= ~MESH_STATE.ACTIVE;
-         }
-      }
-
-      // Run recursive
-      if (child.children.boundary) {
-         Recurse_mesh_set_active(child, flag_activate)
-      }
-   }
-}
-
-
-
-
-
-
 /**
  * This function runs through children of mesh type:Section,
  * and removes children that are located above (upper clamped chunk)
@@ -950,20 +493,20 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
          if (bottom <= clip_top) {
    
             // child.Deactivate();
-            // child.state.mask |= MESH_STATE.CLIPED_Y
-            // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-            child.StateDisable(MESH_STATE.ACTIVE)
-            child.StateEnable(MESH_STATE.CLIPED_Y)
+            // child.state.mask |= MESH_STATE_FLAGS.CLIPED_Y
+            // child.StateDisable(MESH_STATE_FLAGS.ACTIVE|MESH_STATE_FLAGS.CLIPED_Y)
+            child.StateDisable(MESH_STATE_FLAGS.ACTIVE)
+            child.StateEnable(MESH_STATE_FLAGS.CLIPED_Y)
             
             if (firstupper === INT_NULL) firstupper = i;
          }
          else if (top >= clip_bottom) {
             
             // child.Deactivate();
-            // child.state.mask |= MESH_STATE.CLIPED_Y
-            // child.StateDisable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-            child.StateDisable(MESH_STATE.ACTIVE)
-            child.StateEnable(MESH_STATE.CLIPED_Y)
+            // child.state.mask |= MESH_STATE_FLAGS.CLIPED_Y
+            // child.StateDisable(MESH_STATE_FLAGS.ACTIVE|MESH_STATE_FLAGS.CLIPED_Y)
+            child.StateDisable(MESH_STATE_FLAGS.ACTIVE)
+            child.StateEnable(MESH_STATE_FLAGS.CLIPED_Y)
             
             if (firstlower === INT_NULL) {
                firstlower = i;
@@ -972,11 +515,11 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
          else { // The mesh is inside limits
             
             // child.Activate();
-            // child.state.mask &= ~MESH_STATE.CLIPED_Y
-            // child.StateEnable(MESH_STATE.ACTIVE|MESH_STATE.CLIPED_Y)
-            child.StateEnable(MESH_STATE.ACTIVE)
-            child.StateDisable(MESH_STATE.CLIPED_Y)
-            console.log(child.GetName(), child.state.mask)
+            // child.state.mask &= ~MESH_STATE_FLAGS.CLIPED_Y
+            // child.StateEnable(MESH_STATE_FLAGS.ACTIVE|MESH_STATE_FLAGS.CLIPED_Y)
+            child.StateEnable(MESH_STATE_FLAGS.ACTIVE)
+            child.StateDisable(MESH_STATE_FLAGS.CLIPED_Y)
+            console.log(Mesh_get_name(child), child.state.mask)
    
             if (lastupper === INT_NULL) {
                lastupper = i;
@@ -993,62 +536,3 @@ export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clip_top=null,
    };
 }
 
-
-/**SAVE */
-// export function Clamp_y_remove_children_FIRST_TIME_CLAMP(section, clampy) {
-
-//    // The first and last meshes of scrolled section after been clamped.
-//    let firstupper = INT_NULL, lastupper = INT_NULL, firstlower = INT_NULL, lastlower = INT_NULL;
-//    const clamped_buffer = []; // Store the removed children
-
-
-//    let cnt = 0;
-//    for (let i = 0; i <= section.children.boundary; i++) {
-
-//       const child = section.children.buffer[i];
-//       const top = child.geom.pos[1] - child.geom.dim[1];
-//       const bottom = child.geom.pos[1] + child.geom.dim[1];
-
-//       if (bottom <= clampy.clip_top) {
-
-//          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-//          // section.children.RemoveByIdx(i);
-//          child.state.mask &= ~MESH_STATE.ACTIVE;
-         
-//          if (firstupper === INT_NULL) firstupper = i;
-//       }
-//       else if (top >= clampy.clip_bottom) {
-         
-//          clamped_buffer[cnt++] = child; // Store children to a temp buffer, in order to restore them back after .Render().
-//          // section.children.RemoveByIdx(i);
-//          child.state.mask &= ~MESH_STATE.ACTIVE;
-         
-//          if (firstlower === INT_NULL) {
-//             firstlower = i;
-//             // 1. This clamp is running on mesh initialization, so we need only one chunk, the upper one
-//             // 2. Store the lower border of the renderable area chunk. This is when the first mesh outside the renderable chunk has been reached
-//             clampy.upper_chunk.lower_border = bottom;
-//             clampy.upper_chunk.lower_meshidx = i;
-//          }
-//       }
-//       else { // The mesh is inside limits
-//          child.state.mask |= MESH_STATE.ACTIVE;
-//          if (lastupper === INT_NULL) {
-//             lastupper = i;
-//             // 1. Store the upper border of the renderable area chunk. This is when the first mesh inside the renderable chunk has been reached
-//             clampy.upper_chunk.upper_border = top;
-//             clampy.upper_chunk.upper_meshidx = i;
-//          }
-//       }
-//    }
-
-//    clampy.both_chunks_active = false;
-
-//    return {
-//       firstupper: firstupper,
-//       lastupper: lastupper,
-//       firstlower: firstlower,
-//       lastlower: lastlower,
-//       clamped_buffer: clamped_buffer
-//    };
-// }

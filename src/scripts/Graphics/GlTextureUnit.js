@@ -147,10 +147,11 @@ function Gl_texture_unit_load(gl, texture_unit) {
 
 export function Gl_texture_unit_bind(gl, texture_unit) {
 
+    // FIXME: For some  reason when the reset app is called, we get 'WebGL warning: activeTexture: `texture` (0x0000) must be >= TEXTURE0 (0x84c0).'  
     gl.activeTexture(texture_unit.tex_unit_id);
     gl.bindTexture(gl.TEXTURE_2D, texture_unit.tbo);
 
     GL_STATE.BOUND_TEXTURE_IDX = texture_unit.texidx;
-    Bound_texture.texidx = texture_unit.texidx; // Update the global Texture constant object
+    BOUND_TEXTURE.texidx = texture_unit.texidx; // Update the global Texture constant object
 }
 

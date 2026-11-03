@@ -13,6 +13,7 @@ import { Str_buffer_get_by_idx, Str_buffer_store } from "../Core/StringBuffer.js
 
 
 
+/** */
 const ANIM_DATA = {
     T: 0,
     STEP: 1,
@@ -22,11 +23,11 @@ const ANIM_DATA = {
 
 
 
-
+/** */
 function MeshAnimations_get_type_to_string(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return 'COLOR';
 }
-
+/** */
 function MeshAnimations_get_value_size(anim_type_flag, anim_data_type){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
         if(anim_data_type & ANIMATIONS.DATA.COLOR.R) return 1;
@@ -56,7 +57,7 @@ function MeshAnimations_get_value_size(anim_type_flag, anim_data_type){
     }
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
-
+/** */
 function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
 
     let offsets = [];
@@ -76,13 +77,12 @@ function MeshAnimations_get_value_offset(anim_type_flag, anim_data_type){
         return offsets;
     }
 }
-
-
-
+/** */
 function Choose_update_callback(anim_type_flag){
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR) return Gl_batch_set_RGBA;
     if(anim_type_flag & ANIMATIONS.TYPE.WPOS) return Gl_batch_set_pos_xy;
 }
+/** */
 function Update_test(num_values){
     if(num_values === 2) return Update_values_color_balanced_vec2;
     alert('77777777777 MISSING CALLBACK');
@@ -92,6 +92,7 @@ function Update_test(num_values){
 
 
 
+/** */
 class VB_DATA {
 
     constructor(vbidx, attribsidx, values_len){
@@ -103,7 +104,7 @@ class VB_DATA {
             starts: [],
             counts: null,
             which_vb: null,
-            verts_per_rect: 0,
+            verts_per_face: 0,
             values: [],
             values_indices: [],
             num_faces: [],
@@ -112,7 +113,7 @@ class VB_DATA {
         this.data_count = 0;
     }
 
-    SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_rect, start_val=0, has_start_value=false){
+    SetData(starts, values, num_faces, anim_type_flag, anim_data_type, which_vb, counts, verts_per_face, start_val=0, has_start_value=false){
         if(values.constructor !== Float32Array && values.constructor !== Array) alert('values should be an array\nAnimations.js')
         
 
@@ -120,7 +121,7 @@ class VB_DATA {
         this.data.num_faces.push(num_faces);
         this.data.counts = counts;
         this.data.which_vb = which_vb;
-        this.data.verts_per_rect = verts_per_rect;
+        this.data.verts_per_face = verts_per_face;
         
         
         this.data.offsets = MeshAnimations_get_value_offset(anim_type_flag, anim_data_type);
@@ -136,6 +137,7 @@ class VB_DATA {
         this.data.values_indices.push((this.data_count/this.values_len)-1); // RGBA:4 values -> values_indices = 4/4-1=0idx, next 8/4-1=1idx, next 12/4-1=2idx, ... 
     }
 }
+/** */
 class Animation_Data {
 
     constructor(){
@@ -147,11 +149,7 @@ class Animation_Data {
         this.data.push(t, step, min, max);
     }
 }
-
-
-
-
-
+/** */
 class Mesh_Animation{
 
     constructor(anim_type_flag=0x0, anim_data_type){
@@ -186,16 +184,15 @@ class Mesh_Animation{
 const _mesh_animations_buffer = New_generic_buffer(_, 'Animations Buffer');
 
 
+/** */
 export function Mesh_animations_reset() { 
 
     _mesh_animations_buffer.ResetFull(); 
     ANIMATIONS.Reset();
 }
-
-
+/** */
 export function Mesh_animations_get(){ return _mesh_animations_buffer; }
-
-
+/** */
 function Vb_data_exist(anim_type_idx, vbidx){
     
     if(_mesh_animations_buffer.buffer[anim_type_idx].vb_data === null) return INT_NULL;
@@ -204,7 +201,7 @@ function Vb_data_exist(anim_type_idx, vbidx){
 
     return INT_NULL;
 }
-
+/** */
 function Analyze_flag(anim_type_flag, flag){
 
     if(anim_type_flag & ANIMATIONS.TYPE.COLOR){
@@ -239,8 +236,6 @@ function Analyze_flag(anim_type_flag, flag){
     }
     alert('No apropriate size found for Animations value data size\nAnimations.js')
 }
-
-
 /**
  * 
  * @param {*} anim_type_flag    type of: "ANIMATIONS.TYPE."
@@ -259,7 +254,7 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     const starts = mesh.gfx.vb.starts.buffer;
     const counts = mesh.gfx.vb.counts.buffer;
     const which_vb = mesh.gfx.vb.which_vb;
-    const verts_per_rect = (mesh.gfx.vb.counts.active_count > 1) ? 1 : VERTS_PER_RECT_INDEXED; // For instanced meshes that have per instance data, the number of times run must be 1 and not 4(per vertex)
+    const verts_per_face = (mesh.gfx.vb.counts.active_count > 1) ? 1 : VERTS_PER_RECT_INDEXED; // For instanced meshes that have per instance data, the number of times run must be 1 and not 4(per vertex)
     const attribsidx = mesh.gfx.prog.attribsidx;
     const num_faces = mesh.geom.num_faces;
     let values = [];
@@ -334,19 +329,17 @@ export function Mesh_animations_create(anim_type_flag=0x0, values_len_flag=0x0, 
     }
     
     // Finally, after type and vb are set, create the animation data for the mesh
-    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_rect, start_v, has_start_value)
+    anim.vb_data[vb_data_idx].SetData(starts, values, num_faces, anim_type_flag, vals_len_flag, which_vb, counts, verts_per_face, start_v, has_start_value)
     anim.anim_data[vb_data_idx].SetData(t, t_step, min, max)
     
     // Set apropriate callback
     anim.UpdateClbk = Choose_update_callback(anim_type_flag);
-    anim.TestRenameMe = Update_test(vals_len)
+    // anim.TestRenameMe = Update_test(vals_len);
     
     anim.is_active = true;
     anim.in_animation = true;
 }
-
-
-
+/** */
 function Min_max(values, anim_data, flags, values_len){
 
     const min = anim_data[ANIM_DATA.MIN], max = anim_data[ANIM_DATA.MAX];
@@ -409,8 +402,7 @@ function Update_values_color_balanced_vec2(values, anim_data, flags, values_len)
     // if(flags & ANIMATIONS.TYPE.CYCLICAL){
     
 }
-
-
+/** */
 export function Mesh_animations_run(){
 
     if(_mesh_animations_buffer.active_count===0) return;
@@ -427,8 +419,8 @@ export function Mesh_animations_run(){
                     
                     const vb_data = anim.vb_data[j];
                     const anim_data = anim.anim_data[j].data;
-                    // Min_max(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
-                    anim.TestRenameMe(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+                    Min_max(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
+                    // anim.TestRenameMe(vb_data.data.values, anim_data, anim.anim_type_flag, vb_data.values_len)
 
                     anim.UpdateClbk(vb_data.vbidx, vb_data.data.starts, vb_data.data.values, 
                                                      vb_data.data.values_indices, vb_data.values_len, vb_data.attribsidx, 

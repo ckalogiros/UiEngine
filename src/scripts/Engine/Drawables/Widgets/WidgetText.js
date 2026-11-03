@@ -1,14 +1,17 @@
 "use strict";
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable } from "./Helpers/WidgetEnableProperties.js";
 import { CopyArr2, CopyArr3 } from "../../../Helpers/Math/MathOperations.js";
 import { Mouse_get_pos_dif } from "../../Controls/Input/Mouse.js";
-import { Create_widget_text } from "../../Core/CreateWidget.js";
+import { Create_widget_text } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_get_byidx } from "../../Timers/TimeIntervals.js";
 import { Text_Mesh } from "../Meshes/Text_Mesh.js";
-import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_add_wpos_xy, Set_color_a } from "../Operations/MeshAttributesFunctions.js";
+import { View_add_mesh, View_create_new_group } from "../../Core/Views/MeshBufferViews.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { Renderqueue_set_priority_by_vb } from "../../Renderers/Renderer/RenderQueue.js";
 
 
 
@@ -21,10 +24,9 @@ import { Set_color_a } from "../Operations/MeshAttributesFunctions.js";
  */
 export class Widget_Text extends Text_Mesh {
 
-	constructor(properties) {
-		// { pos: pos, fontsize: fontsize, col: col, text: text, font: font, texture_id: texture_id, variant_idx:variant_idx, sub_texture_id: sub_texture_id, is_debug_mesh: is_debug_mesh },
+	constructor(mesh_bufferidx, properties) {
 
-		super(properties)
+		super(mesh_bufferidx, properties)
 		this.type |= MESH_TYPE.WIDGET_TEXT;
 
 		this.StylesSetPad(properties.pad);
@@ -33,7 +35,12 @@ export class Widget_Text extends Text_Mesh {
 		this.align.flags = properties.layout;
 
 		if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT) {
+
 			this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
+			// Create view group
+			if (this.group_bufferidxs[0] === INT_NULL) {
+            this.group_bufferidxs[0] = View_create_new_group(this);
+         }
 		}
 	}
 
@@ -57,20 +64,29 @@ export class Widget_Text extends Text_Mesh {
 
 	Activate() {
 
-		this.state.mask |= MESH_STATE.ACTIVE;
+		this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
 	}
 
 
 	Deactivate() {
 
-		this.state.mask &= ~MESH_STATE.ACTIVE;
+		this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 	}
 
 
 
 	/*******************************************************************************************************************************************************/
 	// Graphics
+	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
+		const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		this.gfx = ret.gfx;
+		
+		// Add to view group
+		View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
+		
+		return this.gfx;
+	}
 
 	Render() {
 
@@ -89,7 +105,11 @@ export class Widget_Text extends Text_Mesh {
 		this.root_bufferidx = root_bufferidx;
 		Root_group_view_buffer_add_mesh(this.root_bufferidx, this.mesh_bufferidx);
 	}
+	/** */
+	SetViewGroupIndex(view_groupidx) {
 
+		this.group_bufferidxs[0] = view_groupidx;
+	}
 
 	GfxCtxAddFlag(FLAGS, gfx_ctx_parent = INT_NULL, recurse = false) {
 
@@ -121,7 +141,7 @@ export class Widget_Text extends Text_Mesh {
 		const pos = [0, 0];
 		CopyArr2(pos, this.geom.pos);
 
-		if (flags & ALIGN.LEFT) {
+		if (flags & TEXT_ALIGN.LEFT) {
 
 			const pos = [0, 0];
 			CopyArr2(pos, this.geom.pos);
@@ -135,7 +155,7 @@ export class Widget_Text extends Text_Mesh {
 			CopyArr2(this.geom.pos, pos);
 
 		}
-		else if (flags & ALIGN.RIGHT) {
+		else if (flags & TEXT_ALIGN.RIGHT) {
 
 			const pos = [0, 0];
 			CopyArr2(pos, this.geom.pos);
@@ -218,17 +238,17 @@ export class Widget_Text extends Text_Mesh {
 	}
 
 
-	Move(x, y) {
+	// Move(x, y) {
 
-		if (x === 0 && y === 0) return;
+	// 	if (x === 0 && y === 0) return;
 
-		this.geom.pos[0] += x;
-		this.geom.pos[1] += y;
-		this.geom.AddWposXY(this.gfx, x, y);
+	// 	this.geom.pos[0] += x;
+	// 	this.geom.pos[1] += y;
+	// 	this.geom.AddWposXY(this.gfx, x, y);
 
-		// console.log(this.GetName(), this.geom.pos)
+	// 	// console.log(this.GetName(), this.geom.pos)
 
-	}
+	// }
 
 
 	ListenEventConstruct() { return false; }
@@ -236,77 +256,15 @@ export class Widget_Text extends Text_Mesh {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/** */
 export class Widget_Multi_Text extends Widget_Text {
 
 	alignment = 0x0;
 
 	/** Set the max number of characters for the dynamic text, by passing any text as 'dynamic_text' of length= dynamic text number of characters*/
-	constructor(properties) {
+	constructor(mesh_bufferidx, properties) {
 
-		super(properties);
+		super(mesh_bufferidx, properties);
 		this.type |= MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 
 		this.alignment = properties.align;
@@ -366,22 +324,32 @@ export class Widget_Multi_Text extends Widget_Text {
 			}
 		}
 	}
+    /** */
+    SetViewGroupIndex(view_groupidx) {
 
+        this.group_bufferidxs[0] = view_groupidx;
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) {
+				child.group_bufferidxs[0] = view_groupidx;
+			}
+		}
+    }
 
 	Activate() {
 
-		this.state.mask |= MESH_STATE.ACTIVE;
+		this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask |= MESH_STATE_FLAGS.ACTIVE;
 		}
 	}
 
 
 	Deactivate() {
 
-		this.state.mask &= ~MESH_STATE.ACTIVE;
+		this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 		for (let i = 0; i <= this.children.boundary; i++) {
-			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MESH_STATE.ACTIVE;
+			if (this.children.buffer[i]) this.children.buffer[i].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 		}
 	}
 
@@ -459,7 +427,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		this.SetClbkGfxUniforms(unif_name, Clbk, clbk_params);
 		for (let i = 0; i <= this.children.boundary; i++) {
 			const child = this.children.buffer[i];
-			if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
+			// if (child) child.GfxUniformsSetClbk(unif_name, Clbk, clbk_params);
 		}
 	}
 
@@ -469,8 +437,13 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	GenGfxCtx(FLAGS, specific_vb_groupidx = INT_NULL) {
 
-		super.GenGfxCtx(FLAGS, specific_vb_groupidx);
-
+		const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+		this.gfx = ret.gfx;
+		
+		// Add to view group
+		View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
+		
+		// super.GenGfxCtx(FLAGS, specific_vb_groupidx);
 		// We know that the 'this' is of type text, so we use the same gfx buffer index for all children texts
 		FLAGS |= GFX_CTX_FLAGS.SPECIFIC;
 		const vb_groupidx = this.gfx.vb.groupidx;
@@ -523,7 +496,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	// 	let max_width = super.GetMaxWidth();
 
-	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
+	// 	if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 	// 		for (let i = 0; i <= this.children.boundary; i++) {
 	// 			// if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 	// 			if (this.children.buffer[i]) max_width += this.children.buffer[i].CalculateTextWidth().w + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
@@ -547,7 +520,7 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		let max_width = super.GetMaxWidth();
 
-		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
+		if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, acumulate all text meshes widths
 			for (let i = 0; i <= this.children.boundary; i++) {
 				if (this.children.buffer[i]) max_width += this.children.buffer[i].text_width + this.children.buffer[i].StylesGetPad(STYLES.AXIS.X);
 			}
@@ -572,8 +545,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 	// 	let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
-	// 	// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
-	// 	if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
+	// 	// HACK: TODO: Set only one of both(SECTION or TEXT_ALIGN) as global align bit field
+	// 	if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
 	// 		return max_height;
 	// 	}
 	// 	else { // Else calculate all the lines of the text meshes
@@ -588,8 +561,8 @@ export class Widget_Multi_Text extends Widget_Text {
 
 		let max_height = this.geom.dim[1] + this.StylesGetPad(STYLES.AXIS.Y);
 
-		// HACK: TODO: Set only one of both(SECTION or ALIGN) as global align bit field
-		if (this.alignment & ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
+		// HACK: TODO: Set only one of both(SECTION or TEXT_ALIGN) as global align bit field
+		if (this.alignment & TEXT_ALIGN.HORIZONTAL) { // If the children text meshes are aligned horizontaly, return the height of the 'this' text mesh height
 			return max_height;
 		}
 		else { // Else calculate all the lines of the text meshes
@@ -633,7 +606,7 @@ export class Widget_Multi_Text extends Widget_Text {
 	// TODO: Implement align self correctly
 	// TODO: Is there a way to align differently for each text mesh????
 
-	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL) {
+	CreateNewText(dynamic_text, font_size, text_col2, pad = [0, 0], bold = .5, align = TEXT_ALIGN.HORIZONTAL, align_NEW=LAYOUT.HORIZONTAL) {
 
 		/** DEBUG ERROR*/ if (!Array.isArray(pad)) console.error('Pad is not of type array');
 
@@ -661,11 +634,12 @@ export class Widget_Multi_Text extends Widget_Text {
 			texture_id:this.mat.texture_file_id, 
 			variant_idx:this.TEMPORARY_variant_idx,
 			pad:pad,
-			is_debug_mesh:false,
+			is_debug_mesh:0x0n,
 		});
 
 		Widget_gfx_ready_enable({mesh:new_text, enable_attr_dim:false,});
 
+		new_text.SetViewGroupIndex(this.group_bufferidxs[0]);
 		new_text.type = MESH_TYPE.WIDGET_TEXT_DYNAMIC;
 		new_text.align.flags = align_NEW;
 		// new_text.StylesSetPad(pad);
@@ -691,7 +665,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		// const second_pad = new_text.StylesGetPad();
 
 
-		if (this.alignment & ALIGN.VERTICAL) {
+		if (this.alignment & TEXT_ALIGN.VERTICAL) {
 			// new_text.geom.pos[0] = prev_text_mesh.geom.dim[0];
 			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
 			// new_text.geom.pos[1] += (prev_text_mesh.geom.dim[1] + first_pad[1]) + new_text.geom.dim[1];
@@ -699,7 +673,7 @@ export class Widget_Multi_Text extends Widget_Text {
 			// New align fix
 			new_text.align.flags = LAYOUT.VERTICAL;
 		}
-		else if (this.alignment & ALIGN.HORIZONTAL) {
+		else if (this.alignment & TEXT_ALIGN.HORIZONTAL) {
 			// new_text.geom.pos[0] = prev_text_mesh.geom.pos[0] + first_pad[0];
 			// new_text.geom.pos[0] += prev_text_mesh.text_width * 2 + second_pad[0];
 			// new_text.geom.pos[1] = prev_text_mesh.geom.pos[1];
@@ -841,7 +815,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		if (mouse_pos.x === 0 && mouse_pos.y === 0) return;
 
 		// Move 'this' text
-		mesh.geom.AddWposXY(mesh.gfx, mouse_pos.x, -mouse_pos.y,);
+		Mesh_add_wpos_xy(mesh, mouse_pos.x, -mouse_pos.y,);
 
 		// Move children text
 		for (let i = 0; i <= mesh.children.boundary; i++) {
@@ -948,25 +922,25 @@ export class Widget_Multi_Text extends Widget_Text {
 	}
 
 
-	SetWposXFromAddWPos(x) {
-		this.geom.SetWposXFromAddWPos(x);
-	}
+	// SetWposXFromAddWPos(x) {
+	// 	this.geom.SetWposXFromAddWPos(x);
+	// }
 
 
-	SetWposYFromAddWPos(y) {
-		this.geom.SetWposYFromAddWPos(y);
-	}
+	// SetWposYFromAddWPos(y) {
+	// 	this.geom.SetWposYFromAddWPos(y);
+	// }
 
 
-	TEMP_recalc(x, y) {
-		alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
-		// this.geom.pos[0] = x;
-		// this.geom.pos[1] = y;
-		// for (let i = 0; i <= this.children.boundary; i++) {
-		//    const child = this.children.buffer[i];
-		//    if (child) child.TEMP_recalc(x, y);
-		// }
-	}
+	// TEMP_recalc(x, y) {
+	// 	alert('IMPLEMENT ME\nTEMP_recalc\nWidget_Multi_Text')
+	// 	// this.geom.pos[0] = x;
+	// 	// this.geom.pos[1] = y;
+	// 	// for (let i = 0; i <= this.children.boundary; i++) {
+	// 	//    const child = this.children.buffer[i];
+	// 	//    if (child) child.TEMP_recalc(x, y);
+	// 	// }
+	// }
 
 
 	SetPosZNoGfxUpdate(z) {
@@ -984,7 +958,7 @@ export class Widget_Multi_Text extends Widget_Text {
 		const dim = this.geom.dim;
 		CopyArr2(pos, this.geom.pos);
 		let ypos = pos[1] + dim[1] * 2;
-		if (flags & ALIGN.VERTICAL) {
+		if (flags & TEXT_ALIGN.VERTICAL) {
 
 			for (let i = 0; i <= this.children.boundary; i++) {
 
@@ -1070,6 +1044,13 @@ export class Widget_Multi_Text extends Widget_Text {
 		return false;
 	}
 
+	SetRenderPriority(flag) {
+		Renderqueue_set_priority_by_vb(flag, this.gfx.vb.groupidx);
+		for (let i = 0; i <= this.children.boundary; i++) {
+			const child = this.children.buffer[i];
+			if (child) Renderqueue_set_priority_by_vb(flag, child.gfx.vb.groupidx);
+		}
+	}
 
 }
 

@@ -15,8 +15,6 @@
 
 // export const frag_glow_sphere_call = '   final_color = blend_color_multiply( final_color, frag_glow_sphere() );'
 export const frag_glow_sphere_call = '   final_color = blend_decider( final_color, frag_glow_sphere(), u_blend_mode );'
-// export const frag_glow_sphere_call = '   final_color = blend_color_add( final_color, frag_glow_sphere() );'
-// export const frag_glow_sphere_call = '   final_color = blend_mode_vec4( final_color, frag_glow_sphere() );'
 
 export const frag_glow_sphere = `
 
@@ -45,9 +43,6 @@ export const frag_glow_sphere = `
 #ifdef BLEND_MODE 
   #include <blend_mode_directives>
 #endif
-
-
-
 
 
 
@@ -110,15 +105,6 @@ vec4 frag_glow_sphere()
 
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
-
-// export const frag_inner_shadow_rhomboid_call = `
-//   // vec4 new_color = inner_shadow_rhomboid(scale_down, u_gen_ctrl_map_cnt);
-//   // final_color = blend_mode_vec4( final_color, new_color );
-//   inner_shadow_rhomboid(scale_down, u_gen_ctrl_map_cnt)\\`;
-
-// export const frag_inner_shadow_rhomboid_call = '    inner_shadow_rhomboid(scale_down, u_gen_ctrl_map_cnt)';
-
-// blend_decider(in vec4 c1, in vec4 c2, in int mode)
 export const frag_inner_shadow_rhomboid_call = '  final_color = blend_decider( final_color, inner_shadow_rhomboid(scale_down, u_gen_ctrl_map_cnt), u_blend_mode );';
 
 export const frag_inner_shadow_rhomboid = `
@@ -148,7 +134,6 @@ export const frag_inner_shadow_rhomboid = `
    #include <blend_mode_directives>
 #endif
 
-
 #ifndef GAMMA_CORRECTION 
   #include <gamma_correction>
 #endif
@@ -156,9 +141,6 @@ export const frag_inner_shadow_rhomboid = `
 #ifndef BRIGHTNESS_CONTRAST 
   #include <brightness_contrast>
 #endif
-
-
-
 
 
 
@@ -210,7 +192,6 @@ vec4 inner_shadow_rhomboid(in float scale_down, inout int u_gen_ctrl_map_cnt)
   float ratio_min = mn / mx;
   float ratio_inv = 1.-ratio_min;
 
-
   
   float c_hor = abs((fract(uv.x*repeatx) - .5)* 2.);
   float c_vert = abs((fract(uv.y*repeaty) - .5)* 2.);
@@ -248,11 +229,6 @@ vec4 inner_shadow_rhomboid(in float scale_down, inout int u_gen_ctrl_map_cnt)
 
 /*************************************************************************************************************************/
 /*************************************************************************************************************************/
-
-// export const frag_explosion_circle_call = `
-//   // final_color = blend_color_add( final_color, frag_explosion_circle(scale_down, u_gen_ctrl_map_cnt) );
-//   final_color = blend_color_add( final_color, frag_explosion_circle(scale_down) );
-// `;
 export const frag_explosion_circle_call = '  final_color = blend_decider( final_color, frag_explosion_circle(scale_down), u_blend_mode );';
 
 export const frag_explosion_circle = `
@@ -272,10 +248,9 @@ export const frag_explosion_circle = `
 
 /*****************************************************/
 // BLEND MODES FUNCTION DECLERATIONS
-#ifdef BLEND_MODE 
+#ifdef BLEND_MODE
    #include <blend_mode_directives>
 #endif
-
 
 
 // vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
@@ -305,123 +280,164 @@ vec4 frag_explosion_circle(in float scale_down)
 
   float time = a_time;
 
-  
-  
+
   #define UV_READY 1
   uv = gl_FragCoord.xy;
   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
 
   float mod = src_color.a;
   vec3 color = vec3(.0);
-  
-  float d = length(uv/dim) / scale_down;
 
-  float c = 1.-smoothstep(.0, smoothstep_outer, d);
+
+  float len1 = length(uv/dim);
+  float d1 = len1 / scale_down;
+  float c = 1.-smoothstep(.0, smoothstep_outer, d1);
+
+  // create time function for background glow(so that x=0 and x=1 -> f(x)=0, x=.5->f(x)=1)
+  //float t_fn = ((4.0*time) - (4.0*(time*time)));
+  float t_fn = time;
+  //float t_fn = time*time;
+
+  float len2 = length(uv/(dim*(t_fn*.5)));
+  // make the round glow enlarge and shrink with the t_fn function
+  float d2 = 1.0 - len2 / scale_down;
 
   // Normalize time from [0.0, 1.0] to [0.1, 0.3]
-  float nt = time*.55 + .1; // To [0.1, 0.75] 
-  
-  float tt = time*.8 + .2; // To [0.3, 1.] 
-  float ring = smoothstep(0.0, tt, abs(d * 1.- (time*ringDiameter)));
-  
-  
-  
-  float centerFlash = .2*nt; // The Smaller the value, the greater the flash in the center ring
-  float cg = (time*(1.0-center_glow_start) + center_glow_start); // 'Delay' the center glow (smaller) 
-  float ex = (d * cg * centerFlash); 
-  
-  float dim_down = 4.1;
+  float nt = time*.55 + .1; // To [0.1, 0.75]
+
+  float tt = time*.8 + .2; // To [0.3, 1.]
+  float ring = smoothstep(0.0, tt, abs(d1 * 1.- (time*ringDiameter)));
+
+  float centerFlash = .1*nt; // The Smaller the value, the greater the flash in the center ring
+  float cg = (time*(1.0-center_glow_start) + center_glow_start); // 'Delay' the center glow (smaller)
+  float ex = (d1 * cg * centerFlash);
 
   float ring_width = .5; // Small values, larger width
-  // color = vec3(v_generic2_y) / min(ring*ring_width, ex);
   color = vec3(intensity) / min(ring*ring_width, ex);
 
+  //vec3 glow_bk = (src_color.rgb * (1.-t_fn)) * d2;
+  //vec3 glow_bk = (src_color.rgb * (t_fn)) * d2 * 1.;
+  vec3 glow_bk = src_color.rgb * d2;
+
+  //float rev_t = 1.-(time*.8+.1);
+  float rev_t = 1.-(time+0.1);
+
+
+  //color = mix(color, src_color.rgb, 1.-(time*.2));
+  color *= c*rev_t*time;
+  //color = mix(color, glow_bk, 1.-(time*.2));
+  //color = mix(color, glow_bk, (time*.2));
   
-  color = mix(color, src_color.rgb, 1.-(time*.2));
-  
-  
-  
-  // float rev_t = 1.-(time*.8+.1);
-  float rev_t = 1.-(time*1.+.1);
-  vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color*c*rev_t, c*rev_t);
-  // vec4 final = vec4(color*c*rev_t, c*rev_t);
-  
-  final *= src_color.a;
-  return final; 
+  //color *= glow_bk;
+  //glow_bk *= rev_t;
+
+
+
+  //vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color*c*rev_t, c*rev_t);
+  vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color, c*rev_t);
+  //final = vec4(color, c*rev_t);
+  //final = vec4(color, 0.0);
+
+  //final = vec4(glow_bk, 1.0);
+  return final;
 }
 `;
-/**SAVE_NEW */
-  // // float ringDiameter = .6*control2; // The smaller the value, the smaller the explosion ring.
-  // float ringDiameter = 1.6*control2; // The smaller the value, the smaller the explosion ring.
-  // // float ring = abs(c * (1.*control3)- (time*ringDiameter));
-  // // float ring = abs(c*1.3 * (1.)- (time*ringDiameter));
-  // // float ring = abs(c*1.3 * (time*ringDiameter));
-  // float ring = abs(c*1.3 * (1.)- ((1.-time)*ringDiameter));
-  // // return vec4(ring)*src_color;
-
-  // float centerFlash = 2.6*control3; // The Smaller the value, the greater the flash in the center ring
-  // // float ex = 1.-abs(c * fract(time) * centerFlash); // GOOD!
-  // float ex = c-abs(c * fract(time) * centerFlash); // GOOD!
-  // // float ex = 1.-abs(c * fract(time* centerFlash) ); // GOOD!
-  // // float ex = .2;
-  // // float ex = abs(c*1. * fract(1.-time*1.) * centerFlash)*1.; // GOOD!
-  // // return vec4(ex)*src_color;
-  
-  
-  // // color = vec3(1.) * mix(ring*1., ex*1.1, control3);
-  // // color = vec3(1.) * mix(ring*1., ex*1.1, .5);
-  // // color = vec3(1.) * blm_color_dodge(ring, ex);
-  // color = vec3(1.) * (ring / ex);
-  // return vec4(color, 0.)*src_color;
-
-  // color = vec3(.2) / min(ring*.5, ex*1.5);
-  // // color = vec3(.1) / min(ring*1.5, ex*.5);
-  
-  // color = mix(color, src_color.rgb, (time*.09));
-  // // color = mix(color, src_color.rgb, 1.-(time*.2));
-
-  // return vec4(color, 0.);
-/** SAVE-ONLY THE FUNCTION
- *   vec3 color = vec3(.0);
-
-  // if(uv.x > -100.) return RED;
-  // if(gl_FragCoord.xy.x > 200.1) return RED;
-  
-  float d = length(uv)/v_dim2_x;
-  // if(uv.x > -100.) return RED;
-  // if(d > 1.*control1) return smoothstep(0.2, control1, RED);
-  // return vec4(d*control1);
-  // return vec4(d);
-  float c = 1.-smoothstep(.0, .9, d);
-  // return vec4(c);
-  
-  float ringDiameter = 1.6; // The smaller the value, the smaller the explosion ring.
-  float ring = abs(c * 1.- (time*ringDiameter));
-  // return vec4(ring);
-
-  float centerFlash = .6; // The Smaller the value, the greater the flash in the center ring
-  float ex = abs(c * fract(time) * centerFlash); // GOOD!
-  
-  // color = vec3(.2) / min(ring*.5, ex*1.5);
-  color = vec3(.1) / min(ring*1.5, ex*.5);
-  return vec4(1.-color, 0.5);
-  
-  color = mix(color, src_color.rgb, (time*.09));
-  // color = mix(color, src_color.rgb, 1.-(time*.2));
-
-  return vec4(color, 0.);
- */
-
-
-
-/*************************************************************************************************************************/
-/*************************************************************************************************************************/
-
-// export const frag_explosion_glow_call = `
-//   vec4 new_color = frag_explosion_glow();
-//   final_color = new_color;
+/*SAVE*/
+// export const frag_explosion_circle = `
+//
+// /********************************************************************************************/
+// // SHADER UNIT: frag_explosion_circle
+// /********************************************************************************************/
+//
+//
+// /*****************************************************/
+// // GENERIC GLOBAL VARIABLES DECLERATIONS
+// #ifndef UV_READY
+//   vec2 uv = vec2(0,0);
+// #endif
+//
+//
+//
+// /*****************************************************/
+// // BLEND MODES FUNCTION DECLERATIONS
+// #ifdef BLEND_MODE
+//    #include <blend_mode_directives>
+// #endif
+//
+//
+// // vec4 frag_explosion_circle(in float scale_down, inout int u_gen_ctrl_map_cnt)
+// vec4 frag_explosion_circle(in float scale_down)
+// {
+//   #ifdef A_TIME
+//     float a_time = v_time;
+//   #endif
+//
+//   #ifdef U_TIME_FLOAT
+//     float u_time = u_time;
+//   #endif
+//
+//
+//   // float smoothstep_outer = u_generic_controls[u_gen_ctrl_map_cnt++];
+//   // float ringDiameter = u_generic_controls[u_gen_ctrl_map_cnt++] * 1.5; // The smaller the value, the smaller the explosion ring.
+//   // float intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
+//   // float center_glow_start = u_generic_controls[u_gen_ctrl_map_cnt++]; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
+//   float smoothstep_outer = 1.;
+//   float ringDiameter = 1.5*v_generic2_x; // The smaller the value, the smaller the explosion ring.
+//   float intensity = v_generic2_y;
+//   float center_glow_start = .9; // start: between 0-1; If start=0.8, then 0.8-1.0 will give a smaller center glow
+//
+//   vec2 res = u_screen_res;
+//   vec2 dim = vec2(v_dim2_x, v_dim2_y);
+//   vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);
+//
+//   float time = a_time;
+//
+//
+//   #define UV_READY 1
+//   uv = gl_FragCoord.xy;
+//   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
+//
+//   float mod = src_color.a;
+//   vec3 color = vec3(.0);
+//
+//
+//   float d1 = length(uv/dim) / scale_down;
+//   float c = 1.-smoothstep(.0, smoothstep_outer, d1);
+//
+//
+//   // Normalize time from [0.0, 1.0] to [0.1, 0.3]
+//   float nt = time*.55 + .1; // To [0.1, 0.75]
+//
+//   float tt = time*.8 + .2; // To [0.3, 1.]
+//   float ring = smoothstep(0.0, tt, abs(d1 * 1.- (time*ringDiameter)));
+//
+//
+//   float centerFlash = .2*nt; // The Smaller the value, the greater the flash in the center ring
+//   float cg = (time*(1.0-center_glow_start) + center_glow_start); // 'Delay' the center glow (smaller)
+//   float ex = (d1 * cg * centerFlash);
+//
+//   float ring_width = .5; // Small values, larger width
+//   color = vec3(intensity) / min(ring*ring_width, ex);
+//
+//
+//   color = mix(color, src_color.rgb, 1.-(time*.2));
+//
+//   // float rev_t = 1.-(time*.8+.1);
+//   float rev_t = 1.-(time*1.+.1);
+//
+//
+//   vec4 final = vec4((src_color.rgb * ((rev_t*time)+.2) * c) + color*c*rev_t, c*rev_t);
+//
+//   //final *= src_color.a;
+//   return final;
+// }
 // `;
-export const frag_explosion_glow_call = '  final_color = blend_decider( final_color, frag_explosion_glow(), u_blend_mode );'
+//
+
+
+/*************************************************************************************************************************/
+/*************************************************************************************************************************/
+export const frag_explosion_glow_call = '  final_color = blend_decider( final_color, frag_explosion_glow(scale_down), u_blend_mode );'
 
 export const frag_explosion_glow = `
 
@@ -451,18 +467,16 @@ export const frag_explosion_glow = `
 #endif
 
 
-
-
-
-vec4 frag_explosion_glow()
+vec4 frag_explosion_glow(in float scale_down)
 {
 // TODO: Implement with u_generic_controls[counter++] from fragment main() 
   #ifdef U_GENERIC_CONTROLS
     int u_gen_ctrl_map_cnt = 0;
   #endif
 
-  float ${u}ctrl1 = u_generic_controls[u_gen_ctrl_map_cnt++];
-  float ${u}ctrl2 = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}size = u_generic_controls[u_gen_ctrl_map_cnt++]*2.;
+  float ${u}glow_distance = u_generic_controls[u_gen_ctrl_map_cnt++];
+  float ${u}intensity = u_generic_controls[u_gen_ctrl_map_cnt++];
 
   vec2 res = u_screen_res;
   vec2 local_res = vec2(v_dim2_x*2., v_dim2_y*2.);
@@ -473,26 +487,22 @@ vec4 frag_explosion_glow()
   #define UV_READY 1
   uv = gl_FragCoord.xy;
   pixel_map_model_space_coordinates(uv, res, v_wpos3_x, v_wpos3_y);
-  
   uv_map_coordinates_zero_one( uv, local_res );
+  //uv *= scale_down;
   
-  // ctrl1
-  float d = .7 - length(uv)*2.*${u}ctrl1+(rev_time*.5);
+  // size
+  float d = ${u}intensity - ( length(uv) * ${u}size ) + (rev_time*.5);
   
-  // ctrl2
-  float c = d * smoothstep(${u}ctrl2, 1.*rev_time, (d));
+  // glow_distance
+  float c = d * smoothstep(${u}glow_distance, rev_time, (d));
   
   c *=c;
 
   /* Animate a control from high to low for the third parameters of the smoothmin function */
-  // c = smoothmin(c,  2.*u_generic_controls[u_gen_ctrl_map_cnt++], c*u_generic_controls[u_gen_ctrl_map_cnt++]);
+  c = smoothmin(c,  2.*u_generic_controls[u_gen_ctrl_map_cnt++], c*u_generic_controls[u_gen_ctrl_map_cnt++]);
 
 
   return vec4(c*rev_time*rev_time) * src_color;
-  // return vec4(c*rev_time*rev_time);
-  // return vec4(c);
-  // return RED;
-  // return vec4(vec3(c), c*time*time);
     
 }
 `;

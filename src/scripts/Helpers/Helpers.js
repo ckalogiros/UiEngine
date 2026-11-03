@@ -1,5 +1,5 @@
 "use strict";
-import { COLOR_ARRAY3 } from "../Engine/Drawables/Material/Base/Colors.js";
+import { COLOR_ARRAY3 } from "../Engine/Drawables/Material/Colors.js";
 import { MapLinear } from "./Math/MathOperations.js";
 
 
@@ -134,7 +134,7 @@ export function GetSignInt(val){
 export function GetSign(val){
         if (val<0) return -1;
         if (val>0) return 1;
-        if (val===-0) return -1;
+        // if (val===-0) return -1;
         else return 0;
 }
 
@@ -246,9 +246,9 @@ export function SizeOfObject( object ) {
 
 export function Bubble_sort(arr) {
 
-    const n = arr.length;
-    for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - i - 1; j++) {
+    const len = arr.length;
+    for (let i = 0; i < len - 1; i++) {
+        for (let j = 0; j < len - i - 1; j++) {
             if (arr[j] > arr[j + 1]) {
                 // Swap
                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];

@@ -86,6 +86,7 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
    let block_created = false;
 
    const len = _uniforms_info.length;
+    let std140_total_size = 0;
 
    for (let i = 0; i < len; i++) {
       if (_uniforms_info[i].shader & UNIFORM.IS_SHARED) {
@@ -98,12 +99,24 @@ function Resolve_uniforms_from_sid(_uniforms_info, which_shader) {
 
          const type = UNIF_TYPE.GetStr(_uniforms_info[i].type);
          uniforms_code += ` ${type} ${_uniforms_info[i].name};\n`;
+
+          std140_total_size += UNIF_TYPE.GetSizeInBytes(_uniforms_info[i].type, "UNIF_TYPE");
+
       }
 
    }
 
+   const std140_byte_size =  Math.ceil(std140_total_size / 16) * 16;
+   if(std140_byte_size > std140_total_size){
+       const remaining_bytes = std140_byte_size-std140_total_size;
+       const pad_str = UNIF_TYPE.GetStrFromSize(remaining_bytes);
+       uniforms_code += ` ${pad_str} ${'padding'};\n`;
+       // _uniforms_info
+   }
+
    // End uniforms block
    if (block_created) uniforms_code += '};\n';
+
 
 
    // uniforms_code += '\n// ---------- UNIFORMS ----------\n';
@@ -435,9 +448,11 @@ function Resolve_function_operations_called_from_main(shader_ops=null) {
          else shader_ops_code += `  final_color = ${Resolve_blending_mode(blend_mode)}( final_color, sdf_rect_color );`;
       }
 
+
    }
 
    return shader_ops_code;
+   // return len;
 
 }
 
@@ -480,7 +495,7 @@ const attribs_info = { mesh_attribs: [], attribs_loc: [] };
 
 
 
-
+/** */
 function Create_new_attrib_location(loc, loc_idx) {
 
    if (loc_idx > 4)
@@ -496,9 +511,7 @@ function Create_new_attrib_location(loc, loc_idx) {
 
    return loc_idx;
 }
-
-
-
+/** */
 function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, attrib_flag=0x0) {
 
    const pass_to_fs = sid.pass & attrib_flag;
@@ -514,9 +527,296 @@ function Create_attribute(name, extension, location_name, attr_idx, sid = 0x0, a
 
    return o;
 }
+/** */
+export function Shader_builder_create_attribs_info(sid) {
+
+   const assign_new_loc = (loc, loc_idx)=>   {
+      if (loc_idx > 4)
+         console.error('8144325 \nloc_idx excceding max')
+   
+      loc_idx++;
+      loc[loc_idx].name = `a_generic_${loc_idx}`;
+      loc[loc_idx].is_active = true;
+   
+      return loc_idx;
+   }
+
+   const create_attribute = (name, extension, location_name, attr_idx, sid = 0x0, attrib_flag=0x0)=> {
+
+      const pass_to_fs = sid.pass & attrib_flag;
+   
+      const a = {
+         is_occupied: true,
+         is_passing: pass_to_fs, // Is this attrib passing to the fragment shader 
+         name: name,
+         out_name: `v_${name}${extension}`,
+         in_name: `${location_name}.${attribs_xyzw[attr_idx]}`,
+         // extra: '',
+      };
+   
+      return a;
+   }
+
+   const loc = [
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+      {
+         attrib_data_on_different_vb: false,
+         is_instanced_buffer: false,
+         is_active: false,
+         name: '',
+         attr: [
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+            { is_occupied: false, name: '', in_name: '', },
+         ],
+      },
+   ];
+
+
+   const attribs_info_m = { mesh_attribs: [], attribs_loc: [] };
+
+
+   const prog_attribs_indexing = new Shader_Attributes(true, INT_NULL); // Specific to gl Program. Store the connection of shader attrib location to the SID flag(E.x. .COL4:loc=2)
+   let attribs_idx = 0;
+   let loc_idx = -1;
+   let vec_idx = 0;
+
+   
+   loc_idx = assign_new_loc(loc, loc_idx, sid.inst); vec_idx = 0;
+
+   
+   loc[loc_idx].attrib_data_on_different_vb = false;
+   loc[loc_idx].is_instanced_buffer = true;
+
+
+   //
+   const attributes_len = Shader_bit_flags_get_attr_size();
+   for (let i = 0; i < attributes_len; i++) {
+
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      if ((sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG)) && (attr_info.FLAG & SID.ATTR.MSDF)===0) {
+
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.ATTR_NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+
+
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         mesh_attribute.name = attr_name;
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc)
+         
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+            
+            const vshader_attr_name = attr_name
+            
+            if (vec_idx >= max_val_in_loc) {
+               loc_idx = Create_new_attrib_location(loc, loc_idx, sid.inst); vec_idx = 0;
+               loc[loc_idx].is_instanced_buffer = true;
+            }
+
+            
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            loc[loc_idx].attr[vec_idx] = create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
+            
+            vec_idx++;
+            mesh_attribute.size++;
+            
+         }
+         
+         mesh_attribute.loc = loc_idx;
+         attribs_info_m.mesh_attribs.push(mesh_attribute);
+
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
+
+      }
+   }
+
+   // Case there is no Instanced buffer, we have already created the first attribute location 
+   if (loc_idx !== 0) {
+      loc_idx = assign_new_loc(loc, loc_idx, false);
+      vec_idx = 0;
+   }
+   loc[loc_idx].attrib_data_on_different_vb = true;
+   loc[loc_idx].is_instanced_buffer = false;
 
 
 
+   for (let i = 0; i < attributes_len; i++) {
+
+      const attr_info = Shader_bit_flags_get_attr_info_from_index(i);
+      
+      // if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0) {
+      if (sid.attr & attr_info.FLAG && (sid.inst & attr_info.FLAG) === 0 
+         && (attr_info.FLAG & SID.ATTR.COL4_PER_VERTEX)===0
+         && (attr_info.FLAG & SID.ATTR.MSDF)===0
+      ) {
+
+         const attr_flag = attr_info.FLAG;
+         const attr_name = attr_info.ATTR_NAME;
+         const attr_type = attr_info.TYPE;
+         const attr_type_size = attr_info.TYPE_SIZE;
+
+         // TODO: Look if the attrib_flag or any other info is already accessible from the ShaderBitFlags file for efficiency
+         const mesh_attribute = new Mesh_attribute();
+         mesh_attribute.name = attr_name; // console.log(attr_name)
+         mesh_attribute.attrib_flag |= attr_flag;
+         mesh_attribute.type = attr_type;
+         mesh_attribute.offset = vec_idx + (loc_idx * max_val_in_loc);
+
+
+         // Run for type size
+         for (let j = 0; j < attr_type_size; j++) {
+
+            const ext = (attr_type_size > 1) ? `_${Attribute_get_type_extension(j)}` : ''; // Get the extension [.x, .y, .z, .w]
+
+            const vshader_attr_name = attr_name;
+
+            // Check for full attrib location
+            if (vec_idx >= max_val_in_loc) {
+               loc_idx = assign_new_loc(loc, loc_idx, sid.inst); vec_idx = 0;
+               loc[loc_idx].is_instanced_buffer = false;
+            }
+
+            // HACK: TODO: Should the pass attributes be set by the user on root mesh creation? 
+            loc[loc_idx].attr[vec_idx] = loc[loc_idx].attr[vec_idx] = create_attribute(vshader_attr_name, ext, loc[loc_idx].name, vec_idx, sid, attr_flag);
+
+            
+            vec_idx++;
+            mesh_attribute.size++;
+            
+         }
+         
+         mesh_attribute.loc = loc_idx;
+         attribs_info_m.mesh_attribs.push(mesh_attribute);
+         
+         // Enable attribute in the Program's attrib_indexing, by setting to the attribute key it's shader location index. E.x. prog_attribs_indexing.COL4 = 0 (loc)
+         const obj_key = Shader_bit_flags_get_attr_key_name_from_flag(attr_flag);
+         prog_attribs_indexing[obj_key] = attribs_idx++;
+         
+      }
+   }
+
+   // console.log('{{{{{{{{{{ PROGRAMS LOC INDEXING }}}}}}}}}}\n  prog_attribs_indexing', prog_attribs_indexing);
+
+   locations = loc;
+
+   if (vec_idx === 1) {
+      loc[loc_idx].attr[0].in_name = `${loc[loc_idx].name}`
+   }
+
+
+   // Create the generic attribute locations info
+   let offset = 0;
+   let devisor = 0;
+   let size = 0;
+   for (let i = 0; i < locations.length; i++) {
+
+      if (locations[i].is_active) {
+
+         offset += size;
+         size = 0;
+
+         // FIX HERE: For the generic location where the instanced buffer begins, we need to reset the offset to 0.
+         for (let j = 0; j < locations[i].attr.length; j++) {
+            if (locations[i].attr[j].is_occupied) size++;
+         }
+
+         if (loc[i].is_instanced_buffer === true) devisor = 1;
+         else devisor = 0;
+         if (loc[i].attrib_data_on_different_vb === true)
+            offset = 0;
+
+         attribs_info_m.attribs_loc.push({
+            locs: i,
+            sizes: size,
+            offsets: offset,
+            devisor: devisor,
+         });
+      }
+   }
+
+
+
+   // DEBUG-PRINT
+   if(DEBUG.SHADERS) console.log('{{{{{{{{{{ PROGRAMS ATTRIBUTES }}}}}}}}}}', '\n attribs_info_m', attribs_info_m, '\n attribs_indexing', prog_attribs_indexing.PrintEnabled())
+   // console.log('{{{{{{{{{{ PROGRAMS LOC INDEXING }}}}}}}}}}\n  prog_attribs_indexing', prog_attribs_indexing);
+
+   return {
+      attribs_info_m: attribs_info_m,
+      attribs_indexing: prog_attribs_indexing,
+   }
+
+
+}
+/** */
 function Vertex_shader_resolve_attributes_in(sid) {
 
    attributes_in_code += ''
@@ -786,9 +1086,7 @@ function Vertex_shader_resolve_attributes_in(sid) {
 
 
 }
-
-
-
+/** */
 function Vertex_shader_resolve_attributes_out() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -805,9 +1103,7 @@ function Vertex_shader_resolve_attributes_out() {
    }
 
 }
-
-
-
+/** */
 function Vertex_shader_resolve_attributes_out_assignment() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -831,9 +1127,6 @@ function Vertex_shader_resolve_attributes_out_assignment() {
 
    // console.log('-------------------------------------------------------\nResolver: Attributes Assign:\n', attributes_assign_code);
 }
-
-
-
 /**
  * Set 'DEFINES_xxxx' and then find and replace the 'DEFINES_xxxx' with code from a function
  */
@@ -931,10 +1224,11 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
        * for vertex pos and another 2 for dimention
        */
 
-
-      (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
-         ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
-         : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+      
+      '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
+      // (sid.unif & SID.UNIF.PROJECTION_MATRIX) // TODO: See if we can set the code for 'u_projection' with a flag from the 'Resolve_uniforms_from_sid()' and not have to set the SID.UNIF.PROJECTION_MATRIX manualy
+      //    ? '   vec4 position = u_projection * vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);'
+      //    : '   vec4 position = vec4(v_pos2_x + v_wpos3_x, v_pos2_y + v_wpos3_y, v_wpos3_z, 1.0);',
 
       '   gl_Position = position;',
 
@@ -944,7 +1238,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
 
    const vertex_shader = vs_chunks.filter(filterEmptyLine).join('\n')
 
-   // const vs = Vertex_shader_includes_resolve(vertex_shader);
    const vs = Shader_includes_resolve(vertex_shader);
 
    const attribsidx = Shader_attributes_create(ret.attribs_info);
@@ -957,7 +1250,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
       code:vs_chunks,
    };
 }
-
 /** // https://www.khronos.org/opengl/wiki/Fragment_Shader
  * Fragment Shaders have the following built-in input variables.
 
@@ -966,10 +1258,6 @@ export function Shaders_build_vertex_shader(sid, uniforms_info) {
    in vec2 gl_PointCoord;
 
  */
-
-
-
-
 function Fragment_shader_resolve_attributes_in() {
 
    for (let i = 0; i < locations.length; i++) {
@@ -986,10 +1274,11 @@ function Fragment_shader_resolve_attributes_in() {
 
    // console.log('-------------------------------------------------------\nResolver: Fragment Shader Inputs:\n', fs_attribs_in_code);
 }
-
+/** */
 export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=null) {
 
    Fragment_shader_resolve_attributes_in();
+   // const has_shader_ops = Resolve_function_operations_called_from_main(shader_ops);
 
    const fs_chunks = [
       '#version 300 es',
@@ -1012,8 +1301,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '#include <precision_high>',
 
       // TODO: REMOVE  U_SMOKE_PARAMS_VEC3 U_NOISE_PARAMS and replace with generic buffer
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? '#define U_SMOKE_PARAMS_VEC3 1' : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC2) ? '#define U_SMOKE_PARAMS_VEC2 1' : '',
       (sid.attr & SID.ATTR.TEX2) ? '#define A_TEX_COORD 1' : '',
       (sid.attr & SID.ATTR.TIME) ? '#define A_TIME 1' : '',
       (sid.attr & SID.ATTR.ANGLE) ? '#define A_ANGLE 1' : '',
@@ -1071,24 +1358,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       Resolve_uniforms_from_sid(uniforms_info, UNIFORM.IN_FS),
       (sid.attr & SID.ATTR.TEX2) ? '#include <frag_u_sampler0>' : '',
 
-      // TODO: Is U_GENERIC_FLOAT needed?? REMOVE IT
-      // TODO: Is U_GENERIC_VECxxx needed?? REMOVE IT
       // Generic Uniforms
       (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '#define U_SCALE_VEC2 1' : '',
       (sid.unif & SID.UNIF.FS_TIME_FLOAT) ? '#define U_TIME_FLOAT 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '#define U_GENERIC_VEC2 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '#define U_GENERIC_VEC3 1' : '',
-      (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '#define U_GENERIC_VEC4 1' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_CONTROLS) ? '#define U_GENERIC_CONTROLS 1' : '',
 
-      // Uniforms for testing
-      // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '#define U_GENERIC_FLOAT 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC2) ? '#define U_GENERIC_VEC2 1' : '', 
-      // (sid.unif & SID.UNIF.FS_TEST_VEC3) ? '#define U_GENERIC_VEC3 1' : '', 
-
-      // Resolve function operations shader code 
-      // (shader_ops!==null) ? Resolve_function_operations(shader_ops) : '',
 
 
 
@@ -1122,8 +1396,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       '\n#include <smoothmin>',
       '\n#include <brightness_contrast>',
 
-      // IMPORTANT: Ca;;s the old 'frag_round_corners()' only if both rcorners and feather are enabled.
-      // FIXME: Repeal 'frag_round_corners()', but think if we need the feather effect or the SFD_RECT satisfies the feathering
+      // FIXME: Remove any unecessary
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_corners :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners : '',
       (sid.attr & SID.ATTR.SDF) ? frag_sdf : '',
@@ -1135,7 +1408,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow : '',
       // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise : '',
       // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2 : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
+      // (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke : '',
       
       
       /********************************************************************************************************/
@@ -1199,31 +1472,27 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
   `,
       (sid.pass & SID.ATTR.DIM2) ? `  vec2 dim = vec2(v_dim2_x, v_dim2_y);\n  vec2 local_res = vec2(dim.x, dim.y);` : '',
 
-      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  float scale_down = u_scale2.x;' : '  float scale_down = 1.;', // Initialize scale down variable
       (sid.attr & SID.ATTR.TEX2) ? '  vec2 v_tex_coord = vec2(v_tex2_x, v_tex2_y);' : '', // Initialize texture coordinates variable
       (sid.unif & SID.UNIF.SCREEN_RESOLUTION) ? '  vec2 res = u_screen_res;' : '', // Initialize screen resolution variable
       
       (sid.pass & SID.ATTR.VPOS2) ? '  vec2 vpos = vec2(v_pos2_x, v_pos2_y);' : '', // Initialize pixel coordinates variable
       '  vec2 uv = vec2(0.0, 0.0);', // Initialize pixel coordinates variable
-      // '  vec2 uv = gl_FragCoord.xy;', // Initialize pixel coordinates variable
       '  vec4 src_color = vec4(v_col4_x, v_col4_y, v_col4_z, v_col4_w);', // The users color
       '  vec4 final_color = vec4(0.0);', // The final output color
+      // '  vec4 final_color = vec4(1.0);', // The final output color
+      // '  vec4 final_color = vec4(1.0);', // The final output color
       // '  final_color = src_color;', // The final output color
 
-
-
-      Resolve_function_operations_called_from_main(shader_ops),
+      // If no operations in shaer, then the final_color(0) should be additive otherwise is gonna be 0
+      (shader_ops!==null) ? Resolve_function_operations_called_from_main(shader_ops) : 
+      // `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_ADD)}( final_color, src_color );`,
+      `  final_color = ${Resolve_blending_mode(SID.BLEND_OPTIONS.BLEND_MODE_MULTIPLY)}( final_color, src_color );`,
 
 
 
       ((sid.attr & SID.ATTR.BORDER) && (sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_style_call :
          ((sid.attr & SID.ATTR.R_CORNERS) && (sid.attr & SID.ATTR.FEATHER)) ? frag_round_corners_call :
 
-      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? '  float alpha = final_color.a;' : '',
-      // (sid.fx & (SID.FX.FS_GLOW_VEC3 | SID.FX.FS_GLOW_VEC2)) ? frag_glow_call : '',
-      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
-      // (sid.fx & SID.SHAD.FN_NOISE2) ? frag_noise_2_call : '',
-      (sid.fx & SID.FX.FS_SMOKE_VEC3) ? frag_smoke_call : '',
       (sid.attr & SID.ATTR.TEX2) ? (sid.attr & SID.ATTR.SDF) ? frag_sdf_call : (sid.attr & SID.ATTR.MSDF) ? frag_msdf_call : frag_tex : '',
 
       
@@ -1244,7 +1513,6 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_1) ? frag_noise_voronoi_1_call : '',
       (sid.shad & SID.SHAD.FN_NOISE_VORONOI_2) ? frag_noise_voronoi_2_call : '',
       
-      // (sid.fx & SID.SHAD.FN_NOISE) ? frag_noise_call : '',
       // Test Shaders
       (sid.shad & SID.SHAD.FS_TEST2) ? frag_test2_call : '',
       (sid.shad & SID.SHAD.FS_TEST1) ? frag_test1_call : '',
@@ -1253,18 +1521,10 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.shad & SID.SHAD.FS_TEST5) ? frag_test5_bubble_call : '',
       
       
-      // '  );',
-
-
-      // Resolve_function_operations_called_from_main(shader_ops),
-
-
-
 
       /********************************************************************************************************/
       // Color fragment
       (sid.shad & SID.SHAD.PRE_MULTIPLIED_ALPHA) ? '   final_color.rgb *= final_color.a; ' : '',
-      // '   color.rgb *= color.a; ',
 
       /**
        * Human Perception Luminance Formulas
@@ -1309,6 +1569,7 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // '  frag_color = final_color;',
       // '  frag_color = final_color * src_color;',
       (sid.shad & SID.SHAD.ENABLE_SRC_COLOR_IN_FRAG_MAIN) ? '  frag_color = final_color * src_color;' : '  frag_color = final_color;',
+      // '  frag_color = src_color;',
 
 
 
@@ -1316,13 +1577,13 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
 
 
       /********************************************************************************************************/
-      // HACK: prevent optimizer from removing the uniform u_scale2
-      // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  if(u_scale2.x == 0.) ;' : '', 
+      // HACK: prevent optimizer from removing unused uuniforms
       (sid.unif & SID.UNIF.TIME) ? '  if(u_time == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_FLOAT) ? '  if(u_generic_float == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC2) ? '  if(u_generic_vec2.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC3) ? '  if(u_generic_vec3.x == 0.) ;' : '',
       (sid.unif & SID.UNIF.FS_GENERIC_VEC4) ? '  if(u_generic_vec4.x == 0.) ;' : '',
+<<<<<<< HEAD
       // '  if(u_blend_mode) bool a = false;',
       '  if(u_blend_mode == 0) final_color *= 1.0;', // SID.UNIF.BLEND_MODE
       // (sid.unif & SID.UNIF.FS_TEST_FLOAT) ? '   if(u_generic_float == 0.) ;' : '', 
@@ -1331,6 +1592,11 @@ export function Shaders_build_fragment_shader(sid, uniforms_info, shader_ops=nul
       // (sid.unif & SID.UNIF.TIME) ? '  frag_color.xyz *= u_time;' : '',
       // (sid.unif & SID.UNIF.U_SCALE_VEC2) ? '  frag_color.xyz *= u_scale2.x;' : '',
       // true ? 'frag_color = vec4(1.);' : '',
+=======
+      // '  if(u_blend_mode == 0) final_color *= 1.0 + float(u_blend_mode);',
+      // '  final_color *= 1.0 + float(u_blend_mode);',
+      '  final_color = blend_decider( final_color, src_color, u_blend_mode );',
+>>>>>>> buffers-visualize
 
       true ? '}' : '',
 

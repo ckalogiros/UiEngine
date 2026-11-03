@@ -2,16 +2,18 @@
 
 import { Callback_animations_create } from "../../Engine/Animations/CallbackAnimations.js";
 import { Mesh_animations_create } from "../../Engine/Animations/MeshAnimations.js";
-import { Create_rect_mesh } from "../../Engine/Core/CreateWidget.js";
-import { Mesh_unif_get_vb_root_wpos, Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
-import { Root_group_activate_all_vbs_in_renderqueue } from "../../Engine/Core/Views/RootView.js";
-import { BLUE, COLOR_GRADIENT_HORIZONTAL, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Base/Colors.js";
-import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Drawables/Operations/Recursions.js";
-import { Style_rect_default_properties } from "../../Engine/Drawables/Widgets/WidgetReadyStyles.js";
+import { Create_rect_mesh } from "../../Engine/Drawables/Widgets/Helpers/CreateWidgetInterface.js";
+import { Mesh_unif_set_vb_root_wpos } from "../../Engine/Core/MeshUniformsBuffer.js";
+import { BLUE, GREEN, GREY, RED, YELLOW } from "../../Engine/Drawables/Material/Colors.js";
 import { Gl_set_angle } from "../../Graphics/Buffers/VertexBuffersOps.js";
 import { Function_Slope, Logarithmic_interpolation } from "../../Helpers/Math/MathFunctions.js";
-import { Align_pre_simple } from "../Tests/TestAlignNestedSections.js";
-import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "../../Engine/Drawables/Widgets/Helpers/WidgetEnableProperties.js";
+import { Mesh_rotate_z } from "../../Engine/Drawables/Operations/MeshAttributesFunctions.js";
+import { Mesh_event_callback_create } from "../../Engine/Drawables/Operations/MeshPropertiesFunctions.js";
+import { Layout_basic_pre_render } from "../../Engine/Drawables/Operations/AlignNestedSections.js";
+import { View_render_from_view_NEW } from "../../Engine/Core/Views/MeshBufferViews.js";
+import { Vertex_buffer_calculate_vertexbuffer_render_group_starts } from "../../Graphics/Buffers/VertexBuffers.js";
+import { Construct_listen_events_from_mesh_tree, Construct_listen_events_relations_from_mesh_tree } from "../../Engine/Events/EventListeners.js";
 
 
 
@@ -22,110 +24,47 @@ import { Widget_gfx_ready_enable } from "../Widgets/WidgetGfxReady.js";
 let rotation = 0;
 
 
-// let ID = 0;
-// function Get_ID() { return ID++; }
 
-
-
-// class Function_Slope {
-//    constructor(slope_constant = 1.0, time_step = 0.1, scale = 100, name = ID) {
-
-//       this.slope_constant = slope_constant;
-//       this.time_step = time_step;
-//       this.timer = 0.0;
-//       this.scale = scale;
-//       this.in_animation = false;
-
-//       if (name) this.name = name;
-//       else name = Get_ID();
-//    }
-
-//    GetSlope() {
-//       return this.slope_constant;
-//    }
-
-//    SetSlope(val) {
-//       this.slope_constant = val;
-//    }
-
-//    GetTimer() {
-//       return this.timer;
-//    }
-
-//    SetTimer(val) {
-//       this.timer = val;
-//    }
-
-//    IncrementTimer() {
-//       this.timer += this.time_step;
-//    }
-
-//    GetAmmount() {
-//       return this.scale;
-//    }
-
-//    SetAmmount(val) {
-//       this.scale = val;
-//    }
-
-//    GetInAnimation() {
-//       return this.in_animation;
-//    }
-
-//    SetInAnimation(val) {
-//       this.in_animation = val;
-//    }
-// }
-
-
-
-
-export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create = true) {
+export function Board_rotations(x = 0, y = 0, root_widget = 0x0, transparency = 1, rows=12, columns=5, rect_size=25, controls_create = true) {
 
    let total_height = 10;
 
-   const size = 25;
+   const size = rect_size;
    const scale_down = .5;
    const rcorners = size/2;
+   // const transparency = .06;
 
    let controls_section = null;
-
+   
 
    const pad = 10;
-   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: GREY[1] }));
-   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners })
-   section.align.flags = LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF;
-   if (!PLATFORM.ANY_SMARTPHONE_DEVICE) section.CreateListenEvent(LISTEN_EVENT_TYPES.MOVE);
-   section.StateEnable(MESH_STATE.IS_RESIZEABLE);
-   section.SetName('BoardRotationsPanel');
-
+   const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [20, 20], pos: [x + pad, y + total_height * 2, 0], col: TRANSPARENCY(GREY[1], transparency*.0), name:'BoardRotationsPanel' }));
+   Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: rcorners, listener:{type:LISTEN_EVENT_TYPES.MOVE} })
+   section.StateEnable(MESH_STATE_FLAGS.IS_RESIZEABLE);
 
 
    const dim = [size, size]
-   let color_arr = [RED[8], BLUE[9], YELLOW[7], GREEN[6],];
-   // let color_arr = [GREY[2], GREY[4], GREY[8], GREY[6],];
+   let color_arr = [TRANSPARENCY(RED[8], transparency), TRANSPARENCY(BLUE[9], transparency), TRANSPARENCY(YELLOW[7], transparency), TRANSPARENCY(GREEN[6], transparency),];
    const color = [color_arr[0], color_arr[1], color_arr[2], color_arr[3],]
    let k = 0;
-   const cols = 5, rows = 12;
    const inner_pad = [size/8, size/16];
    let align = LAYOUT.HORIZONTAL
-   for (let i = 0; i < cols * rows; i++) {
+   for (let i = 0; i < columns * rows; i++) {
 
       k += 1; if (k >= 4) k = 0;
       color[0] = color_arr[k++]; if (k >= 4) k = 0;
       color[1] = color_arr[k++]; if (k >= 4) k = 0;
       color[2] = color_arr[k++]; if (k >= 4) k = 0;
       color[3] = color_arr[k++]; if (k >= 4) k = 0;
+      // color[3] = 1.; k++; if (k >= 4) k = 0;
 
-      if (i % cols === 0 && i !== 0) inner_pad[0] = 0
-      else inner_pad[0] = size/8;
+      if (i % columns === 0) inner_pad[0] = 0
+      else inner_pad[0] = size/3;
 
-      // console.log(i, inner_pad)
-
+      
       const mesh = Create_rect_mesh(Style_rect_default_properties({ pad: inner_pad, dim: dim, col: color }));
-      Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color });
-      mesh.align.flags = (i % cols === 0) ? LAYOUT.VERTICAL : align;
-      mesh.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER);
+      Widget_gfx_ready_enable({ mesh: mesh, enable_sdf_rect: rcorners, enable_attr_angle: true, enable_col_per_vertex: color, listener:{type:LISTEN_EVENT_TYPES.HOVER} });
+      mesh.align.flags = (i % columns === 0) ? LAYOUT.VERTICAL : align;
       section.AddItem(mesh);
 
       const equalize = 4;
@@ -139,16 +78,13 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
          equalize: equalize,
       };
 
-      const event_clbk_params = {
-         Clbk: (params_c) => {
+
+      const Clbk = (params_c) => {
             if (params_c.o.in_animation === false)
                Callback_animations_create(Animation_rotate_run, Animation_rotate_stop, params, `Run`);
-         },
-         clbk_params: {
-            o: slope_params_pointer,
-         },
-      }
-      mesh.CreateEventCallback(event_clbk_params);
+         }
+      const clbk_params = { o: slope_params_pointer, };
+      Mesh_event_callback_create(mesh, Clbk, clbk_params);
 
    }
 
@@ -156,11 +92,13 @@ export function Board_rotations(x = 0, y = 0, root_widget = 0x0, controls_create
 
    /****************************************************************************************************************/
    // Render
-   Align_pre_simple(section);
-   section.GenGfxCtx(GFX_CTX_FLAGS.PRIVATE | GFX_CTX_FLAGS.FROM_PARENT_DSC);
-   section.Render();
-   Root_group_activate_all_vbs_in_renderqueue(section.root_bufferidx);
-   section.GfxUniformsSetClbk('u_wposxy', Mesh_unif_get_vb_root_wpos, section.gfx.vb.groupidx);
+   section.GenGfxCtx();
+   
+   Layout_basic_pre_render(section);
+
+   Vertex_buffer_calculate_vertexbuffer_render_group_starts();
+   View_render_from_view_NEW(section.group_bufferidxs[0]);
+
 
    Construct_listen_events_from_mesh_tree(section)
    Construct_listen_events_relations_from_mesh_tree(section);
@@ -217,7 +155,7 @@ function Animation_rotate_run(params) {
 
    const rot = (slope * params.equalize * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
 
 
@@ -274,9 +212,9 @@ function Animation_rotate_back_run(params) {
 
    const rot = ((1. - slope) * angle);
 
-   mesh.RotateZ(rot);
+   Mesh_rotate_z(mesh, rot);
    Gl_set_angle(mesh.gfx, rot);
-   rotation = rot;
+   // rotation = rot;
 
    if (slope < 1.) return true;
    else return false

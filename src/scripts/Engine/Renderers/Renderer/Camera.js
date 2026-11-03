@@ -19,6 +19,7 @@ import { Matrix4 } from '../../../Helpers/Math/Matrix4.js';
 const DEG2RAD = Math.PI / 180;
 
 _CNT = 1;
+/** */
 export const CAMERA_CONTROLS = {
 	PAN: _CNT++,
 	ROTATE: _CNT++,
@@ -27,10 +28,7 @@ export const CAMERA_CONTROLS = {
 	NONE: 0,
 	COUNT: _CNT,
 };
-
-
-
-
+/** */
 export class Camera extends Matrix4 {
 
 	isSet; // To debug if camera has been created.
@@ -138,10 +136,7 @@ export class Camera extends Matrix4 {
 	}
 
 }
-
-
-
-
+/** */
 export class CameraOrthographic extends Camera {
 
 
@@ -170,10 +165,7 @@ export class CameraOrthographic extends Camera {
 	}
 
 }
-
-
-
-
+/** */
 export class CameraPerspective extends Camera {
 
 	constructor() {

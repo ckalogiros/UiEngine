@@ -1,16 +1,19 @@
 "use strict";
 
-import { Widget_gfx_ready_enable } from "../../../App/Widgets/WidgetGfxReady.js";
+import { Widget_gfx_ready_enable, Style_rect_default_properties } from "./Helpers/WidgetEnableProperties.js";
+import { State_mesh_set_clicked } from "../../../GlobalFunctions.js";
 import { CopyArr4 } from "../../../Helpers/Math/MathOperations.js";
-import { Create_rect_mesh } from "../../Core/CreateWidget.js";
+import { Create_rect_mesh } from "./Helpers/CreateWidgetInterface.js";
 import { Mesh_buffer_get_mesh_byidx } from "../../Core/MeshBuffer.js";
 import { Mesh_unif_is_vb_root_wpos, Mesh_unif_set_vb_root_wpos, Mesh_unif_set_vb_root_wposx, Mesh_unif_set_vb_root_wposy } from "../../Core/MeshUniformsBuffer.js";
 import { Root_group_view_buffer_add_mesh, Root_group_view_buffer_create_root } from "../../Core/Views/RootView.js";
 import { Listeners_set_priority } from "../../Events/EventListeners.js";
-import { Time_intervals_create, Time_intervals_destroy_byidx } from "../../Timers/TimeIntervals.js";
+import { Time_intervals_create, Time_intervals_destroy_byidx, Time_intervals_print } from "../../Timers/TimeIntervals.js";
 import { Rect_Mesh } from "../Meshes/Rect_Mesh.js";
-import { Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
-import { Style_rect_default_properties } from "./WidgetReadyStyles.js";
+import { Mesh_add_wpos_x, Mesh_add_wpos_xy, Mesh_add_wpos_y, Set_color_rgba, Set_default_color_rgba, Set_hover_color_rgba } from "../Operations/MeshAttributesFunctions.js";
+import { Mesh_listener_add, Mesh_listener_create } from "../Operations/MeshPropertiesFunctions.js";
+import { Gfx_generate_context } from "../../Interfaces/Gfx/MeshGfxContext.js";
+import { View_add_mesh, View_remove_mesh } from "../../Core/Views/MeshBufferViews.js";
 
 
 /**
@@ -40,7 +43,16 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       properties.style.rcorners = properties.size;
       properties.dim = switch_dim;
 
-      super(mesh_bufferidx, properties)
+      super(mesh_bufferidx, Style_rect_default_properties({
+         is_root: 0x0, // Avoid double setting as root, in this class and in Rect_Mesh class
+         pos: properties.pos,
+         dim: properties.dim,
+         col: properties.col,
+         pad: properties.pad,
+         name: properties.name,
+         num_faces: properties.num_faces,
+         is_debug_mesh: properties.is_debug_mesh,
+      }));
 
       this.color_active = [0, 0, 0, 0];
       CopyArr4(this.color_active, properties.col);
@@ -49,7 +61,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.mesh_bufferidx = mesh_bufferidx;
       this.isOn = 0x0;
       this.type |= MESH_TYPE.WIDGET_SWITCH;
-      this.SetName('Switch Widget');
 
       this.evt_params = null;
       
@@ -59,26 +70,29 @@ export class Widget_Switch_Simple extends Rect_Mesh {
          dim:[properties.size - pad, properties.size - pad], 
          col:properties.handle.col, 
          hover_margin:properties.handle.hover_margin, 
+         name:properties.handle.name,
          is_debug_mesh:properties.is_debug_mesh
       }));
       Widget_gfx_ready_enable({mesh:switch_handle, enable_sdf_rect:properties.size * (1 - ratio)});
 
-      this.EnableGfxUniforms({ unif: SID.UNIF.SCREEN_RESOLUTION }, 'u_screen_res', UNIF_TYPE.FVEC2, UNIFORM.IS_SHARED);
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
-
-      switch_handle.SetName('switch');
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
 
       switch_handle.mat.style.rcorners = properties.size - pad;
-      switch_handle.state.mask &= ~MESH_STATE.ACTIVE;
+      // switch_handle.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
 
-      this.AddChild(switch_handle);
-      this.StateEnable(MESH_STATE.IS_HOVER_COLORABLE);
+      // this.AddChild(switch_handle);
+      this.AddItem(switch_handle);
+      this.StateEnable(MESH_STATE_FLAGS.IS_HOVER_COLORABLE);
 
       this.SetLayout(properties.layout);
 
       if (properties.is_root & ROOT_WIDGETS.CREATE_ROOT && this) {
          this.root_bufferidx = Root_group_view_buffer_create_root(this.mesh_bufferidx);
          switch_handle.root_bufferidx = this.root_bufferidx;
+         
+         // Create view group
+         this.group_bufferidxs[0] = View_create_new_group(this);
+         switch_handle.group_bufferidxs[0] = this.group_bufferidxs[0];
       }
 
    }
@@ -97,17 +111,22 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
    Activate() {
 
-      this.state.mask |= MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask |= MESH_STATE.ACTIVE;
+      this.state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
+      this.children.buffer[0].state.mask |= MESH_STATE_FLAGS.ACTIVE;
+      
    }
-
-
+   
+   
    Deactivate() {
+      
+      this.state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.group_bufferidxs, this.geom.num_faces);
 
-      this.state.mask &= ~MESH_STATE.ACTIVE;
-      this.children.buffer[0].state.mask &= ~MESH_STATE.ACTIVE;
+      this.children.buffer[0].state.mask &= ~MESH_STATE_FLAGS.ACTIVE;
+      // View_remove_mesh(this.children.buffer[0].group_bufferidxs, this.children.buffer[0].geom.num_faces);
    }
-
+      
    StateEnable(MASK = 0x0) {
 
       this.state.mask |= MASK;
@@ -140,6 +159,12 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       this.children.buffer[0].root_bufferidx = root_bufferidx;
       Root_group_view_buffer_add_mesh(this.children.buffer[0].root_bufferidx, this.children.buffer[0].mesh_bufferidx);
    }
+   
+   SetViewGroupIndex(view_groupidx) {
+         
+      this.group_bufferidxs[0] = view_groupidx;
+      this.children.buffer[0].group_bufferidxs[0] = view_groupidx;
+   }
 
 
    SetGfxEnable(which, params) {
@@ -167,8 +192,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (this.gfx_ctx_parent === INT_NULL) {
 
-         this.gfx_ctx_flags = FLAGS;
-         this.gfx_ctx_parent = gfx_ctx_parent;
+         if ((this.gfx_ctx_flags & GFX_CTX_FLAGS.NEW) === 0) {
+            this.gfx_ctx_flags = FLAGS;
+            this.gfx_ctx_parent = gfx_ctx_parent;
+        }
          this.children.buffer[0].gfx_ctx_flags = FLAGS;
          this.children.buffer[0].gfx_ctx_parent = gfx_ctx_parent;
       }
@@ -220,16 +247,23 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       if (this.gfx_ctx_flags) FLAGS = this.gfx_ctx_flags; // Use user specific gfx flags, if user have enabled/assign any.
 
-      const gfx = super.GenGfxCtx(FLAGS, specific_vb_groupidx);
-      this.children.buffer[0].GenGfxCtx(FLAGS, specific_vb_groupidx);
-
-      return gfx;
+      const ret = Gfx_generate_context(FLAGS, this, specific_vb_groupidx);
+      this.gfx = ret.gfx;
+      // Add to view group
+      View_add_mesh(this.group_bufferidxs[0], this, ret.is_root_widget_on_reused_vb);
+      
+      const child_ret = Gfx_generate_context(FLAGS, this.children.buffer[0], specific_vb_groupidx);
+      this.children.buffer[0].gfx = child_ret.gfx;
+      // Add to view group
+      View_add_mesh(this.children.buffer[0].group_bufferidxs[0], this.children.buffer[0], child_ret.is_root_widget_on_reused_vb);
+      
+      return this.gfx;
    }
 
 
    Render() {
 
-      if (this.state.mask & MESH_STATE.ACTIVE) {
+      if (this.state.mask & MESH_STATE_FLAGS.ACTIVE) {
          super.AddToGfx();
          this.children.buffer[0].AddToGfx();
       }
@@ -256,10 +290,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       this.geom.pos[0] += x;
       this.geom.pos[1] += y;
-      this.geom.AddWposXY(this.gfx, x, y,);
+      Mesh_add_wpos_xy(this, x, y,);
       this.children.buffer[0].geom.pos[0] += x;
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposXY(this.gfx, x, y,);
+      Mesh_add_wpos_xy(this.children.buffer[0], x, y,);
 
    }
 
@@ -269,9 +303,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (x === 0) return;
 
       this.geom.pos[0] += x;
-      this.geom.AddWposX(this.gfx, x,);
+      Mesh_add_wpos_x(this, x,);
       this.children.buffer[0].geom.pos[0] += x;
-      this.children.buffer[0].geom.AddWposX(this.gfx, x,);
+      Mesh_add_wpos_x(this.children.buffer[0], x,);
    }
 
 
@@ -280,9 +314,9 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       if (y === 0) return;
 
       this.geom.pos[1] += y;
-      this.geom.AddWposY(this.gfx, y,);
+      Mesh_add_wpos_y(this, y,);
       this.children.buffer[0].geom.pos[1] += y;
-      this.children.buffer[0].geom.AddWposY(this.gfx, y,);
+      Mesh_add_wpos_y(this.children.buffer[0], y,);
 
    }
 
@@ -364,10 +398,10 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 
-   SetHoverColor() { this.SetUpdateFrameBuffer(); Set_hover_color_rgba(this.children.buffer[0]); }
+   SetHoverColor() { Set_hover_color_rgba(this.children.buffer[0]); }
 
 
-   SetHoverColorDefault() { this.SetUpdateFrameBuffer(); Set_default_color_rgba(this.children.buffer[0]); }
+   SetHoverColorDefault() { Set_default_color_rgba(this.children.buffer[0]); }
 
 
 
@@ -394,16 +428,16 @@ export class Widget_Switch_Simple extends Rect_Mesh {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
 
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
 
@@ -418,18 +452,17 @@ export class Widget_Switch_Simple extends Rect_Mesh {
       const switch_handle = mesh.children.buffer[0];
 
       mesh.isOn ^= 0x1;
-      mesh.SetUpdateFrameBuffer();
-      STATE.mesh.SetClicked(mesh);
+      State_mesh_set_clicked(mesh);
 
       if (mesh.isOn) {
          Set_color_rgba(mesh, mesh.color_active);
          switch_handle.geom.pos[0] += mesh.geom.dim[0];
-         switch_handle.geom.AddWposX(switch_handle.gfx, mesh.geom.dim[0],);
+         Mesh_add_wpos_x(switch_handle, mesh.geom.dim[0],);
       }
       else {
          Set_default_color_rgba(mesh);
          switch_handle.geom.pos[0] -= mesh.geom.dim[0];
-         switch_handle.geom.AddWposX(switch_handle.gfx, -mesh.geom.dim[0],);
+         Mesh_add_wpos_x(switch_handle, -mesh.geom.dim[0],);
       }
 
 
@@ -503,9 +536,6 @@ export class Widget_Switch_Simple extends Rect_Mesh {
    }
 
 }
-
-
-
 /** A callback function calls another callback that must be called via 'timeInterval'. 
  * Is responsible for creation/destruction of the timeInterval that in its turn 
  * will run automaticaly a callback from the application */
@@ -517,21 +547,22 @@ export function Switch_simple_time_interval_callback(params) {
 
       const intervalIdx = this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE];
       Time_intervals_destroy_byidx(intervalIdx);
-      this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
-
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxNoGapsVersion(INTERVALS.UPDATE);
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersion(INTERVALS.UPDATE);
+      // this_switch.timeIntervalsIdxBuffer.RemoveByIdxSortedVersionLastElemGuarantee(INTERVALS.UPDATE);
+      this_switch.timeIntervalsIdxBuffer.RemoveByIdx(INTERVALS.UPDATE);
+      
       return;
    }
 
    if (this_switch.isOn === 0x1 && this_switch.timeIntervalsIdxBuffer.buffer[INTERVALS.UPDATE] === INT_NULL) {
 
       const Clbk = params.targetBindingFunctions;
-      // const idx = Time_intervals_create(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, this.evt_params.EventClbk, this.evt_params.evt_params);
-      const idx = Time_intervals_create(10, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
+      const idx = Time_intervals_create(1, 'Switch TimeInterval Creation', TIME_INTERVAL_REPEAT_ALWAYS, Clbk, params.params);
       this_switch.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
    }
 }
-
-
+/** */
 export function Switch_set_listeners_priority(switch1) {
 
    const handle = switch1.children.buffer[0];
@@ -548,8 +579,7 @@ export function Switch_set_listeners_priority(switch1) {
    // } 
 
 }
-
-
+/** */
 function Switch_click_default_callback(params) {
    console.log(params, ' Clicked!');
 }

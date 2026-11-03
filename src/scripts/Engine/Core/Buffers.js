@@ -9,7 +9,42 @@
 // TODO: IMPLEMENT FREEIDX OR FREE_BUFFER (Also impl at MeshBufferViews.js: at // IMPORTANT: After consolidation, the buffer's freeidx is not valid)
 
 
+export const DEBUG_INFO_STRUCTS = {
 
+	BUFFER: {
+		GENERIC: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		CHARACTER: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class (new M_Buffer operations)
+			TOTAL_BUFFER_SIZE: 0, // The total ammount of all generic buffer's sizes. 
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT8: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT16: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT32: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+		INT64: {
+			NUM_BUFFERS: 0, // Count how many instantiations of Generic_Buffer class
+			TOTAL_BUFFER_SIZE: 0,
+			TOTAL_ELEM_COUNT: 0, // The total ammount of active elements in all buffers of the application
+		},
+
+	},
+};
 
 
 
@@ -23,7 +58,7 @@ let dubg = 0;
 /** */
 class Array_Buffer_Integer_Interface {
 
-
+   /** */
    constructor() {
 
       this.buffer = null;
@@ -37,7 +72,7 @@ class Array_Buffer_Integer_Interface {
       this.debug_name = null;
 
    }
-   
+   /** */
    Reset() {
 
       for (let i = 0; i <= this.boundary; i++) {
@@ -53,7 +88,7 @@ class Array_Buffer_Integer_Interface {
       this.freeidx = 0;
       this.reserveidx = INT_NULL;
    }
-
+   /** */
    Add(elem) {
 
       if (this.freeidx !== INT_NULL) {
@@ -72,8 +107,7 @@ class Array_Buffer_Integer_Interface {
       this.active_count++;
       return idx;
    }
-
-
+   /** */
    AddAtIndex(idx, elem) {
 
       if (idx < 0) console.error('SEVERE_ERROR.\nWRONG Index. Adding item at: ', idx);
@@ -96,8 +130,7 @@ class Array_Buffer_Integer_Interface {
 
       return idx;
    }
-
-
+   /** */
    GetNextFree() {
 
       if (this.active_count >= this.size) {
@@ -119,8 +152,7 @@ class Array_Buffer_Integer_Interface {
          }
       }
    }
-   
-   
+   /** */
    ShiftLeft(){
 
       if(this.boundary >= 0) {
@@ -163,8 +195,7 @@ class Array_Buffer_Integer_Interface {
          if(this.boundary > this.count) console.error('009988176651 \n Boundary > active_count', this.boundary, this.count)
       }
    }
-
-
+   /** */
    RemoveByIdx(idx) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -187,20 +218,9 @@ class Array_Buffer_Integer_Interface {
 
          return;
       }
-      // alert('877877877877 BUFFERS')
-      // console.error('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
       console.warn('877877877877 Buffer elem NOT exists', '\nidx', idx, '\nbuffer', this.buffer)
    }
-
-
-   /** Fast Remove Last Item. Caller is responsible of making sure at least one element exists. No check happens */
-   RemoveByIdxSortedVersionLastElemGuarantee() {
-
-      this.buffer[this.boundary] = INT_NULL;
-      this.boundary--;
-      this.active_count--;
-      /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
-   }
+   /** */
    RemoveByIdxNoGapsVersion(idx, debug_id, debug_name) {
 
       if (this.buffer[idx] !== INT_NULL) {
@@ -258,8 +278,7 @@ class Array_Buffer_Integer_Interface {
       this.active_count--;
       /**Debug */ if(this.boundary < INT_NULL) alert('0-Boundary is out of bounds\nBoundary <= -2');
    }
-
-   
+   /** */
    Consolidate() {
 
       alert(' 00909987813245 IMPLEMENT CORRECTLY')
@@ -288,8 +307,7 @@ class Array_Buffer_Integer_Interface {
       this.boundary = leftidx;
       // this.count has been calculated in a remove_idx function;
    }
-
-
+   /** */
    CopyFromBufferToStart(oldData) {
 
       const size = oldData.length;
@@ -300,20 +318,6 @@ class Array_Buffer_Integer_Interface {
    }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -375,28 +379,17 @@ export function New_int8_buffer(size=1, debug_name='INT8 DEBUB UNAMED') {
 }
 /** */
 export function Free_int8_buffer(buffer){
-   if(!buffer || buffer===_)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918767. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT8.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS--;
    // DEBUG_INFO_STRUCTS.BUFFER.INT8.NUM_BUFFERS = 0;
     // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -460,8 +453,11 @@ export function New_int16_buffer(size=1, debug_name='INT16 DEBUB UNAMED') {
 }
 /** */
 export function Free_int16_buffer(buffer){
-   if(!buffer || buffer===_)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918769. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT16.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT16.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
@@ -531,21 +527,17 @@ export function New_int32_buffer(size=1, debug_name='INT32 DEBUB UNAMED') {
 }
 /** */
 export function Free_int32_buffer(buffer){
-   
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918764. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.INT32.TOTAL_BUFFER_SIZE -= buffer.size;
    DEBUG_INFO_STRUCTS.BUFFER.INT32.NUM_BUFFERS--;
    // console.warn('ppppppppppppppppppp', buffer.debug_name)
    // console.log('Mem-DE-Alloc', buffer.debug_name, 'size', buffer.size)
    buffer = null;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -672,6 +664,12 @@ export class M_Buffer {
 
 
    ResetFull() {
+
+      if(!this.buffer || this.buffer===_) {
+
+         console.error('7155431200918768. Free buffer:Buffer is null ');
+         return;
+      }
 
       // If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
       if(this.buffer[this.boundary] instanceof Int32_Buffer) {
@@ -858,7 +856,8 @@ export class M_Buffer {
    }
 
 
-   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS AND THE SUBSTITUTION INDEX UPDATE IS FOR THE MESHES IDX FIELD. Call this on every Destroy, to have all M_Buffer elements not sparsed
+   // TODO: APPLIES ONLY FOR MESH TYPE ELEMENTS. THE SUBSTITUTION INDEX UPDATE IS FOR THE MESHES IDX FIELD. 
+   // Call this on every Destroy, to have all M_Buffer elements not sparsed
    ShiftElementOnDestroy(destroyed_idx) {
 
       if (destroyed_idx < this.boundary) {
@@ -935,6 +934,8 @@ export class M_Buffer {
 }
 const _generic_buffers_container = new M_Buffer();
 /** */
+export function Debug_Generic_buffers_container_get_buffer(){ return _generic_buffers_container }
+/** */
 export function Generic_buffers_container_get_size(){ return _generic_buffers_container.size }
 /** */
 export function Generic_buffers_container_get_active_count(){ return _generic_buffers_container.active_count }
@@ -965,8 +966,11 @@ export function New_generic_buffer(obj, debug_name = 'UNAMED BUFFER') {
 /** */
 export function Free_generic_buffer(buffer) {
 
-   if(!buffer)
-      console.log()
+   if(!buffer || buffer===_) {
+
+      console.error('7155431200918765. Free buffer:Buffer is null ');
+      return;
+   }
    //  If buffer element is another buffer type, destroy it. Always get a valid active element with index=boundary
    if(buffer.buffer[buffer.boundary] instanceof Int32_Buffer) {
 
@@ -1134,7 +1138,11 @@ export function New_generic_char_buffer(obj, debug_name = 'UNAMED BUFFER') {
 }
 /** */
 export function Free_generic_char_buffer(buffer) {
+   if(!buffer || buffer===_) {
 
+      console.error('7155431200918766. Free buffer:Buffer is null ');
+      return;
+   }
    DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.TOTAL_BUFFER_SIZE -= buffer.size; // Remove from the total allocations size the size of the buffer that is destroyed
    DEBUG_INFO_STRUCTS.BUFFER.CHARACTER.NUM_BUFFERS--;
 
@@ -1293,3 +1301,199 @@ export function DEBUG_INFO_BUFFERS_PRINT2() {
 //    }
 
 // }
+
+
+
+
+
+
+/**********************************************************************************************************************************************/
+// Queue: Generic Array
+/**********************************************************************************************************************************************/
+/** */
+class Queue_buffer {
+   constructor(capacity) {
+      this.capacity = capacity;
+      this.size = 0;
+      this.front = 0;
+      this.buffer = new Array();
+   }
+   Realloc() {
+      console.log('---------------------- REALLOC ----------------------');
+      let old_data = this.buffer;
+      const old_capacity = this.capacity;
+
+      this.capacity *= 2;
+      const new_data = new Array(this.capacity);
+
+      // for (let i = 0; i < old_capacity; i++) {
+      //    new_data[i] = old_data[i];
+      // }
+      // for (let i = old_capacity; i < this.capacity; i++) {
+      //    new_data[i] = null;
+      // }
+      // for (let i = 0; i < this.front; i++) {
+      //    new_data[i] = old_data[i];
+      // }
+      // for (let i = old_capacity; i < this.capacity; i++) {
+      //    new_data[i] = null;
+      // }
+      for (let i = 0; i < this.capacity; i++) {
+         new_data[i] = null;
+      }
+      const new_front = (this.front+old_capacity) % this.capacity;
+      for (let i = 0; i < old_capacity; i++) {
+         const old_idx = (this.front+i) % old_capacity;
+         const idx = (new_front + i) % this.capacity;
+         new_data[idx] = old_data[old_idx];
+      }
+      
+      console.log(new_data);
+
+      
+      old_data = null;
+      this.buffer = new_data;
+
+      return old_capacity;
+
+   }
+   Add(elem) {
+      let idx = (this.front + this.size) % this.capacity;
+      if(this.size >= this.capacity) {
+
+         const old_capacity = this.Realloc();
+         this.front = (this.front+old_capacity) % this.capacity;
+         idx = (this.front + this.size) % this.capacity;
+      }
+
+
+      this.buffer[idx] = elem;
+      this.size++;
+   }
+   Remove() {
+      if(this.size <= 0) return;
+      this.buffer[this.front] = null;
+      this.front = (this.front+1) % this.capacity;
+      this.size--;
+   }
+   Print() {
+      console.log(
+         '   Capacity:', this.capacity,
+         '   Size:', this.size,
+         '   Front idx:', this.front,
+         '   Elements:', 
+      )
+      // for (let i = 0; i < this.size; i++) {
+      //    const idx = (this.front+i) % this.capacity;
+      //    console.log(this.buffer[idx])
+      // }
+      console.log(this.buffer);
+      console.log('--------------------------------------');
+   }
+
+}
+export function New_generic_queue(capacity=4) {
+
+   if(capacity % 2 !== 0) alert('Capacity should be a multiple of 2');
+   const buffer = new Queue_buffer(capacity);
+   return buffer;
+
+}
+export function Test_queue_buffer() {
+
+   const capacity = 4;
+   const q = New_generic_queue(capacity);
+   console.log(
+      'Test: Queue buffer',
+      'Init queue. capacity:', capacity,
+   );
+   
+   
+   q.Add('1');
+   console.log('----  Adding: 1', );
+   q.Print()
+   
+   q.Add('2');
+   console.log(' ----  Adding: 2', );
+   q.Print()
+   
+   q.Add('3');
+   console.log(' ----  Adding: 3', );
+   q.Print()
+   
+   q.Add('4');
+   console.log(' ----   Adding: 4', );
+   q.Print()
+   
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   // q.Remove();
+   // console.log(' ----  Remove');
+   // q.Print()
+   
+
+
+   q.Add('1');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('2');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('3');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   q.Add('5');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+   
+   q.Remove();
+   console.log(' ----  Remove');
+   q.Print()
+
+
+   q.Add('6');
+   console.log(' ----  -Adding: Reallocation', );
+   q.Print()
+
+   q.Add('7');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('8');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('9');
+   console.log(' ----  Adding:', );
+   q.Print()
+
+   q.Add('10');
+   console.log(' ----  Adding:', );
+   q.Print()
+   
+
+
+}

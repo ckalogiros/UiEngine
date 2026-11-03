@@ -1,9 +1,11 @@
 "use strict";
 
+import { State_mesh_set_clicked, State_mesh_set_clickhold } from '../../../GlobalFunctions.js';
 import { Time_intervals_create, Time_intervals_destroy_byidx } from '../../Timers/TimeIntervals.js';
-import { GREY, WHITE } from '../Material/Base/Colors.js';
+import { GREY, WHITE } from '../Material/Colors.js';
+import { Mesh_listener_add, Mesh_listener_create, Mesh_state_check } from '../Operations/MeshPropertiesFunctions.js';
+import { Style_button_default_properties } from './Helpers/WidgetEnableProperties.js';
 import { Widget_Label } from './WidgetLabel.js';
-import { Style_button_default_properties } from './WidgetReadyStyles.js';
 
 
 
@@ -11,6 +13,7 @@ import { Style_button_default_properties } from './WidgetReadyStyles.js';
 
 
 
+/** */
 export class Widget_Button extends Widget_Label {
 
    // constructor(mesh_bufferidx, is_root, text, Align, pos, fontsize, col, text_col, pad = [20, 15], bold = .4, style = {rcorners:6, feather:2, border:0}, font = TEXTURES.DEFAULT_FONT, is_debug_mesh) {
@@ -60,41 +63,40 @@ export class Widget_Button extends Widget_Label {
 
       const mesh = this;
 
-      if (mesh.state.mask & MESH_STATE.ACTIVE) {
-         
+      if (mesh.state.mask & MESH_STATE_FLAGS.ACTIVE) {
+
          // Construct HOVER event
          if (mesh.listeners && mesh.listeners.buffer[E.H] === INT_NULL) {
-            mesh.AddListenEvent(E.H, null, null);
+            Mesh_listener_add(mesh, E.H, null, null);
          }
          // Construct CLICK_UP/MOVE event
          if (mesh.listeners && mesh.listeners.buffer[E.C] === INT_NULL) {
             const evt_params = { target_mesh: mesh, };
-            mesh.AddListenEvent(E.C, mesh.OnClick, evt_params);
+            Mesh_listener_add(mesh, E.C, mesh.OnClick, evt_params);
          }
       }
-      
+
       return false;
    }
 
 
    OnClick(params) {
-
       const mesh = params.evt_params.target_mesh;
 
       // Case the mesh has a chain callback function to call. (For now the button's chain callbacks are not chained)
       if (mesh.evt_params && mesh.evt_params.EventClbk) {
 
          // Create time interval to continuosly press the button
-         if (mesh.StateCheck(MESH_STATE.IS_HOLD_CLICK)) {
+         if (Mesh_state_check(mesh, MESH_STATE_FLAGS.IS_HOLD_CLICK)) {
 
             const EventClbk = mesh.evt_params.EventClbk;
             const target_params = mesh.evt_params.params.target_params
-            const idx = Time_intervals_create(16, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
+            const idx = Time_intervals_create(1, 'Button Click Hold', TIME_INTERVAL_REPEAT_ALWAYS, EventClbk, { target_params: target_params });
             mesh.timeIntervalsIdxBuffer.AddAtIndex(INTERVALS.UPDATE, idx);
 
-            STATE.mesh.SetClickHold(mesh);
+            State_mesh_set_clickhold(mesh);
          }
-         else  {
+         else {
 
             const EventClbk = mesh.evt_params.EventClbk;
             EventClbk(mesh.evt_params);
@@ -114,7 +116,7 @@ export class Widget_Button extends Widget_Label {
 
    RemoveTimeInterval(idx) {
       const intervalIdx = this.timeIntervalsIdxBuffer.buffer[idx];
-      if(intervalIdx===-1){
+      if (intervalIdx === -1) {
          console.error('intervalIdx', intervalIdx, 'this.timeIntervalsIdxBuffer.buffer', this.timeIntervalsIdxBuffer.buffer)
          alert('417772839 \nIssue with timeInterval\nPossible error: We overloaded the time intervals buffer\nThe buffer currently holds up to two intervals\nINTERVALS.UPDATE and INTERVALS.MOVE\nTry to dissable mesh Move event')
       }
@@ -144,7 +146,7 @@ export class Widget_Button extends Widget_Label {
 
       if (click_flags) this.state.mask |= click_flags;
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.CLICK_UP);
 
       // If there is a click event already created
    }
@@ -159,7 +161,7 @@ export class Widget_Switch extends Widget_Button {
 
       const max_text = properties.text_on.length > properties.text_off.length ? properties.text_on : properties.text_off;
 
-      super(mesh_bufferidx, Style_button_default_properties({is_root:properties.is_root, text:max_text, align:properties.align, pos:properties.pos, col:properties.col, text_col:properties.text_col, text_pad:properties.text_pad, font_size:properties.font_size,  texture_id:properties.txture_id}))
+      super(mesh_bufferidx, Style_button_default_properties({ is_root: properties.is_root, text: max_text, align: properties.align, pos: properties.pos, col: properties.col, text_col: properties.text_col, text_pad: properties.text_pad, font_size: properties.font_size, texture_id: properties.txture_id }))
 
       this.text_mesh.ReplaceText(properties.text_on);
 
@@ -170,7 +172,7 @@ export class Widget_Switch extends Widget_Button {
       this.type |= MESH_TYPE.WIDGET_BUTTON;
       this.SetName('Switch');
 
-      this.CreateListenEvent(LISTEN_EVENT_TYPES.HOVER)
+      Mesh_listener_create(this, LISTEN_EVENT_TYPES.HOVER)
 
    }
 
@@ -178,9 +180,9 @@ export class Widget_Switch extends Widget_Button {
 
       this.align.flags = align_flags;
    }
-   
+
    AddLayout(align_flags) {
-      
+
       tthis.align.flags |= align_flags;
    }
 
@@ -213,8 +215,7 @@ export class Widget_Switch extends Widget_Button {
 
       mesh.isOn ^= 0x1;
       text_mesh.RenderTextFromString(mesh.state_text[mesh.isOn]);
-      mesh.SetUpdateFrameBuffer();
-      STATE.mesh.SetClicked(mesh);
+      State_mesh_set_clicked(mesh);
 
       /**
        * For popup menu options and slider connections.
@@ -244,7 +245,6 @@ export class Widget_Switch extends Widget_Button {
 
       if (!EventClbk) { EventClbk = Button_click_default_callback; params = 'Button'; }
 
-      // this.CreateListenEvent(LISTEN_EVENT_TYPES.CLICK_UP);
       this.evt_params = { // Create the parameters to pass for the button's click event. 
          EventClbk: EventClbk,
          targetBindingFunctions: targetBindingFunctions,
@@ -259,6 +259,7 @@ export class Widget_Switch extends Widget_Button {
 }
 
 
+/** */
 function Button_click_default_callback(params) {
    console.log(params, ' Clicked!');
 }

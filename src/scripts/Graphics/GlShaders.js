@@ -98,7 +98,7 @@ function Load_shaders(gl, vertex_shader, fragment_shader, sid) {
 	const vShader = Load_shader(gl, gl.VERTEX_SHADER, vertex_shader, 'Vertex');
 	const fShader = Load_shader(gl, gl.FRAGMENT_SHADER, fragment_shader, 'Fragment');
 
-	const shader_program = gl.createProgram();
+	let shader_program = gl.createProgram();
 
 	gl.attachShader(shader_program, vShader);
 	gl.attachShader(shader_program, fShader);
