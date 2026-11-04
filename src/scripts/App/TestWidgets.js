@@ -234,13 +234,13 @@ export function TestWidgetsGeneric() {
 
 
     /** Some testing */
-        // Test_queue_buffer();
-        // const section = Test_adding_mesh_to_a_view_group_after_has_been_rendered();
-        // Test_on_hover_show_info(200, 300); // NOT WORKING:RE-IMPLEMENT
-        // Test: New implementation -> VB render groups PLUS reset (by group) and rerender (by rendergroup)
-        // Test_create_render_groups_resize_and_rerender();
-        // Test_create_remove_render_groups();
-        // Test_time_intervals_performance();
+    // Test_queue_buffer();
+    // const section = Test_adding_mesh_to_a_view_group_after_has_been_rendered();
+    // Test_on_hover_show_info(200, 300); // NOT WORKING:RE-IMPLEMENT
+    // Test: New implementation -> VB render groups PLUS reset (by group) and rerender (by rendergroup)
+    // Test_create_render_groups_resize_and_rerender();
+    // Test_create_remove_render_groups();
+    // Test_time_intervals_performance();
 
 
 
@@ -248,7 +248,7 @@ export function TestWidgetsGeneric() {
 
     // Statistics-Performance rendering tools
     {
-        // const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
+        const d0 = Debug_info_ui_static(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d0.geom.dim[1] * 2
         // const d1 = Debug_info_ui_fps_detailed(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d1.geom.dim[1] * 2
         // const d2 = Debug_info_ui_static_more_performance_timers(ROOT_WIDGETS.CREATE_ROOT, 0, yy); yy += d2.geom.dim[1]*2
         // const d4 = Debug_info_create_ui_mouse(_, _, yy); yy += d4.geom.dim[1] * 2
@@ -261,7 +261,7 @@ export function TestWidgetsGeneric() {
     }
 
 
-    // Demo_page();
+    Demo_page();
     // Demos_welcome_menu();
 
     // Games
@@ -275,7 +275,8 @@ export function TestWidgetsGeneric() {
     // Annimations
     {
 
-        { // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribute
+        // Rotation: Rotate sdf line. Dont forget to disable the 'style' attribute
+        {
             // Test_rotate_section_with_round_corners();
 
             // Rotatable_section_with_rcorners_via_attribute_rotation();
@@ -291,14 +292,16 @@ export function TestWidgetsGeneric() {
             // Demo_clbk_animations_text_counter(ROOT_WIDGETS.CREATE_ROOT, true, );
         }
 
-        { // Callback Animations
+        // Callback Animations
+        {
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 20, CALLBACK_ANIMATION_TYPE_FLAGS.SCALE);
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 220, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY);
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 420, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_X);
             // Demo_animations_ready_button_anim(ROOT_WIDGETS.CREATE_ROOT, 0, 420, CALLBACK_ANIMATION_TYPE_FLAGS.MOVE_XY|CALLBACK_ANIMATION_TYPE_FLAGS.SCALE);
         }
 
-        { // Mesh Animations
+        // Mesh Animations
+        {
 
             // const label = Widget_ready_label(ROOT_WIDGETS.CREATE_ROOT, '[ HELLO ] !!!', TEXTURES.MTSDF_COMIC_1024, 300, 50, 20, _, _, _, _, _);
             // Mesh_animations_create(ANIMATIONS.TYPE.COLOR|ANIMATIONS.TYPE.CYCLICAL, ANIMATIONS.DATA.COLOR.G, label, .03, 0., 1.,)
@@ -335,7 +338,7 @@ export function TestWidgetsGeneric() {
 
             // Create_smoke_particles();
 
-            Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
+            // Create_comet_particles(100, 100, 300, 300, 1, ROOT_WIDGETS.CREATE_ROOT, true, 28, );
 
             // Test_noise_shader(); // NOT IMPLEMENTED
 
@@ -546,6 +549,7 @@ export function TestWidgetsGeneric() {
         // Shader_color_functions_glow_sphere(_, _);
 
     }
+
     // Some basic widgets
     {
         // CreateSimpleWidgetText(120, 280)
@@ -567,9 +571,9 @@ export function TestWidgetsGeneric() {
     }
 
     // Test many render groups
-    // const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 200, 0], dim: [100, 100], col: TRANSPARENCY(GREY[1], 1), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
-    // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
     {
+        // const section = Create_rect_mesh(Style_rect_default_properties({ is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [15, 15], pos: [100, 200, 0], dim: [100, 100], col: TRANSPARENCY(GREY[1], 1), layout: LAYOUT.HORIZONTAL | LAYOUT.RESIZE_SELF }));
+        // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 20, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
 
         // const label = CreateLabel(0x0, '|',  TEXTURES.MTSDF_CONSOLAS_1024, _, 300, 100, _, _, _, 30);
         // section.AddItem(label);
@@ -583,47 +587,36 @@ export function TestWidgetsGeneric() {
     }
 
     // Test: Tool-tip info
-    // const info_panel = Create_info_panel_tool_tip(10, 600);
-    // // const event_clbk_params = {
-    // //     Clbk: (params) => {
-    // //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
-    // //     },
-    // //     clbk_params: {
-    // //         info_panel: info_panel,
-    // //     },
-    // // }
-    // const Clbk = (params) => {
-    //         // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
-    //     };
-    // const clbk_params = {
-    //         info_panel: info_panel,
-    //     };
+
     {
-
+        // const info_panel = Create_info_panel_tool_tip(10, 600);
+        // const Clbk = (params) => {
+        //     // ISN"T CALLED IF A RESOLVE FUNCTION IS PASSED IN:Mesh_event_callback_create()
+        // };
+        // const clbk_params = {
+        //     info_panel: info_panel,
+        // };
         // let k = 0, y=50;
-        // {
-        //     const section = Create_rect_mesh(Style_rect_default_properties({
-        //         is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10],
-        //         pos: [200,300,0], dim: [0,0], col: GREY[2],
-        //         name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+        // const section = Create_rect_mesh(Style_rect_default_properties({
+        //     is_root: ROOT_WIDGETS.CREATE_ROOT, pad: [10,10],
+        //     pos: [200,300,0], dim: [0,0], col: GREY[2],
+        //     name: 'InfoPanel', layout:LAYOUT.HORIZONTAL|LAYOUT.RESIZE_SELF,
+        // }));
+        // Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
+        //
+        // for(let i=0; i<13; i++){
+        //     const label = Create_widget_label(Style_label_default_properties({
+        //         pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
+        //         texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL,
         //     }));
-        //     Widget_gfx_ready_enable({ mesh: section, enable_sdf_rect: 10, listener: { type: LISTEN_EVENT_TYPES.HOVER | LISTEN_EVENT_TYPES.MOVE } })
-
-        //     for(let i=0; i<13; i++){
-        //         const label = Create_widget_label(Style_label_default_properties({
-        //             pos: [200, 300, 0], col: Color_hsv_to_rgb_calibrated(.73, 1, 1, 1, .4, 0), text_pad: [12, 8], text: `label${k++}`,
-        //             texture_id: TEXTURES.MTSDF_COMIC_1024, font_size: 10, layout: LAYOUT.VERTICAL,
-        //         }));
-        //         Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
-        //         section.AddItem(label);
-        //         Mesh_event_callback_create(label, Clbk, clbk_params, Resolve_mesh_info_tool_tip);
-        //     }
-
-        //     section.GenGfxCtx();
-        //     Layout_basic_pre_render(section);
-        //     Widget_render(section);
-
+        //     Widget_gfx_ready_enable({ mesh: label, enable_sdf_rect: 4, listener: { type: LISTEN_EVENT_TYPES.HOVER } });
+        //     section.AddItem(label);
+        //     Mesh_event_callback_create(label, Clbk, clbk_params, Resolve_mesh_info_tool_tip);
         // }
+        //
+        // section.GenGfxCtx();
+        // Layout_basic_pre_render(section);
+        // Widget_render(section);
 
     }
 
